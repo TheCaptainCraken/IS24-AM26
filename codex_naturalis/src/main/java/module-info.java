@@ -1,5 +1,6 @@
 module it.polimi.ingsw {
     requires transitive javafx.graphics;
+
     requires javafx.controls;
     requires javafx.fxml;
 
