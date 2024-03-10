@@ -34,7 +34,6 @@ classDiagram
         <<abstract>>
         - id: int
         - kingdom: Kingdom
-        + play()
     }
 
     Card --* Kingdom : is from
@@ -42,12 +41,12 @@ classDiagram
     class ObjectiveType {
         STAIRS
         STACKED
-        OHTER
+        OTHER
         RESOURCES
     }
 
     class ObjectiveCard {
-        - tybe: ObjectiveType
+        - type: ObjectiveType
     }
 
     ObjectiveCard --* ObjectiveType : is of type 
@@ -92,6 +91,9 @@ classDiagram
 
     class Deck~Card~ {
         - cards: ArrayList~Card~
+        + Card draw()
+        + void shuffle()
+        + void reset()
     }
 
     Deck --* Card : contains
@@ -108,7 +110,7 @@ classDiagram
     Player --* Color : has color
 
     class Table {
-        - cards: PlayedCards
+        - cards: ArrayList~PlayedCard~
     }
 
     Player --* Table : plays at
@@ -132,5 +134,12 @@ classDiagram
     GameMaster --* Player : manages
     GameMaster --* Deck : manages
     GameMaster --* GameState : is in state
+
+    class PlayedCard {
+        - position: Tuple~Int, Int~
+    }
+
+    Table --* PlayedCard : contains
+    PlayableCard --|> PlayedCard
 
 ```
