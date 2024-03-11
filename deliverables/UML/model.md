@@ -82,14 +82,14 @@ classDiagram
 
     SpecialGoldCard --* Resource : counts
 
-    Card --|> ObjectiveCard
-    Card --|> PlayableCard
-    PlayableCard --|> StartingCard
-    PlayableCard --|> ResourceCard
-    ResourceCard --|> GoldCard
-    GoldCard --|> SpecialGoldCard
+    Card <|-- ObjectiveCard
+    Card <|-- PlayableCard
+    PlayableCard <|-- StartingCard
+    PlayableCard <|-- ResourceCard
+    ResourceCard <|-- GoldCard
+    GoldCard <|-- SpecialGoldCard
 
-    class Deck~Card~ {
+    class Deck {
         - cards: ArrayList~Card~
         + Card draw()
         + void shuffle()
@@ -104,13 +104,18 @@ classDiagram
         - hand: ArrayList~Card~
         - color: Color
         - table: Table
+
+        + ArrayList~Card~ showHand() 
     }
 
     Player --* Card : has in their hand 
     Player --* Color : has color
 
     class Table {
-        - cards: ArrayList~PlayedCard~
+        - cards: ArrayList~(PlayableCard, (Int, Int), bool)~
+
+        + void tryPlace(Card card, Tuple~Int, Int~ position, bool faceFront)
+        + int countEndGamePoints()
     }
 
     Player --* Table : plays at
@@ -129,17 +134,15 @@ classDiagram
         - goldDeck: Deck~GoldCard~
         - objectivesDeck: Deck~ObjectiveCard~
         - gameState: enum
+        - publicObjectiveCards: ArrayList~ObjectiveCard~
+        - publicCards: ArrayList~~Tuple~bool, PlayableCard~ ~~
+
+        + void startNewGame()
     }
 
     GameMaster --* Player : manages
     GameMaster --* Deck : manages
     GameMaster --* GameState : is in state
-
-    class PlayedCard {
-        - position: Tuple~Int, Int~
-    }
-
-    Table --* PlayedCard : contains
-    PlayableCard --|> PlayedCard
+    GameMaster --* PlayableCard : shows
 
 ```
