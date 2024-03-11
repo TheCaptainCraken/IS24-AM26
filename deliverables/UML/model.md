@@ -121,7 +121,6 @@ classDiagram
     Player --* Table : plays at
 
     class GameState {
-        START
         PLAY
         END
         WAITING
