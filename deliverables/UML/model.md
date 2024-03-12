@@ -1,5 +1,9 @@
 # Model UML
 
+## Cose da chiedere
+
+- Dobbiamo fare partite consecutive?
+
 ```mermaid
 classDiagram
 
@@ -9,18 +13,18 @@ classDiagram
         ANIMAL
         PLANT
         INSECT
-        NEUTRAL
     }
 
-    class Resource {
+    class Sign {
         <<enumeration>>
         MUSHROOM
         LEAF
         BUTTERFLY
         WOLF
-        FEATHER
-        INK
+        QUILL        
+        INKWELL
         SCROLL
+        EMPTY
     }
 
     class Color {
@@ -34,53 +38,86 @@ classDiagram
         <<abstract>>
         - id: int
         - kingdom: Kingdom
+        + getId() int
+        + getKingdom() Kingdom
     }
 
     Card --* Kingdom : is from
 
     class ObjectiveType {
-        STAIRS
-        STACKED
-        OTHER
-        RESOURCES
+        STAIR
+        L_FORMATION
+        FREE_RESOURCES
+        TWO_QUILLS
+        TWO_INKS
+        TWO_SCROLLS
+        TRIS
+
     }
 
     class ObjectiveCard {
         - type: ObjectiveType
+        - multiplier: int
+
+        + countPoints(Table table) int
+        + getType() ObjectiveType
+        + getMultiplier() int
     }
 
     ObjectiveCard --* ObjectiveType : is of type 
 
-    %% Non sono sicuro di come rappresentarli.
+    class Corner {
+        <<enumeration>>
+        TOP_LEFT
+        TOP_RIGHT
+        BOTTOM_LEFT
+        BOTTOM_RIGHT
+    }
+
     class PlayableCard {
         <<abstract>>
-        - corners: ArrayList~Resource~ 
+        - corners: HashTable~Corner, Sign~
+
+        + GetCorners() HashTable~Corner, Sign~
     }
 
-    PlayableCard --* Resource : requires at a corner
+    PlayableCard --* Corner
+    PlayableCard --* Sign : requires at a corner
 
     class StartingCard {
-        - bonusResources: Set~Resource~
+        - backSideCorners: HashTable~Corner, Sign~
+        - bonusResources: Set~Sign~
+
+        + getBonusResources() Set~Sign~
+        + getBackSideCorners() HashTable~Corner, Sign~
     }
 
-    StartingCard --* Resource : gives
+    StartingCard --* Sign
+    StartingCard --* Corner
+
 
     class ResourceCard {
-        - points: int 
+        - points: int
+
+        + getPoints() int
     }
 
     class GoldCard {
-        - requirements: Set~Resource~
+        - requirements: HashTable~Kingdom, int~
+
+        + getRequirements() HashTable~Kingdom, int~
     }
 
-    GoldCard --* Resource : requires to play
+    GoldCard --* Sign : requires to play
+    GoldCard --* Kingdom
 
     class SpecialGoldCard {
-        - thingToCount: Resource
-        - multiplier: int
+        - thingToCount: Countable
+
+        + getCountable() Countable
     }
 
-    SpecialGoldCard --* Resource : counts
+    SpecialGoldCard --* Countable : counts
 
     Card <|-- ObjectiveCard
     Card <|-- PlayableCard
@@ -91,9 +128,9 @@ classDiagram
 
     class Deck {
         - cards: ArrayList~Card~
+        - shuffle() void
         + Card draw()
-        + void shuffle()
-        + void reset()
+        + void reset() 
     }
 
     Deck --* Card : contains
@@ -103,22 +140,13 @@ classDiagram
         - points: int
         - hand: ArrayList~Card~
         - color: Color
-        - table: Table
+        - rootCard: StartingCard 
 
         + ArrayList~Card~ showHand() 
     }
 
     Player --* Card : has in their hand 
     Player --* Color : has color
-
-    class Table {
-        - cards: ArrayList~(PlayableCard, (Int, Int), bool)~
-
-        + void tryPlace(Card card, Tuple~Int, Int~ position, bool faceFront)
-        + int countEndGamePoints()
-    }
-
-    Player --* Table : plays at
 
     class GameState {
         PLAY
@@ -129,9 +157,10 @@ classDiagram
     class GameMaster {
         - players: HashTable~String, Player~
         - currentPlayer: String
-        - resourceDeck: Deck~ResourceCard~
-        - goldDeck: Deck~GoldCard~
-        - objectivesDeck: Deck~ObjectiveCard~
+        - resourceDeck: Deck
+        - goldDeck: Deck
+        - objectivesDeck: Deck
+        - staringDeck: Deck
         - gameState: enum
         - publicObjectiveCards: ArrayList~ObjectiveCard~
         - publicCards: ArrayList~~Tuple~bool, PlayableCard~ ~~
@@ -144,4 +173,34 @@ classDiagram
     GameMaster --* GameState : is in state
     GameMaster --* PlayableCard : shows
 
+    class Countable {
+        INKWELL
+        QUILL
+        SCROLL
+        CORNER
+    }
+
+    class PlayedCard {
+        - card: PlayableCard
+        - isFacingUp: bool
+        - attachmentCorners: HashMap~Corner, PlayedCard~
+        - countedForObjective: bool %% chiedere al prof
+        - turnOfPositioning: int
+        - position: Point~int, int~
+
+        + getCard() Card
+        + isFacingUp() bool
+        + attachCard(PlayedCard p) void
+        + setCountedForObjective() void
+        
+    }
+
+    class Lobby {
+        -playerList: ArrayList(Player p)
+
+        +addPlayer(Player p) void
+    }
+
+    PlayedCard --* PlayableCard
+    PlayedCard --* Corner
 ```
