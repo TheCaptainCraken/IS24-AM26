@@ -28,6 +28,7 @@ public class Player {
 
     public void setRootCard(PlayedCard rootCard) {//TODO che rimanga const, final?
         this.rootCard = rootCard;
+        /* funziona */
     }
 
     public void addToSimbolCounter(Sign sign){//TODO capire questa cosa
