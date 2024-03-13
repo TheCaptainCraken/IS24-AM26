@@ -1,5 +1,7 @@
 package it.polimi.ingsw.model;
 
+import javafx.scene.effect.Light;
+
 public class GameMaster {
     private int numberOfTurn=0;
     private Lobby community;
@@ -14,7 +16,7 @@ public class GameMaster {
 
 
 
-/*    void play(){
+    void play(){
         gameSetup();
         while(notLastTurn){
             numberOfTurn++;
@@ -46,10 +48,10 @@ public class GameMaster {
     //player.drawPlayer(deck.draw())
 
     //placeCard
-    public int placeCard(String player, Point position){
-        if(player.equals(currentPlayer)){
+    public int placeCard(String player, PlayableCard cardToPlace, Light.Point position){
+        if(player.equals(currentPlayer)){//TODO capire come identificare user
             PlayedCard newPlayedCard;
-            if(isPositionable(cardId, )){
+            if(isPositionable(cardToPlace, )){
                 newPlayedCard=new PlayedCard();
 
                 if(newPlayedCard.getPlayableCard() instanceof SpecialGoldCard){
@@ -70,7 +72,7 @@ public class GameMaster {
         return 1;
     }
 
-    public int drawCard(boolean goldOrNot,){
+/*    public int drawCard(boolean goldOrNot,){
         if(goldOrNot){
 
         }else{
@@ -98,7 +100,7 @@ public class GameMaster {
         return null;
     }
 */
-    private boolean isPositionable(PlayedCard playedCard ){
+    private boolean isPositionable(PlayedCard baseCard,  ){
 
     }
 
