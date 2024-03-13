@@ -1,6 +1,6 @@
 package it.polimi.ingsw.model;
-
-import javafx.scene.effect.Light;
+import java.awt.*;
+import java.util.Stack;
 
 public class GameMaster {
     private int numberOfTurn=0;
@@ -30,7 +30,7 @@ public class GameMaster {
     }
 
 
-    public void gameSetup(){
+ /*   public void gameSetup(){
     //using src
         deckResource = new Deck (...)// mettiamo direttamente il nome del json e poi calcoliamo quanto è grande?
         deckGold = new Deck(...)
@@ -48,7 +48,7 @@ public class GameMaster {
     //player.drawPlayer(deck.draw())
 
     //placeCard
-    public int placeCard(String player, PlayableCard cardToPlace, Light.Point position){
+    public int placeCard(String player, PlayableCard cardToPlace, Point position){
         if(player.equals(currentPlayer)){//TODO capire come identificare user
             PlayedCard newPlayedCard;
             if(isPositionable(cardToPlace, )){
@@ -72,7 +72,7 @@ public class GameMaster {
         return 1;
     }
 
-/*    public int drawCard(boolean goldOrNot,){
+    public int drawCard(boolean goldOrNot,){
         if(goldOrNot){
 
         }else{
@@ -84,23 +84,29 @@ public class GameMaster {
     private isPositionable(PlayedCard baseCard, Corner, PlayableCard toPlaceCard){
 
     }
+*/
 
     private PlayedCard findCard(PlayedCard card, Point coordinates){
-        if(card==null){
+        Stack<PlayedCard> stack = new Stack<PlayedCard>();//Anche Arraylist è uguale
+        return recursiveFindCard(card, coordinates, stack);
+    }
+
+    private PlayedCard recursiveFindCard(PlayedCard card, Point coordinates, Stack stack) {
+        if (stack.search(card) > 0 || card == null) {
             return null;
-        }else if(card.getCoordinates().x==coordinates.x && card.getCoordinates().y==coordinates.y){
+        } else if (card.getCoordinates().x == coordinates.x && card.getCoordinates().y == coordinates.y) {
             return card;
         }
-        for(Corner corner : Corner.values())
-            PlayedCard found = findCard(card.get, targetCoord);
+        for (Corner corner : Corner.values()) {
+            PlayedCard found = recursiveFindCard(card.getAttachmentCorners().get(corner), coordinates, stack);
             if (found != null) {
                 return found;
             }
         }
         return null;
     }
-*/
-    private boolean isPositionable(PlayedCard baseCard,  ){
+
+    private boolean isPositionable(PlayedCard baseCard, Corner angleOfBaseCard, PlayableCard ){
 
     }
 
