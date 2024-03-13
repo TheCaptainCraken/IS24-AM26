@@ -5,7 +5,7 @@
 - Pietro Agnoli
 - Arturo Amoretti
 - Daniel Carrozzo
-- Pietro Benecchi. 
+- Pietro Benecchi.
 
 ## Features implementate
 
