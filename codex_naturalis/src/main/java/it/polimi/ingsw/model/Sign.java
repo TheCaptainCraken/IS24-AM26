@@ -1,12 +1,12 @@
 package it.polimi.ingsw.model;
 
 public enum Sign {
+    MUSHROOM,
+    LEAF,
+    BUTTERFLY,
+    WOLF,
+    QUILL,
     INKWELL,
-    something,//TODO
-    paper,//TODO
-    PLANT,
-    ANIMAL,
-    FUNGI,
-    INSECT,
+    SCROLL,
     EMPTY
 }

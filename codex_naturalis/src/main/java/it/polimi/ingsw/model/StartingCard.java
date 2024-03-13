@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model;
 
+
 import java.util.Dictionary;
 import java.util.Hashtable;
 
@@ -14,7 +15,4 @@ public class StartingCard extends PlayableCard {
         this.extraSignResource = extraSignResource;
     }
     //o arraylist Sign in effetti... è uguale
-
-
-
 }

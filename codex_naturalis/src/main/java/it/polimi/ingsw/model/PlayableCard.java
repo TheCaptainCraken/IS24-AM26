@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model;
 
+
 import java.util.Dictionary;
 import java.util.Hashtable;
 
@@ -28,5 +29,4 @@ public abstract class PlayableCard extends Card{
     public Sign getSign() {
         return sign;
     }
-
 }
