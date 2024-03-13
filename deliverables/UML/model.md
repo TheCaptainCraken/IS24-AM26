@@ -2,7 +2,7 @@
 
 ## Cose da chiedere
 
-- Dobbiamo fare partite consecutive? no, buttiamo giù il server
+- Dobbiamo fare partite consecutive? no, buttiamo giù il   server
 - Va bene usare solo `GameMaster` per interfacciarsi con il controller? si, dipende dove si fa lobby
 - Si può vedere la mano degli avversari? Solo un lato? slack
 - Come gestiamo il mandare in giro il grafo con le carte piazzate? ---
