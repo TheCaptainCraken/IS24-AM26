@@ -3,140 +3,144 @@ package it.polimi.ingsw.model;
 import java.util.HashMap;
 
 public class Player {
-    private final String nickname;
+    private final String name;
     private int points;
-    private final ColorPin pin;
-    private final boolean isFirst;
+    private final Color color;
     private PlayedCard rootCard;
-    private HashMap<Sign, Integer> symbolCounter;
-    private ObjectiveCard hiddenObjectiveCard;
-    private ResourceCard[] hand = new ResourceCard[3];
-    private int stateTurn;
+    private HashMap<Sign, Integer> resources;
+    private ObjectiveCard secretObjective;
+    private ResourceCard[] hand;
 
-    public Player(String nickname, ColorPin pin, boolean isFirst) {
-        this.nickname = nickname;
-        this.pin = pin;
-        this.isFirst = isFirst;
+    /**
+     * It is the constructor of Player, it set the  name and the color of the pin
+     * @param name
+     * @param color
+     */
+    public Player(String name, Color color) {
+        this.name = name;
+        this.color = color;
         this.points = 0;
-        symbolCounter = new HashMap<>();
+        resources = new HashMap<>();
         for(Sign sign : Sign.values()){
-            if(sign != null) {
-                this.symbolCounter.put(sign, 0);
-            }
+            this.resources.put(sign, 0);
         }
         int i;
+        this.hand = new ResourceCard[3];
         for(i = 0; i < hand.length; i++){
             hand[i] = null;
         }
-        this.hiddenObjectiveCard = null;
-        this.hand = null;
+        this.secretObjective = null;
     }
 
-    public String getNickname() {
-        return nickname;
+    /**
+     *   getter of player's name
+     */
+    public String getName() {
+        return name;
     }
 
+    /**
+     *  getter of player's points
+     */
     public int getPoints() {
         return points;
     }
 
-    public ColorPin getPin() {
-        return pin;
+    /**
+     * getter of the color of the pin
+     */
+    public Color getColor() {
+        return color;
     }
 
-    public boolean isFirst() {
-        return isFirst;
-    }
-
+    /**
+     * getter of root card, which is the starting card of the game
+     */
     public PlayedCard getRootCard() {
         return rootCard;
     }
 
-    public HashMap<Sign, Integer> getSymbolCounter() {
-        return symbolCounter;
+    /**
+     * getter of symbol counter. It tracks the resources for gold card and special objects.
+     */
+    public HashMap<Sign, Integer> getResources() {
+        return resources;
     }
 
-    public ObjectiveCard getHiddenObjectiveCard() {
-        return hiddenObjectiveCard;
+    /**
+     * getter of the secret objective.
+     */
+    public ObjectiveCard getSecretObjective() {
+        return secretObjective;
     }
 
+    /**
+     * getter of the hand of the player, a fixed array of three resources cards
+     */
     public ResourceCard[] getHand() {
         return hand;
     }
 
-    public int getStateTurn() {
-        return stateTurn;
-    }
-
+    /**
+     * setter of the root of the player. The game master should pass the front or back of the card, chosen by the player
+     * @param rootCard the front or back of the card, chosen by the player. It's the starting card.
+     */
     public void setRootCard(PlayedCard rootCard) {
         this.rootCard = rootCard;
     }
 
-    public void setHiddenObjectiveCard(ObjectiveCard hiddenObjectiveCard) {
-        this.hiddenObjectiveCard = hiddenObjectiveCard;
-    }
-
-    public void setStateTurn(int stateTurn) {
-        this.stateTurn = stateTurn;
+    /**
+     * It is the setter of secret objective card, which will randomly be given by the game master
+     * @param secretObjective the secret objective, that gives extra points at the ending of the game
+     */
+    public void setSecretObjective(ObjectiveCard secretObjective) {
+        this.secretObjective = secretObjective;
     }
 
     /**
+     * At the beginning of the game, the game master set the hand of each player
      * @param hand an array of free cards
-     * at the beginning of the game, the game master set the hand of each player
      */
     public void setHand(ResourceCard[] hand){
         this.hand = hand;
     }
+
     /**
-     *
+     * this function updates the resources given by a new card put on table
      * @param sign the type of resource to update
-     * @param num_resources how many resouces a card gives
-     *        this function update the resources given by a new card put on table
+     * @param numResources how many resources a card gives
      */
-    public void addSymbolCounter(Sign sign, Integer num_resources){
-        symbolCounter.put(sign, symbolCounter.get(sign) + num_resources);
-    }
-    /**
-     *
-     * @param sign the type of resource to update
-     * @param num_resources how many resouces to delate
-     *        this function update the resources. It subtracts the resources covered by a new card played
-     */
-    public void removeSymbolCounter(Sign sign, Integer num_resources){
-        symbolCounter.put(sign, symbolCounter.get(sign) - num_resources);
+    public void addResource(Sign sign, Integer numResources){
+        resources.put(sign, resources.get(sign) + numResources);
     }
 
     /**
-     * @param card the new card drawn from the deck
-     *        this function update the resources. It subtracts the resources covered by a new card played
+     * this function updates the resources. It subtracts the resources covered by a new card played.
+     * @param sign the type of resource to update
+     * @param numResources how many resources to delete
      */
-    public void pickCard(ResourceCard card){
+    public void removeResources(Sign sign, Integer numResources){
+        resources.put(sign, resources.get(sign) - numResources);
+    }
+
+    /**
+     * It updates the hand of the player. It removes the card played on the table changing it with a new card drawn.
+     * It a unique method for cardOnTable and pickCard, which now are useless.
+     * @param cardToRemove the card played by the player, thus to be removed
+     * @param newCard the new card drawn by the player
+     */
+    public void updateCard(ResourceCard cardToRemove, ResourceCard newCard){
         int i;
         for(i = 0; i < 3; i++){
-            //it updates the hand in the place null, where a card is missing
-            if(hand[i] == null){
-                hand[i] = card;
+            if(hand[i] == cardToRemove){
+                hand[i] = newCard;
                 break;
             }
         }
     }
     /**
-     * @param card the card put on table, thus a played card
-     *        this function update the resources. It subtracts the resources covered by a new card played
-     */
-    public void cardOnTable(ResourceCard card){
-        int i;
-        for(i = 0; i < 3; i++){
-            if(hand[i] == card){
-                hand[i] = null;
-                break;
-            }
-        }
-    }
-
-    /**
+     * this function updates the points of a player
      * @param new_points the points possibly given by a new card or a secret objective
-     *                   this function updates the points of a player
      */
     public void updatePoints(int new_points){
         //the player in the game can earn maximum 29 points, no more, see slack
