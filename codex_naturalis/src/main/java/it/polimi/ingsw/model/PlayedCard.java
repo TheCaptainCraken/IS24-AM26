@@ -4,9 +4,8 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-/**
- * This class is used to represent the card placed onto the board
- * @author Arturo*/
+/**@author Arturo
+ * class used to represent the card placed onto the board, it's role is to update the board for every move the player makes*/
 public class PlayedCard {
     private PlayableCard playableCard;
     private HashMap<Corner, PlayedCard> attachmentCorners;
