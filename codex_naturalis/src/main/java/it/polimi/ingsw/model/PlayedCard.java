@@ -7,25 +7,25 @@ import java.util.HashMap;
 /**@author Arturo
  * class used to represent the card placed onto the board, it's role is to update the board for every move the player makes*/
 public class PlayedCard {
-    private PlayableCard playableCard;
+    private PlayableCard card;
     private HashMap<Corner, PlayedCard> attachmentCorners;
     private boolean flagCountedForObjective;
-    private boolean side; // false per fronte, true per retro
+    private boolean isFacingUp; // true per fronte, false per retro
     private int turnOfPositioning;
-    private Point coordinates;//x e y, alla fine Point lo usiamo oppure no? (Arturo)
+    private Point position;//x e y, alla fine Point lo usiamo oppure no? (Arturo)
 
-    public PlayedCard(PlayableCard playableCard, ArrayList<DifferentPair<Corner,PlayedCard>> cardsToBeAttached,boolean side, int turnNumber, Point coordinates) {
+    public PlayedCard(PlayableCard playableCard, ArrayList<DifferentPair<Corner,PlayedCard>> cardsToBeAttached,boolean side, int turnNumber, Point position) {
         //usual constructor operations
-        this.playableCard = playableCard;
+        this.card = playableCard;
 
         attachmentCorners = new HashMap<>(); // these are the corners of the new PlayedCard that will be attached to the cards present in toAttach
         for(Corner corner : Corner.values()){
             attachmentCorners.put(corner,null);
         }
         this.flagCountedForObjective = false;
-        this.side = side;
+        this.isFacingUp = side;
         this.turnOfPositioning = turnNumber;
-        this.coordinates = coordinates;
+        this.position = position;
 
         /*qui completiamo attachmentcorners con tutte le carte a cui la nuova PlayedCArd è collegata
         il ciclo itera per tutte le carte da considerare,collega prima la nuova carta a quella vecchia, poi fà il contrario
@@ -55,13 +55,13 @@ public class PlayedCard {
     public boolean isFlagCountedForObjective() {
         return flagCountedForObjective;
     }
-    /**returns true if card was played on it's back*/
-    public boolean getSide() {
-        return side;
+    /**returns true if card was played on it's front*/
+    public boolean isFacingUp() {
+        return isFacingUp;
     }
 
-    public PlayableCard getPlayableCard() {
-        return playableCard;
+    public PlayableCard getCard() {
+        return card;
     }
     /**returns the turn in which the card was played*/
     public int getTurnOfPositioning() {
@@ -79,12 +79,12 @@ public class PlayedCard {
         return attachmentCorners;
     }
     /**returns the PlayedCard that has been attached to the corner given to this */
-    public PlayedCard getAttachedAt(Corner corner){
+    public PlayedCard getAttached(Corner corner){
         return attachmentCorners.get(corner);
     }
     /**returns the coordinates corresponding to the place,related to the StartingCard, in which the card was played*/
-    public Point getCoordinates() {
-        return coordinates;
+    public Point getPosition() {
+        return position;
     }
     /**records the use of the card in calculating Objective scores*/
     public void flagWasCountedForObjective() {
