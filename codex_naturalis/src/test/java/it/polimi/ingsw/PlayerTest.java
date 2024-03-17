@@ -1,6 +1,7 @@
 package it.polimi.ingsw;
 
 import it.polimi.ingsw.model.ColorPin;
+import it.polimi.ingsw.model.Sign;
 import org.junit.jupiter.api.Test;
 import it.polimi.ingsw.model.Player;
 
@@ -39,5 +40,13 @@ public class PlayerTest {
         p5.updatePoints(0);
         p5.updatePoints(0);
         assert p5.getPoints() == 0;
+    }
+    @Test
+    public void playerSymbolCounter(){
+        Player p1 = new Player("Pietro", ColorPin.BLUE, true);
+        p1.addSymbolCounter(Sign.BUTTERFLY, 5);
+        assert p1.getSymbolCounter().get(Sign.BUTTERFLY) == 5;
+        p1.removeSymbolCounter(Sign.BUTTERFLY, 5);
+        assert p1.getSymbolCounter().get(Sign.BUTTERFLY) == 0;
     }
 }

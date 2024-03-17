@@ -76,6 +76,10 @@ public class Player {
         this.hiddenObjectiveCard = hiddenObjectiveCard;
     }
 
+    public void setStateTurn(int stateTurn) {
+        this.stateTurn = stateTurn;
+    }
+
     /**
      * @param hand an array of free cards
      * at the beginning of the game, the game master set the hand of each player
@@ -107,7 +111,8 @@ public class Player {
      *        this function update the resources. It subtracts the resources covered by a new card played
      */
     public void pickCard(ResourceCard card){
-        for(int i = 0; i < 3; i++){
+        int i;
+        for(i = 0; i < 3; i++){
             //it updates the hand in the place null, where a card is missing
             if(hand[i] == null){
                 hand[i] = card;
@@ -120,7 +125,8 @@ public class Player {
      *        this function update the resources. It subtracts the resources covered by a new card played
      */
     public void cardOnTable(ResourceCard card){
-        for(int i = 0; i < 3; i++){
+        int i;
+        for(i = 0; i < 3; i++){
             if(hand[i] == card){
                 hand[i] = null;
                 break;
