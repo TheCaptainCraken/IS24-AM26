@@ -2,6 +2,13 @@ package it.polimi.ingsw.model;
 
 import java.util.HashMap;
 
+/**
+ * This is the entity of player.
+ * It should have a unique name, a color for the pin and a counter of points. It has also a hashmap for tracking resources.
+ * For the game, it has the rootCard(the starting card) and secretObjective.
+ * At the start phase, the game master should set rootCard, SecretObjective and the hand of the player(a fixed array of 3 cards).
+ * At the beginning of the game, the game master set rootCard, secretObjective and the hand.
+ */
 public class Player {
     private final String name;
     private int points;
