@@ -98,8 +98,8 @@ public class GameMaster {
             return null;
         }
     */
-    private boolean isPositionable(PlayedCard playedCard ){
-
+   /* private boolean isPositionable(PlayedCard playedCard ){
+        return;
     }
 
     public void setCurrentPlayer(String currentPlayer) {
@@ -108,6 +108,7 @@ public class GameMaster {
 
     public void setOnTableResourceCard(ResourceCard[] onTableResourceCard) {
         this.onTableResourceCard = onTableResourceCard;
+        ret
     }
 
     public void setOnTableGoldCard(GoldCard[] onTableGoldCard) {
@@ -116,5 +117,5 @@ public class GameMaster {
 
     public void setOnTableObjectiveCard(ObjectiveCard[] onTableObjectiveCard) {
         this.onTableObjectiveCard = onTableObjectiveCard;
-    }
+    }*/
 }
