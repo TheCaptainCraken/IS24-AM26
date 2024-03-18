@@ -12,9 +12,25 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+/**
+ * This class represents the deck of cards.
+ */
 public class Deck {
+    /**
+     * The list of cards in the deck.
+     */
     private ArrayList<Card> cards;
 
+    /**
+     * This constructor generates the deck of cards from a JSON file and shuffles
+     * it.
+     * 
+     * @param cardsFile the path of the JSON file containing the cards.
+     * @throws FileNotFoundException    if the file is not found.
+     * @throws IOException              if an I/O error occurs.
+     * @throws ParseException           if the JSON file is not valid.
+     * @throws IllegalArgumentException if the card prototype is invalid.
+     */
     public Deck(String cardsFile) throws FileNotFoundException, IOException, ParseException, IllegalArgumentException {
         cards = new ArrayList<Card>();
         this.generateDeck(cardsFile);
