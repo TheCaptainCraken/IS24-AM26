@@ -4,106 +4,89 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-/** The class is used to represent the card placed onto the board, it's role is to keep track of the moves that a player makes
- * during the match
- * *@author Arturo*/
+/**@author Arturo
+ * class used to represent the card placed onto the board, it's role is to update the board for every move the player makes*/
 public class PlayedCard {
-    /**@param card the PlayableCard that the instance of PlayedCard references
-     * @param attachmentCorners HashMap that keeps track of the cards that are attached to the PlayedCard instance
-     * @param flagCountedForObjective is true if the card has already been used for calculating Objective Scores
-     * @param isFacingUp used to identify on which side the card has been played, true if it's on its front
-     * @param turnOfPositioning used to record in which turn the card has been played
-     * @param position used to identify the position in which the card is on the board*/
-    private final PlayableCard card;
-    private final HashMap<Corner, PlayedCard> attachmentCorners;
+    private PlayableCard card;
+    private HashMap<Corner, PlayedCard> attachmentCorners;
     private boolean flagCountedForObjective;
-    private final boolean isFacingUp;
-    private final int turnOfPositioning;
-    private final Point position;
+    private boolean isFacingUp; // true per fronte, false per retro
+    private int turnOfPositioning;
+    private Point position;//x e y, alla fine Point lo usiamo oppure no? (Arturo)
 
-    /**Constructor for the PlayedCard class
-     * @param cardsToAttach is the map which contains the cards that will have to be attached to our new PlayedCard*/
-    public PlayedCard(PlayableCard playableCard, HashMap<Corner,PlayedCard> cardsToAttach,boolean side, int turnNumber, Point position) {
+    public PlayedCard(PlayableCard playableCard, ArrayList<DifferentPair<Corner,PlayedCard>> cardsToBeAttached,boolean side, int turnNumber, Point position) {
         //usual constructor operations
         this.card = playableCard;
-        attachmentCorners = new HashMap<>();
+
+        attachmentCorners = new HashMap<>(); // these are the corners of the new PlayedCard that will be attached to the cards present in toAttach
+        for(Corner corner : Corner.values()){
+            attachmentCorners.put(corner,null);
+        }
         this.flagCountedForObjective = false;
         this.isFacingUp = side;
         this.turnOfPositioning = turnNumber;
         this.position = position;
 
-        /**this ForEach cycle iterates on the Corner Enumeration to fill out attachmentCorners with the PlayedCards
-         * that are attached to this instance of PlayedCard,the newest card is attached first. In the case in which there is no card related to the Corner
-         * that is being analyzed, the HashMap will still have a reference for it but the value field will be null*/
+        /*qui completiamo attachmentcorners con tutte le carte a cui la nuova PlayedCArd è collegata
+        il ciclo itera per tutte le carte da considerare,collega prima la nuova carta a quella vecchia, poi fà il contrario
+        tenendo in conto quale angolo stiamo considerando, si noti che il controllo sulla disponibilità dell'angolo è fatta dal GameMaster*/
 
-        /*if(!cardsToAttach.isEmpty()){
+        for(DifferentPair <Corner,PlayedCard> toAttach : cardsToBeAttached){
 
-        }*/
-        for(Corner c: Corner.values()){
-            this.attachCard(c,cardsToAttach.get(c));
-            try{
-                switch (c) {
-                    case TOP_LEFT:
-                        cardsToAttach.get(c).attachCard(Corner.BOTTOM_RIGHT,this);
-                        break;
-                    case TOP_RIGHT:
-                        cardsToAttach.get(c).attachCard(Corner.BOTTOM_LEFT,this);
-                        break;
-                    case BOTTOM_LEFT:
-                        cardsToAttach.get(c).attachCard(Corner.TOP_RIGHT,this);
-                        break;
-                    case BOTTOM_RIGHT:
-                        cardsToAttach.get(c).attachCard(Corner.TOP_LEFT,this);
-                        break;
-                }
-            } catch (NullPointerException e){
+            toAttach.getSecond().attachCard(toAttach.getFirst(),this);
+            switch (toAttach.getFirst()) {
+                case TOP_LEFT:
+                    this.attachCard(Corner.BOTTOM_RIGHT,toAttach.getSecond());
+                    break;
+                case TOP_RIGHT:
+                    this.attachCard(Corner.BOTTOM_LEFT,toAttach.getSecond());
+                    break;
+                case BOTTOM_LEFT:
+                    this.attachCard(Corner.TOP_RIGHT,toAttach.getSecond());
+                    break;
+                case BOTTOM_RIGHT:
+                    this.attachCard(Corner.TOP_LEFT,toAttach.getSecond());
+                    break;
             }
         }
     }
 
-    /**@return true if card has already been used for calculating Objective scores*/
+    /**returns true if card has already been used for calculating Objective scores*/
     public boolean isFlagCountedForObjective() {
         return flagCountedForObjective;
     }
-    /**@return true if card was played on its front*/
+    /**returns true if card was played on it's front*/
     public boolean isFacingUp() {
         return isFacingUp;
     }
 
-    /**@return the PlayableCard related to the PlayedCard*/
     public PlayableCard getCard() {
         return card;
     }
-    /**@return the turn in which the card was played*/
+    /**returns the turn in which the card was played*/
     public int getTurnOfPositioning() {
         return turnOfPositioning;
     }
 
     /** updates the status of a PlayedCard's corners in case it gets attached to a new card*/
-    public void attachCard (Corner corner, PlayedCard playedCard){
-        this.attachmentCorners.put(corner, playedCard);
+    public void attachCard(Corner corner, PlayedCard playedCard){
+        getAttachmentCorners().replace(corner, this);
+        // replace poichè usiamo una hashmap, con voci per ogni angolo già create
     }
 
-    /**@return the map in which the information on the status of the PlayedCard's corners is stored*/
+    /**returns the map in which the information on the status of the PlayedCard's corners is stored*/
     public HashMap<Corner, PlayedCard> getAttachmentCorners() {//TODO Capire se vogliamo passare l'oggetto o è usiamo un metodo che ritorna l'id e poi risaliamo alla carta, altrimenti così passiamo un oggetto per valore e si può modificare
-        HashMap<Corner, PlayedCard> attachmentCornersCopy = new HashMap<>();
-        for(Corner corner : Corner.values()){
-            attachmentCornersCopy.put(corner, attachmentCorners.get(corner));
-        }
-        return attachmentCornersCopy;
+        return attachmentCorners;
     }
-    /**@return the PlayedCard that has been attached to the corner given to this */
+    /**returns the PlayedCard that has been attached to the corner given to this */
     public PlayedCard getAttached(Corner corner){
         return attachmentCorners.get(corner);
     }
-    /*public PlayedCard clone(PlayedCard p){
-        return new PlayedCard(p.getCard(),p.getAttachmentCorners(),p.isFacingUp,p.getTurnOfPositioning(),p.getPosition());
-    }*/
-    /**@return the coordinates corresponding to the place,related to the StartingCard, in which the card was played*/
+    /**returns the coordinates corresponding to the place,related to the StartingCard, in which the card was played*/
     public Point getPosition() {
-        return new Point(position.x, position.y);
+        return position;
     }
-    /**records the use of the card in calculating Objective scores by setting the parameter to true*/
+    /**records the use of the card in calculating Objective scores*/
     public void flagWasCountedForObjective() {
         this.flagCountedForObjective = true;
     }
