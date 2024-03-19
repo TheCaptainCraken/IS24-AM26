@@ -3,6 +3,7 @@
 - Ci conviene mettere un valore in più nell'enumerazione o gestire il caso in cui è null?
 - Vogliamo creare uun getter the ritorni una hash table ma non proprio una ref a quella contenuta nella classe!
 - Dobbiamo segnare costruttori e attributi final nell'UML?
+- Va bene che le carte objective calcolino da sole i propri punti?
 
 ## Cose da chiedere
 
@@ -165,16 +166,27 @@ classDiagram
         - onTableObjectiveCards: ObjectiveCard[]
         - onTableResourceCards: ResourceCard[]
         - onTableGoldCards: GoldCards[]
-        - 
-        + gameSetup() void
-        + placeCard(String player, int cardId, Point position) void
-        + getPlayerPoints(String player) int
-        + getPlayerHand(String player) ArrayList~Card~
-        + drawPhase(String player) void
-        + endGame() String
-        + getGameState() GameState
-        + getTurnNumber() int
-        + getCurrentPlayer() String
+
+        + GameMaster(Lobby lobby, String jsonResourceCardFileName,  String jsonGoldCardFileName,  String jsonObjectiveCardFileName,  String jsonObjectiveStartFileName)
+        + placeRootCard(String namePlayer, boolean side)
+        + chooseObjectiveCard(String namePlayer, int whichCard)
+        + placeCard(String namePlayer, PlayableCard cardToPlace, Point position, boolean side)
+        + drawCard(String namePlayer, boolean goldOrNot, int ontTableOrDeck) : ResourceCard
+        + endGame(String namePlayer)
+        - fromKingdomToSign(Kingdom kingdom) : Sign
+        - isPositionable(PlayedCard startingCard, PlayableCard cardToPLlace, Point position) : HashMap~Corner, PlayedCard~
+        + findCard(PlayedCard startingCard, Point position) : PlayedCard 
+        - recursiveFindCard(PlayedCard startingCard, Point position, Stack~PlayedCard~ stack) : PlayedCard
+        + getTurn() : int
+        + getCurrentPlayer() : Player
+        + getOrderOfPlayOfThePlayer(String name) : int
+        + isCurrentPlayer(String namePlayer, Player currentPlayer) : boolean
+        + nextGlobalTurn()
+        + setOnTableResourceCard(ResourceCard resourceCard, int place)
+        + setOnTableGoldCard(GoldCard goldCard, int place)
+        + setOnTableObjectCard(ObjectCard ObjectCard, int place)
+        + getPlayerPoints(String name) : int
+        + getPlayerResources(String name) : HashMap~Sign, Integer~
     }
     GameMaster --* Player : manages
     GameMaster --* Deck : manages
