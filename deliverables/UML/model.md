@@ -1,14 +1,10 @@
 # Model UML
 
-## Cose da chiedere
+- Ci conviene mettere un valore in più nell'enumerazione o gestire il caso in cui è null?
+- Vogliamo creare uun getter the ritorni una hash table ma non proprio una ref a quella contenuta nella classe!
+- Dobbiamo segnare costruttori e attributi final nell'UML?
 
-- Dobbiamo fare partite consecutive? no, buttiamo giù il   server
-- Va bene usare solo `GameMaster` per interfacciarsi con il controller? si, dipende dove si fa lobby
-- Si può vedere la mano degli avversari? Solo un lato? slack
-- Come gestiamo il mandare in giro il grafo con le carte piazzate? ---
-- Lobby? si
-- Gigantesco switch o implementiamo un interfaccia per le enumerazioni?? sulle carte
-- Gerarchia di enumerazioni? no, è brutta da fare
+## Cose da chiedere
 
 ```mermaid
 classDiagram
@@ -40,6 +36,7 @@ classDiagram
         <<abstract>>
         - id: int
         - kingdom: Kingdom
+        Card(int id, Kingdom kingdom) : Card
         + getId() int
         + getKingdom() Kingdom
     }
@@ -47,7 +44,7 @@ classDiagram
     class ObjectiveType {
         STAIR
         L_FORMATION
-        FREE_RESOURCES
+        THREE_RESOURCES
         TWO_QUILLS
         TWO_INKS
         TWO_SCROLLS
@@ -56,7 +53,8 @@ classDiagram
     class ObjectiveCard {
         - type: ObjectiveType
         - multiplier: int
-        + countPoints(Table table) int
+        + ObjectiveCard(int id, Kingdom kingdom, ObjectiveType type, int multiplier) : ObjectiveCard
+        + countPoints(PlayedCard rootCard) int
         + getType() ObjectiveType
         + getMultiplier() int
     }
@@ -70,34 +68,38 @@ classDiagram
     }
     class PlayableCard {
         <<abstract>>
-        - corners: HashTable~Corner, Sign~
-        + GetCorners() HashTable~Corner, Sign~
-        + 
+        - corners: HashMap~Corner, Sign~
+        + PlayableCard(int id, Kingdom kingdom,  HashMap~Corner, Sign~ corners)
+        + getCorners() HashMap~Corner, Sign~
     }
     PlayableCard --* Corner
     PlayableCard --* Sign : requires at a corner
     class StartingCard {
-        - backSideCorners: HashTable~Corner, Sign~
-        - bonusResources: Set~Sign~
-        + getBonusResources() Set~Sign~
-        + getBackSideCorners() HashTable~Corner, Sign~
+        - backSideCorners: HashMap~Corner, Sign~
+        - bonusResources: ArrayList~Sign~
+        + StartingCard(int id, Kingdom kingdom, HashMap~Corner, Sign~ frontCorners, HashMap~Corner, Sign~ backCorners, ArrayList~Sign~ bonusResources) : StartingCard
+        + getBonusResources() ArrayList~Sign~
+        + getBackSideCorners() HashMap~Corner, Sign~
     }
     StartingCard --* Sign
     StartingCard --* Corner
     class ResourceCard {
         - points: int
+        + ResourceCard(int id, Kingdom kingdom, HashMap~Corner, Sign~ frontCorners, int points) : ResourceCard
         + getPoints() int
     }
     class GoldCard {
-        - requirements: HashTable~Kingdom, int~
-        + getRequirements() HashTable~Kingdom, int~
+        - requirements: HashMap~Sign, int~
+        + GoldCard(int id, Kingdom kingdom, HashMap~Corner, Sign~ frontCorners, int points, HashMap~Sign, int~ requirements) : GoldCard
+        + getRequirements() HashMap~Sign, int~
     }
     GoldCard --* Sign : requires to play
     GoldCard --* Kingdom
     class SpecialGoldCard {
         - thingToCount: Countable
-        - getCountable() Countable
-        + pointsToAdd(PlayedCard root) int
+        + getCountable() Countable
+        + SpecialGoldCard(int id, Kingdom kingdom, HashMap~Corner, Sign~ frontCorners, int points, HashMap~Sign, int~ requirements, Countable thingToCount) : GoldCard
+        + pointsToAdd(PlayedCard rootCard) int
     }
     SpecialGoldCard --* Countable : counts
     Card <|-- ObjectiveCard
@@ -108,10 +110,11 @@ classDiagram
     GoldCard <|-- SpecialGoldCard
     class Deck {
         - cards: ArrayList~Card~
-        - shuffle() void
-        + draw() Card
-        + reset() void
-        + seeFirst() Kingdom
+        - shuffle()
+        + Deck(String file):Deck
+        + draw(): Card
+        + seeFirst(): Kingdom
+        + isEmpty(): boolean
     }
     Deck --* Card : contains
     class Player {
@@ -122,36 +125,47 @@ classDiagram
         - rootCard: StartingCard 
         - secretObjective: ObjectiveCard
         - resources: HashMap~Sign, int~
-        + getHand() ArrayList~Card~ 
+        + Player(String name, Color color) : Player
+        + getHand() Card[] 
         + getResources() HashMap~Sign, int~
         + getPoints() int
         + getColor() Color
         + getRootCard() PlayedCard
         + getSecretObjective() ObjectiveCard
         + getName() String
+        + setRootCard(PlayedCard rootCard)
+        + setSecretObjective(ObjectiveCard secretObjective)
+        + setHand(ResourceCard[] hand)
+        + addResources(Sign sign, Integer numResources)
+        + removeResources(Sign sign, Integer numResources)
+        + giveCard(ResourceCard card)
+        + takeCard(ResourceCard card)
+        + updatePoints(int points)
     }
     Player --* Card : has in their hand 
     Player --* Color : has color
     Player --* ObjectiveCard
     class GameState {
-        PLAY
+        CHOOSING_ROOT_CARD
+        CHOOSING_OBJECTIVE_CARD
         END
         DRAWING_PHASE
         PLACING_PHASE
-        ENDGAME
     }
     class GameMaster {
-        - players: HashTable~String, Player~
+        - globalTurn: int
+        - flagTurnRemained: int
         - turnNumber: int
-        - currentPlayer: String
+        - lobby: Lobby
+        - gameState: GameState
         - resourceDeck: Deck
         - goldDeck: Deck
+        - startingDeck: Deck
         - objectivesDeck: Deck
-        - staringDeck: Deck
-        - gameState: enum
-        - publicObjectiveCards: Array~ObjectiveCard~
-        - publicResourceCards: Array~ResourceCard~
-        - publicGoldCards: Array~GoldCards~
+        - onTableObjectiveCards: ObjectiveCard[]
+        - onTableResourceCards: ResourceCard[]
+        - onTableGoldCards: GoldCards[]
+        - 
         + gameSetup() void
         + placeCard(String player, int cardId, Point position) void
         + getPlayerPoints(String player) int
@@ -169,6 +183,16 @@ classDiagram
     GameMaster --* ResourceCard
     GameMaster --* ObjectiveCard
     GameMaster --* PlayedCard
+
+    class Lobby {
+        - players: ArrayList~Player~
+        
+        + Lobby() : Lobby
+        + addPlayer(Player player)
+        + getPlayers() : Player[]
+        + getPlayerFromName(String name) : Player
+
+    }
     class Countable {
         INKWELL
         QUILL
@@ -177,16 +201,22 @@ classDiagram
     }
     class PlayedCard {
         - card: PlayableCard
-        - isFacingUp: bool
+        - isFacingUp: boolean
         - attachmentCorners: HashMap~Corner, PlayedCard~
-        - countedForObjective: bool %% chiedere al prof
+        - flagCountedForObjective: boolean
         - turnOfPositioning: int
         - position: Point~int, int~
-        + getCard() Card
-        + isFacingUp() bool
-        + attachCard(PlayedCard p) void
-        + setCountedForObjective() void
+        + PlayedCard(PlayableCard playableCard, HashMap~Corner, PlayedCard~ cardsToAttach, booleanean side, int turnNumber, Point~int, int~ position)
+        + getCard(): Card
+        + isFacingUp(): boolean
+        + attachCard(Corner corner, PlayedCard card)
+        + setCountedForObjective()
         + getAttached(Corner corner) PlayedCard
+        + setAttached(Corner corner, PlayedCard card)
+        + isFlagCountedForObjective(): boolean
+        + getTurnOfPositioning() : int
+        + getPosition() : Point~int, int~
+        + flagWasCountedForObjective()
     }
     PlayedCard --* PlayableCard
     PlayedCard --* Corner
