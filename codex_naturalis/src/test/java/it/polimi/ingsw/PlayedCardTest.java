@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test;
 import java.awt.*;
 import java.util.HashMap;
 
+import static org.junit.jupiter.api.Assertions.assertNull;
+
 public class PlayedCardTest {
     Point p;
     Point p2;
@@ -27,8 +29,10 @@ public class PlayedCardTest {
     @Test
     public void NullHashMapTest(){
         PlayedCard t1 = new PlayedCard(test,map,true,1,p);
-        //assert();
-
+        assertNull(t1.getAttached(Corner.TOP_LEFT));
+        assertNull(t1.getAttached(Corner.TOP_RIGHT));
+        assertNull(t1.getAttached(Corner.BOTTOM_LEFT));
+        assertNull(t1.getAttached(Corner.BOTTOM_RIGHT));
     }
     @Test
     public void NormalCaseTest(){
