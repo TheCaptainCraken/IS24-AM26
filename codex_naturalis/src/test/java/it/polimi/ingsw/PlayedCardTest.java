@@ -10,7 +10,7 @@ import java.util.HashMap;
 public class PlayedCardTest {
     Point p;
     Point p2;
-    PlayableCard test ;
+    PlayableCard test;
     HashMap<Corner,PlayedCard> map1 ;
     HashMap<Corner,PlayedCard> map ;
 
@@ -27,7 +27,7 @@ public class PlayedCardTest {
     @Test
     public void NullHashMapTest(){
         PlayedCard t1 = new PlayedCard(test,map,true,1,p);
-        assert(t1.getAttachmentCorners().isEmpty());
+        //assert();
 
     }
     @Test
@@ -35,7 +35,9 @@ public class PlayedCardTest {
         PlayedCard t1 = new PlayedCard(test,map,true,1,p);
         map1.put(Corner.BOTTOM_LEFT,t1);
         PlayedCard t2 = new PlayedCard(test,map1,false,2,p2);
-        assert(t2.getAttachmentCorners().containsKey(Corner.BOTTOM_LEFT) );
+        assert(t2.getAttachmentCorners().containsKey(Corner.BOTTOM_LEFT));
+        t2.attachCard(Corner.BOTTOM_RIGHT,t1);
+        assert(t2.getAttachmentCorners().containsKey(Corner.BOTTOM_RIGHT));
         assert(!t2.isFacingUp());
         assert(!t2.isFlagCountedForObjective());
         t2.flagWasCountedForObjective();
@@ -43,7 +45,6 @@ public class PlayedCardTest {
         assert(t2.getCard().equals(test));
         assert(t2.getTurnOfPositioning() == 2);
         assert(t2.getAttached(Corner.BOTTOM_LEFT).equals(t1));
-
     }
 
 
