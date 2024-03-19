@@ -175,7 +175,7 @@ classDiagram
         + endGame(String namePlayer)
         - fromKingdomToSign(Kingdom kingdom) : Sign
         - isPositionable(PlayedCard startingCard, PlayableCard cardToPLlace, Point position) : HashMap~Corner, PlayedCard~
-        + findCard(PlayedCard startingCard, Point position) : PlayedCard 
+        ~ findCard(PlayedCard startingCard, Point position) : PlayedCard 
         - recursiveFindCard(PlayedCard startingCard, Point position, Stack~PlayedCard~ stack) : PlayedCard
         + getTurn() : int
         + getCurrentPlayer() : Player
