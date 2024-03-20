@@ -1,8 +1,8 @@
 package it.polimi.ingsw.model;
 
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.HashMap;
+
 
 /** The class is used to represent the card placed onto the board, it's role is to keep track of the moves that a player makes
  * during the match
@@ -32,29 +32,28 @@ public class PlayedCard {
         this.turnOfPositioning = turnNumber;
         this.position = position;
 
-        /**this ForEach cycle iterates on the Corner Enumeration to fill out attachmentCorners with the PlayedCards
-         * that are attached to this instance of PlayedCard,the newest card is attached first. In the case in which there is no card related to the Corner
-         * that is being analyzed, the HashMap will still have a reference for it but the value field will be null*/
-        for(Corner c: Corner.values()){
+        /**this ForEach cycle iterates on the Keys of the cardsToAttach given in order to fill out attachmentCorners with the PlayedCards
+         * that are attached to this instance of PlayedCard,the newest card is attached first. */
+        for(Corner c : cardsToAttach.keySet()){
             this.attachCard(c,cardsToAttach.get(c));
-            try{
-                switch (c) {
-                    case TOP_LEFT:
-                        cardsToAttach.get(c).attachCard(Corner.BOTTOM_RIGHT,this);
-                        break;
-                    case TOP_RIGHT:
-                        cardsToAttach.get(c).attachCard(Corner.BOTTOM_LEFT,this);
-                        break;
-                    case BOTTOM_LEFT:
-                        cardsToAttach.get(c).attachCard(Corner.TOP_RIGHT,this);
-                        break;
-                    case BOTTOM_RIGHT:
-                        cardsToAttach.get(c).attachCard(Corner.TOP_LEFT,this);
-                        break;
-                }
-            } catch (NullPointerException e){
+            switch (c) {
+                case TOP_LEFT:
+                    cardsToAttach.get(c).attachCard(Corner.BOTTOM_RIGHT,this);
+                    break;
+                case TOP_RIGHT:
+                    cardsToAttach.get(c).attachCard(Corner.BOTTOM_LEFT,this);
+                    break;
+                case BOTTOM_LEFT:
+                    cardsToAttach.get(c).attachCard(Corner.TOP_RIGHT,this);
+                    break;
+                case BOTTOM_RIGHT:
+                    cardsToAttach.get(c).attachCard(Corner.TOP_LEFT,this);
+                    break;
+                default:
+                    break;
             }
         }
+
     }
 
     /**@return true if card has already been used for calculating Objective scores*/
