@@ -4,6 +4,14 @@
 - Vogliamo creare uun getter the ritorni una hash table ma non proprio una ref a quella contenuta nella classe!
 - Dobbiamo segnare costruttori e attributi final nell'UML?
 - Va bene che le carte objective calcolino da sole i propri punti?
+----------
+uml giocato
+- scelta del pin(da specifiche il giocatore deve scegliere il pin, non casuale) --> manca il metodo!
+- settare mano, dove lo fa game master nel costruttore o esiste un game setup
+- scelta giocatore di partenza casuale(da specifiche) --> chi lo fa? lobby?
+- fase gioco tutta presente
+- gestione fase finale di gioco, che metodo la fa?
+- fase finale. fa tutto endgame? ovvero conta i punti obittivo(manca il metodo), controlla se esiste un vincitore unico, altrimenti vede i punti obiettivo e assegna parità o vittoria di uno
 
 ## Cose da chiedere
 
