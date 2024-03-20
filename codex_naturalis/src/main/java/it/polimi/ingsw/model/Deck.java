@@ -96,7 +96,7 @@ public class Deck {
         Sign cornerBotRight = Sign.valueOf((String) cardObject.get("cornerBotRight"));
         Sign sign = Sign.valueOf((String) cardObject.get("sign"));
         int points = (int) cardObject.get("points");
-        this.insert(new ResourceCard(id, cornerTopLeft, cornerTopRight, cornerBotLeft, cornerBotRight, sign, points));
+        // TODO: create resource card with the new constructor.
     }
 
     /**
