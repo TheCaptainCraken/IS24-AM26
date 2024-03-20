@@ -3,8 +3,8 @@ package it.polimi.ingsw.model;
 public class ResourceCard extends PlayableCard {
     private int points;
 
-    public ResourceCard(int id, Sign cornerTopLeft, Sign cornerTopRight, Sign cornerBotLeft, Sign cornerBotRight, Sign sign, int punti) {
-        super(id, cornerTopLeft, cornerTopRight, cornerBotLeft, cornerBotRight, sign);
+    public ResourceCard(int id, Kingdom kingdom,int punti) {
+        super(id,kingdom);
         this.points = punti;
     }
 
