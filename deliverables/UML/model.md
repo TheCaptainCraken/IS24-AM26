@@ -1,20 +1,5 @@
 # Model UML
 
-- Ci conviene mettere un valore in più nell'enumerazione o gestire il caso in cui è null?
-- Vogliamo creare uun getter the ritorni una hash table ma non proprio una ref a quella contenuta nella classe!
-- Dobbiamo segnare costruttori e attributi final nell'UML?
-- Va bene che le carte objective calcolino da sole i propri punti?
-----------
-uml giocato
-- scelta del pin(da specifiche il giocatore deve scegliere il pin, non casuale) --> manca il metodo!
-- settare mano, dove lo fa game master nel costruttore o esiste un game setup
-- scelta giocatore di partenza casuale(da specifiche) --> chi lo fa? lobby?
-- fase gioco tutta presente
-- gestione fase finale di gioco, che metodo la fa?
-- fase finale. fa tutto endgame? ovvero conta i punti obittivo(manca il metodo), controlla se esiste un vincitore unico, altrimenti vede i punti obiettivo e assegna parità o vittoria di uno
-
-## Cose da chiedere
-
 ```mermaid
 classDiagram
     class Kingdom {
@@ -180,7 +165,8 @@ classDiagram
         + chooseObjectiveCard(String namePlayer, int whichCard)
         + placeCard(String namePlayer, PlayableCard cardToPlace, Point position, boolean side)
         + drawCard(String namePlayer, boolean goldOrNot, int ontTableOrDeck) : ResourceCard
-        + endGame(String namePlayer)
+        + calculateEndGamePoints()
+        + getWinners() : ArrayList~Player~
         - fromKingdomToSign(Kingdom kingdom) : Sign
         - isPositionable(PlayedCard startingCard, PlayableCard cardToPLlace, Point position) : HashMap~Corner, PlayedCard~
         ~ findCard(PlayedCard startingCard, Point position) : PlayedCard 
@@ -196,6 +182,7 @@ classDiagram
         + getPlayerPoints(String name) : int
         + getPlayerResources(String name) : HashMap~Sign, Integer~
     }
+    GameMaster --* Lobby : managess
     GameMaster --* Player : manages
     GameMaster --* Deck : manages
     GameMaster --* GameState : is in state
@@ -205,10 +192,11 @@ classDiagram
     GameMaster --* PlayedCard
 
     class Lobby {
-        - players: ArrayList~Player~
+        - players: ArrayList~(Player, Color)~
         
         + Lobby() : Lobby
-        + addPlayer(Player player)
+        + addPlayer(Player player, Color desiredPin)
+        + getAvailablePins() ArrayList~Color~
         + getPlayers() : Player[]
         + getPlayerFromName(String name) : Player
 
