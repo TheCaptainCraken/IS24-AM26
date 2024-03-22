@@ -22,7 +22,7 @@ public class ObjectiveCard extends Card {
      * @param type       The objective card's type.
      * @param multiplier The objective card's multiplier.
      */
-    ObjectiveCard(int id, Kingdom kingdom, ObjectiveType type, int multiplier) {
+    public ObjectiveCard(int id, Kingdom kingdom, ObjectiveType type, int multiplier) {
         super(id, kingdom);
         this.type = type;
         this.multiplier = multiplier;

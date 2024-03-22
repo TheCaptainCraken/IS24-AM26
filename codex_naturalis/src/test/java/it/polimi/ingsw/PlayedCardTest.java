@@ -48,6 +48,7 @@ public class PlayedCardTest {
         assert (t2.getCard().equals(test));
         assert (t2.getTurnOfPositioning() == 2);
         assert (t2.getAttached(Corner.BOTTOM_LEFT).equals(t1));
+        assert(t2.getPosition().equals(p));
     }
 
 }

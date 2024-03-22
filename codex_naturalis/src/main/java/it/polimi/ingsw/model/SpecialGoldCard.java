@@ -12,7 +12,7 @@ public class SpecialGoldCard extends GoldCard {
     /**
      * The thing to count.
      */
-    private Countable thingToCount;
+    private final Countable thingToCount;
 
     /**
      * Class constructor.
