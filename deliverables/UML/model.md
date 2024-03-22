@@ -142,7 +142,6 @@ classDiagram
         - type: ObjectiveType
         - multiplier: int
         + ObjectiveCard(int id, Kingdom kingdom, ObjectiveType type, int multiplier) : ObjectiveCard
-        + countPoints(PlayedCard rootCard) int
         + getType() ObjectiveType
         + getMultiplier() int
     }
