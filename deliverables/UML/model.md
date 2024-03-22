@@ -37,6 +37,7 @@ classDiagram
         + setOnTableObjectCard(ObjectCard ObjectCard, int place)
         + getPlayerPoints(String name) : int
         + getPlayerResources(String name) : HashMap~Sign, Integer~
+        - calculateSpecialGoldPoints(GoldCard card) : int
     }
     GameMaster --* Lobby : manages
     GameMaster --* Player : manages
@@ -76,10 +77,10 @@ classDiagram
         - color: Color
         - rootCard: StartingCard 
         - secretObjective: ObjectiveCard
-        - resources: HashMap~Sign, int~
+        - resources: HashMap~Sign, Integer~
         + Player(String name, Color color) : Player
         + getHand() Card[] 
-        + getResources() HashMap~Sign, int~
+        + getResources() HashMap~Sign, Integer~
         + getPoints() int
         + getColor() Color
         + getRootCard() PlayedCard
@@ -92,7 +93,7 @@ classDiagram
         + removeResources(Sign sign, Integer numResources)
         + giveCard(ResourceCard card)
         + takeCard(ResourceCard card)
-        + updatePoints(int points)
+        + addPoints(int points)
     }
     Player --* Card : has in their hand 
     Player --* Color : has color
@@ -176,17 +177,16 @@ classDiagram
         + getPoints() int
     }
     class GoldCard {
-        - requirements: HashMap~Sign, int~
-        + GoldCard(int id, Kingdom kingdom, HashMap~Corner, Sign~ frontCorners, int points, HashMap~Sign, int~ requirements) : GoldCard
-        + getRequirements() HashMap~Sign, int~
+        - requirements: HashMap~Sign, Integer~
+        + GoldCard(int id, Kingdom kingdom, HashMap~Corner, Sign~ frontCorners, int points, HashMap~Sign, Integer~ requirements) : GoldCard
+        + getRequirements() HashMap~Sign, Integer~
     }
     GoldCard --* Sign : requires to play
     GoldCard --* Kingdom
     class SpecialGoldCard {
         - thingToCount: Countable
         + getCountable() Countable
-        + SpecialGoldCard(int id, Kingdom kingdom, HashMap~Corner, Sign~ frontCorners, int points, HashMap~Sign, int~ requirements, Countable thingToCount) : GoldCard
-        + pointsToAdd(PlayedCard rootCard) int
+        + SpecialGoldCard(int id, Kingdom kingdom, HashMap~Corner, Sign~ frontCorners, int points, HashMap~Sign, Integer~ requirements, Countable thingToCount) : GoldCard
     }
     SpecialGoldCard --* Countable : counts
     Card <|-- ObjectiveCard
