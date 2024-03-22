@@ -1,24 +1,34 @@
 package it.polimi.ingsw.model;
 
+import java.util.HashMap;
 
-import java.util.Dictionary;
-import java.util.Hashtable;
+/**
+ * This class represents a playable card.
+ */
+public abstract class PlayableCard extends Card {
+    /**
+     * The playable card's corners.
+     */
+    private HashMap<Corner, Sign> corners = new HashMap<>();
 
-public abstract class PlayableCard extends Card{
-    private Dictionary<Corner, Sign> corners= new Hashtable<>();//topleft, topright, botleft, botright
-    //TODO enumeration or vocabulary as python
-    //TODO va qua la def?
-    private Sign sign;
-
-    PlayableCard(int id, Kingdom kingdom ) {
-        super(id,kingdom);
+    /**
+     * Class constructor.
+     *
+     * @param id      The playable card's id.
+     * @param kingdom The playable card's kingdom.
+     * @param corners The playable card's corners.
+     */
+    PlayableCard(int id, Kingdom kingdom, HashMap<Corner, Sign> corners) {
+        super(id, kingdom);
+        this.corners = corners;
     }
 
-    /*public Sign[] getCorners() {
+    /**
+     * Returns the playable card's corners.
+     *
+     * @return The playable card's corners.
+     */
+    public HashMap<Corner, Sign> getCorners() {
         return corners;
-    }*/
-
-    /*public Sign getSign() {
-        return sign;
-    }*/
+    }
 }
