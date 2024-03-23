@@ -1,13 +1,37 @@
 package it.polimi.ingsw.model;
 
-import java.util.Dictionary;
-import java.util.Hashtable;
+import java.util.HashMap;
 
+/**
+ * This class represents a gold card.
+ */
 public class GoldCard extends ResourceCard {
-    Dictionary<Kingdom, Sign> requirements= new Hashtable<>();
+    /**
+     * The gold card's requirements.
+     */
+    private HashMap<Sign, Integer> requirements = new HashMap<>();
 
-    public GoldCard(int id, Kingdom kingdom,int points) {
-        super(id,kingdom,points);
-        //this.requirements = requirements;//TODO
+    /**
+     * Class constructor.
+     *
+     * @param id           The gold card's id.
+     * @param kingdom      The gold card's kingdom.
+     * @param frontCorners The gold card's corners.
+     * @param points       The gold card's points.
+     * @param requirements The gold card's requirements.
+     */
+    public GoldCard(int id, Kingdom kingdom, HashMap<Corner, Sign> frontCorners, int points,
+            HashMap<Sign, Integer> requirements) {
+        super(id, kingdom, frontCorners, points);
+        this.requirements = requirements;
+    }
+
+    /**
+     * Returns the gold card's requirements.
+     *
+     * @return The gold card's requirements.
+     */
+    public HashMap<Sign, Integer> getRequirements() {
+        return requirements;
     }
 }
