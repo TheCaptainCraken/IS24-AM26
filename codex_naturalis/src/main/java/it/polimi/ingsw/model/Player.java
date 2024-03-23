@@ -1,6 +1,7 @@
 package it.polimi.ingsw.model;
 
 import java.util.HashMap;
+import java.lang.Math;
 
 /**
  * This is the entity of player.
@@ -14,7 +15,7 @@ public class Player {
     private int points;
     private final Color color;
     private PlayedCard rootCard;
-    private HashMap<Sign, Integer> resources;
+    private final HashMap<Sign, Integer> resources;
     private ObjectiveCard secretObjective;
     private ResourceCard[] hand;
 
@@ -131,30 +132,49 @@ public class Player {
     }
 
     /**
-     * It updates the hand of the player. It removes the card played on the table changing it with a new card drawn.
-     * It a unique method for cardOnTable and pickCard, which now are useless.
-     * @param cardToRemove the card played by the player, thus to be removed
-     * @param newCard the new card drawn by the player
+     * This function deletes the card given by input. The game Master should call this method to eliminate a card, played on table, from player's hand
+     * @param card card played
      */
-    public void updateCard(ResourceCard cardToRemove, ResourceCard newCard){
+    public void giveCard(ResourceCard card){
         int i;
         for(i = 0; i < 3; i++){
-            if(hand[i] == cardToRemove){
-                hand[i] = newCard;
+            if(hand[i] == card){
+                hand[i] = null;
                 break;
             }
         }
     }
     /**
-     * this function updates the points of a player
+     * This function gives to player a new card. The game Master should call this method to give a card to player's hand. The new card will be put in the only position
+     * in the array where there is value = null. There is only one null position at every player's round
+     * @param card card played
+     */
+    public void takeCard(ResourceCard card){
+        int i;
+        for(i = 0; i < 3; i++){
+            if(hand[i] == null){
+                hand[i] = card;
+                break;
+            }
+        }
+    }
+    /**
+     * this function sums the new points given by a new played card
      * @param new_points the points possibly given by a new card or a secret objective
      */
-    public void updatePoints(int new_points){
+    public void addPoints(int new_points){
         //the player in the game can earn maximum 29 points, no more, see slack
-        if(points + new_points <= 29) {
+        points = Math.min(29, this.points + new_points);
+    }
+
+    /**
+     * Not in UML; slack professor's comment: Grazie per la segnalazione! Ho cambiato la mia risposta 1 di conseguenza: ci si ferma a 29 punti prima di sommare le carte obiettivo.
+     * A questo punto si procede con la somma degli obiettivi a fine partita e si segue la regola alla risposta 3 in caso di parità
+     *
+     * Sums the extra points given by the objectiveCard
+     * @param new_points  special points given at the end of the game by ObjectiveCard
+     */
+    public void addObjectivePoints(int new_points){
             points += new_points;
-        }else{
-            points = 29;
-        }
     }
 }
