@@ -2,6 +2,7 @@ package it.polimi.ingsw.model;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -63,7 +64,15 @@ public class Deck {
                 case "ResourceCard":
                     insertResourceCard(cardObject);
                     break;
-                // TODO: add the case for the GoldCard, SpecialCard and StartingCard.
+                case "GoldCard":
+                    insertGoldCard(cardObject);
+                    break;
+                case "SpecialGoldCard":
+                    insertSpecialGoldCard(cardObject);
+                    break;
+                case "StartingCard":
+                    insertStartingCard(cardObject);
+                    break;
                 default:
                     throw new IllegalArgumentException("Invalid card prototype");
             }
@@ -80,7 +89,8 @@ public class Deck {
         int id = (int) cardObject.get("id");
         Kingdom kingdom = Kingdom.valueOf((String) cardObject.get("kingdom"));
         ObjectiveType objectiveType = ObjectiveType.valueOf((String) cardObject.get("objectiveType"));
-        this.insert(new ObjectiveCard(id, kingdom, objectiveType));
+        int multiplier = (int) cardObject.get("multiplier");
+        this.insert(new ObjectiveCard(id, kingdom, objectiveType, multiplier));
     }
 
     /**
@@ -90,13 +100,122 @@ public class Deck {
      */
     private void insertResourceCard(JSONObject cardObject) {
         int id = (int) cardObject.get("id");
-        Sign cornerTopLeft = Sign.valueOf((String) cardObject.get("cornerTopLeft"));
-        Sign cornerTopRight = Sign.valueOf((String) cardObject.get("cornerTopRight"));
-        Sign cornerBotLeft = Sign.valueOf((String) cardObject.get("cornerBotLeft"));
-        Sign cornerBotRight = Sign.valueOf((String) cardObject.get("cornerBotRight"));
-        Sign sign = Sign.valueOf((String) cardObject.get("sign"));
+
         int points = (int) cardObject.get("points");
-        // TODO: create resource card with the new constructor.
+        Kingdom kingdom = Kingdom.valueOf((String) cardObject.get("kingdom"));
+
+        JSONObject corners = (JSONObject) cardObject.get("corners");
+
+        this.insert(new ResourceCard(id, kingdom, getCorners(corners), points));
+    }
+
+    /**
+     * This method inserts a {@link GoldCard} into the deck.
+     * 
+     * @param cardObject the JSON object representing the card.
+     */
+    private void insertGoldCard(JSONObject cardObject) {
+        int id = (int) cardObject.get("id");
+        Kingdom kingdom = Kingdom.valueOf((String) cardObject.get("kingdom"));
+        int points = (int) cardObject.get("points");
+
+        JSONObject corners = (JSONObject) cardObject.get("corners");
+
+        this.insert(new GoldCard(id, kingdom, getCorners(corners), points, getRequirements(cardObject)));
+    }
+
+    /**
+     * This method inserts a {@link SpecialGoldCard} into the deck.
+     * 
+     * @param cardObject the JSON object representing the card.
+     */
+    private void insertSpecialGoldCard(JSONObject cardObject) {
+        int id = (int) cardObject.get("id");
+        Kingdom kingdom = Kingdom.valueOf((String) cardObject.get("kingdom"));
+        int points = (int) cardObject.get("points");
+
+        JSONObject corners = (JSONObject) cardObject.get("corners");
+
+        Countable thingToCount = Countable.valueOf((String) cardObject.get("thingToCount"));
+
+        this.insert(new SpecialGoldCard(id, kingdom, getCorners(corners), points, getRequirements(cardObject),
+                thingToCount));
+    }
+
+    /**
+     * This method inserts a {@link StartingCard} into the deck.
+     * 
+     * @param cardObject the JSON object representing the card.
+     */
+    private void insertStartingCard(JSONObject cardObject) {
+        int id = (int) cardObject.get("id");
+        Kingdom kingdom = Kingdom.valueOf((String) cardObject.get("kingdom"));
+
+        JSONObject frontCorners = (JSONObject) cardObject.get("frontCorners");
+        JSONObject backCorners = (JSONObject) cardObject.get("backCorners");
+
+        JSONArray bonusResources = (JSONArray) cardObject.get("bonusResources");
+
+        ArrayList<Sign> bonusResourcesList = new ArrayList<Sign>();
+        for (Object bonusResource : bonusResources) {
+            bonusResourcesList.add(Sign.valueOf((String) bonusResource));
+        }
+
+        this.insert(
+                new StartingCard(id, kingdom, getCorners(frontCorners), getCorners(backCorners), bonusResourcesList));
+    }
+
+    /**
+     * This method returns the requirements of a card.
+     * 
+     * @param cardObject the JSON object representing the card.
+     * @return the requirements of the card.
+     */
+    private HashMap<Sign, Integer> getRequirements(JSONObject cardObject) {
+        JSONObject requirementsObject = (JSONObject) cardObject.get("requirements");
+
+        int mushroom = (int) requirementsObject.get("MUSHROOM");
+        int leaf = (int) requirementsObject.get("LEAF");
+        int wolf = (int) requirementsObject.get("WOLF");
+        int butterfly = (int) requirementsObject.get("BUTTERFLY");
+        int quill = (int) requirementsObject.get("QUILL");
+        int inkwell = (int) requirementsObject.get("INKWELL");
+        int scroll = (int) requirementsObject.get("SCROLL");
+
+        HashMap<Sign, Integer> requirements = new HashMap<Sign, Integer>();
+
+        requirements.put(Sign.MUSHROOM, mushroom);
+        requirements.put(Sign.LEAF, leaf);
+        requirements.put(Sign.WOLF, wolf);
+        requirements.put(Sign.BUTTERFLY, butterfly);
+        requirements.put(Sign.QUILL, quill);
+        requirements.put(Sign.INKWELL, inkwell);
+        requirements.put(Sign.SCROLL, scroll);
+
+        return requirements;
+    }
+
+    /**
+     * This method returns the corners of a card.
+     * 
+     * @param cornersObject the JSON object representing the corners of the card.
+     * @return the corners of the card.
+     */
+    private HashMap<Corner, Sign> getCorners(JSONObject cornersObject) {
+
+        Sign topLeft = Sign.valueOf((String) cornersObject.get("TOP_LEFT"));
+        Sign topRight = Sign.valueOf((String) cornersObject.get("TOP_RIGHT"));
+        Sign bottomLeft = Sign.valueOf((String) cornersObject.get("BOTTOM_LEFT"));
+        Sign bottomRight = Sign.valueOf((String) cornersObject.get("BOTTOM_RIGHT"));
+
+        HashMap<Corner, Sign> corners = new HashMap<Corner, Sign>();
+
+        corners.put(Corner.TOP_LEFT, topLeft);
+        corners.put(Corner.TOP_RIGHT, topRight);
+        corners.put(Corner.BOTTOM_LEFT, bottomLeft);
+        corners.put(Corner.BOTTOM_RIGHT, bottomRight);
+
+        return corners;
     }
 
     /**
