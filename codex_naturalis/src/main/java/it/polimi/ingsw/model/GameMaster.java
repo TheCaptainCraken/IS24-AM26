@@ -33,10 +33,10 @@ public class GameMaster {
         this.objectiveDeck = new Deck(jsonObjectiveCardFileName);
         this.startingDeck = new Deck(jsonObjectiveStartFileName);
         //setupTable
-        setOnTableResourceCard(resourceDeck.draw(), 0);
-        setOnTableResourceCard(resourceDeck.draw(), 1);
-        setOnTableGoldCard(goldDeck.draw(), 0);
-        setOnTableGoldCard(goldDeck.draw(), 1);
+        setOnTableResourceCard((ResourceCard) resourceDeck.draw(), 0);
+        setOnTableResourceCard((ResourceCard) resourceDeck.draw(), 1);
+        setOnTableGoldCard((GoldCard) goldDeck.draw(), 0);
+        setOnTableGoldCard((GoldCard) goldDeck.draw(), 1);
         for(Player player : lobby.getPlayers()){
             player.setStartingHand();
         }
@@ -64,8 +64,12 @@ public class GameMaster {
 //    }
 
 
+    /**First turn cicle in which every player decides in which side place its StartingCard
+     * @param namePlayer player who sent the request
+     * @param side which side the StartingCard has been want placed
+     */
     //TODO pick starting cart e objective card
-    public int placeRootCard(String namePlayer, boolean side){//TODO devo pescare la carta fuori da qua e mostrarla con un-altra funzione e poi settarla qui, capire dove metterla nel mentre, due array (un array e una matrice alta due e num gioc)
+    public void placeRootCard(String namePlayer, boolean side){//TODO devo pescare la carta fuori da qua e mostrarla con un-altra funzione e poi settarla qui, capire dove metterla nel mentre, due array (un array e una matrice alta due e num gioc)
         Player currentPlayer = getCurrentPlayer();
         if(!isCurrentPlayer(namePlayer, currentPlayer)) {
             throw new IllegalStateException ("It's not the turn of this player");//is not their turn
@@ -81,11 +85,13 @@ public class GameMaster {
             if(getOrderOfPlayOfThePlayer(getCurrentPlayer().getName())==0){
                 gameState=GameState.CHOOSING_OBJECTIVE_CARD;
             }
-            return 0;
         }
-        return 1;
     }
 
+    /**Second turn cicle in which every player decides which of the two ObjectiveCard pick
+     * @param namePlayer player who sent the request
+     * @param whichCard which of the two ObjectiveCard wants to be used
+     */
     public int chooseObjectiveCard(String namePlayer, int whichCard){
         Player currentPlayer = getCurrentPlayer();
         if(!isCurrentPlayer(namePlayer, currentPlayer)) {
@@ -103,21 +109,27 @@ public class GameMaster {
         return 1;//is not their turn
     }
 
-    //placeCard
-    public int placeCard(String namePlayer, PlayableCard cardToPlace, Point coordinates, boolean side){
+
+    /**Let the Player capsule in a PlacedCard connected to the rootCard graph of the Player
+     * @param namePlayer Player who sent the request
+     * @param cardToPlace Which card wants to place
+     * @param position In which position of the table the player wants to be place the card
+     * @param side To which side wants the player to place the card
+     */
+    public void placeCard(String namePlayer, PlayableCard cardToPlace, Point position, boolean side){
         Player currentPlayer = getCurrentPlayer();
         if(isCurrentPlayer(namePlayer, currentPlayer)){
             if(gameState==GameState.PLACING_PHASE) {
-                HashMap<Corner, PlayedCard> attachments = isPositionable(currentPlayer.getRootCard(), cardToPlace, coordinates);
+                HashMap<Corner, PlayedCard> attachments = isPositionable(currentPlayer.getRootCard(), cardToPlace, position);
                 if (attachments != null) {
                     if(side){
                         if (cardToPlace instanceof GoldCard) {
                             GoldCard goldCard = (SpecialGoldCard) cardToPlace;
-                            if (!goldCard.requirementsSatisfied(currentPlayer.getSimbolCounter())) {
+                            if (requirementsSatisfied(currentPlayer.getResources(), goldCard.getRequirements())) {
                                 return 4;//not enough resources
                             }
                         }
-                        PlayedCard newPlayedCard = new PlayedCard(cardToPlace, attachments, side, getTurn(), coordinates);//the attachments are of the graph of the player who is playing so there isn-t any reference to Player class in the constructor
+                        PlayedCard newPlayedCard = new PlayedCard(cardToPlace, attachments, side, getTurn(), position);//the attachments are of the graph of the player who is playing so there isn-t any reference to Player class in the constructor
                         if (cardToPlace instanceof SpecialGoldCard) {
                             SpecialGoldCard specialGoldCard = (SpecialGoldCard) cardToPlace;
                             if (specialGoldCard.getCountable() == Countable.CORNER) {
@@ -127,37 +139,38 @@ public class GameMaster {
                             }
                         } else {
                             ResourceCard resourceCard = (ResourceCard) newPlayedCard.getPlayableCard();
-                            currentPlayer.addPoints(resourceCard.getPoints());
+                            currentPlayer.updatePoints();addPoints(resourceCard.getPoints());//TODO addPoints
                         }
                         for(Corner corner : Corner.values()){//
-                            currentPlayer.addToSimbolCounter(cardToPlace.getCorners().get(corner));;
+                            currentPlayer.addResource(cardToPlace.getAttached().get(corner), 1);;
                         }
+                        currentPlayer.addPoints();
                     }else{
-                        PlayedCard newPlayedCard = new PlayedCard(cardToPlace, attachments, side, getTurn(), coordinates);
-                        currentPlayer.addToSimbolCounter(fromKingdomToSign(cardToPlace.getKingdom()));
+                        PlayedCard newPlayedCard = new PlayedCard(cardToPlace, attachments, side, getTurn(), position);
+                        currentPlayer.addResource(fromKingdomToSign(cardToPlace.getKingdom()), 1);
                     }
                     for(Corner corner : Corner.values()){//remove from counter
                         switch(corner){
                             case TOP_LEFT:{
-                                currentPlayer.removeFromSimbolCounter(attachments.get(corner).getPlayableCard().getCorners().get(Corner.BOTTOM_RIGHT));
+                                currentPlayer.removeResources(attachments.get(corner).getPlayableCard().getCorners().get(Corner.BOTTOM_RIGHT), 1);
                                 break;
                             }
                             case TOP_RIGHT:{
-                                currentPlayer.removeFromSimbolCounter(attachments.get(corner).getPlayableCard().getCorners().get(Corner.BOTTOM_LEFT));
+                                currentPlayer.removeResources(attachments.get(corner).getPlayableCard().getCorners().get(Corner.BOTTOM_LEFT), 1);
                                 break;
                             }
                             case BOTTOM_LEFT:{
-                                currentPlayer.removeFromSimbolCounter(attachments.get(corner).getPlayableCard().getCorners().get(Corner.TOP_RIGHT));
+                                currentPlayer.removeResources(attachments.get(corner).getPlayableCard().getCorners().get(Corner.TOP_RIGHT), 1);
                                 break;
                             }
                             case BOTTOM_RIGHT:{
-                                currentPlayer.removeFromSimbolCounter(attachments.get(corner).getPlayableCard().getCorners().get(Corner.TOP_LEFT));
+                                currentPlayer.removeResources(attachments.get(corner).getPlayableCard().getCorners().get(Corner.TOP_LEFT), 1);
                                 break;
                             }
                         }
                     }
                     //rimuovi carta dalla mano dell-utente
-                    currentPlayer.takeCard(cardToPlace.getId());
+                    currentPlayer.giveCard(cardToPlace.getId());
                     gameState=GameState.DRAWING_PHASE;
                     return 0;
                 }
@@ -168,33 +181,29 @@ public class GameMaster {
         return 1;//is not their turn
     }
 
-    private Sign fromKingdomToSign(Kingdom kingdom) {
-        switch(kingdom){
-            case PLANT: return Sign.PLANT;
-            case ANIMAL: return Sign.ANIMAL;
-            case FUNGI: return Sign.FUNGI;
-            case INSECT: return Sign.INSECT;
-        }
-        return null;//TODO excpetion
-    }
-
+    /**
+     * @param namePlayer
+     * @param goldOrNot
+     * @param onTableOrDeck
+     * @return
+     */
     public ResourceCard drawCard(String namePlayer, boolean goldOrNot, int onTableOrDeck){ //onTableOrDeck has 0, 1 for position of array of cards on table and 2 for draw from deck
         Player currentPlayer = getCurrentPlayer();
         if(isCurrentPlayer(namePlayer, currentPlayer)) {//TODO mazzo finito
             if(gameState==GameState.DRAWING_PHASE){
                 if (goldOrNot) {
                     if (onTableOrDeck == 2) {//TODO la view richiede il nuovo retro di quella in cima e non solo di quella spostata
-                        currentPlayer.giveCard((PlayableCard) goldDeck.draw());
+                        currentPlayer.takeCard((PlayableCard) goldDeck.draw());
                     }else{
-                        currentPlayer.giveCard(onTableGoldCards[onTableOrDeck]);
-                        onTableGoldCards[onTableOrDeck]= goldDeck.draw();
+                        currentPlayer.takeCard(onTableGoldCards[onTableOrDeck]);
+                        onTableGoldCards[onTableOrDeck]=(GoldCard) goldDeck.draw();
                     }
                 } else {
                     if (onTableOrDeck == 2) {//TODO la view richiede il nuovo retro di quella in cima e non solo di quella spostata
-                        currentPlayer.giveCard(resourceDeck.draw());
+                        currentPlayer.takeCard(resourceDeck.draw());
                     }else{
-                        currentPlayer.giveCard(onTableResourceCards[onTableOrDeck]);
-                        onTableResourceCards[onTableOrDeck]= resourceDeck.draw();
+                        currentPlayer.takeCard(onTableResourceCards[onTableOrDeck]);
+                        onTableResourceCards[onTableOrDeck]=(ResourceCard) resourceDeck.draw();
                     }
                 }
                 //next player will play?
@@ -226,9 +235,9 @@ public class GameMaster {
         }else if(gameState != GameState.END) {
             throw new IllegalStateException ("It's not the right phase to choose how to place the card");
         }else{
-            currentPlayer.addPoints(currentPlayer.getSecretObjective().effect(currentPlayer.getRootCard()));//TODO finire, qua fare con l'overload dell'interfaccia e poi in questo metodo si chiameranno i metodi di ricerca di this
+            currentPlayer.addPoints(calculateEndGamePoints(currentPlayer.getSecretObjective().getType(), currentPlayer.getSecretObjective().getMultiplier()));//TODO finire, qua fare con l'overload dell'interfaccia e poi in questo metodo si chiameranno i metodi di ricerca di this
             for(ObjectiveCard objectiveCard : onTableObjectiveCards){
-                currentPlayer.addPoints(onTableObjectiveCards.effect(currentPlayer.getRootCard()));//
+                currentPlayer.addPoints(objectiveCard.effect(calculateEndGamePoints(objectiveCard.getType(), objectiveCard.getMultiplier())));//
             }
             return currentPlayer.getPoints();
         }
@@ -346,24 +355,54 @@ public class GameMaster {
         return attachments;
     }
 
-    private PlayedCard findCard(PlayedCard startingCard, Point coordinates){//TODO METTERLO A DISPOSIZIONE DEL MODULE DI GOLDCARD E OBJECTCARD
+    /**Looking at all graph of PlayedCard to find a PlayedCard identified by position
+     * @param startingCard Where the recursion will start to find the required PlayedCard
+     * @param position
+     * @return method recursiveFindCard //TODO è giusto?
+     */
+    private PlayedCard findCard(PlayedCard startingCard, Point position){//TODO METTERLO A DISPOSIZIONE DEL MODULE DI GOLDCARD E OBJECTCARD
         Stack<PlayedCard> stack = new Stack<>();//Anche Arraylist è uguale
-        return recursiveFindCard(card, coordinates, stack);
+        return recursiveFindCard(startingCard, position, stack);
     }
 
-    private PlayedCard recursiveFindCard(PlayedCard card, Point coordinates, Stack<PlayedCard> stack) {
-        if (stack.search(card) > 0 || card == null) {
+    /**Called by findCard
+     * Recursive looking at all graph of PlayedCard to find a PlayedCard identified by position
+     * @param playedCard PlayedCard that I'm visiting
+     * @param position Position of the card that I-m looking for
+     * @param stack Stack in which I save already visited cards
+     * @return PlayedCard if exists else null//TODO needs the logic?
+     */
+    private PlayedCard recursiveFindCard(PlayedCard playedCard, Point position, Stack<PlayedCard> stack) {
+        if (stack.search(playedCard) > 0 || playedCard == null) {
             return null;
-        } else if (card.getCoordinates().x == coordinates.x && card.getCoordinates().y == coordinates.y) {
-            return card;
+        } else if (playedCard.getPosition().x == position.x && playedCard.getPosition().y == position.y) {
+            return playedCard;
         }
         for (Corner corner : Corner.values()) {
-            PlayedCard found = recursiveFindCard(card.getAttached(corner), coordinates, stack);
+            PlayedCard found = recursiveFindCard(playedCard.getAttached(corner), position, stack);
             if (found != null) {
                 return found;
             }
         }
         return null;
+    }
+
+    /**Converts Kingdom enum to Sign enum
+     * @param kingdom Kingdom to comvert
+     * @return Sign in which the Kingdom has been converted
+     */
+    private Sign fromKingdomToSign(Kingdom kingdom) {
+        switch(kingdom){
+            case PLANT: return Sign.PLANT;
+            case ANIMAL: return Sign.ANIMAL;
+            case FUNGI: return Sign.FUNGI;
+            case INSECT: return Sign.INSECT;
+        }
+        return null;//TODO excpetion
+    }
+
+    private int calculateEndGamePoints(){
+        return 0;
     }
 
     public int getTurn(){
@@ -407,9 +446,16 @@ public class GameMaster {
         return lobby.getPlayerFromName(name).getPoints();
     }
 
-    public HashMap<Sign, Integer> getPlayerResources(String name){
-        return lobby.getPlayerFromName(name).getSimbolCounter();
+    public boolean requirementsSatisfied(HashMap<Sign, Integer> resources, HashMap<Sign, Integer> requirements){
+        for(Sign sign : Sign.values()){
+            if(resources.get(sign)<requirements.get(sign)){
+                return false;
+            }
+        }
+        return true;
     }
+
+
 
 //    public StartingCard[] getStartingCardToPosition() {
 //        return startingCardToPosition;
