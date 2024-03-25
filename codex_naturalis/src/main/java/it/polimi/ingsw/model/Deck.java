@@ -58,19 +58,19 @@ public class Deck {
             String prototype = (String) cardObject.get("prototype");
 
             switch (prototype) {
-                case "ObjectiveCard":
+                case "OBJECTIVE":
                     insertObjectiveCard(cardObject);
                     break;
-                case "ResourceCard":
+                case "RESOURCE":
                     insertResourceCard(cardObject);
                     break;
-                case "GoldCard":
+                case "GOLD":
                     insertGoldCard(cardObject);
                     break;
-                case "SpecialGoldCard":
+                case "SPECIAL_GOLD":
                     insertSpecialGoldCard(cardObject);
                     break;
-                case "StartingCard":
+                case "STARTING":
                     insertStartingCard(cardObject);
                     break;
                 default:
@@ -86,10 +86,10 @@ public class Deck {
      * @param cardObject the JSON object representing the card.
      */
     private void insertObjectiveCard(JSONObject cardObject) {
-        int id = (int) cardObject.get("id");
-        Kingdom kingdom = Kingdom.valueOf((String) cardObject.get("kingdom"));
-        ObjectiveType objectiveType = ObjectiveType.valueOf((String) cardObject.get("objectiveType"));
-        int multiplier = (int) cardObject.get("multiplier");
+        int id = Math.toIntExact((long) cardObject.get("id"));
+        Kingdom kingdom = kingdomOrNull((String) cardObject.get("kingdom"));
+        ObjectiveType objectiveType = ObjectiveType.valueOf((String) cardObject.get("objective-type"));
+        int multiplier = Math.toIntExact((long) cardObject.get("multiplier"));
         this.insert(new ObjectiveCard(id, kingdom, objectiveType, multiplier));
     }
 
@@ -239,8 +239,10 @@ public class Deck {
      * from the deck.
      * 
      * @return the first {@link Card} of the deck.
+     * 
+     * @throws IndexOutOfBoundsException if the deck is empty.
      */
-    public Card draw() {
+    public Card draw() throws IndexOutOfBoundsException {
         return cards.remove(0);
     }
 
@@ -251,5 +253,20 @@ public class Deck {
      */
     private void insert(Card card) {
         cards.add(card);
+    }
+
+    /**
+     * This method converts a string to a {@link Kingdom}.
+     * 
+     * @param kingdom the string to convert.
+     * @return the {@link Kingdom} corresponding to the string, or null if the
+     *         string is not a valid kingdom.
+     */
+    private Kingdom kingdomOrNull(String kingdom) {
+        try {
+            return Kingdom.valueOf(kingdom);
+        } catch (NullPointerException e) {
+            return null;
+        }
     }
 }
