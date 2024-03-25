@@ -288,6 +288,13 @@ public class Deck {
         }
     }
 
+    /**
+     * This method extracts an integer from a JSON object.
+     * 
+     * @param object the JSON object.
+     * @param field  the field to extract.
+     * @return the integer extracted from the JSON object.
+     */
     private int extractInteger(JSONObject object, String field) {
         return Math.toIntExact((long) object.get(field));
     }
