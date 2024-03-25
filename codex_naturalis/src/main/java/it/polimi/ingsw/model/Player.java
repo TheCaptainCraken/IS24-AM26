@@ -147,7 +147,7 @@ public class Player {
     /**
      * This function gives to player a new card. The game Master should call this method to give a card to player's hand. The new card will be put in the only position
      * in the array where there is value == null. There is only one null position at every player's round.
-     * @param card card played
+     * @param card the new card drawn
      */
     public void takeCard(ResourceCard card){
         int i;
