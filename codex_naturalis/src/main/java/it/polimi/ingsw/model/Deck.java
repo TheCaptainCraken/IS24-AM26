@@ -86,10 +86,10 @@ public class Deck {
      * @param cardObject the JSON object representing the card.
      */
     private void insertObjectiveCard(JSONObject cardObject) {
-        int id = Math.toIntExact((long) cardObject.get("id"));
+        int id = extractInteger(cardObject, "id");
         Kingdom kingdom = kingdomOrNull((String) cardObject.get("kingdom"));
         ObjectiveType objectiveType = ObjectiveType.valueOf((String) cardObject.get("objective-type"));
-        int multiplier = Math.toIntExact((long) cardObject.get("multiplier"));
+        int multiplier = extractInteger(cardObject, "multiplier");
         this.insert(new ObjectiveCard(id, kingdom, objectiveType, multiplier));
     }
 
@@ -99,9 +99,9 @@ public class Deck {
      * @param cardObject the JSON object representing the card.
      */
     private void insertResourceCard(JSONObject cardObject) {
-        int id = (int) cardObject.get("id");
+        int id = extractInteger(cardObject, "id");
 
-        int points = (int) cardObject.get("points");
+        int points = extractInteger(cardObject, "points");
         Kingdom kingdom = Kingdom.valueOf((String) cardObject.get("kingdom"));
 
         JSONObject corners = (JSONObject) cardObject.get("corners");
@@ -115,9 +115,10 @@ public class Deck {
      * @param cardObject the JSON object representing the card.
      */
     private void insertGoldCard(JSONObject cardObject) {
-        int id = (int) cardObject.get("id");
+        int id = extractInteger(cardObject, "id");
+
         Kingdom kingdom = Kingdom.valueOf((String) cardObject.get("kingdom"));
-        int points = (int) cardObject.get("points");
+        int points = extractInteger(cardObject, "points");
 
         JSONObject corners = (JSONObject) cardObject.get("corners");
 
@@ -130,13 +131,14 @@ public class Deck {
      * @param cardObject the JSON object representing the card.
      */
     private void insertSpecialGoldCard(JSONObject cardObject) {
-        int id = (int) cardObject.get("id");
+        int id = extractInteger(cardObject, "id");
+
         Kingdom kingdom = Kingdom.valueOf((String) cardObject.get("kingdom"));
-        int points = (int) cardObject.get("points");
+        int points = extractInteger(cardObject, "points");
 
         JSONObject corners = (JSONObject) cardObject.get("corners");
 
-        Countable thingToCount = Countable.valueOf((String) cardObject.get("thingToCount"));
+        Countable thingToCount = Countable.valueOf((String) cardObject.get("thing-to-count"));
 
         this.insert(new SpecialGoldCard(id, kingdom, getCorners(corners), points, getRequirements(cardObject),
                 thingToCount));
@@ -148,13 +150,14 @@ public class Deck {
      * @param cardObject the JSON object representing the card.
      */
     private void insertStartingCard(JSONObject cardObject) {
-        int id = (int) cardObject.get("id");
+        int id = extractInteger(cardObject, "id");
+
         Kingdom kingdom = Kingdom.valueOf((String) cardObject.get("kingdom"));
 
-        JSONObject frontCorners = (JSONObject) cardObject.get("frontCorners");
-        JSONObject backCorners = (JSONObject) cardObject.get("backCorners");
+        JSONObject frontCorners = (JSONObject) cardObject.get("front-corners");
+        JSONObject backCorners = (JSONObject) cardObject.get("back-corners");
 
-        JSONArray bonusResources = (JSONArray) cardObject.get("bonusResources");
+        JSONArray bonusResources = (JSONArray) cardObject.get("bonus-resources");
 
         ArrayList<Sign> bonusResourcesList = new ArrayList<Sign>();
         for (Object bonusResource : bonusResources) {
@@ -174,13 +177,13 @@ public class Deck {
     private HashMap<Sign, Integer> getRequirements(JSONObject cardObject) {
         JSONObject requirementsObject = (JSONObject) cardObject.get("requirements");
 
-        int mushroom = (int) requirementsObject.get("MUSHROOM");
-        int leaf = (int) requirementsObject.get("LEAF");
-        int wolf = (int) requirementsObject.get("WOLF");
-        int butterfly = (int) requirementsObject.get("BUTTERFLY");
-        int quill = (int) requirementsObject.get("QUILL");
-        int inkwell = (int) requirementsObject.get("INKWELL");
-        int scroll = (int) requirementsObject.get("SCROLL");
+        int mushroom = extractInteger(requirementsObject, "MUSHROOM");
+        int leaf = extractInteger(requirementsObject, "LEAF");
+        int wolf = extractInteger(requirementsObject, "WOLF");
+        int butterfly = extractInteger(requirementsObject, "BUTTERFLY");
+        int quill = extractInteger(requirementsObject, "QUILL");
+        int inkwell = extractInteger(requirementsObject, "INKWELL");
+        int scroll = extractInteger(requirementsObject, "SCROLL");
 
         HashMap<Sign, Integer> requirements = new HashMap<Sign, Integer>();
 
@@ -203,10 +206,10 @@ public class Deck {
      */
     private HashMap<Corner, Sign> getCorners(JSONObject cornersObject) {
 
-        Sign topLeft = Sign.valueOf((String) cornersObject.get("TOP_LEFT"));
-        Sign topRight = Sign.valueOf((String) cornersObject.get("TOP_RIGHT"));
-        Sign bottomLeft = Sign.valueOf((String) cornersObject.get("BOTTOM_LEFT"));
-        Sign bottomRight = Sign.valueOf((String) cornersObject.get("BOTTOM_RIGHT"));
+        Sign topLeft = signOrNull((String) cornersObject.get("TOP_LEFT"));
+        Sign topRight = signOrNull((String) cornersObject.get("TOP_RIGHT"));
+        Sign bottomLeft = signOrNull((String) cornersObject.get("BOTTOM_LEFT"));
+        Sign bottomRight = signOrNull((String) cornersObject.get("BOTTOM_RIGHT"));
 
         HashMap<Corner, Sign> corners = new HashMap<Corner, Sign>();
 
@@ -268,5 +271,24 @@ public class Deck {
         } catch (NullPointerException e) {
             return null;
         }
+    }
+
+    /**
+     * This method converts a string to a {@link Sign}.
+     * 
+     * @param sign the string to convert.
+     * @return the {@link Sign} corresponding to the string, or null if the string
+     *         is not a valid sign.
+     */
+    private Sign signOrNull(String sign) {
+        try {
+            return Sign.valueOf(sign);
+        } catch (NullPointerException e) {
+            return null;
+        }
+    }
+
+    private int extractInteger(JSONObject object, String field) {
+        return Math.toIntExact((long) object.get(field));
     }
 }
