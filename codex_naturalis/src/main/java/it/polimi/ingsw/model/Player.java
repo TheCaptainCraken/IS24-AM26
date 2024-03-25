@@ -17,7 +17,7 @@ public class Player {
     private PlayedCard rootCard;
     private final HashMap<Sign, Integer> resources;
     private ObjectiveCard secretObjective;
-    private ResourceCard[] hand;
+    private ResourceCard[] hand;  //in uml arraylist
 
     /**
      * It is the constructor of Player, it set the  name and the color of the pin
@@ -132,7 +132,7 @@ public class Player {
     }
 
     /**
-     * This function deletes the card given by input. The game Master should call this method to eliminate a card, played on table, from player's hand
+     * This function deletes the card given by input. The game Master should call this method to eliminate a card, played on table, from player's hand.
      * @param card card played
      */
     public void giveCard(ResourceCard card){
@@ -146,7 +146,7 @@ public class Player {
     }
     /**
      * This function gives to player a new card. The game Master should call this method to give a card to player's hand. The new card will be put in the only position
-     * in the array where there is value = null. There is only one null position at every player's round
+     * in the array where there is value == null. There is only one null position at every player's round.
      * @param card card played
      */
     public void takeCard(ResourceCard card){
