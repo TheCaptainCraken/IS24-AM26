@@ -38,7 +38,7 @@ public class GameMaster {
         setOnTableGoldCard((GoldCard) goldDeck.draw(), 0);
         setOnTableGoldCard((GoldCard) goldDeck.draw(), 1);
         for(Player player : lobby.getPlayers()){
-            player.setStartingHand();
+            player.setRootCard(); //non esiste, cosa passi?
         }
         for(int i=0; i<lobby.getPlayers().length; i++){
             startingCardToPosition[i]=(StartingCard) startingDeck.draw();
@@ -102,11 +102,10 @@ public class GameMaster {
             currentPlayer.setSecretObjective(objectiveCardToChoose[getOrderOfPlayOfThePlayer(currentPlayer.getName())][whichCard]);
             nextGlobalTurn();
             if(getOrderOfPlayOfThePlayer(getCurrentPlayer().getName())==0){
-                gameState=GameState.PLACING_PHASE;
+                gameState = GameState.PLACING_PHASE;
             }
             return 0;
         }
-        return 1;//is not their turn
     }
 
 
@@ -116,30 +115,36 @@ public class GameMaster {
      * @param position In which position of the table the player wants to be place the card
      * @param side To which side wants the player to place the card
      */
-    public void placeCard(String namePlayer, PlayableCard cardToPlace, Point position, boolean side){
+    public int placeCard(String namePlayer, PlayableCard cardToPlace, Point position, boolean side){
         Player currentPlayer = getCurrentPlayer();
-        if(isCurrentPlayer(namePlayer, currentPlayer)){
-            if(gameState==GameState.PLACING_PHASE) {
-                HashMap<Corner, PlayedCard> attachments = isPositionable(currentPlayer.getRootCard(), cardToPlace, position);
-                if (attachments != null) {
-                    if(side){
-                        if (cardToPlace instanceof GoldCard) {
-                            GoldCard goldCard = (SpecialGoldCard) cardToPlace;
-                            if (requirementsSatisfied(currentPlayer.getResources(), goldCard.getRequirements())) {
+        if(! isCurrentPlayer(namePlayer, currentPlayer)) {
+            return 1; //not current turn
+        }
+
+        if(gameState != GameState.PLACING_PHASE) {
+            return 2; //
+        }
+
+        HashMap<Corner, PlayedCard> attachments = isPositionable(currentPlayer.getRootCard(), cardToPlace, position);
+            if (attachments != null) {
+                if(side){
+                    if (cardToPlace instanceof GoldCard) {
+                        GoldCard goldCard = (SpecialGoldCard) cardToPlace;
+                        if (requirementsSatisfied(currentPlayer.getResources(), goldCard.getRequirements())) {
                                 return 4;//not enough resources
                             }
                         }
-                        PlayedCard newPlayedCard = new PlayedCard(cardToPlace, attachments, side, getTurn(), position);//the attachments are of the graph of the player who is playing so there isn-t any reference to Player class in the constructor
-                        if (cardToPlace instanceof SpecialGoldCard) {
-                            SpecialGoldCard specialGoldCard = (SpecialGoldCard) cardToPlace;
-                            if (specialGoldCard.getCountable() == Countable.CORNER) {
+                    PlayedCard newPlayedCard = new PlayedCard(cardToPlace, attachments, side, getTurn(), position);//the attachments are of the graph of the player who is playing so there isn-t any reference to Player class in the constructor
+                    if (cardToPlace instanceof SpecialGoldCard) {
+                        SpecialGoldCard specialGoldCard = (SpecialGoldCard) cardToPlace;
+                        if (specialGoldCard.getThingToCount() == Countable.CORNER) {
                                 currentPlayer.addPoints(specialGoldCard.pointsToAdd(newPlayedCard));//cannot create PlayedCard then because to use the graph and calculate effects I need first to place it here
-                            } else {
-                                currentPlayer.addPoints(specialGoldCard.pointsToAdd(currentPlayer.getResources()));
-                            }
                         } else {
-                            ResourceCard resourceCard = (ResourceCard) newPlayedCard.getPlayableCard();
-                            currentPlayer.updatePoints();addPoints(resourceCard.getPoints());//TODO addPoints
+                            currentPlayer.addPoints(specialGoldCard.pointsToAdd(currentPlayer.getResources()));
+                        }
+                    } else {
+                            ResourceCard resourceCard = (ResourceCard) newPlayedCard.getCard();
+                            currentPlayer.addPoints(resourceCard.getPoints());
                         }
                         for(Corner corner : Corner.values()){//
                             currentPlayer.addResource(cardToPlace.getAttached().get(corner), 1);;
@@ -152,34 +157,30 @@ public class GameMaster {
                     for(Corner corner : Corner.values()){//remove from counter
                         switch(corner){
                             case TOP_LEFT:{
-                                currentPlayer.removeResources(attachments.get(corner).getPlayableCard().getCorners().get(Corner.BOTTOM_RIGHT), 1);
+                                currentPlayer.removeResources(attachments.get(corner).getCard().getCorners().get(Corner.BOTTOM_RIGHT), 1);
                                 break;
                             }
                             case TOP_RIGHT:{
-                                currentPlayer.removeResources(attachments.get(corner).getPlayableCard().getCorners().get(Corner.BOTTOM_LEFT), 1);
+                                currentPlayer.removeResources(attachments.get(corner).getCard().getCorners().get(Corner.BOTTOM_LEFT), 1);
                                 break;
                             }
                             case BOTTOM_LEFT:{
-                                currentPlayer.removeResources(attachments.get(corner).getPlayableCard().getCorners().get(Corner.TOP_RIGHT), 1);
+                                currentPlayer.removeResources(attachments.get(corner).getCard().getCorners().get(Corner.TOP_RIGHT), 1);
                                 break;
                             }
                             case BOTTOM_RIGHT:{
-                                currentPlayer.removeResources(attachments.get(corner).getPlayableCard().getCorners().get(Corner.TOP_LEFT), 1);
+                                currentPlayer.removeResources(attachments.get(corner).getCard().getCorners().get(Corner.TOP_LEFT), 1);
                                 break;
                             }
                         }
                     }
                     //rimuovi carta dalla mano dell-utente
-                    currentPlayer.giveCard(cardToPlace.getId());
+                    currentPlayer.giveCard((ResourceCard) cardToPlace);
                     gameState=GameState.DRAWING_PHASE;
                     return 0;
                 }
                 return 3;//is not positionable
             }
-            return 2;//is not the right phase
-        }
-        return 1;//is not their turn
-    }
 
     /**
      * @param namePlayer
@@ -190,42 +191,43 @@ public class GameMaster {
     public ResourceCard drawCard(String namePlayer, boolean goldOrNot, int onTableOrDeck){ //onTableOrDeck has 0, 1 for position of array of cards on table and 2 for draw from deck
         Player currentPlayer = getCurrentPlayer();
         if(isCurrentPlayer(namePlayer, currentPlayer)) {//TODO mazzo finito
-            if(gameState==GameState.DRAWING_PHASE){
-                if (goldOrNot) {
-                    if (onTableOrDeck == 2) {//TODO la view richiede il nuovo retro di quella in cima e non solo di quella spostata
-                        currentPlayer.takeCard((PlayableCard) goldDeck.draw());
-                    }else{
-                        currentPlayer.takeCard(onTableGoldCards[onTableOrDeck]);
-                        onTableGoldCards[onTableOrDeck]=(GoldCard) goldDeck.draw();
-                    }
-                } else {
-                    if (onTableOrDeck == 2) {//TODO la view richiede il nuovo retro di quella in cima e non solo di quella spostata
-                        currentPlayer.takeCard(resourceDeck.draw());
-                    }else{
-                        currentPlayer.takeCard(onTableResourceCards[onTableOrDeck]);
-                        onTableResourceCards[onTableOrDeck]=(ResourceCard) resourceDeck.draw();
-                    }
-                }
-                //next player will play?
-                //TODO maybe it could be written in a better way
-                if(flagTurnRemained ==1&&getOrderOfPlayOfThePlayer(currentPlayer.getName())+1==lobby.getPlayers().length){//if it is the last player in second-last turn cicle, say the next is the last turn
-                    flagTurnRemained =0;
-                    gameState = GameState.PLACING_PHASE;
-                } else if (flagTurnRemained ==0&&getOrderOfPlayOfThePlayer(currentPlayer.getName())+1==lobby.getPlayers().length) {//if it is the last player in last turn cicle, go to end mode
-                    gameState=GameState.END;
-                }else if(currentPlayer.getPoints()>=20){//if a player reached 20 points set this turn cicle as the second-last
-                    flagTurnRemained =1;
-                    gameState = GameState.PLACING_PHASE;
-                }else{
-                    gameState = GameState.PLACING_PHASE;
-                }
-                nextGlobalTurn();
-                return 0;
-            }
-            return 2;//is not the right phase
+            return null;
         }
-        return 1;//is not their turn
+        if(gameState != GameState.DRAWING_PHASE) {
+            return null;
+        }
+        if (goldOrNot) {
+            if (onTableOrDeck == 2) {//TODO la view richiede il nuovo retro di quella in cima e non solo di quella spostata
+                currentPlayer.takeCard((ResourceCard)goldDeck.draw());
+            }else{
+                currentPlayer.takeCard(onTableGoldCards[onTableOrDeck]);
+                onTableGoldCards[onTableOrDeck]=(GoldCard) goldDeck.draw();
+            }
+        } else {
+            if (onTableOrDeck == 2) {//TODO la view richiede il nuovo retro di quella in cima e non solo di quella spostata
+                        currentPlayer.takeCard((ResourceCard) resourceDeck.draw());
+            }else{
+                currentPlayer.takeCard(onTableResourceCards[onTableOrDeck]);
+                onTableResourceCards[onTableOrDeck]=(ResourceCard) resourceDeck.draw();
+            }
+        }
+        //next player will play?
+        //TODO maybe it could be written in a better way
+        if(flagTurnRemained ==1&&getOrderOfPlayOfThePlayer(currentPlayer.getName())+1==lobby.getPlayers().length){//if it is the last player in second-last turn cicle, say the next is the last turn
+            flagTurnRemained =0;
+            gameState = GameState.PLACING_PHASE;
+        }else if (flagTurnRemained ==0&&getOrderOfPlayOfThePlayer(currentPlayer.getName())+1==lobby.getPlayers().length) {//if it is the last player in last turn cicle, go to end mode
+            gameState=GameState.END;
+        }else if(currentPlayer.getPoints()>=20){//if a player reached 20 points set this turn cicle as the second-last
+            flagTurnRemained =1;
+            gameState = GameState.PLACING_PHASE;
+        }else{
+            gameState = GameState.PLACING_PHASE;
+        }
+        nextGlobalTurn();
+        return null;
     }
+
 
     //TODO calcolaObiettiviAllaFine
     public int endGame(String namePlayer){ //Player will click a button to calculate their points
@@ -308,38 +310,38 @@ public class GameMaster {
                 if(cardToCheck.isFacingUp()){
                     switch(corner){
                         case TOP_LEFT:{
-                            cornerToCheck=cardToCheck.getPlayableCard().getCorners().get(Corner.BOTTOM_RIGHT);
+                            cornerToCheck=cardToCheck.getCard().getCorners().get(Corner.BOTTOM_RIGHT);
                             break;
                         }
                         case TOP_RIGHT:{
-                            cornerToCheck=cardToCheck.getPlayableCard().getCorners().get(Corner.BOTTOM_LEFT);
+                            cornerToCheck=cardToCheck.getCard().getCorners().get(Corner.BOTTOM_LEFT);
                             break;
                         }
                         case BOTTOM_LEFT:{
-                            cornerToCheck=cardToCheck.getPlayableCard().getCorners().get(Corner.TOP_RIGHT);
+                            cornerToCheck=cardToCheck.getCard().getCorners().get(Corner.TOP_RIGHT);
                             break;
                         }
                         case BOTTOM_RIGHT:{
-                            cornerToCheck=cardToCheck.getPlayableCard().getCorners().get(Corner.TOP_LEFT);
+                            cornerToCheck=cardToCheck.getCard().getCorners().get(Corner.TOP_LEFT);
                             break;
                         }
                     }
-                }else if(!cardToCheck.isFacingUp()&&(cardToCheck.getPlayableCard() instanceof StartingCard)){//it's a starting card upside down
+                }else if(!cardToCheck.isFacingUp()&&(cardToCheck.getCard() instanceof StartingCard)){//it's a starting card upside down
                     switch(corner){
                         case TOP_LEFT:{
-                            cornerToCheck=((StartingCard) cardToCheck.getPlayableCard()).getBackSideCorners().get(Corner.BOTTOM_RIGHT);
+                            cornerToCheck=((StartingCard) cardToCheck.getCard()).getBacksideCorners().get(Corner.BOTTOM_RIGHT);
                             break;
                         }
                         case TOP_RIGHT:{
-                            cornerToCheck=((StartingCard) cardToCheck.getPlayableCard()).getBackSideCorners().get(Corner.BOTTOM_LEFT);
+                            cornerToCheck=((StartingCard) cardToCheck.getCard()).getBacksideCorners().get(Corner.BOTTOM_LEFT);
                             break;
                         }
                         case BOTTOM_LEFT:{
-                            cornerToCheck=((StartingCard) cardToCheck.getPlayableCard()).getBackSideCorners().get(Corner.TOP_RIGHT);
+                            cornerToCheck=((StartingCard) cardToCheck.getCard()).getBacksideCorners().get(Corner.TOP_RIGHT);
                             break;
                         }
                         case BOTTOM_RIGHT:{
-                            cornerToCheck=((StartingCard) cardToCheck.getPlayableCard()).getBackSideCorners().get(Corner.TOP_LEFT);
+                            cornerToCheck=((StartingCard) cardToCheck.getCard()).getBacksideCorners().get(Corner.TOP_LEFT);
                             break;
                         }
                     }
