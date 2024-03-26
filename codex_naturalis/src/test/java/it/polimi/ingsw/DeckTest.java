@@ -34,6 +34,12 @@ public class DeckTest {
             Deck deck = new Deck(basePath + "objective_card.json");
             deck.draw();
         });
+
+        Assertions.assertThrows(IndexOutOfBoundsException.class, () -> {
+            Deck deck = new Deck(basePath + "objective_card.json");
+            deck.draw();
+            deck.draw();
+        });
     }
 
     @Test
