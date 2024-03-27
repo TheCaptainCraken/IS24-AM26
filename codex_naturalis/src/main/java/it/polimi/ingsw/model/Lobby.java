@@ -5,17 +5,20 @@ import java.util.List;
 
 public class Lobby {
     private ArrayList<Player> players;
+    boolean complete=true;
 
     public Lobby(){
         players = new ArrayList<>();
     }
-    public void addPlayer(String nickname/*, ColorPin colorPin*/){//TODO excpetion
-        if(players.size()<4){
-            Player newPlayer = new Player(nickname, ColorPin.values()[players.size()], players.size()==0);
-            players.add(newPlayer);
-            //return newPlayer;
+    public void addPlayer(String nickname, Color color){//TODO excpetion
+        if(complete){
+            throw new IndexOutOfBoundsException("The lobby has already 4 players");
         }
-        //return null;
+        Player newPlayer = new Player(nickname, color);
+        players.add(newPlayer);
+        if(players.size()==4){
+            setLock();
+        }
     }
 
     public Player[] getPlayers() {
@@ -24,10 +27,14 @@ public class Lobby {
 
     public Player getPlayerFromName(String nickname){//TODO clone
         for(Player player : getPlayers()){
-            if(player.getNickname().equals(nickname)){
+            if(player.getName().equals(nickname)){
                 return player;
             }
         }
         return null;//TODO add a NoSuchFieldException
+    }
+
+    public void setLock(){
+        complete=false;
     }
 }
