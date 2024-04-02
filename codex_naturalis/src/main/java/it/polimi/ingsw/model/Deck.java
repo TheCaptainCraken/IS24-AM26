@@ -21,7 +21,10 @@ public class Deck {
         return cards.get(0).getKingdom();
     }
 
-    public Card draw(){
+    public Card draw() throws NullPointerException{//TODO understand how to manage it here, GameMaster and getKingdomFirstCard()
+        if(cards.size()==0){
+            throw new NullPointerException("The deck is finished");
+        }
         return cards.remove(0);
     }
 

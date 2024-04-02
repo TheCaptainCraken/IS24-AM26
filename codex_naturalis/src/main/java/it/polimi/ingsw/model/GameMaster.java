@@ -8,16 +8,14 @@ import java.util.HashMap;
 public class GameMaster {
     private int globalTurn;
     private int flagTurnRemained;
-    private TurnType turnType; //TODO mettere enumerazione
+    private TurnType turnType;
     private Lobby lobby;
     private GameState gameState;
 
-    private Deck resourceDeck;//TODO usare i parametri
+    private Deck resourceDeck;
     private Deck goldDeck;
     private Deck startingDeck;
     private Deck objectiveDeck;
-
-    //TODO non veninvano tenute nel deck
     private ResourceCard[] onTableResourceCards;
     private GoldCard[] onTableGoldCards;
     private ObjectiveCard[] onTableObjectiveCards;
@@ -56,21 +54,21 @@ public class GameMaster {
         setOnTableObjectiveCards((ObjectiveCard) objectiveDeck.draw(), 0);
         setOnTableObjectiveCards((ObjectiveCard) objectiveDeck.draw(), 1);
 
-        //TODO settare mano giocatori
-        for (Player player : lobby.getPlayers()) {
-            player.setRootCard(null); //cosa vuoi passare?
-        }
-        //TODO non fai scegliere il lato di starting card
-        int i;
+        int i, j;
         for (i = 0; i < lobby.getPlayers().length; i++) {
             startingCardToPosition[i] = (StartingCard) startingDeck.draw();
         }
-        //perche è una matrice?
         for (i = 0; i < lobby.getPlayers().length; i++) {
-            int j;
             for (j = 0; j < 2; j++) {
                 objectiveCardToChoose[i][j] = (ObjectiveCard) objectiveDeck.draw();
             }
+        }
+        for(Player player : lobby.getPlayers()){
+            ResourceCard[] hand = new ResourceCard[3];
+            hand[0]=(ResourceCard) resourceDeck.draw();
+            hand[1]=(ResourceCard) resourceDeck.draw();
+            hand[2]=(ResourceCard) goldDeck.draw();
+            player.setHand(hand);
         }
     }
 
@@ -92,12 +90,14 @@ public class GameMaster {
             for (Corner corner : Corner.values()) {
                 defaultAttachments.put(corner, null);
             }
-
-            PlayedCard rootCard = new PlayedCard(startingCardToPosition[getOrderPlayer(currentPlayer.getName())],
-                    defaultAttachments, side, 0, new Point(0, 0));
-
-            currentPlayer.setRootCard(rootCard);
-            //TODO aggiornare le risorse di startingcard
+            StartingCard rootCard = startingCardToPosition[getOrderPlayer(currentPlayer.getName())];
+            PlayedCard rootCardPlaced = new PlayedCard(rootCard, defaultAttachments, side, 0, new Point(0, 0));
+            currentPlayer.setRootCard(rootCardPlaced);
+            if(!side){
+                for(Sign sign : rootCard.getBonusResources()) {
+                    currentPlayer.addResource(sign, 1);
+                }
+            }
 
             nextGlobalTurn();
             if (getOrderPlayer(getCurrentPlayer().getName()) == 0) {
@@ -147,21 +147,22 @@ public class GameMaster {
         }
 
         HashMap<Corner, PlayedCard> attachments = isPositionable(currentPlayer.getRootCard(), position);
-        //the player postions the card in the back front. The card is one resource and 4 empty corners.
+        //the player positions the card in the back front. The card is one resource and 4 empty corners.
         if (!side) {
             new PlayedCard(cardToPlace, attachments, side, getTurn(), position);
             currentPlayer.addResource(fromKingdomToSign(cardToPlace.getKingdom()), 1);
-        } else if (cardToPlace instanceof GoldCard) {
-            GoldCard goldCard = (SpecialGoldCard) cardToPlace;
-            if (requirementsSatisfied(currentPlayer, goldCard)) {
-                throw new NotEnoughResourcesException();
+        } else {
+            if (cardToPlace instanceof GoldCard) {
+                GoldCard goldCard = (SpecialGoldCard) cardToPlace;
+                if (requirementsSatisfied(currentPlayer, goldCard)) {
+                    throw new NotEnoughResourcesException();
+                }
             }
             //the attachments are of the graph of the player who is playing so there isn-t any reference to Player class in the constructor
             new PlayedCard(cardToPlace, attachments, side, getTurn(), position);
             for (Corner corner : Corner.values()) {
                 currentPlayer.addResource(cardToPlace.getCorners().get(corner), 1);
             }
-            currentPlayer.addPoints(0); //cosa devo passare @Pietro cosi è inutile chiamarlo
         }
         //remove resources from counter
         for (Corner corner : Corner.values()) {
@@ -184,7 +185,6 @@ public class GameMaster {
                 }
             }
         }
-        //TODO see rules. @Pietro i am not sure that this are the rules
         //At the end because I need to know resources values at the end and how many attachments when I've found them
         if (cardToPlace instanceof SpecialGoldCard) {
             SpecialGoldCard specialGoldCard = (SpecialGoldCard) cardToPlace;
@@ -204,33 +204,36 @@ public class GameMaster {
      * @param onTableOrDeck If the card is taken from the table or not: 2 means from deck, 0 and 1 are the position onTable array
      * @return
      */
-    public ResourceCard drawCard(String namePlayer, boolean goldOrNot, int onTableOrDeck) throws NoSuchFieldException, WrongGamePhaseException, NoTurnException, NotExistsPlayerException {
+    public int drawCard(String namePlayer, boolean goldOrNot, int onTableOrDeck) throws NullPointerException, WrongGamePhaseException, NoTurnException, NotExistsPlayerException {
         //onTableOrDeck has 0, 1 for position of array of cards on table and 2 for draw from deck
         Player currentPlayer = getCurrentPlayer();
-        if (isCurrentPlayer(namePlayer, currentPlayer)) {//TODO mazzo finito
+        if (isCurrentPlayer(namePlayer, currentPlayer)) {
             throw new NoTurnException();
         }
         if (gameState != GameState.DRAWING_PHASE) {
             throw new WrongGamePhaseException();
         }
-
+        ResourceCard cardDrawn;
         if (goldOrNot) {
-            if (onTableOrDeck == 2) {//TODO la view richiede il nuovo retro di quella in cima e non solo di quella spostata
-                currentPlayer.takeCard((ResourceCard) goldDeck.draw());
+            if (onTableOrDeck == 2) {//TODO FOR THE VIEW la view richiede il nuovo retro di quella in cima e non solo di quella spostata
+                cardDrawn = (ResourceCard) goldDeck.draw();
+                currentPlayer.takeCard(cardDrawn);
             } else {
-                currentPlayer.takeCard(onTableGoldCards[onTableOrDeck]);
+                cardDrawn = onTableGoldCards[onTableOrDeck];
+                currentPlayer.takeCard(cardDrawn);
                 onTableGoldCards[onTableOrDeck] = (GoldCard) goldDeck.draw();
             }
         } else {
-            if (onTableOrDeck == 2) {//TODO la view richiede il nuovo retro di quella in cima e non solo di quella spostata
-                currentPlayer.takeCard((ResourceCard) resourceDeck.draw());
+            if (onTableOrDeck == 2) {//TODO FOR THE VIEW la view richiede il nuovo retro di quella in cima e non solo di quella spostata
+                cardDrawn = (ResourceCard) resourceDeck.draw();
+                currentPlayer.takeCard(cardDrawn);
             } else {
-                currentPlayer.takeCard(onTableResourceCards[onTableOrDeck]);
+                cardDrawn = onTableResourceCards[onTableOrDeck];
+                currentPlayer.takeCard(cardDrawn);
                 onTableResourceCards[onTableOrDeck] = (ResourceCard) resourceDeck.draw();
             }
         }
         //next player will play?
-        //TODO maybe it could be written in a better way
         if (flagTurnRemained == 1 && getOrderPlayer(currentPlayer.getName()) + 1 == lobby.getPlayers().length) {
             //if it is the last player in second-last turn cicle, say the next is the last turn
             flagTurnRemained = 0;
@@ -246,7 +249,7 @@ public class GameMaster {
         }
         nextGlobalTurn();
 
-        return null; //TODO cosa devi ritornare?
+        return cardDrawn.getId(); //TODO Check ritornare solo l'id alla view
     }
 
     /**
@@ -255,9 +258,9 @@ public class GameMaster {
      * @param namePlayer Player who sent the request
      * @return
      */
-    //TODO calcolaObiettiviAllaFine
+    //TODO OBJECTIVE CARD POINTS calcolaObiettiviAllaFine
     public void endGame(String namePlayer) throws WrongGamePhaseException { //Player will click a button to calculate their points
-        //TODO rifare senza il calcolo degli stati
+        //TODO OBJECTIVE CARD POINTS rifare senza il calcolo degli stati
 
         ArrayList<Integer> numberOfObjectiveForPlayer = new ArrayList<>();//With a linkedhashmap I can't put before or after an element
         if (gameState != GameState.END) {//It just has an anti-cheat purpose
@@ -265,7 +268,7 @@ public class GameMaster {
         } else {
             for (Player player : lobby.getPlayers()) {
                 int numberOfObjective = calculateBestCombination();
-                //TODO quelli in altro modo
+                //TODO OBJECTIVE CARD POINTS quelli in altro modo
                 //numberOfObjective+=;
                 boolean toInsert = true;
                 int i;
@@ -281,7 +284,7 @@ public class GameMaster {
                     ranking.add(ranking.size(), player);//aggiungi prima
                     numberOfObjectiveForPlayer.add(numberOfObjectiveForPlayer.size(), numberOfObjective);
                 }
-                /*player.addPoints(calculateEndGamePoints(currentPlayer.getSecretObjective().getType(), currentPlayer.getSecretObjective().getMultiplier()));//TODO finire, qua fare con l'overload dell'interfaccia e poi in questo metodo si chiameranno i metodi di ricerca di this
+                /*player.addPoints(calculateEndGamePoints(currentPlayer.getSecretObjective().getType(), currentPlayer.getSecretObjective().getMultiplier()));//TODO OBJECTIVE CARD POINTS finire, qua fare con l'overload dell'interfaccia e poi in questo metodo si chiameranno i metodi di ricerca di this
                 for(ObjectiveCard objectiveCard : onTableObjectiveCards){
                     currentPlayer.addPoints(objectiveCard.effect(calculateEndGamePoints(objectiveCard.getType(), objectiveCard.getMultiplier())));//cosa vuoi fare non esiste effect
 
@@ -382,7 +385,7 @@ public class GameMaster {
             attachments.put(corner, cardToCheck);
         }
         if (!cardToPlaceIsAttached) {
-            throw new NoSuchFieldException("It's not possible place a card unattached from the other cards"); //TODO cambiare eccezzioni
+            throw new NoSuchFieldException("It's not possible place a card unattached from the other cards"); //TODO cambiare eccezioni
         }
         return attachments;
     }
@@ -394,7 +397,7 @@ public class GameMaster {
      * @param position
      * @return method recursiveFindCard //TODO è giusto?
      */
-    private PlayedCard findCard(PlayedCard startingCard, Point position) {//TODO METTERLO A DISPOSIZIONE DEL MODULE DI GOLDCARD E OBJECTCARD
+    private PlayedCard findCard(PlayedCard startingCard, Point position) {//TODO OBJECTIVE CARD POINTS METTERLO A DISPOSIZIONE DEL MODULE DI GOLDCARD E OBJECTCARD
         Stack<PlayedCard> stack = new Stack<>();//Anche Arraylist è uguale
         return recursiveFindCard(startingCard, position, stack);
     }
@@ -425,11 +428,9 @@ public class GameMaster {
 
     /**
      * Converts Kingdom enum to Sign enum
-     *
      * @param kingdom Kingdom to convert
      * @return Sign in which the Kingdom has been converted
      */
-    //TODO sono sbagliati le enum, avrai problemi col merge credo
     private Sign fromKingdomToSign(Kingdom kingdom) throws IllegalArgumentException {
         switch (kingdom) {
             case PLANT:
@@ -507,7 +508,7 @@ public class GameMaster {
         }
     }
 
-    //TODO
+    //TODO OBJECTIVE CARD POINTS
     private int calculateEndGamePoints(ObjectiveType type, int multiplier) {
         return 0;
     }
@@ -516,7 +517,7 @@ public class GameMaster {
      * Calculates the best combination of ObjectiveCard effects to get major increase of points with more application of
      * effects (In case of draw points between players)
      *
-     * @return ..//TODO
+     * @return ..//TODO OBJECTIVE CARD POINTS
      */
     private int calculateBestCombination() {//TODO
         return 0;
@@ -614,7 +615,7 @@ public class GameMaster {
      * @param namePlayer name of the player about is wanted to get info
      * @return points of the player
      */
-    public int getPlayerPoints(String namePlayer) throws NotExistsPlayerException {
+    public int getPlayerPoints(String namePlayer) throws NoSuchFieldException {
         return lobby.getPlayerFromName(namePlayer).getPoints();
     }
 
@@ -624,7 +625,7 @@ public class GameMaster {
      * @param namePlayer name of the player about is wanted to get info
      * @return resources of the player
      */
-    public HashMap<Sign, Integer> getPlayerResources(String namePlayer) throws NotExistsPlayerException {
+    public HashMap<Sign, Integer> getPlayerResources(String namePlayer) throws NoSuchFieldException {
         return lobby.getPlayerFromName(namePlayer).getResources();
     }
 
