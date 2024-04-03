@@ -98,7 +98,6 @@ public class GameMaster {
                     currentPlayer.addResource(sign, 1);
                 }
             }
-
             nextGlobalTurn();
             if (getOrderPlayer(getCurrentPlayer().getName()) == 0) {
                 gameState = GameState.CHOOSING_OBJECTIVE_CARD;
@@ -154,7 +153,7 @@ public class GameMaster {
         } else {
             if (cardToPlace instanceof GoldCard) {
                 GoldCard goldCard = (SpecialGoldCard) cardToPlace;
-                if (requirementsSatisfied(currentPlayer, goldCard)) {
+                if (!requirementsSatisfied(currentPlayer, goldCard)) {
                     throw new NotEnoughResourcesException();
                 }
             }
@@ -284,7 +283,8 @@ public class GameMaster {
                     ranking.add(ranking.size(), player);//aggiungi prima
                     numberOfObjectiveForPlayer.add(numberOfObjectiveForPlayer.size(), numberOfObjective);
                 }
-                /*player.addPoints(calculateEndGamePoints(currentPlayer.getSecretObjective().getType(), currentPlayer.getSecretObjective().getMultiplier()));//TODO OBJECTIVE CARD POINTS finire, qua fare con l'overload dell'interfaccia e poi in questo metodo si chiameranno i metodi di ricerca di this
+                /*player.addPoints(calculateEndGamePoints(currentPlayer.getSecretObjective().getType(), currentPlayer.getSecretObjective().getMultiplier()));
+                //TODO OBJECTIVE CARD POINTS finire, qua fare con l'overload dell'interfaccia e poi in questo metodo si chiameranno i metodi di ricerca di this
                 for(ObjectiveCard objectiveCard : onTableObjectiveCards){
                     currentPlayer.addPoints(objectiveCard.effect(calculateEndGamePoints(objectiveCard.getType(), objectiveCard.getMultiplier())));//cosa vuoi fare non esiste effect
 
@@ -301,7 +301,7 @@ public class GameMaster {
      * Example: starting card is always 0,0 so TOP_LEFT would be 0;1, TOP_RIGHT
      *
      * @param startingCard A card where
-     * @param position     Position that identifies where the next card should be placed
+     * @param position  Position that identifies where the next card should be placed
      * @return Hashmap<Corner, PlayedCard> of the attachments for the card to cardToPlace
      * @throws NoSuchFieldException
      */
@@ -335,7 +335,7 @@ public class GameMaster {
             }
             cardToCheck = findCard(startingCard, new Point(position.x + xPlaceToCheck, position.y + yPlaceToCheck));
             if (cardToCheck != null) {
-                Sign cornerToCheck = null;//IDE gives error in cornerToCheck==null because it could be not initialized but is the purpose of this check
+                Sign cornerToCheck = null;
                 if (cardToCheck.isFacingUp()) {
                     switch (corner) {
                         case TOP_LEFT: {
@@ -355,7 +355,8 @@ public class GameMaster {
                             break;
                         }
                     }
-                } else if (!cardToCheck.isFacingUp() && (cardToCheck.getCard() instanceof StartingCard)) {//it's a starting card upside down
+                } else if (!cardToCheck.isFacingUp() && (cardToCheck.getCard() instanceof StartingCard)) {
+                    //it's a starting card upside down
                     switch (corner) {
                         case TOP_LEFT: {
                             cornerToCheck = ((StartingCard) cardToCheck.getCard()).getBacksideCorners().get(Corner.BOTTOM_RIGHT);
@@ -385,7 +386,8 @@ public class GameMaster {
             attachments.put(corner, cardToCheck);
         }
         if (!cardToPlaceIsAttached) {
-            throw new NoSuchFieldException("It's not possible place a card unattached from the other cards"); //TODO cambiare eccezioni
+            throw new NoSuchFieldException("It's not possible place a card unattached from the other cards");
+            //TODO cambiare eccezioni
         }
         return attachments;
     }
@@ -519,7 +521,7 @@ public class GameMaster {
      *
      * @return ..//TODO OBJECTIVE CARD POINTS
      */
-    private int calculateBestCombination() {//TODO
+    private int calculateBestCombination() {
         return 0;
     }
 

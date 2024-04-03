@@ -1,36 +1,39 @@
 package it.polimi.ingsw.model;
 
+import it.polimi.ingsw.model.exception.*;
+
 import java.util.ArrayList;
-import java.util.List;
 
 public class Lobby {
-    private ArrayList<Player> players;
-    boolean complete=false;
+    private final ArrayList<Player> players;
+    boolean complete = false;
 
-    /**It's an holder for the players that permits to check and limit access
+    /**It's a holder for the players that permits to check and limit access
      */
     public Lobby(){
         players = new ArrayList<>();
     }
 
-    /**If possible it adds a new player to the lobby with an unique nickname
+    /**If possible it adds a new player to the lobby with a unique nickname
      * @param nickname nickname of the new Player
      * @param color color of the pin that the player has chosen
      */
-    public void addPlayer(String nickname, Color color) throws IndexOutOfBoundsException, IllegalArgumentException{//TODO excpetion
+    public void addPlayer(String nickname, Color color) throws LobbyCompleteException, SameNameException{
         if(complete){
-            throw new IndexOutOfBoundsException("The lobby has already 4 players");
+            throw new LobbyCompleteException();
         }
         for(Player player : players){
             if(player.getName().equals(nickname)){
-                throw new IllegalArgumentException("There's already a player with this nickname");
+                throw new SameNameException();
             }
         }
         Player newPlayer = new Player(nickname, color);
         players.add(newPlayer);
-        if(players.size()==4){
+        if(players.size() == 4){
             setLock();
         }
+
+        //TODO bisognerebbe settare casualmente il giocatore iniziale. Non deve essere sempre il primo aggiunto, basta anche uno shuffle.
     }
 
     /**Get a fixed array of players
@@ -40,7 +43,7 @@ public class Lobby {
         return players.toArray( new Player[players.size()]);
     }
 
-    /**Givena  nickname it returns the player with that unique nickname
+    /**Given a  nickname it returns the player with that unique nickname
      * @param nickname nickname of the Player we want to get
      * @return the Player with the given nickname
      */
@@ -56,6 +59,6 @@ public class Lobby {
     /** It locks the lobby so nobody can join anymore, the lobby cannot be unlocked
      */
     public void setLock(){
-        complete=true;
+        complete = true;
     }
 }
