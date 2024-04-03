@@ -1,482 +1,482 @@
 [
   {
     "prototype": "RESOURCE",
-    "id": "",
-    "kingdom": "",
-    "points": "",
+    "id": 17,
+    "kingdom": "FUNGI",
+    "points": 0,
     "corners": {
-      "TOP_LEFT": "",
-      "TOP_RIGHT": "",
-      "BOTTOM_LEFT": "",
-      "BOTTOM_RIGHT": ""
+      "TOP_LEFT": "MUSHROOM",
+      "TOP_RIGHT": "EMPTY",
+      "BOTTOM_LEFT": "MUSHROOM",
+      "BOTTOM_RIGHT": null
     }
   },
   {
     "prototype": "RESOURCE",
-    "id": "",
-    "kingdom": "",
-    "points": "",
+    "id": 18,
+    "kingdom": "FUNGI",
+    "points": 0,
     "corners": {
-      "TOP_LEFT": "",
-      "TOP_RIGHT": "",
-      "BOTTOM_LEFT": "",
-      "BOTTOM_RIGHT": ""
+      "TOP_LEFT": "MUSHROOM",
+      "TOP_RIGHT": "MUSHROOM",
+      "BOTTOM_LEFT": null,
+      "BOTTOM_RIGHT": "EMPTY"
     }
   },
   {
     "prototype": "RESOURCE",
-    "id": "",
-    "kingdom": "",
-    "points": "",
+    "id": 19,
+    "kingdom": "FUNGI",
+    "points": 0,
     "corners": {
-      "TOP_LEFT": "",
-      "TOP_RIGHT": "",
-      "BOTTOM_LEFT": "",
-      "BOTTOM_RIGHT": ""
+      "TOP_LEFT": "EMPTY",
+      "TOP_RIGHT": null,
+      "BOTTOM_LEFT": "MUSHROOM",
+      "BOTTOM_RIGHT": "MUSHROOM"
     }
   },
   {
     "prototype": "RESOURCE",
-    "id": "",
-    "kingdom": "",
-    "points": "",
+    "id": 20,
+    "kingdom": "FUNGI",
+    "points": 0,
     "corners": {
-      "TOP_LEFT": "",
-      "TOP_RIGHT": "",
-      "BOTTOM_LEFT": "",
-      "BOTTOM_RIGHT": ""
+      "TOP_LEFT": null,
+      "TOP_RIGHT": "MUSHROOM",
+      "BOTTOM_LEFT": "EMPTY",
+      "BOTTOM_RIGHT": "MUSHROOM"
     }
   },
   {
     "prototype": "RESOURCE",
-    "id": "",
-    "kingdom": "",
-    "points": "",
+    "id": 21,
+    "kingdom": "FUNGI",
+    "points": 0,
     "corners": {
-      "TOP_LEFT": "",
-      "TOP_RIGHT": "",
-      "BOTTOM_LEFT": "",
-      "BOTTOM_RIGHT": ""
+      "TOP_LEFT": null,
+      "TOP_RIGHT": "QUILL",
+      "BOTTOM_LEFT": "LEAF",
+      "BOTTOM_RIGHT": "MUSHROOM"
     }
   },
   {
     "prototype": "RESOURCE",
-    "id": "",
-    "kingdom": "",
-    "points": "",
+    "id": 22,
+    "kingdom": "FUNGI",
+    "points": 0,
     "corners": {
-      "TOP_LEFT": "",
-      "TOP_RIGHT": "",
-      "BOTTOM_LEFT": "",
-      "BOTTOM_RIGHT": ""
+      "TOP_LEFT": "INKWELL",
+      "TOP_RIGHT": "MUSHROOM",
+      "BOTTOM_LEFT": null,
+      "BOTTOM_RIGHT": "WOLF"
     }
   },
   {
     "prototype": "RESOURCE",
-    "id": "",
-    "kingdom": "",
-    "points": "",
+    "id": 23,
+    "kingdom": "FUNGI",
+    "points": 0,
     "corners": {
-      "TOP_LEFT": "",
-      "TOP_RIGHT": "",
-      "BOTTOM_LEFT": "",
-      "BOTTOM_RIGHT": ""
+      "TOP_LEFT": "MUSHROOM",
+      "TOP_RIGHT": "BUTTERFLY",
+      "BOTTOM_LEFT": "SCROLL",
+      "BOTTOM_RIGHT": "EMPTY"
     }
   },
   {
     "prototype": "RESOURCE",
-    "id": "",
-    "kingdom": "",
-    "points": "",
+    "id": 24,
+    "kingdom": "FUNGI",
+    "points": 1,
     "corners": {
-      "TOP_LEFT": "",
-      "TOP_RIGHT": "",
-      "BOTTOM_LEFT": "",
-      "BOTTOM_RIGHT": ""
+      "TOP_LEFT": "EMPTY",
+      "TOP_RIGHT": "MUSHROOM",
+      "BOTTOM_LEFT": "EMPTY",
+      "BOTTOM_RIGHT": null
     }
   },
   {
     "prototype": "RESOURCE",
-    "id": "",
-    "kingdom": "",
-    "points": "",
+    "id": 25,
+    "kingdom": "FUNGI",
+    "points": 1,
     "corners": {
-      "TOP_LEFT": "",
-      "TOP_RIGHT": "",
-      "BOTTOM_LEFT": "",
-      "BOTTOM_RIGHT": ""
+      "TOP_LEFT": "MUSHROOM",
+      "TOP_RIGHT": null,
+      "BOTTOM_LEFT": "EMPTY",
+      "BOTTOM_RIGHT": "EMPTY"
     }
   },
   {
     "prototype": "RESOURCE",
-    "id": "",
-    "kingdom": "",
-    "points": "",
+    "id": 26,
+    "kingdom": "FUNGI",
+    "points": 1,
     "corners": {
-      "TOP_LEFT": "",
-      "TOP_RIGHT": "",
-      "BOTTOM_LEFT": "",
-      "BOTTOM_RIGHT": ""
+      "TOP_LEFT": null,
+      "TOP_RIGHT": "EMPTY",
+      "BOTTOM_LEFT": "MUSHROOM",
+      "BOTTOM_RIGHT": "EMPTY"
     }
   },
   {
     "prototype": "RESOURCE",
-    "id": "",
-    "kingdom": "",
-    "points": "",
+    "id": 27,
+    "kingdom": "PLANT",
+    "points": 0,
     "corners": {
-      "TOP_LEFT": "",
-      "TOP_RIGHT": "",
-      "BOTTOM_LEFT": "",
-      "BOTTOM_RIGHT": ""
+      "TOP_LEFT": null,
+      "TOP_RIGHT": "LEAF",
+      "BOTTOM_LEFT": "EMPTY",
+      "BOTTOM_RIGHT": "LEAF"
     }
   },
   {
     "prototype": "RESOURCE",
-    "id": "",
-    "kingdom": "",
-    "points": "",
+    "id": 28,
+    "kingdom": "PLANT",
+    "points": 0,
     "corners": {
-      "TOP_LEFT": "",
-      "TOP_RIGHT": "",
-      "BOTTOM_LEFT": "",
-      "BOTTOM_RIGHT": ""
+      "TOP_LEFT": "LEAF",
+      "TOP_RIGHT": "LEAF",
+      "BOTTOM_LEFT": null,
+      "BOTTOM_RIGHT": "EMPTY"
     }
   },
   {
     "prototype": "RESOURCE",
-    "id": "",
-    "kingdom": "",
-    "points": "",
+    "id": 29,
+    "kingdom": "PLANT",
+    "points": 0,
     "corners": {
-      "TOP_LEFT": "",
-      "TOP_RIGHT": "",
-      "BOTTOM_LEFT": "",
-      "BOTTOM_RIGHT": ""
+      "TOP_LEFT": "EMPTY",
+      "TOP_RIGHT": null,
+      "BOTTOM_LEFT": "LEAF",
+      "BOTTOM_RIGHT": "LEAF"
     }
   },
   {
     "prototype": "RESOURCE",
-    "id": "",
-    "kingdom": "",
-    "points": "",
+    "id": 30,
+    "kingdom": "PLANT",
+    "points": 0,
     "corners": {
-      "TOP_LEFT": "",
-      "TOP_RIGHT": "",
-      "BOTTOM_LEFT": "",
-      "BOTTOM_RIGHT": ""
+      "TOP_LEFT": null,
+      "TOP_RIGHT": "LEAF",
+      "BOTTOM_LEFT": "EMPTY",
+      "BOTTOM_RIGHT": "LEAF"
     }
   },
   {
     "prototype": "RESOURCE",
-    "id": "",
-    "kingdom": "",
-    "points": "",
+    "id": 31,
+    "kingdom": "PLANT",
+    "points": 0,
     "corners": {
-      "TOP_LEFT": "",
-      "TOP_RIGHT": "",
-      "BOTTOM_LEFT": "",
-      "BOTTOM_RIGHT": ""
+      "TOP_LEFT": null,
+      "TOP_RIGHT": "BUTTERFLY",
+      "BOTTOM_LEFT": "QUILL",
+      "BOTTOM_RIGHT": "LEAF"
     }
   },
   {
     "prototype": "RESOURCE",
-    "id": "",
-    "kingdom": "",
-    "points": "",
+    "id": 32,
+    "kingdom": "PLANT",
+    "points": 0,
     "corners": {
-      "TOP_LEFT": "",
-      "TOP_RIGHT": "",
-      "BOTTOM_LEFT": "",
-      "BOTTOM_RIGHT": ""
+      "TOP_LEFT": "MUSHROOM",
+      "TOP_RIGHT": "LEAF",
+      "BOTTOM_LEFT": null,
+      "BOTTOM_RIGHT": "INKWELL"
     }
   },
   {
     "prototype": "RESOURCE",
-    "id": "",
-    "kingdom": "",
-    "points": "",
+    "id": 33,
+    "kingdom": "PLANT",
+    "points": 0,
     "corners": {
-      "TOP_LEFT": "",
-      "TOP_RIGHT": "",
-      "BOTTOM_LEFT": "",
-      "BOTTOM_RIGHT": ""
+      "TOP_LEFT": "SCROLL",
+      "TOP_RIGHT": null,
+      "BOTTOM_LEFT": "LEAF",
+      "BOTTOM_RIGHT": "WOLF"
     }
   },
   {
     "prototype": "RESOURCE",
-    "id": "",
-    "kingdom": "",
-    "points": "",
+    "id": 34,
+    "kingdom": "PLANT",
+    "points": 1,
     "corners": {
-      "TOP_LEFT": "",
-      "TOP_RIGHT": "",
-      "BOTTOM_LEFT": "",
-      "BOTTOM_RIGHT": ""
+      "TOP_LEFT": "EMPTY",
+      "TOP_RIGHT": "EMPTY",
+      "BOTTOM_LEFT": "LEAF",
+      "BOTTOM_RIGHT": null
     }
   },
   {
     "prototype": "RESOURCE",
-    "id": "",
-    "kingdom": "",
-    "points": "",
+    "id": 35,
+    "kingdom": "plant",
+    "points": 1,
     "corners": {
-      "TOP_LEFT": "",
-      "TOP_RIGHT": "",
-      "BOTTOM_LEFT": "",
-      "BOTTOM_RIGHT": ""
+      "TOP_LEFT": "EMPTY",
+      "TOP_RIGHT": "EMPTY",
+      "BOTTOM_LEFT": null,
+      "BOTTOM_RIGHT": "LEAF"
     }
   },
   {
     "prototype": "RESOURCE",
-    "id": "",
-    "kingdom": "",
-    "points": "",
+    "id": 36,
+    "kingdom": "PLANT",
+    "points": 1,
     "corners": {
-      "TOP_LEFT": "",
-      "TOP_RIGHT": "",
-      "BOTTOM_LEFT": "",
-      "BOTTOM_RIGHT": ""
+      "TOP_LEFT": null,
+      "TOP_RIGHT": "LEAF",
+      "BOTTOM_LEFT": "EMPTY",
+      "BOTTOM_RIGHT": "EMPTY"
     }
   },
   {
     "prototype": "RESOURCE",
-    "id": "",
-    "kingdom": "",
-    "points": "",
+    "id": 37,
+    "kingdom": "ANIMAL",
+    "points": 0,
     "corners": {
-      "TOP_LEFT": "",
-      "TOP_RIGHT": "",
-      "BOTTOM_LEFT": "",
-      "BOTTOM_RIGHT": ""
+      "TOP_LEFT": "WOLF",
+      "TOP_RIGHT": "WOLF",
+      "BOTTOM_LEFT": "EMPTY",
+      "BOTTOM_RIGHT": null
     }
   },
   {
     "prototype": "RESOURCE",
-    "id": "",
-    "kingdom": "",
-    "points": "",
+    "id": 38,
+    "kingdom": "ANIMAL",
+    "points": 0,
     "corners": {
-      "TOP_LEFT": "",
-      "TOP_RIGHT": "",
-      "BOTTOM_LEFT": "",
-      "BOTTOM_RIGHT": ""
+      "TOP_LEFT": null,
+      "TOP_RIGHT": "EMPTY",
+      "BOTTOM_LEFT": "WOLF",
+      "BOTTOM_RIGHT": "WOLF"
     }
   },
   {
     "prototype": "RESOURCE",
-    "id": "",
-    "kingdom": "",
-    "points": "",
+    "id": 39,
+    "kingdom": "ANIMAL",
+    "points": 0,
     "corners": {
-      "TOP_LEFT": "",
-      "TOP_RIGHT": "",
-      "BOTTOM_LEFT": "",
-      "BOTTOM_RIGHT": ""
+      "TOP_LEFT": "WOLF",
+      "TOP_RIGHT": null,
+      "BOTTOM_LEFT": "WOLF",
+      "BOTTOM_RIGHT": "EMPTY"
     }
   },
   {
     "prototype": "RESOURCE",
-    "id": "",
-    "kingdom": "",
-    "points": "",
+    "id": 40,
+    "kingdom": "ANIMAL",
+    "points": 0,
     "corners": {
-      "TOP_LEFT": "",
-      "TOP_RIGHT": "",
-      "BOTTOM_LEFT": "",
-      "BOTTOM_RIGHT": ""
+      "TOP_LEFT": "EMPTY",
+      "TOP_RIGHT": "WOLF",
+      "BOTTOM_LEFT": null,
+      "BOTTOM_RIGHT": "WOLF"
     }
   },
   {
     "prototype": "RESOURCE",
-    "id": "",
-    "kingdom": "",
-    "points": "",
+    "id": 41,
+    "kingdom": "ANIMAL",
+    "points": 0,
     "corners": {
-      "TOP_LEFT": "",
-      "TOP_RIGHT": "",
-      "BOTTOM_LEFT": "",
-      "BOTTOM_RIGHT": ""
+      "TOP_LEFT": null,
+      "TOP_RIGHT": "BUTTERFLY",
+      "BOTTOM_LEFT": "INKWELL",
+      "BOTTOM_RIGHT": "WOLF"
     }
   },
   {
     "prototype": "RESOURCE",
-    "id": "",
-    "kingdom": "",
-    "points": "",
+    "id": 42,
+    "kingdom": "ANIMAL",
+    "points": 0,
     "corners": {
-      "TOP_LEFT": "",
-      "TOP_RIGHT": "",
-      "BOTTOM_LEFT": "",
-      "BOTTOM_RIGHT": ""
+      "TOP_LEFT": "LEAF",
+      "TOP_RIGHT": "WOLF",
+      "BOTTOM_LEFT": null,
+      "BOTTOM_RIGHT": "SCROLL"
     }
   },
   {
     "prototype": "RESOURCE",
-    "id": "",
-    "kingdom": "",
-    "points": "",
+    "id": 43,
+    "kingdom": "ANIMAL",
+    "points": 0,
     "corners": {
-      "TOP_LEFT": "",
-      "TOP_RIGHT": "",
-      "BOTTOM_LEFT": "",
-      "BOTTOM_RIGHT": ""
+      "TOP_LEFT": "QUILL",
+      "TOP_RIGHT": null,
+      "BOTTOM_LEFT": "WOLF",
+      "BOTTOM_RIGHT": "MUSHROOM"
     }
   },
   {
     "prototype": "RESOURCE",
-    "id": "",
-    "kingdom": "",
-    "points": "",
+    "id": 44,
+    "kingdom": "ANIMAL",
+    "points": 1,
     "corners": {
-      "TOP_LEFT": "",
-      "TOP_RIGHT": "",
-      "BOTTOM_LEFT": "",
-      "BOTTOM_RIGHT": ""
+      "TOP_LEFT": null,
+      "TOP_RIGHT": "EMPTY",
+      "BOTTOM_LEFT": "WOLF",
+      "BOTTOM_RIGHT": "EMPTY"
     }
   },
   {
     "prototype": "RESOURCE",
-    "id": "",
-    "kingdom": "",
-    "points": "",
+    "id": 45,
+    "kingdom": "ANIMAL",
+    "points": 1,
     "corners": {
-      "TOP_LEFT": "",
-      "TOP_RIGHT": "",
-      "BOTTOM_LEFT": "",
-      "BOTTOM_RIGHT": ""
+      "TOP_LEFT": "EMPTY",
+      "TOP_RIGHT": null,
+      "BOTTOM_LEFT": "EMPTY",
+      "BOTTOM_RIGHT": "WOLF"
     }
   },
   {
     "prototype": "RESOURCE",
-    "id": "",
-    "kingdom": "",
-    "points": "",
+    "id": 46,
+    "kingdom": "ANIMAL",
+    "points": 1,
     "corners": {
-      "TOP_LEFT": "",
-      "TOP_RIGHT": "",
-      "BOTTOM_LEFT": "",
-      "BOTTOM_RIGHT": ""
+      "TOP_LEFT": "EMPTY",
+      "TOP_RIGHT": "WOLF",
+      "BOTTOM_LEFT": "EMPTY",
+      "BOTTOM_RIGHT": null
     }
   },
   {
     "prototype": "RESOURCE",
-    "id": "",
-    "kingdom": "",
-    "points": "",
+    "id": 47,
+    "kingdom": "INSECT",
+    "points": 0,
     "corners": {
-      "TOP_LEFT": "",
-      "TOP_RIGHT": "",
-      "BOTTOM_LEFT": "",
-      "BOTTOM_RIGHT": ""
+      "TOP_LEFT": "BUTTERFLY",
+      "TOP_RIGHT": "BUTTERFLY",
+      "BOTTOM_LEFT": "EMPTY",
+      "BOTTOM_RIGHT": null
     }
   },
   {
     "prototype": "RESOURCE",
-    "id": "",
-    "kingdom": "",
-    "points": "",
+    "id": 48,
+    "kingdom": "INSECT",
+    "points": 0,
     "corners": {
-      "TOP_LEFT": "",
-      "TOP_RIGHT": "",
-      "BOTTOM_LEFT": "",
-      "BOTTOM_RIGHT": ""
+      "TOP_LEFT": null,
+      "TOP_RIGHT": "EMPTY",
+      "BOTTOM_LEFT": "BUTTERFLY",
+      "BOTTOM_RIGHT": "BUTTERFLY"
     }
   },
   {
     "prototype": "RESOURCE",
-    "id": "",
-    "kingdom": "",
-    "points": "",
+    "id": 49,
+    "kingdom": "INSECT",
+    "points": 0,
     "corners": {
-      "TOP_LEFT": "",
-      "TOP_RIGHT": "",
-      "BOTTOM_LEFT": "",
-      "BOTTOM_RIGHT": ""
+      "TOP_LEFT": "BUTTERFLY",
+      "TOP_RIGHT": null,
+      "BOTTOM_LEFT": "BUTTERFLY",
+      "BOTTOM_RIGHT": "EMPTY"
     }
   },
   {
     "prototype": "RESOURCE",
-    "id": "",
-    "kingdom": "",
-    "points": "",
+    "id": 50,
+    "kingdom": "INSECT",
+    "points": 0,
     "corners": {
-      "TOP_LEFT": "",
-      "TOP_RIGHT": "",
-      "BOTTOM_LEFT": "",
-      "BOTTOM_RIGHT": ""
+      "TOP_LEFT": "EMPTY",
+      "TOP_RIGHT": "BUTTERFLY",
+      "BOTTOM_LEFT": null,
+      "BOTTOM_RIGHT": "BUTTERFLY"
     }
   },
   {
     "prototype": "RESOURCE",
-    "id": "",
-    "kingdom": "",
-    "points": "",
+    "id": 51,
+    "kingdom": "INSECT",
+    "points": 0,
     "corners": {
-      "TOP_LEFT": "",
-      "TOP_RIGHT": "",
-      "BOTTOM_LEFT": "",
-      "BOTTOM_RIGHT": ""
+      "TOP_LEFT": null,
+      "TOP_RIGHT": "QUILL",
+      "BOTTOM_LEFT": "WOLF",
+      "BOTTOM_RIGHT": "BUTTERFLY"
     }
   },
   {
     "prototype": "RESOURCE",
-    "id": "",
-    "kingdom": "",
-    "points": "",
+    "id": 52,
+    "kingdom": "INSECT",
+    "points": 0,
     "corners": {
-      "TOP_LEFT": "",
-      "TOP_RIGHT": "",
-      "BOTTOM_LEFT": "",
-      "BOTTOM_RIGHT": ""
+      "TOP_LEFT": "SCROLL",
+      "TOP_RIGHT": "BUTTERFLY",
+      "BOTTOM_LEFT": null,
+      "BOTTOM_RIGHT": "MUSHROOM"
     }
   },
   {
     "prototype": "RESOURCE",
-    "id": "",
-    "kingdom": "",
-    "points": "",
+    "id": 53,
+    "kingdom": "INSECT",
+    "points": 0,
     "corners": {
-      "TOP_LEFT": "",
-      "TOP_RIGHT": "",
-      "BOTTOM_LEFT": "",
-      "BOTTOM_RIGHT": ""
+      "TOP_LEFT": "BUTTERFLY",
+      "TOP_RIGHT": "LEAF",
+      "BOTTOM_LEFT": "INKWELL",
+      "BOTTOM_RIGHT": null
     }
   },
   {
     "prototype": "RESOURCE",
-    "id": "",
-    "kingdom": "",
-    "points": "",
+    "id": 54,
+    "kingdom": "INSECT",
+    "points": 1,
     "corners": {
-      "TOP_LEFT": "",
-      "TOP_RIGHT": "",
-      "BOTTOM_LEFT": "",
-      "BOTTOM_RIGHT": ""
+      "TOP_LEFT": "BUTTERFLY",
+      "TOP_RIGHT": null,
+      "BOTTOM_LEFT": "EMPTY",
+      "BOTTOM_RIGHT": "EMPTY"
     }
   },
   {
     "prototype": "RESOURCE",
-    "id": "",
-    "kingdom": "",
-    "points": "",
+    "id": 55,
+    "kingdom": "INSECT",
+    "points": 1,
     "corners": {
-      "TOP_LEFT": "",
-      "TOP_RIGHT": "",
-      "BOTTOM_LEFT": "",
-      "BOTTOM_RIGHT": ""
+      "TOP_LEFT": "EMPTY",
+      "TOP_RIGHT": "EMPTY",
+      "BOTTOM_LEFT": null,
+      "BOTTOM_RIGHT": "BUTTERFLY"
     }
   },
   {
     "prototype": "RESOURCE",
-    "id": "",
-    "kingdom": "",
-    "points": "",
+    "id": 56,
+    "kingdom": "INSECT",
+    "points": 1,
     "corners": {
-      "TOP_LEFT": "",
-      "TOP_RIGHT": "",
-      "BOTTOM_LEFT": "",
-      "BOTTOM_RIGHT": ""
+      "TOP_LEFT": null,
+      "TOP_RIGHT": "BUTTERFLY",
+      "BOTTOM_LEFT": "EMPTY",
+      "BOTTOM_RIGHT": "EMPTY"
     }
   }
 ]

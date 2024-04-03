@@ -63,6 +63,7 @@
         "multiplier": 2
     },
     {
+        "prototype": "OBJECTIVE",
         "id": 10,
         "objective-type": "STAIRS",
         "kingdom": "INSECT",
