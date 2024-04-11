@@ -1,0 +1,128 @@
+[
+  {
+    "prototype":"STARTING",
+    "id":97,
+    "kingdom": null,
+    "front-corners": {
+      "TOP_LEFT":"MUSHROOM",
+      "TOP_RIGHT":"LEAF",
+      "BOTTOM_LEFT":"BUTTERFLY",
+      "BOTTOM_RIGHT":"WOLF"
+    },
+    "back-corners": {
+      "TOP_LEFT":"EMPTY",
+      "TOP_RIGHT":"LEAF",
+      "BOTTOM_LEFT": "BUTTERFLY",
+      "BOTTOM_RIGHT":"EMPTY"
+    },
+    "bonus-resources": [
+        "BUTTERFLY"
+    ]
+  },
+  {
+    "prototype":"STARTING",
+    "id":98,
+    "kingdom": null,
+    "front-corners": {
+      "TOP_LEFT":"LEAF",
+      "TOP_RIGHT":"WOLF",
+      "BOTTOM_LEFT":"MUSHROOM",
+      "BOTTOM_RIGHT":"BUTTERFLY"
+    },
+    "back-corners": {
+      "TOP_LEFT":"WOLF",
+      "TOP_RIGHT":"EMPTY",
+      "BOTTOM_LEFT":"EMPTY",
+      "BOTTOM_RIGHT":"MUSHROOM"
+    },
+    "bonus-resources": [
+        "MUSHROOM"
+    ]
+  },
+  {
+    "prototype":"STARTING",
+    "id":99,
+    "kingdom": null,
+    "front-corners": {
+      "TOP_LEFT":"BUTTERFLY",
+      "TOP_RIGHT":"WOLF",
+      "BOTTOM_LEFT":"MUSHROOM",
+      "BOTTOM_RIGHT":"LEAF"
+    },
+    "back-corners": {
+      "TOP_LEFT":"EMPTY",
+      "TOP_RIGHT":"EMPTY",
+      "BOTTOM_LEFT":"EMPTY",
+      "BOTTOM_RIGHT":"EMPTY"
+    },
+    "bonus-resources": [
+        "LEAF",
+        "MUSHROOM"
+    ]
+  },
+  {
+    "prototype":"STARTING",
+    "id":100,
+    "kingdom": null,
+    "front-corners": {
+      "TOP_LEFT":"LEAF",
+      "TOP_RIGHT":"BUTTERFLY",
+      "BOTTOM_LEFT":"WOLF",
+      "BOTTOM_RIGHT":"MUSHROOM"
+    },
+    "back-corners": {
+      "TOP_LEFT":"EMPTY",
+      "TOP_RIGHT":"EMPTY",
+      "BOTTOM_LEFT":"EMPTY",
+      "BOTTOM_RIGHT":"EMPTY"
+    },
+    "bonus-resources": [
+        "WOLF",
+        "BUTTERFLY"
+    ]
+  },
+  {
+    "prototype":"STARTING",
+    "id":101,
+    "kingdom": null,
+    "front-corners": {
+      "TOP_LEFT":"BUTTERFLY",
+      "TOP_RIGHT":"MUSHROOM",
+      "BOTTOM_LEFT":"LEAF",
+      "BOTTOM_RIGHT":"WOLF"
+    },
+    "back-corners": {
+      "TOP_LEFT":"EMPTY",
+      "TOP_RIGHT":"EMPTY",
+      "BOTTOM_LEFT":null,
+      "BOTTOM_RIGHT":null
+    },
+    "bonus-resources": [
+        "WOLF",
+        "BUTTERFLY",
+        "LEAF"
+    ]
+  },
+  {
+    "prototype":"STARTING",
+    "id":102,
+    "kingdom": null,
+    "front-corners": {
+      "TOP_LEFT":"MUSHROOM",
+      "TOP_RIGHT":"WOLF",
+      "BOTTOM_LEFT":"LEAF",
+      "BOTTOM_RIGHT":"BUTTERFLY"
+    },
+    "back-corners": {
+      "TOP_LEFT":"EMPTY",
+      "TOP_RIGHT":"EMPTY",
+      "BOTTOM_LEFT":null,
+      "BOTTOM_RIGHT":null
+    },
+    "bonus-resources": [
+        "LEAF",
+        "WOLF",
+        "MUSHROOM"
+    ]
+  }
+]
