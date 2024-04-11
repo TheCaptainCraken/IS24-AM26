@@ -1,7 +1,10 @@
 package it.polimi.ingsw.model;
 
 import it.polimi.ingsw.model.exception.*;
+import org.json.simple.parser.ParseException;
+
 import java.awt.*;
+import java.io.IOException;
 import java.util.*;
 import java.util.HashMap;
 
@@ -32,11 +35,16 @@ public class GameMaster {
      * @param jsonObjectiveCardFileName  json file name to create the objective deck
      * @param jsonObjectiveStartFileName json file name to create the starting deck
      */
-    public GameMaster(Lobby lobby, String jsonResourceCardFileName, String jsonGoldCardFileName, String jsonObjectiveCardFileName, String jsonObjectiveStartFileName) {
+    public GameMaster(Lobby lobby, String jsonResourceCardFileName, String jsonGoldCardFileName, String jsonObjectiveCardFileName, String jsonObjectiveStartFileName) throws IOException, ParseException {
         this.globalTurn = 0;
         this.flagTurnRemained = 2;
         this.turnType = TurnType.PLAYING;
-
+        this.onTableResourceCards = new ResourceCard[2];
+        this.onTableGoldCards = new GoldCard[2];
+        this.onTableObjectiveCards = new ObjectiveCard[2];
+        this.startingCardToPosition = new StartingCard[lobby.getPlayers().length];
+        this.objectiveCardToChoose = new ObjectiveCard[lobby.getPlayers().length][2];
+        this.ranking = new ArrayList<>();
         this.lobby = lobby;
         this.lobby.setLock();
         this.gameState = GameState.CHOOSING_ROOT_CARD;
@@ -73,7 +81,7 @@ public class GameMaster {
     }
 
     /**
-     * First turn cicle in which every player decides in which side place its StartingCard
+     * First turn cycle in which every player decides in which side place its StartingCard
      *
      * @param namePlayer player who sent the request
      * @param side       which side the StartingCard has been want placed
@@ -106,7 +114,7 @@ public class GameMaster {
     }
 
     /**
-     * Second turn cicle in which every player decides which of the two ObjectiveCard pick
+     * Second turn cycle in which every player decides which of the two ObjectiveCard pick
      *
      * @param namePlayer player who sent the request
      * @param whichCard  which of the two ObjectiveCard wants to be used
@@ -436,13 +444,13 @@ public class GameMaster {
     private Sign fromKingdomToSign(Kingdom kingdom) throws IllegalArgumentException {
         switch (kingdom) {
             case PLANT:
-                return Sign.PLANT;
+                return Sign.LEAF;
             case ANIMAL:
-                return Sign.ANIMAL;
+                return Sign.WOLF;
             case FUNGI:
-                return Sign.FUNGI;
+                return Sign.MUSHROOM;
             case INSECT:
-                return Sign.INSECT;
+                return Sign.BUTTERFLY;
         }
         throw new IllegalArgumentException("It's not a right Kingdom to convert");
     }
@@ -456,11 +464,11 @@ public class GameMaster {
     private Sign fromCountableToSign(Countable countable) throws IllegalArgumentException {
         switch (countable) {
             case QUILL:
-                return Sign.PLANT;
+                return Sign.QUILL;
             case INKWELL:
-                return Sign.ANIMAL;
+                return Sign.INKWELL;
             case SCROLL:
-                return Sign.FUNGI;
+                return Sign.SCROLL;
         }
         throw new IllegalArgumentException("It's not a right Countable to convert");
     }

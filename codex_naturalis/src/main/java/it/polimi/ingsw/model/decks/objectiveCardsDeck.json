@@ -58,27 +58,28 @@
     {
         "prototype": "OBJECTIVE",
         "id": 9,
-        "objective-type": "STAIRS",
+        "objective-type": "STAIR",
         "kingdom": "FUNGI",
         "multiplier": 2
     },
     {
         "prototype": "OBJECTIVE",
         "id": 10,
-        "objective-type": "STAIRS",
+        "objective-type": "STAIR",
         "kingdom": "INSECT",
         "multiplier": 2
     },
     {
         "prototype": "OBJECTIVE",
         "id": 11,
-        "objective-type": "STAIRS",
+        "objective-type": "STAIR",
         "kingdom": "ANIMAL",
         "multiplier": 2
     },
     {
+        "prototype": "OBJECTIVE",
         "id": 12,
-        "objective-type": "STAIRS",
+        "objective-type": "STAIR",
         "kingdom": "PLANT",
         "multiplier": 2
     },
@@ -90,6 +91,7 @@
         "multiplier": 2
     },
     {
+        "prototype": "OBJECTIVE",
         "id": 14,
         "objective-type": "L_FORMATION",
         "kingdom": "INSECT",

@@ -152,7 +152,7 @@ public class Deck {
     private void insertStartingCard(JSONObject cardObject) {
         int id = extractInteger(cardObject, "id");
 
-        Kingdom kingdom = Kingdom.valueOf((String) cardObject.get("kingdom"));
+        Kingdom kingdom = kingdomOrNull((String) cardObject.get("kingdom"));
 
         JSONObject frontCorners = (JSONObject) cardObject.get("front-corners");
         JSONObject backCorners = (JSONObject) cardObject.get("back-corners");
