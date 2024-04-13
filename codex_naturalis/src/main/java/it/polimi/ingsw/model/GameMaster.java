@@ -49,7 +49,7 @@ public class GameMaster {
         this.lobby.setLock();
         this.gameState = GameState.CHOOSING_ROOT_CARD;
 
-        this.resourceDeck = new Deck(jsonResourceCardFileName);// mettiamo direttamente il nome del json e poi calcoliamo quanto è grande?
+        this.resourceDeck = new Deck(jsonResourceCardFileName);
         this.goldDeck = new Deck(jsonGoldCardFileName);
         this.objectiveDeck = new Deck(jsonObjectiveCardFileName);
         this.startingDeck = new Deck(jsonObjectiveStartFileName);
@@ -95,17 +95,16 @@ public class GameMaster {
             throw new WrongGamePhaseException();
         } else {
             HashMap<Corner, PlayedCard> defaultAttachments = new HashMap<>();
-            /*for (Corner corner : Corner.values()) {
-                defaultAttachments.put(corner, null);
-            }*/
             StartingCard rootCard = startingCardToPosition[getOrderPlayer(currentPlayer.getName())];
             PlayedCard rootCardPlaced = new PlayedCard(rootCard, defaultAttachments, side, 0, new Point(0, 0));
             currentPlayer.setRootCard(rootCardPlaced);
+
             if(!side){
                 for(Sign sign : rootCard.getBonusResources()) {
                     currentPlayer.addResource(sign, 1);
                 }
             }
+
             nextGlobalTurn();
             if (getOrderPlayer(getCurrentPlayer().getName()) == 0) {
                 gameState = GameState.CHOOSING_OBJECTIVE_CARD;
@@ -207,39 +206,40 @@ public class GameMaster {
      * Allows the Player to draw a card from the table or decks (there are 6 different possibilities based on goldOrNot and onTableOrDeck)
      *
      * @param namePlayer    Player who sent the request
-     * @param goldOrNot     If the type of the resourceCard that wants to be drawn is gold or not
-     * @param onTableOrDeck If the card is taken from the table or not: 2 means from deck, 0 and 1 are the position onTable array
+     * @param Gold     If the type of the resourceCard that wants to be drawn is gold or not
+     * @param CardPosition If the card is taken from the table or not: 2 means from deck, 0 and 1 are the position onTable array
      * @return
      */
-    public int drawCard(String namePlayer, boolean goldOrNot, int onTableOrDeck) throws NullPointerException, WrongGamePhaseException, NoTurnException, NotExistsPlayerException {
+    public int drawCard(String namePlayer, boolean Gold, int CardPosition) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException{
         //onTableOrDeck has 0, 1 for position of array of cards on table and 2 for draw from deck
         Player currentPlayer = getCurrentPlayer();
-        if (isCurrentPlayer(namePlayer, currentPlayer)) {
+        if (!isCurrentPlayer(namePlayer, currentPlayer)) {
             throw new NoTurnException();
         }
         if (gameState != GameState.DRAWING_PHASE) {
             throw new WrongGamePhaseException();
         }
         ResourceCard cardDrawn;
-        if (goldOrNot) {
-            if (onTableOrDeck == 2) {//TODO FOR THE VIEW la view richiede il nuovo retro di quella in cima e non solo di quella spostata
+        if (Gold) {
+            if (CardPosition == 2) {//TODO FOR THE VIEW la view richiede il nuovo retro di quella in cima e non solo di quella spostata
                 cardDrawn = (ResourceCard) goldDeck.draw();
                 currentPlayer.takeCard(cardDrawn);
             } else {
-                cardDrawn = onTableGoldCards[onTableOrDeck];
+                cardDrawn = onTableGoldCards[CardPosition];
                 currentPlayer.takeCard(cardDrawn);
-                onTableGoldCards[onTableOrDeck] = (GoldCard) goldDeck.draw();
+                onTableGoldCards[CardPosition] = (GoldCard) goldDeck.draw();
             }
         } else {
-            if (onTableOrDeck == 2) {//TODO FOR THE VIEW la view richiede il nuovo retro di quella in cima e non solo di quella spostata
+            if (CardPosition == 2) {//TODO FOR THE VIEW la view richiede il nuovo retro di quella in cima e non solo di quella spostata
                 cardDrawn = (ResourceCard) resourceDeck.draw();
                 currentPlayer.takeCard(cardDrawn);
             } else {
-                cardDrawn = onTableResourceCards[onTableOrDeck];
+                cardDrawn = onTableResourceCards[CardPosition];
                 currentPlayer.takeCard(cardDrawn);
-                onTableResourceCards[onTableOrDeck] = (ResourceCard) resourceDeck.draw();
+                onTableResourceCards[CardPosition] = (ResourceCard) resourceDeck.draw();
             }
         }
+
         //next player will play?
         if (flagTurnRemained == 1 && getOrderPlayer(currentPlayer.getName()) + 1 == lobby.getPlayers().length) {
             //if it is the last player in second-last turn cicle, say the next is the last turn
@@ -254,9 +254,9 @@ public class GameMaster {
         } else {
             gameState = GameState.PLACING_PHASE;
         }
-        nextGlobalTurn();
 
-        return cardDrawn.getId(); //TODO Check ritornare solo l'id alla view
+        nextGlobalTurn();
+        return cardDrawn.getId();
     }
 
     /**
@@ -291,12 +291,7 @@ public class GameMaster {
                     ranking.add(ranking.size(), player);//aggiungi prima
                     numberOfObjectiveForPlayer.add(numberOfObjectiveForPlayer.size(), numberOfObjective);
                 }
-                /*player.addPoints(calculateEndGamePoints(currentPlayer.getSecretObjective().getType(), currentPlayer.getSecretObjective().getMultiplier()));
                 //TODO OBJECTIVE CARD POINTS finire, qua fare con l'overload dell'interfaccia e poi in questo metodo si chiameranno i metodi di ricerca di this
-                for(ObjectiveCard objectiveCard : onTableObjectiveCards){
-                    currentPlayer.addPoints(objectiveCard.effect(calculateEndGamePoints(objectiveCard.getType(), objectiveCard.getMultiplier())));//cosa vuoi fare non esiste effect
-
-                }*/
             }
         }
     }

@@ -5,6 +5,7 @@ import it.polimi.ingsw.model.Color;
 import it.polimi.ingsw.model.exception.*;
 import org.json.simple.parser.ParseException;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.awt.*;
@@ -27,9 +28,16 @@ public class GameMasterTest {
         lobby.addPlayer("marco", Color.GREEN);
         lobby.addPlayer("giovanni", Color.RED);
         lobby.addPlayer("francesco", Color.BLUE);
+
+        game = new GameMaster(lobby,
+                basePath + "resourceCardsDeck.json",
+                basePath + "goldCardsDeck.json",
+                basePath + "objectiveCardsDeck.json",
+                basePath + "startingCardsDeck.json");
     }
 
     @Test
+    @DisplayName("Test of constructor")
     public void BasicGettersTest() throws IOException, ParseException, NoSuchFieldException {
         GameMaster game = new GameMaster(lobby,
                 basePath + "resourceCardsDeck.json",
@@ -45,19 +53,18 @@ public class GameMasterTest {
 
         assertEquals(game.getTurn(),-1);//testing getTurn()..
 
-        assertEquals(game.getPlayerPoints(game.getCurrentPlayer().getName()),0);//testing getPlayerPoints..
-
+        assertEquals(game.getPlayerPoints(game.getCurrentPlayer().getName()),0);//testing getPlayerPoints.
 
     }
 
     @Test
-    public void PlayingPhaseTest() throws IOException, ParseException, WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException {
-        GameMaster game = new GameMaster(lobby,
-                basePath + "resourceCardsDeck.json",
-                basePath + "goldCardsDeck.json",
-                basePath + "objectiveCardsDeck.json",
-                basePath + "startingCardsDeck.json");
+    @DisplayName("Exception not current player for placeRootCard")
+    public void NotCurrentPlayerTest() throws IOException, ParseException, WrongGamePhaseException, NoTurnException, NotExistsPlayerException {
+        assertThrows(NoTurnException.class, ()->game.placeRootCard("marco", false));
+    }
 
+    @Test
+    public void PlayingPhaseTest() throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException {
         //Piazza RootCard...
         Player startingPlayer = game.getCurrentPlayer();
         for(int i = 0; i < lobby.getPlayers().length; i++){
@@ -67,7 +74,7 @@ public class GameMasterTest {
                 game.placeRootCard(game.getCurrentPlayer().getName(), false);
             }
         }
-        assertEquals(startingPlayer,game.getCurrentPlayer());
+        assertEquals(startingPlayer, game.getCurrentPlayer());
 
         //Scegli il tuo obbiettivo segreto...
         for(int i = 0; i < lobby.getPlayers().length; i++){
@@ -92,4 +99,16 @@ public class GameMasterTest {
     }
     /*quello sopra è inevitabilmente un test "cicciotto" poichè intende simulare un'inizio della partita, fino al piazzamento della prima carta
     * chiaramente è impossibile piazzare una carta PRIMA di avere fatto tutto il setup, dunque ho deciso di unire i due in un unica istanza*/
+
+    //Test of drawCard
+    public void drawCardGoldTest() throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException {
+        int card = game.drawCard("pietro", true, 1);
+
+
+
+    }
+
 }
+
+
+
