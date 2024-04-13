@@ -95,9 +95,9 @@ public class GameMaster {
             throw new WrongGamePhaseException();
         } else {
             HashMap<Corner, PlayedCard> defaultAttachments = new HashMap<>();
-            for (Corner corner : Corner.values()) {
+            /*for (Corner corner : Corner.values()) {
                 defaultAttachments.put(corner, null);
-            }
+            }*/
             StartingCard rootCard = startingCardToPosition[getOrderPlayer(currentPlayer.getName())];
             PlayedCard rootCardPlaced = new PlayedCard(rootCard, defaultAttachments, side, 0, new Point(0, 0));
             currentPlayer.setRootCard(rootCardPlaced);
@@ -548,7 +548,7 @@ public class GameMaster {
      * @return the cycle of turns made in total
      */
     public int getTurn() {
-        return globalTurn / lobby.getPlayers().length - 1;//non conta giro rootCard e giro ObjectiveCard
+        return globalTurn / lobby.getPlayers().length - 1;//non conta giro rootCard (turn = -1) e giro ObjectiveCard (turn = 0)
     }
 
     /**

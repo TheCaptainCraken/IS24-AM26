@@ -1,14 +1,13 @@
 package it.polimi.ingsw;
 
+import it.polimi.ingsw.model.*;
 import it.polimi.ingsw.model.Color;
-import it.polimi.ingsw.model.Sign;
 import it.polimi.ingsw.model.exception.*;
 import org.json.simple.parser.ParseException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import it.polimi.ingsw.model.GameMaster;
-import it.polimi.ingsw.model.Lobby;
 
+import java.awt.*;
 import java.io.IOException;
 import java.util.HashMap;
 
@@ -39,31 +38,58 @@ public class GameMasterTest {
                 basePath + "startingCardsDeck.json");
 
         assertEquals("pietro", game.getCurrentPlayer().getName());
+        assertEquals(lobby.getPlayers().length,4);
 
         HashMap<Sign, Integer> test = game.getPlayerResources(game.getCurrentPlayer().getName());
         assert (!test.isEmpty()); //testing getPlayerResources()..
 
-        assertEquals(game.getTurn(),0);//testing getTurn()..
+        assertEquals(game.getTurn(),-1);//testing getTurn()..
 
         assertEquals(game.getPlayerPoints(game.getCurrentPlayer().getName()),0);//testing getPlayerPoints..
 
 
     }
+
     @Test
-    public void PlayingPhaseTest() throws IOException, ParseException, WrongGamePhaseException, NoTurnException, NotExistsPlayerException {
+    public void PlayingPhaseTest() throws IOException, ParseException, WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException {
         GameMaster game = new GameMaster(lobby,
                 basePath + "resourceCardsDeck.json",
                 basePath + "goldCardsDeck.json",
                 basePath + "objectiveCardsDeck.json",
                 basePath + "startingCardsDeck.json");
 
+        //Piazza RootCard...
+        Player startingPlayer = game.getCurrentPlayer();
         for(int i = 0; i < lobby.getPlayers().length; i++){
             try{
                 game.placeRootCard("marco",false);
-            } catch(NoTurnException e){
-                game.placeRootCard(game.getCurrentPlayer().getName(),false);
+            } catch(NoTurnException e) {
+                game.placeRootCard(game.getCurrentPlayer().getName(), false);
             }
+        }
+        assertEquals(startingPlayer,game.getCurrentPlayer());
+
+        //Scegli il tuo obbiettivo segreto...
+        for(int i = 0; i < lobby.getPlayers().length; i++){
+            try{
+                game.chooseObjectiveCard("marco",0);
+            } catch(NoTurnException e) {
+                game.chooseObjectiveCard(game.getCurrentPlayer().getName(), 1);
+            }
+        }
+        assertEquals(startingPlayer,game.getCurrentPlayer());
+
+        for(int i = 0; i < lobby.getPlayers().length; i++){
+            try{
+                Point p = new Point(1,0);
+                game.placeCard(game.getCurrentPlayer().getName(),game.getCurrentPlayer().getHand()[0],p,true );
+            } catch (NotEnoughResourcesException e) {
+                throw new RuntimeException(e);
+            }
+            assertEquals(game.getTurn(),1);
         }
 
     }
+    /*quello sopra è inevitabilmente un test "cicciotto" poichè intende simulare un'inizio della partita, fino al piazzamento della prima carta
+    * chiaramente è impossibile piazzare una carta PRIMA di avere fatto tutto il setup, dunque ho deciso di unire i due in un unica istanza*/
 }
