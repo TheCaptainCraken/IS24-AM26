@@ -5,6 +5,7 @@ import it.polimi.ingsw.model.Color;
 import it.polimi.ingsw.model.exception.*;
 import org.json.simple.parser.ParseException;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -17,7 +18,9 @@ import static org.mockito.Mockito.*;
 
 public class GameMasterTest {
     static GameMaster game;
+    static GameMaster game2;
     static Lobby lobby;
+    static Lobby lobby2;
     static String basePath = "src/main/java/it/polimi/ingsw/model/decks/";
 
     @BeforeAll
@@ -100,12 +103,29 @@ public class GameMasterTest {
     /*quello sopra è inevitabilmente un test "cicciotto" poichè intende simulare un'inizio della partita, fino al piazzamento della prima carta
     * chiaramente è impossibile piazzare una carta PRIMA di avere fatto tutto il setup, dunque ho deciso di unire i due in un unica istanza*/
 
+    //These are test for draw card. I use just one player to easily test the method
+    @BeforeEach
+    public void setUp2() throws SameNameException, LobbyCompleteException, IOException, ParseException {
+        //create player
+        lobby2 = new Lobby();
+        lobby2.addPlayer("pietro", Color.YELLOW);
+        lobby2.addPlayer("marco", Color.GREEN);
+
+        game2 = new GameMaster(lobby2,
+                basePath + "resourceCardsDeck.json",
+                basePath + "goldCardsDeck.json",
+                basePath + "objectiveCardsDeck.json",
+                basePath + "startingCardsDeck.json");
+    }
     //Test of drawCard
-    public void drawCardGoldTest() throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException {
-        int card = game.drawCard("pietro", true, 1);
-
-
-
+    @Test
+    public void drawCardGoldTest() throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException, NotEnoughResourcesException {
+        game2.placeRootCard("pietro", false);
+        game2.placeRootCard("marco", false);
+        game2.chooseObjectiveCard("pietro", 0);
+        game2.chooseObjectiveCard("marco", 0);
+        game2.placeCard("pietro", game.getCurrentPlayer().getHand()[0], new Point(1, 0), true);
+        game2.drawCard("pietro", true, 1);
     }
 
 }

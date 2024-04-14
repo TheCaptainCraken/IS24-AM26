@@ -119,7 +119,9 @@ public class Player {
      * @param numResources how many resources a card gives
      */
     public void addResource(Sign sign, Integer numResources){
-        resources.put(sign, resources.get(sign) + numResources);
+        if(sign != null){
+            resources.put(sign, resources.get(sign) + numResources);
+        }
     }
 
     /**
@@ -128,7 +130,9 @@ public class Player {
      * @param numResources how many resources to delete
      */
     public void removeResources(Sign sign, Integer numResources){
-        resources.put(sign, resources.get(sign) - numResources);
+        if(sign != null){
+            resources.put(sign, resources.get(sign) - numResources);
+        }
     }
 
     /**

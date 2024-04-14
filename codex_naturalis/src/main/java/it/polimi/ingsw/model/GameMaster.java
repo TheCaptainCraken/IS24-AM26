@@ -172,22 +172,24 @@ public class GameMaster {
         }
         //remove resources from counter
         for (Corner corner : Corner.values()) {
-            switch (corner) {
-                case TOP_LEFT: {
-                    currentPlayer.removeResources(attachments.get(corner).getCard().getCorners().get(Corner.BOTTOM_RIGHT), 1);
-                    break;
-                }
-                case TOP_RIGHT: {
-                    currentPlayer.removeResources(attachments.get(corner).getCard().getCorners().get(Corner.BOTTOM_LEFT), 1);
-                    break;
-                }
-                case BOTTOM_LEFT: {
-                    currentPlayer.removeResources(attachments.get(corner).getCard().getCorners().get(Corner.TOP_RIGHT), 1);
-                    break;
-                }
-                case BOTTOM_RIGHT: {
-                    currentPlayer.removeResources(attachments.get(corner).getCard().getCorners().get(Corner.TOP_LEFT), 1);
-                    break;
+            if(attachments.get(corner) != null) {
+                switch (corner) {
+                    case TOP_LEFT: {
+                        currentPlayer.removeResources(attachments.get(corner).getCard().getCorners().get(Corner.BOTTOM_RIGHT), 1);
+                        break;
+                    }
+                    case TOP_RIGHT: {
+                        currentPlayer.removeResources(attachments.get(corner).getCard().getCorners().get(Corner.BOTTOM_LEFT), 1);
+                        break;
+                    }
+                    case BOTTOM_LEFT: {
+                        currentPlayer.removeResources(attachments.get(corner).getCard().getCorners().get(Corner.TOP_RIGHT), 1);
+                        break;
+                    }
+                    case BOTTOM_RIGHT: {
+                        currentPlayer.removeResources(attachments.get(corner).getCard().getCorners().get(Corner.TOP_LEFT), 1);
+                        break;
+                    }
                 }
             }
         }
@@ -551,8 +553,8 @@ public class GameMaster {
      *
      * @return the current player
      */
-    public Player getCurrentPlayer() {//TODO offset
-        return lobby.getPlayers()[globalTurn % lobby.getPlayers().length];
+    public Player getCurrentPlayer() {
+        return lobby.getPlayers()[globalTurn % (lobby.getPlayers().length)];
     }
 
     /**
