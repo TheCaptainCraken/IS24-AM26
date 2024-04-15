@@ -186,9 +186,9 @@ public class GameMaster {
         }
         //remove resources from counter
         for (Corner corner : Corner.values()) {
-            //if corner points to null doesn't remove any resources
-            //TODO
-            if(attachments.get(corner) != null) {
+            //if corner points to null doesn't remove any resources, resources are subtracted only if the PlayedCards
+            //present in the attachments HashMap are played on their front side or are referencing the StartingCard
+            if(attachments.get(corner) != null && (attachments.get(corner).isFacingUp() || attachments.get(corner).getCard() instanceof StartingCard) ) {
                 switch (corner) {
                     case TOP_LEFT: {
                         currentPlayer.removeResources(attachments.get(corner).getCard().getCorners().get(Corner.BOTTOM_RIGHT), 1);
@@ -546,21 +546,18 @@ public class GameMaster {
      * @throws IllegalArgumentException
      */
     private int calculatesSpecialGoldPoints(Player player, SpecialGoldCard specialGoldCard, HashMap<Corner, PlayedCard> attachments){
-        int numberOfAttachments;
-        switch (specialGoldCard.getThingToCount()) {
-            case CORNER: {
-                numberOfAttachments = 0;
-                for (PlayedCard playedCard : attachments.values()) {
-                    if (playedCard != null) {
-                        numberOfAttachments++;
-                    }
+        if (specialGoldCard.getThingToCount() == Countable.CORNER) {
+            int numberOfAttachments = 0;
+            for (PlayedCard playedCard : attachments.values()) {
+                if (playedCard != null) {
+                    numberOfAttachments++;
                 }
-                return specialGoldCard.getPoints() * numberOfAttachments;
             }
-            default: {
-                return specialGoldCard.getPoints() * player.getResources().get(fromCountableToSign(specialGoldCard.getThingToCount()));
-            }
-        }
+            return specialGoldCard.getPoints() * numberOfAttachments;
+        } else
+            return specialGoldCard.getPoints() * player.getResources().get(fromCountableToSign(specialGoldCard.getThingToCount()));
+
+
     }
 
     //TODO OBJECTIVE CARD POINTS
