@@ -10,7 +10,6 @@ import java.util.HashMap;
 
 public class GameMaster {
     private int globalTurn;
-    private int flagTurnRemained;
     private TurnType turnType;
     private Lobby lobby;
     private GameState gameState;
@@ -19,11 +18,13 @@ public class GameMaster {
     private Deck goldDeck;
     private Deck startingDeck;
     private Deck objectiveDeck;
+
     private ResourceCard[] onTableResourceCards;
     private GoldCard[] onTableGoldCards;
     private ObjectiveCard[] onTableObjectiveCards;
     private StartingCard[] startingCardToPosition;
     private ObjectiveCard[][] objectiveCardToChoose;
+
     private ArrayList<Player> ranking;
 
     /**
@@ -35,9 +36,9 @@ public class GameMaster {
      * @param jsonObjectiveCardFileName  json file name to create the objective deck
      * @param jsonObjectiveStartFileName json file name to create the starting deck
      */
-    public GameMaster(Lobby lobby, String jsonResourceCardFileName, String jsonGoldCardFileName, String jsonObjectiveCardFileName, String jsonObjectiveStartFileName) throws IOException, ParseException {
+    public GameMaster(Lobby lobby, String jsonResourceCardFileName, String jsonGoldCardFileName, String jsonObjectiveCardFileName,
+                      String jsonObjectiveStartFileName) throws IOException, ParseException {
         this.globalTurn = 0;
-        this.flagTurnRemained = 2;
         this.turnType = TurnType.PLAYING;
         this.onTableResourceCards = new ResourceCard[2];
         this.onTableGoldCards = new GoldCard[2];
@@ -144,6 +145,7 @@ public class GameMaster {
     public void placeCard(String namePlayer, ResourceCard cardToPlace, Point position, boolean side) throws
             NoSuchFieldException, IllegalArgumentException, NoTurnException, WrongGamePhaseException, NotEnoughResourcesException, CardPositionException {
 
+        //manage all possible exceptions
         Player currentPlayer = getCurrentPlayer();
         if (!isCurrentPlayer(namePlayer, currentPlayer)) {
             throw new NoTurnException();
@@ -152,19 +154,27 @@ public class GameMaster {
             throw new WrongGamePhaseException();
         }
 
+        //check if the card can be placed in the position
         HashMap<Corner, PlayedCard> attachments = isPositionable(currentPlayer.getRootCard(), position);
+        //TODO deve essere gestita qua la exception di CardPositionException credo.
         //the player positions the card in the back front. The card is one resource and 4 empty corners.
         if (!side) {
             new PlayedCard(cardToPlace, attachments, side, getTurn(), position);
             currentPlayer.addResource(fromKingdomToSign(cardToPlace.getKingdom()), 1);
         } else {
-            if (cardToPlace instanceof GoldCard) {
+            if (cardToPlace instanceof SpecialGoldCard) {
                 GoldCard goldCard = (SpecialGoldCard) cardToPlace;
+                if (!requirementsSatisfied(currentPlayer, goldCard)) {
+                    throw new NotEnoughResourcesException();
+                }
+            }else if(cardToPlace instanceof GoldCard) {
+                GoldCard goldCard = (GoldCard) cardToPlace;
                 if (!requirementsSatisfied(currentPlayer, goldCard)) {
                     throw new NotEnoughResourcesException();
                 }
             }
             //the attachments are of the graph of the player who is playing so there isn-t any reference to Player class in the constructor
+            //TODO ma cosi costruisci solo per le ResourceCard in questo caso??
             new PlayedCard(cardToPlace, attachments, side, getTurn(), position);
             for (Corner corner : Corner.values()) {
                 currentPlayer.addResource(cardToPlace.getCorners().get(corner), 1);
@@ -172,6 +182,8 @@ public class GameMaster {
         }
         //remove resources from counter
         for (Corner corner : Corner.values()) {
+            //if corner points to null doesn't remove any resources
+            //TODO
             if(attachments.get(corner) != null) {
                 switch (corner) {
                     case TOP_LEFT: {
@@ -193,12 +205,15 @@ public class GameMaster {
                 }
             }
         }
+        //TODO se è girata non devi aggiungere i punti
         //At the end because I need to know resources values at the end and how many attachments when I've found them
-        if (cardToPlace instanceof SpecialGoldCard) {
-            SpecialGoldCard specialGoldCard = (SpecialGoldCard) cardToPlace;
-            currentPlayer.addPoints(calculatesSpecialGoldPoints(currentPlayer, specialGoldCard, attachments));
-        } else {
-            currentPlayer.addPoints(cardToPlace.getPoints());
+        if(side) {
+            if (cardToPlace instanceof SpecialGoldCard) {
+                SpecialGoldCard specialGoldCard = (SpecialGoldCard) cardToPlace;
+                currentPlayer.addPoints(calculatesSpecialGoldPoints(currentPlayer, specialGoldCard, attachments));
+            } else {
+                currentPlayer.addPoints(cardToPlace.getPoints());
+            }
         }
 
         currentPlayer.giveCard(cardToPlace);
@@ -209,12 +224,12 @@ public class GameMaster {
      * Allows the Player to draw a card from the table or decks (there are 6 different possibilities based on goldOrNot and onTableOrDeck)
      *
      * @param namePlayer    Player who sent the request
-     * @param Gold     If the type of the resourceCard that wants to be drawn is gold or not
-     * @param CardPosition If the card is taken from the table or not: 2 means from deck, 0 and 1 are the position onTable array
+     * @param Gold          If the type of the resourceCard that wants to be drawn is gold or not
+     * @param CardPosition  If the card is taken from the table or not: 2 means from deck, 0 and 1 are the position onTable array
      * @return
      */
     public int drawCard(String namePlayer, boolean Gold, int CardPosition) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException{
-        //onTableOrDeck has 0, 1 for position of array of cards on table and 2 for draw from deck
+        //CardPosition has 0, 1 for position of array of cards on table and 2 for drawing from deck
         Player currentPlayer = getCurrentPlayer();
         if (!isCurrentPlayer(namePlayer, currentPlayer)) {
             throw new NoTurnException();
@@ -222,9 +237,11 @@ public class GameMaster {
         if (gameState != GameState.DRAWING_PHASE) {
             throw new WrongGamePhaseException();
         }
+
         ResourceCard cardDrawn;
         if (Gold) {
-            if (CardPosition == 2) {//TODO FOR THE VIEW la view richiede il nuovo retro di quella in cima e non solo di quella spostata
+            if (CardPosition == 2) {
+                //TODO FOR THE VIEW la view richiede il nuovo retro di quella in cima e non solo di quella spostata
                 cardDrawn = (ResourceCard) goldDeck.draw();
                 currentPlayer.takeCard(cardDrawn);
             } else {
@@ -233,7 +250,8 @@ public class GameMaster {
                 onTableGoldCards[CardPosition] = (GoldCard) goldDeck.draw();
             }
         } else {
-            if (CardPosition == 2) {//TODO FOR THE VIEW la view richiede il nuovo retro di quella in cima e non solo di quella spostata
+            if (CardPosition == 2) {
+                //TODO FOR THE VIEW la view richiede il nuovo retro di quella in cima e non solo di quella spostata
                 cardDrawn = (ResourceCard) resourceDeck.draw();
                 currentPlayer.takeCard(cardDrawn);
             } else {
@@ -244,15 +262,18 @@ public class GameMaster {
         }
 
         //next player will play?
-        if (flagTurnRemained == 1 && getOrderPlayer(currentPlayer.getName()) + 1 == lobby.getPlayers().length) {
+        if (turnType == TurnType.SECOND_LAST_TURN && getOrderPlayer(currentPlayer.getName()) + 1 == lobby.getPlayers().length) {
             //if it is the last player in second-last turn cicle, say the next is the last turn
-            flagTurnRemained = 0;
+            turnType = TurnType.LAST_TURN;
             gameState = GameState.PLACING_PHASE;
-        } else if (flagTurnRemained == 0 && getOrderPlayer(currentPlayer.getName()) + 1 == lobby.getPlayers().length) {
+        } else if (turnType == TurnType.LAST_TURN && getOrderPlayer(currentPlayer.getName()) + 1 == lobby.getPlayers().length) {
             //if it is the last player in last turn cicle, go to end mode
             gameState = GameState.END;
-        } else if (currentPlayer.getPoints() >= 20) {//if a player reached 20 points set this turn cicle as the second-last
-            flagTurnRemained = 1;
+            //TODO fine gioco
+        } else if (currentPlayer.getPoints() >= 20) {
+            //if a player reached 20 points set this turn cicle as the second-last
+            //TODO fine mazzi e fine partita
+            turnType = TurnType.SECOND_LAST_TURN;
             gameState = GameState.PLACING_PHASE;
         } else {
             gameState = GameState.PLACING_PHASE;
@@ -295,7 +316,8 @@ public class GameMaster {
                     ranking.add(ranking.size(), player);//aggiungi prima
                     numberOfObjectiveForPlayer.add(numberOfObjectiveForPlayer.size(), numberOfObjective);
                 }
-                //TODO OBJECTIVE CARD POINTS finire, qua fare con l'overload dell'interfaccia e poi in questo metodo si chiameranno i metodi di ricerca di this
+                //TODO OBJECTIVE CARD POINTS finire, qua fare con l'overload dell'interfaccia e poi in questo metodo
+                // si chiameranno i metodi di ricerca di this
             }
         }
     }
@@ -305,18 +327,20 @@ public class GameMaster {
     /**
      * Given a position it gives attachments to the card, the Corner keys are referred to the Corner of the new card
      * Notation is x and y based on cartesian axes system rotated of 45 degrees counterclockwise, every card represents a dot with natural coordinates
-     * Example: starting card is always 0,0 so TOP_LEFT would be 0;1, TOP_RIGHT
+     * Example: starting card is always 0,0 so TOP_LEFT would be 0;1, TOP_RIGHT //TODO sistema meglio questo commento
      *
-     * @param startingCard A card where
+     * @param startingCard A card where the recursion will start to find the required PlayedCard
      * @param position  Position that identifies where the next card should be placed
      * @return Hashmap<Corner, PlayedCard> of the attachments for the card to cardToPlace
      * @throws NoSuchFieldException
      */
-    private HashMap<Corner, PlayedCard> isPositionable(PlayedCard startingCard, Point position) throws NoSuchFieldException, IllegalStateException, CardPositionException {
+    private HashMap<Corner, PlayedCard> isPositionable(PlayedCard startingCard, Point position) throws CardPositionException {
         HashMap<Corner, PlayedCard> attachments = new HashMap<>();
         PlayedCard cardToCheck;
-        boolean cardToPlaceIsAttached = false;
+        boolean validPosition = false;
         int xPlaceToCheck = 0, yPlaceToCheck = 0;
+
+        //For each corner of the card to be placed, it checks if there is a possible card to attach it. The switch case refers to the new Card.
         for (Corner corner : Corner.values()) {
             switch (corner) {
                 case TOP_LEFT: {
@@ -341,8 +365,13 @@ public class GameMaster {
                 }
             }
             cardToCheck = findCard(startingCard, new Point(position.x + xPlaceToCheck, position.y + yPlaceToCheck));
+
             if (cardToCheck != null) {
                 Sign cornerToCheck = null;
+                /*Checks if the corner is valid:
+                * if the card is facing up, it checks the corner of the card to be placed
+                * if the card is facing down, it checks the backside corner of the card to be placed(only for starting card).
+                */
                 if (cardToCheck.isFacingUp()) {
                     switch (corner) {
                         case TOP_LEFT: {
@@ -385,17 +414,19 @@ public class GameMaster {
                 } else {
                     cornerToCheck = Sign.EMPTY;
                 }
+                //It verifies if the corner of the card to be placed is compatible with the corner of the card to which it is attached
                 if (cornerToCheck == null) {
                     throw new CardPositionException();
                 }
-                cardToPlaceIsAttached = true;
+                validPosition = true;
             }
             attachments.put(corner, cardToCheck);
         }
-        if (!cardToPlaceIsAttached) {
-            throw new NoSuchFieldException("It's not possible place a card unattached from the other cards");
-            //TODO cambiare eccezioni
+
+        if (!validPosition) {
+            throw new CardPositionException();
         }
+        //TODO doppia carta matematica o logica
         return attachments;
     }
 
@@ -406,8 +437,9 @@ public class GameMaster {
      * @param position
      * @return method recursiveFindCard //TODO è giusto?
      */
-    private PlayedCard findCard(PlayedCard startingCard, Point position) {//TODO OBJECTIVE CARD POINTS METTERLO A DISPOSIZIONE DEL MODULE DI GOLDCARD E OBJECTCARD
-        Stack<PlayedCard> stack = new Stack<>();//Anche Arraylist è uguale
+    private PlayedCard findCard(PlayedCard startingCard, Point position) {
+        //TODO OBJECTIVE CARD POINTS METTERLO A DISPOSIZIONE DEL MODULE DI GOLDCARD E OBJECTCARD
+        Stack<PlayedCard> stack = new Stack<>();
         return recursiveFindCard(startingCard, position, stack);
     }
 
@@ -481,8 +513,10 @@ public class GameMaster {
      */
     public boolean requirementsSatisfied(Player player, GoldCard goldCard) {
         for (Sign sign : Sign.values()) {
-            if (player.getResources().get(sign) < goldCard.getRequirements().get(sign)) {
-                return false;
+            if(sign != Sign.EMPTY) {
+                if (player.getResources().get(sign) < goldCard.getRequirements().get(sign)) {
+                    return false;
+                }
             }
         }
         return true;
@@ -547,7 +581,8 @@ public class GameMaster {
      * @return the cycle of turns made in total
      */
     public int getTurn() {
-        return globalTurn / lobby.getPlayers().length - 1;//non conta giro rootCard (turn = -1) e giro ObjectiveCard (turn = 0)
+        return globalTurn / lobby.getPlayers().length - 1;
+        //non conta giro rootCard (turn = -1) e giro ObjectiveCard (turn = 0)
     }
 
     /**
@@ -565,8 +600,9 @@ public class GameMaster {
      * @param name player who sent the request
      * @return get order of player
      */
-    private int getOrderPlayer(String name) throws NotExistsPlayerException {//TODO offset
-        for (int i = 0; i < lobby.getPlayers().length; i++) {
+    private int getOrderPlayer(String name) throws NotExistsPlayerException {
+        int i;
+        for (i = 0; i < lobby.getPlayers().length; i++) {
             if (lobby.getPlayers()[i].getName().equals(name)) {
                 return i;
             }
@@ -647,7 +683,33 @@ public class GameMaster {
         return ranking;
     }
 
-    public GoldCard getGoldCardDeck(int position) {
+    /**
+     * Give the gold card on the table
+     *
+     * @param position position of the card on the table
+     * @return ResourceCard on the table
+     */
+    public GoldCard getGoldCardOnTable(int position) {
        return onTableGoldCards[position];
     }
+
+
+    public Card getGoldCardDeck() {
+        return goldDeck.draw();
+    }
+
+    /**
+     * Give the resource card on the table
+     *
+     * @param position position of the card on the table
+     * @return ResourceCard on the table
+     */
+    public ResourceCard getResourceCardOnTable(int position) {
+        return onTableResourceCards[position];
+    }
+
+    public Card getResourceCardDeck() {
+        return resourceDeck.draw();
+    }
+
 }

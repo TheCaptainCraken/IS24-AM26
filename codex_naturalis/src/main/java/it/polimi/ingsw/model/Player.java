@@ -17,7 +17,7 @@ public class Player {
     private PlayedCard rootCard;
     private final HashMap<Sign, Integer> resources;
     private ObjectiveCard secretObjective;
-    private ResourceCard[] hand;  //in uml arraylist
+    private ResourceCard[] hand;
 
     /**
      * It is the constructor of Player, it set the  name and the color of the pin
