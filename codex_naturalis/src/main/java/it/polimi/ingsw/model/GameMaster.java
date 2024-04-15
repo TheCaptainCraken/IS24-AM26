@@ -104,6 +104,10 @@ public class GameMaster {
                 for(Sign sign : rootCard.getBonusResources()) {
                     currentPlayer.addResource(sign, 1);
                 }
+            } else {
+                for (Corner corner : Corner.values()) {
+                    currentPlayer.addResource(rootCard.getCorners().get(corner), 1);
+                }
             }
 
             nextGlobalTurn();

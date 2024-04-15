@@ -18,8 +18,10 @@ import static org.junit.jupiter.api.Assertions.*;
 public class GameMasterTest {
     static GameMaster game;
     static GameMaster game2;
+    static GameMaster game3;
     static Lobby lobby;
     static Lobby lobby2;
+    static Lobby lobby3;
     static String basePath = "src/main/java/it/polimi/ingsw/model/decks/";
 
     @BeforeEach
@@ -75,12 +77,6 @@ public class GameMasterTest {
             game.chooseObjectiveCard(lobby.getPlayers()[i].getName(),0);
         }
         assertEquals(startingPlayer,game.getCurrentPlayer());
-
-        Point p = new Point(1,0);
-        for(i = 0; i < lobby.getPlayers().length; i++){
-                game.placeCard(game.getCurrentPlayer().getName(),game.getCurrentPlayer().getHand()[0],p,true );
-                game.drawCard(game.getCurrentPlayer().getName(),false,1);
-        }
 
     }
 
@@ -318,6 +314,79 @@ public class GameMasterTest {
         assertThrows(CardPositionException.class, ()->
                 game2.placeCard("pietro", game2.getCurrentPlayer().getHand()[0], new Point(1,0), false));
    }
+    @BeforeEach
+    public void setUp3() throws SameNameException, LobbyCompleteException, IOException, ParseException,
+            WrongGamePhaseException, NoTurnException, NotExistsPlayerException {
+        //create player
+        lobby3 = new Lobby();
+        lobby3.addPlayer("pietro", Color.YELLOW);
+
+        game3 = new GameMaster(lobby3,
+                basePath + "resourceCardsDeck.json",
+                basePath + "goldCardsDeck.json",
+                basePath + "objectiveCardsDeck.json",
+                basePath + "startingCardsDeck.json");
+
+        game3.placeRootCard("pietro", true);
+        game3.chooseObjectiveCard("pietro", 0);
+
+    }
+
+    @Test
+    @DisplayName("Card is Attached to 2 cards")
+    public void TwoAttachments() throws WrongGamePhaseException, NoTurnException, NoSuchFieldException, NotEnoughResourcesException, CardPositionException, NotExistsPlayerException {
+
+        game3.placeCard("pietro", game3.getCurrentPlayer().getHand()[0], new Point(1, 0), false);
+        game3.drawCard("pietro",false,0);
+        game3.placeCard("pietro", game3.getCurrentPlayer().getHand()[0], new Point(0, -1), false);
+        game3.drawCard("pietro",false,0);
+
+        assertDoesNotThrow(
+                ()-> game3.placeCard("pietro", game3.getCurrentPlayer().getHand()[0], new Point(1, -1), false)
+        );
+
+    }
+
+    @Test
+    @DisplayName("Card is Attached to 3 cards")
+    public void ThreeAttachments() throws WrongGamePhaseException, NoTurnException, NoSuchFieldException, NotEnoughResourcesException, CardPositionException, NotExistsPlayerException {
+
+        game3.placeCard("pietro", game3.getCurrentPlayer().getHand()[0], new Point(1, 0), false);
+        game3.drawCard("pietro",false,0);
+        game3.placeCard("pietro", game3.getCurrentPlayer().getHand()[0], new Point(0, -1), false);
+        game3.drawCard("pietro",false,0);
+        game3.placeCard("pietro", game3.getCurrentPlayer().getHand()[0], new Point(2, 0), false);
+        game3.drawCard("pietro",false,0);
+        game3.placeCard("pietro", game3.getCurrentPlayer().getHand()[0], new Point(2,-1), false);
+        game3.drawCard("pietro",false,0);
+
+        assertDoesNotThrow(
+                ()-> game3.placeCard("pietro", game3.getCurrentPlayer().getHand()[0], new Point(1, -1), false)
+        );
+    }
+
+    @Test
+    @DisplayName("Card is Attached to 4 cards")
+    public void FourAttachments() throws WrongGamePhaseException, NoTurnException, NoSuchFieldException, NotEnoughResourcesException, CardPositionException, NotExistsPlayerException {
+
+        game3.placeCard("pietro", game3.getCurrentPlayer().getHand()[0], new Point(1, 0), false);
+        game3.drawCard("pietro",false,0);
+        game3.placeCard("pietro", game3.getCurrentPlayer().getHand()[0], new Point(0, -1), false);
+        game3.drawCard("pietro",false,0);
+        game3.placeCard("pietro", game3.getCurrentPlayer().getHand()[0], new Point(2, 0), false);
+        game3.drawCard("pietro",false,0);
+        game3.placeCard("pietro", game3.getCurrentPlayer().getHand()[0], new Point(2,-1), false);
+        game3.drawCard("pietro",false,0);
+        game3.placeCard("pietro", game3.getCurrentPlayer().getHand()[0], new Point(0,-2), false);
+        game3.drawCard("pietro",false,0);
+        game3.placeCard("pietro", game3.getCurrentPlayer().getHand()[0], new Point(1,-2), false);
+        game3.drawCard("pietro",false,0);
+
+
+        assertDoesNotThrow(
+                ()-> game3.placeCard("pietro", game3.getCurrentPlayer().getHand()[0], new Point(1, -1), false)
+        );
+    }
 
 }
 
