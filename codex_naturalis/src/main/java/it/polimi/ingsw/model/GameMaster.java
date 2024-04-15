@@ -142,7 +142,7 @@ public class GameMaster {
      * @param side        To which side wants the player to place the card
      */
     public void placeCard(String namePlayer, ResourceCard cardToPlace, Point position, boolean side) throws
-            NoSuchFieldException, IllegalArgumentException, NoTurnException, WrongGamePhaseException, NotEnoughResourcesException {
+            NoSuchFieldException, IllegalArgumentException, NoTurnException, WrongGamePhaseException, NotEnoughResourcesException, CardPositionException {
 
         Player currentPlayer = getCurrentPlayer();
         if (!isCurrentPlayer(namePlayer, currentPlayer)) {
@@ -200,6 +200,7 @@ public class GameMaster {
         } else {
             currentPlayer.addPoints(cardToPlace.getPoints());
         }
+
         currentPlayer.giveCard(cardToPlace);
         gameState = GameState.DRAWING_PHASE;
     }
@@ -268,7 +269,8 @@ public class GameMaster {
      * @return
      */
     //TODO OBJECTIVE CARD POINTS calcolaObiettiviAllaFine
-    public void endGame(String namePlayer) throws WrongGamePhaseException { //Player will click a button to calculate their points
+    public void endGame(String namePlayer) throws WrongGamePhaseException {
+        //Player will click a button to calculate their points. No we can do in drawCard.
         //TODO OBJECTIVE CARD POINTS rifare senza il calcolo degli stati
 
         ArrayList<Integer> numberOfObjectiveForPlayer = new ArrayList<>();//With a linkedhashmap I can't put before or after an element
@@ -310,7 +312,7 @@ public class GameMaster {
      * @return Hashmap<Corner, PlayedCard> of the attachments for the card to cardToPlace
      * @throws NoSuchFieldException
      */
-    private HashMap<Corner, PlayedCard> isPositionable(PlayedCard startingCard, Point position) throws NoSuchFieldException, IllegalStateException {
+    private HashMap<Corner, PlayedCard> isPositionable(PlayedCard startingCard, Point position) throws NoSuchFieldException, IllegalStateException, CardPositionException {
         HashMap<Corner, PlayedCard> attachments = new HashMap<>();
         PlayedCard cardToCheck;
         boolean cardToPlaceIsAttached = false;
@@ -384,7 +386,7 @@ public class GameMaster {
                     cornerToCheck = Sign.EMPTY;
                 }
                 if (cornerToCheck == null) {
-                    throw new IllegalStateException("Cannot attach to an hidden corner");
+                    throw new CardPositionException();
                 }
                 cardToPlaceIsAttached = true;
             }
@@ -645,4 +647,7 @@ public class GameMaster {
         return ranking;
     }
 
+    public GoldCard getGoldCardDeck(int position) {
+       return onTableGoldCards[position];
+    }
 }

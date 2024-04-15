@@ -67,7 +67,7 @@ public class GameMasterTest {
     }
 
     @Test
-    public void PlayingPhaseTest() throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException {
+    public void PlayingPhaseTest() throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException, CardPositionException {
         //Piazza RootCard...
         Player startingPlayer = game.getCurrentPlayer();
         for(int i = 0; i < lobby.getPlayers().length; i++){
@@ -105,7 +105,8 @@ public class GameMasterTest {
 
     //These are test for draw card. I use just one player to easily test the method
     @BeforeEach
-    public void setUp2() throws SameNameException, LobbyCompleteException, IOException, ParseException {
+    public void setUp2() throws SameNameException, LobbyCompleteException, IOException, ParseException,
+            WrongGamePhaseException, NoTurnException, NotExistsPlayerException {
         //create player
         lobby2 = new Lobby();
         lobby2.addPlayer("pietro", Color.YELLOW);
@@ -116,18 +117,46 @@ public class GameMasterTest {
                 basePath + "goldCardsDeck.json",
                 basePath + "objectiveCardsDeck.json",
                 basePath + "startingCardsDeck.json");
-    }
-    //Test of drawCard
-    @Test
-    public void drawCardGoldTest() throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException, NotEnoughResourcesException {
+
         game2.placeRootCard("pietro", false);
         game2.placeRootCard("marco", false);
         game2.chooseObjectiveCard("pietro", 0);
         game2.chooseObjectiveCard("marco", 0);
-        game2.placeCard("pietro", game.getCurrentPlayer().getHand()[0], new Point(1, 0), true);
-        game2.drawCard("pietro", true, 1);
+    }
+    //Test of drawCard
+    @Test
+    @DisplayName("No turn exception for draw card test")
+    public void drawNoTurnTest() throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException, NotEnoughResourcesException {
+        assertThrows(
+                NoTurnException.class,
+                () -> game2.drawCard("marco", true, 1)
+        );
     }
 
+    @Test
+    @DisplayName("Not right phase exception for draw card test")
+    public void drawNotRightPhaseTest() throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException, NotEnoughResourcesException {
+        assertThrows(
+                WrongGamePhaseException.class,
+                () -> game2.drawCard("pietro", true, 1)
+        );
+    }
+
+    @Test
+    @DisplayName("Correct position of drawn card test")
+    public void drawCardTest() throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException,
+            NoSuchFieldException, NotEnoughResourcesException, CardPositionException {
+        game2.placeCard("pietro", game2.getCurrentPlayer().getHand()[0], new Point(1, 0), true);
+        int CardId = game2.drawCard("pietro", true, 1);
+        assertEquals(CardId, lobby2.getPlayers()[0].getHand()[0].getId());
+
+        int CardId2;
+        game2.placeCard("marco", game2.getCurrentPlayer().getHand()[0], new Point(1, 0), true);
+        CardId2 = game2.getGoldCardDeck(1).getId();
+        CardId = game2.drawCard("marco", true, 1);
+        assertEquals(CardId, lobby2.getPlayers()[1].getHand()[0].getId());
+        assertNotEquals(CardId2, game2.getGoldCardDeck(1).getId());
+    }
 }
 
 
