@@ -336,7 +336,7 @@ public class GameMaster {
      */
     private HashMap<Corner, PlayedCard> isPositionable(PlayedCard startingCard, Point position) throws CardPositionException {
         HashMap<Corner, PlayedCard> attachments = new HashMap<>();
-        PlayedCard cardToCheck;
+        PlayedCard cardToCheck, newCard;
         boolean validPosition = false;
         int xPlaceToCheck = 0, yPlaceToCheck = 0;
 
@@ -363,6 +363,12 @@ public class GameMaster {
                     yPlaceToCheck = -1;
                     break;
                 }
+            }
+
+            //TODO carta già posizionata, si potrebbe fare matematicamente.
+            newCard = findCard(startingCard, position);
+            if(newCard != null){
+                throw new CardPositionException();
             }
             cardToCheck = findCard(startingCard, new Point(position.x + xPlaceToCheck, position.y + yPlaceToCheck));
 
@@ -426,7 +432,6 @@ public class GameMaster {
         if (!validPosition) {
             throw new CardPositionException();
         }
-        //TODO doppia carta matematica o logica
         return attachments;
     }
 
@@ -438,7 +443,6 @@ public class GameMaster {
      * @return method recursiveFindCard //TODO è giusto?
      */
     private PlayedCard findCard(PlayedCard startingCard, Point position) {
-        //TODO OBJECTIVE CARD POINTS METTERLO A DISPOSIZIONE DEL MODULE DI GOLDCARD E OBJECTCARD
         Stack<PlayedCard> stack = new Stack<>();
         return recursiveFindCard(startingCard, position, stack);
     }
@@ -448,16 +452,20 @@ public class GameMaster {
      * Recursive looking at all graph of PlayedCard to find a PlayedCard identified by position
      *
      * @param playedCard PlayedCard that I'm visiting
-     * @param position   Position of the card that I-m looking for
+     * @param position   Position of the card that I'm looking for
      * @param stack      Stack in which I save already visited cards
-     * @return PlayedCard if exists else null//TODO needs the logic?
+     * @return PlayedCard if exists else null
      */
     private PlayedCard recursiveFindCard(PlayedCard playedCard, Point position, Stack<PlayedCard> stack) {
-        if (stack.search(playedCard) > 0 || playedCard == null) {
+        if (playedCard == null) {
             return null;
-        } else if (playedCard.getPosition().x == position.x && playedCard.getPosition().y == position.y) {
+        } else if(stack.contains(playedCard)) {
+            return null;
+        }
+        else if (playedCard.getPosition().x == position.x && playedCard.getPosition().y == position.y) {
             return playedCard;
         }
+        stack.push(playedCard);
         for (Corner corner : Corner.values()) {
             PlayedCard found = recursiveFindCard(playedCard.getAttached(corner), position, stack);
             if (found != null) {

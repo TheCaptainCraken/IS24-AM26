@@ -280,6 +280,45 @@ public class GameMasterTest {
         assertEquals(lobby2.getPlayers()[0].getRootCard().getCard().getId(),
                 lobby2.getPlayers()[0].getRootCard().getAttachmentCorners().get(Corner.BOTTOM_RIGHT).getAttachmentCorners().get(Corner.TOP_LEFT).getCard().getId());
     }
+
+    @Test
+    public void WrongPositionTest(){
+        assertThrows(CardPositionException.class, ()->
+                game2.placeCard("pietro", game2.getCurrentPlayer().getHand()[0], new Point(4,3), true));
+        assertThrows(CardPositionException.class, ()->
+                game2.placeCard("pietro", game2.getCurrentPlayer().getHand()[0], new Point(3,3), true));
+        assertThrows(CardPositionException.class, ()->
+                game2.placeCard("pietro", game2.getCurrentPlayer().getHand()[0], new Point(10,-10), true));
+    }
+
+    @Test
+    public void CardAlreadyThere() throws WrongGamePhaseException, NoTurnException, NoSuchFieldException, NotEnoughResourcesException, CardPositionException, NotExistsPlayerException {
+        game2.placeCard("pietro", game2.getCurrentPlayer().getHand()[2], new Point(1, 0), false);
+        game2.drawCard("pietro", true, 2);
+
+        game2.placeCard("marco", game2.getCurrentPlayer().getHand()[2], new Point(1, 0), false);
+        game2.drawCard("marco", true, 2);
+
+        assertThrows(CardPositionException.class, ()->
+                game2.placeCard("pietro", game2.getCurrentPlayer().getHand()[0], new Point(0,0), false));
+
+        game2.placeCard("pietro", game2.getCurrentPlayer().getHand()[0], new Point(2, 0), false);
+        game2.drawCard("pietro", true, 2);
+
+        game2.placeCard("marco", game2.getCurrentPlayer().getHand()[0], new Point(2, 0), false);
+        game2.drawCard("marco", true, 2);
+
+
+        game2.placeCard("pietro", game2.getCurrentPlayer().getHand()[0], new Point(3, 0), false);
+        game2.drawCard("pietro", true, 2);
+
+        game2.placeCard("marco", game2.getCurrentPlayer().getHand()[0], new Point(3, 0), false);
+        game2.drawCard("marco", true, 2);
+
+        assertThrows(CardPositionException.class, ()->
+                game2.placeCard("pietro", game2.getCurrentPlayer().getHand()[0], new Point(1,0), false));
+   }
+
 }
 
 
