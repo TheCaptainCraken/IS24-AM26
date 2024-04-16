@@ -232,8 +232,8 @@ public class GameMaster {
      * @param CardPosition  If the card is taken from the table or not: 2 means from deck, 0 and 1 are the position onTable array
      * @return
      */
-    public int drawCard(String namePlayer, boolean Gold, int CardPosition) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException{
-        //CardPosition has 0, 1 for position of array of cards on table and 2 for drawing from deck
+    public int drawCard(String namePlayer, boolean Gold, int CardPosition) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, IndexOutOfBoundsException{
+        //CardPosition has 0, 1 for position of array of cards on table and -1 for drawing from deck
         Player currentPlayer = getCurrentPlayer();
         if (!isCurrentPlayer(namePlayer, currentPlayer)) {
             throw new NoTurnException();
@@ -244,24 +244,36 @@ public class GameMaster {
 
         ResourceCard cardDrawn;
         if (Gold) {
-            if (CardPosition == 2) {
-                //TODO FOR THE VIEW la view richiede il nuovo retro di quella in cima e non solo di quella spostata
+            if (CardPosition == -1) {
                 cardDrawn = (ResourceCard) goldDeck.draw();
                 currentPlayer.takeCard(cardDrawn);
             } else {
                 cardDrawn = onTableGoldCards[CardPosition];
+                if(cardDrawn == null) {
+                    throw new IllegalArgumentException("There is no card in that spot on table");
+                }
                 currentPlayer.takeCard(cardDrawn);
-                onTableGoldCards[CardPosition] = (GoldCard) goldDeck.draw();
+                try{
+                    onTableGoldCards[CardPosition] = (GoldCard) goldDeck.draw();
+                }catch (IndexOutOfBoundsException e){
+                    onTableGoldCards[CardPosition] = null;
+                }
             }
         } else {
-            if (CardPosition == 2) {
-                //TODO FOR THE VIEW la view richiede il nuovo retro di quella in cima e non solo di quella spostata
+            if (CardPosition == -1) {
                 cardDrawn = (ResourceCard) resourceDeck.draw();
                 currentPlayer.takeCard(cardDrawn);
             } else {
                 cardDrawn = onTableResourceCards[CardPosition];
+                if(cardDrawn == null) {
+                    throw new IllegalArgumentException("There is no card in that spot on table");
+                }
                 currentPlayer.takeCard(cardDrawn);
-                onTableResourceCards[CardPosition] = (ResourceCard) resourceDeck.draw();
+                try {
+                    onTableResourceCards[CardPosition] = (ResourceCard) resourceDeck.draw();
+                }catch (IndexOutOfBoundsException e){
+                    onTableResourceCards[CardPosition] = null;
+                }
             }
         }
 

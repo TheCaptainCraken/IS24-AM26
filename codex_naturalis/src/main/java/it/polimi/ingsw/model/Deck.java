@@ -246,7 +246,11 @@ public class Deck {
      * @throws IndexOutOfBoundsException if the deck is empty.
      */
     public Card draw() throws IndexOutOfBoundsException {
-        return cards.remove(0);
+        try{
+            return cards.remove(0);
+        }catch(IndexOutOfBoundsException e){
+            throw new IndexOutOfBoundsException("The deck is empty");//just to add the message
+        }
     }
 
     /**
