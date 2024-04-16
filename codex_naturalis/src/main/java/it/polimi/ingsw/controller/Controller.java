@@ -23,6 +23,11 @@ public class Controller {
         lobby.addPlayer(nickname, color);
     }
 
+
+    public void chooseFirstPlayer(int i) {
+        lobby.chooseFirstPlayer(i);
+    }
+
     public void start() {
         lobby.setLock();
         game = new GameMaster(lobby, "f1", "f2", "f3", "f4");
@@ -65,6 +70,8 @@ public class Controller {
         return player.getSecretObjective().getId();
     }
 
-
+    public ... getTable() {
+        return //TODO
+    }
 }
 
