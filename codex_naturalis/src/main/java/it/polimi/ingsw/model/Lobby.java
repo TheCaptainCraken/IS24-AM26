@@ -7,12 +7,15 @@ import java.util.Collections;
 
 public class Lobby {
     private final ArrayList<Player> players;
-    boolean complete = false;
+    private int index;//to letchooseFirstPlayer being reusable
+    boolean complete;
 
     /**It's a holder for the players that permits to check and limit access
      */
     public Lobby(){
         players = new ArrayList<>();
+        index = 0;
+        complete = false;
     }
 
     /**If possible it adds a new player to the lobby with a unique nickname
@@ -62,7 +65,9 @@ public class Lobby {
      * @param i the index starting from 0 of the player that will be the first one to play
      */
     public void chooseFirstPlayer(int i){
+        Collections.rotate(players, index);
         Collections.rotate(players, -i);
+        index = i;
     }
 
     /** It locks the lobby so nobody can join anymore, the lobby cannot be unlocked
