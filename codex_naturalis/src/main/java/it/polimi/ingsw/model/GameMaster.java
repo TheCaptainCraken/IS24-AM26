@@ -147,7 +147,7 @@ public class GameMaster {
      * @param side        To which side wants the player to place the card
      */
     public void placeCard(String namePlayer, ResourceCard cardToPlace, Point position, boolean side) throws
-            NoSuchFieldException, IllegalArgumentException, NoTurnException, WrongGamePhaseException, NotEnoughResourcesException, CardPositionException {
+            NoSuchFieldException, IllegalArgumentException, NoTurnException, WrongGamePhaseException, NotEnoughResourcesException, CardPositionException, NotExistsPlayerException {
 
         //manage all possible exceptions
         Player currentPlayer = getCurrentPlayer();
@@ -221,7 +221,18 @@ public class GameMaster {
         }
 
         currentPlayer.giveCard(cardToPlace);
-        gameState = GameState.DRAWING_PHASE;
+        if(areTheCardFinished()){//only when the card are fijnished and the game is in the final phase
+            nextGlobalTurn();
+            if (turnType == TurnType.SECOND_LAST_TURN && getOrderPlayer(currentPlayer.getName()) + 1 == lobby.getPlayers().length) {
+                //if it is the last player in second-last turn cicle, say the next is the last turn
+                turnType = TurnType.LAST_TURN;
+            } else if (turnType == TurnType.LAST_TURN && getOrderPlayer(currentPlayer.getName()) + 1 == lobby.getPlayers().length) {
+                //if it is the last player in last turn cicle, go to end mode
+                gameState = GameState.END;
+            }
+        }else{
+            gameState = GameState.DRAWING_PHASE;
+        }
     }
 
     /**
@@ -286,7 +297,7 @@ public class GameMaster {
             //if it is the last player in last turn cicle, go to end mode
             gameState = GameState.END;
             //TODO fine gioco
-        } else if (currentPlayer.getPoints() >= 20) {
+        } else if (currentPlayer.getPoints() >= 20 || areTheCardFinished()) {
             //if a player reached 20 points set this turn cicle as the second-last
             //TODO fine mazzi e fine partita
             turnType = TurnType.SECOND_LAST_TURN;
@@ -704,19 +715,8 @@ public class GameMaster {
         return ranking;
     }
 
-    /**
-     * Give the gold card on the table
-     *
-     * @param position position of the card on the table
-     * @return ResourceCard on the table
-     */
-    public GoldCard getGoldCardOnTable(int position) {
-       return onTableGoldCards[position];
-    }
-
-
-    public Card getGoldCardDeck() {
-        return goldDeck.draw();
+    private boolean areTheCardFinished(){
+        return getKingdomNextCardResourceDeck()==null && getKingdomNextCardGoldDeck()==null && getResourceCardOnTable(0)==null && getResourceCardOnTable(1)==null && getGoldCardOnTable(0)==null && getGoldCardOnTable(1)==null;
     }
 
     /**
@@ -729,8 +729,39 @@ public class GameMaster {
         return onTableResourceCards[position];
     }
 
-    public Card getResourceCardDeck() {
-        return resourceDeck.draw();
+    /**
+     * Give the gold card on the table
+     *
+     * @param position position of the card on the table
+     * @return ResourceCard on the table
+     */
+    public GoldCard getGoldCardOnTable(int position) {
+       return onTableGoldCards[position];
     }
 
+    /**
+     * Give the Kingdom of the next card of the resourceDeck
+     *
+     * @return Kingdom of the next card of the deck
+     */
+    public Kingdom getKingdomNextCardResourceDeck() {
+        try {
+            return resourceDeck.getKingdomFirstCard();
+        }catch (IndexOutOfBoundsException e){
+            return null;
+        }
+    }
+
+    /**
+     * Give the Kingdom of the next card of the goldDeck
+     *
+     * @return Kingdom of the next card of the deck
+     */
+    public Kingdom getKingdomNextCardGoldDeck() {
+        try {
+            return goldDeck.getKingdomFirstCard();
+        }catch (IndexOutOfBoundsException e){
+            return null;
+        }
+    }
 }

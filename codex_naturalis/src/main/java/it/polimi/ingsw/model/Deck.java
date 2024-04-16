@@ -233,7 +233,7 @@ public class Deck {
      * 
      * @return the {@link Kingdom} of the first card of the deck.
      */
-    public Kingdom getKingdomFirstCard() {
+    public Kingdom getKingdomFirstCard() throws IndexOutOfBoundsException{
         return cards.get(0).getKingdom();
     }
 
