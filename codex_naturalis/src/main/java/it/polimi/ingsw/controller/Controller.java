@@ -1,73 +1,70 @@
 package it.polimi.ingsw.controller;
 
+
 import it.polimi.ingsw.model.*;
 import it.polimi.ingsw.model.Color;
+import it.polimi.ingsw.model.exception.NoTurnException;
+import it.polimi.ingsw.model.exception.NotEnoughResourcesException;
+import it.polimi.ingsw.model.exception.NotExistsPlayerException;
+import it.polimi.ingsw.model.exception.WrongGamePhaseException;
 
 import java.awt.*;
 import java.util.HashMap;
 
-
-//In the controller of the client the view will be updated basing on currentPlayer
-//Example: Controller of the client gets an answer of the new update and it updates its points or the points of the player who is currently playing
-//Another possible implementation is send an object with property currentPlayer and the view will be updated basing on that property, in this way client controller will not need to knwo who is the current player and update it
 public class Controller {
     Lobby lobby;
-    GameMaster game;
-    public Controller(){
-        lobby=new Lobby();
+    GameMaster game = null;
+
+    public Controller() {
+        lobby = new Lobby();
     }
 
-    public ... addPlayer(String nickname, Color color){
+    public void addPlayer(String nickname, Color color) {
         lobby.addPlayer(nickname, color);
     }
 
-    //TODO Return objects with cards on table and to each player root card and objective cards
-    public ... start(){
+    public void start() {
         lobby.setLock();
-        game=new GameMaster(lobby, "f1", "f2", "f3", "f4");
-        for(Player player : lobby.getPlayers()){
-            game.getStartingCard(player);
-            game.getObjectiveCard(player);
-            //prepare object to send to that player
-        }
+        game = new GameMaster(lobby, "f1", "f2", "f3", "f4");
     }
 
-    placeRootCard(){
-        game.placeRootCard();
+    public void placeRootCard(String player, boolean side) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException {
+        game.placeRootCard(player, side);
     }
 
-    chooseObjectiveCard(int index){
-        game.chooseObjectiveCard();
-        return index
+    public void chooseObjectiveCard(String player, int whichCard) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException {
+        game.chooseObjectiveCard(player, whichCard);
     }
 
-    public ... placeCard(int indexHand, int  x, int y){//TODO understand because we pass an object in GameMaster.placeCard()
-        game.placeCard(getCurrentPlayer(), id, new Point(x, y));
+    public void placeCard(String player, ResourceCard cardToPlace, Point position, boolean side) throws WrongGamePhaseException,
+            NoTurnException, NoSuchFieldException, NotEnoughResourcesException {
+        game.placeCard(player, cardToPlace, position, side);
     }
 
-    public ... drawCard(boolean goldOrNot, int onTableOrDeck){
-        int id=game.drawCard(getCurrentPlayer(), goldOrNot, );
-        //
-        if(game.getGameStatus()==GameStatus.END){
-            endGame();
-        }
+    public int drawCard(String player, boolean gold, int position) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException {
+        return game.drawCard(player, gold, position);
     }
 
-    private void endGame(){
-        for(Player player : lobby.getPlayers()){
-            game.endGame();
-        }
+    public int getPlayerPoints(String player) throws NoSuchFieldException {
+        return lobby.getPlayerFromName(player).getPoints();
     }
 
-    public int getPlayerPoints(){
-        return game.getPlayerPoints();
+    public HashMap<Sign, Integer> getPlayerResources(String player) throws NoSuchFieldException {
+        return lobby.getPlayerFromName(player).getResources();
     }
 
-    public HashMap<Sign, Integer> getPlayerResources(){
-        return game.getPlayerResources();
+    public String getCurrentPlayer() {
+        return game.getCurrentPlayer().getName();
     }
 
-    private/public ... getCurrentPlayer(){
-        return game.getCurrentPlayer();
+    public int getStartingCard(Player player) {
+        return player.getRootCard().getCard().getId();
     }
+
+    public int getSecretObjective(Player player) {
+        return player.getSecretObjective().getId();
+    }
+
+
 }
+
