@@ -3,6 +3,7 @@ package it.polimi.ingsw.model;
 import it.polimi.ingsw.model.exception.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class Lobby {
     private final ArrayList<Player> players;
@@ -54,6 +55,14 @@ public class Lobby {
             }
         }
         throw new NoSuchFieldException("There's no Player with the given nickname");
+    }
+
+    /**Set the first player
+     *
+     * @param i the index starting from 0 of the player that will be the first one to play
+     */
+    public void chooseFirstPlayer(int i){
+        Collections.rotate(players, -i);
     }
 
     /** It locks the lobby so nobody can join anymore, the lobby cannot be unlocked
