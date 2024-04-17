@@ -221,13 +221,13 @@ public class GameMaster {
         }
 
         currentPlayer.giveCard(cardToPlace);
-        if(areTheCardFinished()){//only when the card are fijnished and the game is in the final phase
+        if(areTheCardFinished()){//only when the card are finished and the game is in the final phase
             nextGlobalTurn();
             if (turnType == TurnType.SECOND_LAST_TURN && getOrderPlayer(currentPlayer.getName()) + 1 == lobby.getPlayers().length) {
-                //if it is the last player in second-last turn cicle, say the next is the last turn
+                //if it is the last player in second-last turn cycle, say the next is the last turn
                 turnType = TurnType.LAST_TURN;
             } else if (turnType == TurnType.LAST_TURN && getOrderPlayer(currentPlayer.getName()) + 1 == lobby.getPlayers().length) {
-                //if it is the last player in last turn cicle, go to end mode
+                //if it is the last player in last turn cycle, go to end mode
                 gameState = GameState.END;
             }
         }else{
@@ -240,7 +240,7 @@ public class GameMaster {
      *
      * @param namePlayer    Player who sent the request
      * @param Gold          If the type of the resourceCard that wants to be drawn is gold or not
-     * @param CardPosition  If the card is taken from the table or not: 2 means from deck, 0 and 1 are the position onTable array
+     * @param CardPosition  If the card is taken from the table or not: -1 means from deck, 0 and 1 are the position onTable array
      * @return
      */
     public int drawCard(String namePlayer, boolean Gold, int CardPosition) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, IndexOutOfBoundsException{
@@ -290,15 +290,15 @@ public class GameMaster {
 
         //next player will play?
         if (turnType == TurnType.SECOND_LAST_TURN && getOrderPlayer(currentPlayer.getName()) + 1 == lobby.getPlayers().length) {
-            //if it is the last player in second-last turn cicle, say the next is the last turn
+            //if it is the last player in second-last turn cycle, say the next is the last turn
             turnType = TurnType.LAST_TURN;
             gameState = GameState.PLACING_PHASE;
         } else if (turnType == TurnType.LAST_TURN && getOrderPlayer(currentPlayer.getName()) + 1 == lobby.getPlayers().length) {
-            //if it is the last player in last turn cicle, go to end mode
+            //if it is the last player in last turn cycle, go to end mode
             gameState = GameState.END;
             //TODO fine gioco
         } else if (currentPlayer.getPoints() >= 20 || areTheCardFinished()) {
-            //if a player reached 20 points set this turn cicle as the second-last
+            //if a player reached 20 points set this turn cycle as the second-last
             //TODO fine mazzi e fine partita
             turnType = TurnType.SECOND_LAST_TURN;
             gameState = GameState.PLACING_PHASE;
@@ -608,7 +608,7 @@ public class GameMaster {
     }
 
     /**
-     * Calculates the number of cicles made by players, the cicle of setup are not counted
+     * Calculates the number of cycles made by players, the cycle of setup are not counted
      *
      * @return the cycle of turns made in total
      */
