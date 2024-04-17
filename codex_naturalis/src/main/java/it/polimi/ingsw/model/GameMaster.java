@@ -147,7 +147,8 @@ public class GameMaster {
      * @param side        To which side wants the player to place the card
      */
     public void placeCard(String namePlayer, ResourceCard cardToPlace, Point position, boolean side) throws
-            NoSuchFieldException, IllegalArgumentException, NoTurnException, WrongGamePhaseException, NotEnoughResourcesException, CardPositionException, NotExistsPlayerException {
+            NoSuchFieldException, IllegalArgumentException, NoTurnException, WrongGamePhaseException,
+            NotEnoughResourcesException, CardPositionException, NotExistsPlayerException {
 
         //manage all possible exceptions
         Player currentPlayer = getCurrentPlayer();
@@ -221,7 +222,8 @@ public class GameMaster {
         }
 
         currentPlayer.giveCard(cardToPlace);
-        if(areTheCardFinished()){//only when the card are finished and the game is in the final phase
+        if(areTheCardFinished()){
+            //only when the card are finished and the game is in the final phase
             nextGlobalTurn();
             if (turnType == TurnType.SECOND_LAST_TURN && getOrderPlayer(currentPlayer.getName()) + 1 == lobby.getPlayers().length) {
                 //if it is the last player in second-last turn cycle, say the next is the last turn
@@ -229,6 +231,7 @@ public class GameMaster {
             } else if (turnType == TurnType.LAST_TURN && getOrderPlayer(currentPlayer.getName()) + 1 == lobby.getPlayers().length) {
                 //if it is the last player in last turn cycle, go to end mode
                 gameState = GameState.END;
+                //TODO chiamata a fine del gioco
             }
         }else{
             gameState = GameState.DRAWING_PHASE;
@@ -243,7 +246,8 @@ public class GameMaster {
      * @param CardPosition  If the card is taken from the table or not: -1 means from deck, 0 and 1 are the position onTable array
      * @return
      */
-    public int drawCard(String namePlayer, boolean Gold, int CardPosition) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, IndexOutOfBoundsException{
+    public int drawCard(String namePlayer, boolean Gold, int CardPosition) throws WrongGamePhaseException, NoTurnException,
+            NotExistsPlayerException, IndexOutOfBoundsException{
         //CardPosition has 0, 1 for position of array of cards on table and -1 for drawing from deck
         Player currentPlayer = getCurrentPlayer();
         if (!isCurrentPlayer(namePlayer, currentPlayer)) {
@@ -261,6 +265,7 @@ public class GameMaster {
             } else {
                 cardDrawn = onTableGoldCards[CardPosition];
                 if(cardDrawn == null) {
+                    //TODO excpetion
                     throw new IllegalArgumentException("There is no card in that spot on table");
                 }
                 currentPlayer.takeCard(cardDrawn);
@@ -277,6 +282,7 @@ public class GameMaster {
             } else {
                 cardDrawn = onTableResourceCards[CardPosition];
                 if(cardDrawn == null) {
+                    //TODO excpetion
                     throw new IllegalArgumentException("There is no card in that spot on table");
                 }
                 currentPlayer.takeCard(cardDrawn);
@@ -354,7 +360,7 @@ public class GameMaster {
     /**
      * Given a position it gives attachments to the card, the Corner keys are referred to the Corner of the new card
      * Notation is x and y based on cartesian axes system rotated of 45 degrees counterclockwise, every card represents a dot with natural coordinates
-     * Example: starting card is always 0,0 so TOP_LEFT would be 0;1, TOP_RIGHT //TODO sistema meglio questo commento
+     * Example: starting card is always 0,0 so TOP_LEFT would be 0;1, TOP_RIGHT
      *
      * @param startingCard A card where the recursion will start to find the required PlayedCard
      * @param position  Position that identifies where the next card should be placed
@@ -467,7 +473,7 @@ public class GameMaster {
      *
      * @param startingCard Where the recursion will start to find the required PlayedCard
      * @param position
-     * @return method recursiveFindCard //TODO è giusto?
+     * @return method recursiveFindCard
      */
     private PlayedCard findCard(PlayedCard startingCard, Point position) {
         Stack<PlayedCard> stack = new Stack<>();
@@ -716,7 +722,10 @@ public class GameMaster {
     }
 
     private boolean areTheCardFinished(){
-        return getKingdomNextCardResourceDeck()==null && getKingdomNextCardGoldDeck()==null && getResourceCardOnTable(0)==null && getResourceCardOnTable(1)==null && getGoldCardOnTable(0)==null && getGoldCardOnTable(1)==null;
+        return getKingdomNextCardResourceDeck() == null &&
+                getKingdomNextCardGoldDeck()==null && getResourceCardOnTable(0)==null &&
+                getResourceCardOnTable(1)==null && getGoldCardOnTable(0)==null &&
+                getGoldCardOnTable(1)==null;
     }
 
     /**
@@ -772,5 +781,9 @@ public class GameMaster {
 
     public Card getResourceCardDeck() {
         return resourceDeck.draw();
+    }
+
+    public GameState getGameState() {
+        return gameState;
     }
 }
