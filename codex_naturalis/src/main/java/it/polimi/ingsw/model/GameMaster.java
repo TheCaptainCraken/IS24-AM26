@@ -764,4 +764,13 @@ public class GameMaster {
             return null;
         }
     }
+
+    //getter for testing
+    public Card getGoldCardDeck() {
+        return goldDeck.draw();
+    }
+
+    public Card getResourceCardDeck() {
+        return resourceDeck.draw();
+    }
 }
