@@ -20,11 +20,13 @@ public class GameMasterTest {
     static GameMaster game2;
     static GameMaster game3;
     static GameMaster game4;
+    static GameMaster game5;
     static Lobby lobby;
     static Lobby lobby2;
     static Lobby lobby3;
     static Lobby lobby4;
     static String basePath = "src/main/java/it/polimi/ingsw/model/decks/";
+    static String alternatebasePath = "src/test/java/it/polimi/ingsw/test_decks/";
 
     @BeforeEach
     public void setUp() throws SameNameException, LobbyCompleteException, IOException, ParseException {
@@ -437,7 +439,7 @@ public class GameMasterTest {
         lobby4 = new Lobby();
         lobby4.addPlayer("pietro", Color.YELLOW);
 
-        game4 = new GameMaster(lobby3,
+        game4 = new GameMaster(lobby4,
                 basePath + "resourceCardsDeck.json",
                 basePath + "goldCardsDeck.json",
                 basePath + "objectiveCardsDeck.json",
@@ -466,8 +468,141 @@ public class GameMasterTest {
 
 
     }
+    @Test
+    @DisplayName("Test for Decks Emptying")
+    public void deckEmpty() throws IOException, ParseException, WrongGamePhaseException, NoTurnException,
+            NotExistsPlayerException, NoSuchFieldException, NotEnoughResourcesException, CardPositionException {
+        game5 = new GameMaster(lobby4,
+                alternatebasePath+"test_resourceDeck.json",
+                alternatebasePath+"test_goldDeck.json",
+                basePath+"objectiveCardsDeck.json",
+                basePath+"startingCardsDeck.json");
 
+        game5.placeRootCard("pietro",true);
+        game5.chooseObjectiveCard("pietro",1);
 
+        // resource deck is now empty
+        game5.placeCard("pietro", game5.getCurrentPlayer().getHand()[2], new Point(1, 0), false);
+        game5.drawCard("pietro",false,-1);
+
+        //testing if deck raises the exception, as it is empty
+        game5.placeCard("pietro", game5.getCurrentPlayer().getHand()[2], new Point(2, 0), false);
+
+        //testing if deck raises the exception, as it is empty
+        assertThrows(IndexOutOfBoundsException.class,
+                ()-> game5.drawCard("pietro",false,-1));
+
+        //gold deck is now empty
+        game5.drawCard("pietro",true,-1);
+
+        game5.placeCard("pietro", game5.getCurrentPlayer().getHand()[2], new Point(3, 0), false);
+        //testing if deck raises the exception, as it is empty
+        assertThrows(IndexOutOfBoundsException.class,
+                ()-> game5.drawCard("pietro",true,-1));
+
+        //slot[0] of resourceCard is empty
+        game5.drawCard("pietro",false,0);
+        game5.placeCard("pietro", game5.getCurrentPlayer().getHand()[2], new Point(4, 0), false);
+
+        assertThrows(IllegalArgumentException.class,
+                ()-> game5.drawCard("pietro",false,0));
+
+        //slot[1] of resourceCard is empty
+        game5.drawCard("pietro",false,1);
+        game5.placeCard("pietro", game5.getCurrentPlayer().getHand()[2], new Point(5, 0), false);
+
+        assertThrows(IllegalArgumentException.class,
+                ()-> game5.drawCard("pietro",false,1));
+
+        //slot[0] of goldCard is empty
+        game5.drawCard("pietro",true,0);
+        game5.placeCard("pietro", game5.getCurrentPlayer().getHand()[2], new Point(6, 0), false);
+        assertThrows(IllegalArgumentException.class,
+                ()-> game5.drawCard("pietro",true,0));
+
+        //slot[1] of goldCard is empty
+        game5.drawCard("pietro",true,1);
+        game5.placeCard("pietro", game5.getCurrentPlayer().getHand()[2], new Point(7, 0), false);
+
+        //ultimi check sono per valutare se effettivamente, dopo che non ci sono più carte da pescare,
+        // il gameMaster fa in modo che i giocatori non debbano più pescare
+        //saltando quindi la DRAWING PHASE
+        assertThrows(WrongGamePhaseException.class,
+                ()-> game5.drawCard("pietro",true,0));
+        assertDoesNotThrow(() -> game5.placeCard("pietro", game5.getCurrentPlayer().getHand()[0], new Point(8, 0), true));
+
+    }
+    @Test
+    @DisplayName("Test for Decks Emptying")
+    public void deckEmpty_FullLobby() throws IOException, ParseException, WrongGamePhaseException, NoTurnException,
+            NotExistsPlayerException, NoSuchFieldException, NotEnoughResourcesException, CardPositionException {
+        GameMaster game = new GameMaster(lobby,
+                alternatebasePath + "test_resourceDeck2.json",
+                alternatebasePath + "test_goldDeck2.json",
+                basePath + "objectiveCardsDeck.json",
+                basePath + "startingCardsDeck.json");
+
+        int i;
+        for(i = 0; i < lobby.getPlayers().length; i++){
+            game.placeRootCard(game.getCurrentPlayer().getName(),true);
+        }
+        for(i = 0; i < lobby.getPlayers().length; i++){
+            game.chooseObjectiveCard(game.getCurrentPlayer().getName(),1);
+        }
+        // resource deck is now empty, player 1
+        game.placeCard(game.getCurrentPlayer().getName(), game.getCurrentPlayer().getHand()[2], new Point(1, 0), false);
+        game.drawCard(game.getCurrentPlayer().getName(),false,-1);
+
+        game.placeCard(game.getCurrentPlayer().getName(), game.getCurrentPlayer().getHand()[2], new Point(1, 0), false);
+        assertThrows(IndexOutOfBoundsException.class,
+                ()->game.drawCard(game.getCurrentPlayer().getName(),false,-1));
+
+        // gold deck is now empty, player 2
+        game.drawCard(game.getCurrentPlayer().getName(),true,-1);
+        game.placeCard(game.getCurrentPlayer().getName(), game.getCurrentPlayer().getHand()[2], new Point(1, 0), false);
+        assertThrows(IndexOutOfBoundsException.class,
+                ()->game.drawCard(game.getCurrentPlayer().getName(),true,-1));
+
+        // resource slot[0] is now empty, player 3
+        game.drawCard(game.getCurrentPlayer().getName(),false,0);
+        game.placeCard(game.getCurrentPlayer().getName(), game.getCurrentPlayer().getHand()[2], new Point(1, 0), false);
+        assertThrows(IllegalArgumentException.class,
+                ()->game.drawCard(game.getCurrentPlayer().getName(),false,0));
+
+        // resource slot[1] is now empty, player 4
+        game.drawCard(game.getCurrentPlayer().getName(),false,1);
+        game.placeCard(game.getCurrentPlayer().getName(), game.getCurrentPlayer().getHand()[2], new Point(2, 0), false);
+        assertThrows(IllegalArgumentException.class,
+                ()->game.drawCard(game.getCurrentPlayer().getName(),false,1));
+
+        //gold slot[1] is now empty, player 1
+        game.drawCard(game.getCurrentPlayer().getName(),true,1);
+        game.placeCard(game.getCurrentPlayer().getName(), game.getCurrentPlayer().getHand()[2], new Point(2, 0), false);
+        assertThrows(IllegalArgumentException.class,
+                ()->game.drawCard(game.getCurrentPlayer().getName(),true,1));
+
+        //gold slot[0] is now empty, player 2
+        game.drawCard(game.getCurrentPlayer().getName(),true,0);
+
+        //TABLE EMPTY NOW
+        for(i = 0; i < 6; i++){
+            Player p = game.getCurrentPlayer();
+            if(i < 2){
+                game.placeCard(game.getCurrentPlayer().getName(), game.getCurrentPlayer().getHand()[2], new Point(2, 0), false);
+                assertNull((p.getHand()[2]));
+            } else {
+                game.placeCard(game.getCurrentPlayer().getName(), game.getCurrentPlayer().getHand()[1], new Point(3, 0), false);
+                assertNull((p.getHand()[1]));
+            }
+            assertThrows(WrongGamePhaseException.class,
+                    ()->game.drawCard(game.getCurrentPlayer().getName(),true,1));
+        }
+
+        //ultima assert serve a confermare che GameMaster abbia fatto transizione verso GameState.END
+        assertThrows(WrongGamePhaseException.class,
+                ()->game.placeCard(game.getCurrentPlayer().getName(), game.getCurrentPlayer().getHand()[2], new Point(4, 0), false));
+        assertEquals(GameState.END, game.getGameState());
+    }
 }
 
 
