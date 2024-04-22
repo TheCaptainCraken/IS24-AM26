@@ -325,8 +325,13 @@ public class GameMaster {
         } else if (currentPlayer.getPoints() >= 20 || areTheCardFinished()) {
             //if a player reached 20 points set this turn cycle as the second-last
             //TODO fine mazzi e fine partita
-            turnType = TurnType.SECOND_LAST_TURN;
-            gameState = GameState.PLACING_PHASE;
+            if(getOrderPlayer(currentPlayer.getName()) + 1 == lobby.getPlayers().length){
+                turnType = TurnType.LAST_TURN;
+                gameState = GameState.PLACING_PHASE;
+            }else {
+                turnType = TurnType.SECOND_LAST_TURN;
+                gameState = GameState.PLACING_PHASE;
+            }
         } else {
             gameState = GameState.PLACING_PHASE;
         }
@@ -427,7 +432,6 @@ public class GameMaster {
                 }
             }
 
-            // TODO carta già posizionata, si potrebbe fare matematicamente.
             newCard = findCard(startingCard, position);
             if (newCard != null) {
                 throw new CardPositionException();
@@ -792,9 +796,9 @@ public class GameMaster {
 
     private boolean areTheCardFinished(){
         return getKingdomNextCardResourceDeck() == null &&
-                getKingdomNextCardGoldDeck()==null && getResourceCardOnTable(0)==null &&
-                getResourceCardOnTable(1)==null && getGoldCardOnTable(0)==null &&
-                getGoldCardOnTable(1)==null;
+                getKingdomNextCardGoldDeck() == null &&
+                getResourceCardOnTable(0) == null && getResourceCardOnTable(1) == null &&
+                getGoldCardOnTable(0) == null && getGoldCardOnTable(1) == null;
     }
 
     /**

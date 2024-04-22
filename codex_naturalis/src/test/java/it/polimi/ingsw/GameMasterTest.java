@@ -453,8 +453,7 @@ public class GameMasterTest {
     //TEST FOR RESOURCES
     @Test
     @DisplayName("Test for resources")
-    public void notEnoughResourcesTest() throws WrongGamePhaseException, NoTurnException, NoSuchFieldException,
-            NotEnoughResourcesException, NotExistsPlayerException, CardPositionException {
+    public void notEnoughResourcesTest() {
         assertThrows(NotEnoughResourcesException.class,
                 ()-> game4.placeCard("pietro", game4.getCurrentPlayer().getHand()[2], new Point(1, 0), true));
     }
@@ -524,12 +523,10 @@ public class GameMasterTest {
         game5.drawCard("pietro",true,1);
         game5.placeCard("pietro", game5.getCurrentPlayer().getHand()[2], new Point(7, 0), false);
 
-        //ultimi check sono per valutare se effettivamente, dopo che non ci sono più carte da pescare,
-        // il gameMaster fa in modo che i giocatori non debbano più pescare
-        //saltando quindi la DRAWING PHASE
         assertThrows(WrongGamePhaseException.class,
                 ()-> game5.drawCard("pietro",true,0));
-        assertDoesNotThrow(() -> game5.placeCard("pietro", game5.getCurrentPlayer().getHand()[0], new Point(8, 0), true));
+        assertDoesNotThrow(() ->
+                game5.placeCard("pietro", game5.getCurrentPlayer().getHand()[0], new Point(8, 0), true));
 
     }
     @Test
@@ -598,11 +595,68 @@ public class GameMasterTest {
                     ()->game.drawCard(game.getCurrentPlayer().getName(),true,1));
         }
 
-        //ultima assert serve a confermare che GameMaster abbia fatto transizione verso GameState.END
         assertThrows(WrongGamePhaseException.class,
                 ()->game.placeCard(game.getCurrentPlayer().getName(), game.getCurrentPlayer().getHand()[2], new Point(4, 0), false));
         assertEquals(GameState.END, game.getGameState());
     }
+
+
+    //test for end game point
+    @Test
+    @DisplayName("End game tris test")
+    public void endGameTrisTest() throws WrongGamePhaseException, NoTurnException,
+            NoSuchFieldException, NotEnoughResourcesException, NotExistsPlayerException, CardPositionException {
+        int i, j, z, a ;
+        j = 0;
+        z = 1;
+        a = 1;
+
+        for(i = 0; i < 20 && j < 4; i++) {
+            if (game4.getCurrentPlayer().getHand()[1].getKingdom() ==
+                    lobby4.getPlayerFromName("pietro").getSecretObjective().getKingdom()) {
+                game4.placeCard("pietro", game4.getCurrentPlayer().getHand()[1], new Point(a, 0), false);
+                j++;
+                a++;
+            }else{
+                game4.placeCard("pietro", game4.getCurrentPlayer().getHand()[1], new Point(0, -z), false);
+                z++;
+            }
+            game4.drawCard("pietro", false, 0);
+        }
+
+        //TODO assert points
+    }
+
+    @Test
+    public void TrisTest() throws WrongGamePhaseException, NoTurnException, NoSuchFieldException,
+            NotEnoughResourcesException, NotExistsPlayerException, CardPositionException {
+        game4.placeCard("pietro", game4.getCurrentPlayer().getHand()[0], new Point(0, 1), false);
+        game4.drawCard("pietro", false, 0);
+
+        int i, a , b;
+        a = 1;
+        b = 1;
+        for (i = 0; i < 20; i++) {
+            //TODO kingdom non ha senso è null
+            if (game4.getCurrentPlayer().getHand()[1].getKingdom() ==
+                    lobby4.getPlayerFromName("pietro").getSecretObjective().getKingdom()) {
+                game4.placeCard("pietro", game4.getCurrentPlayer().getHand()[1], new Point(a, 1), false);
+                game4.drawCard("pietro", false, 0);
+                a++;
+            }else {
+                game4.placeCard("pietro", game4.getCurrentPlayer().getHand()[1], new Point(-b, 0), false);
+                game4.drawCard("pietro", false, 0);
+                b++;
+            }
+        }
+        //TODO assert points
+    }
+
+    //TODO test for L formation
+
+    //TODO test for resourcs @Arturo
+
+
 }
 
 
