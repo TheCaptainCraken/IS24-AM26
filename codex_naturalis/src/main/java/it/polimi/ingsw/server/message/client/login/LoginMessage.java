@@ -1,9 +1,12 @@
 package it.polimi.ingsw.server.message.client.login;
 
-public class LoginMessage {
-    private String nickname;
+import it.polimi.ingsw.server.message.ClientMessage;
+
+public class LoginMessage extends ClientMessage {
+    private final String nickname;
 
     public LoginMessage(String nickname) {
+        super(nickname);
         this.nickname = nickname;
     }
 
