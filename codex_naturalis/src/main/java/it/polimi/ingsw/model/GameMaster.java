@@ -154,8 +154,8 @@ public class GameMaster {
      *                    place the card
      * @param side        To which side wants the player to place the card
      */
-    public void placeCard(String namePlayer, ResourceCard cardToPlace, Point position, boolean side) throws
-            NoSuchFieldException, IllegalArgumentException, NoTurnException, WrongGamePhaseException,
+    public void placeCard(String namePlayer, ResourceCard cardToPlace, Point position, boolean side)
+            throws NoSuchFieldException, IllegalArgumentException, NoTurnException, WrongGamePhaseException,
             NotEnoughResourcesException, CardPositionException, NotExistsPlayerException {
 
         // manage all possible exceptions
@@ -240,16 +240,19 @@ public class GameMaster {
         }
 
         currentPlayer.giveCard(cardToPlace);
-        if(areTheCardFinished()){
-            //only when the card are finished and the game is in the final phase
+        if (areTheCardFinished()) {
+            // only when the card are finished and the game is in the final phase
             nextGlobalTurn();
-            if (turnType == TurnType.SECOND_LAST_TURN && getOrderPlayer(currentPlayer.getName()) + 1 == lobby.getPlayers().length) {
-                //if it is the last player in second-last turn cycle, say the next is the last turn
+            if (turnType == TurnType.SECOND_LAST_TURN
+                    && getOrderPlayer(currentPlayer.getName()) + 1 == lobby.getPlayers().length) {
+                // if it is the last player in second-last turn cycle, say the next is the last
+                // turn
                 turnType = TurnType.LAST_TURN;
-            } else if (turnType == TurnType.LAST_TURN && getOrderPlayer(currentPlayer.getName()) + 1 == lobby.getPlayers().length) {
-                //if it is the last player in last turn cycle, go to end mode
+            } else if (turnType == TurnType.LAST_TURN
+                    && getOrderPlayer(currentPlayer.getName()) + 1 == lobby.getPlayers().length) {
+                // if it is the last player in last turn cycle, go to end mode
                 gameState = GameState.END;
-                //TODO chiamata a fine del gioco
+                // TODO chiamata a fine del gioco
             }
         } else {
             gameState = GameState.DRAWING_PHASE;
@@ -260,14 +263,18 @@ public class GameMaster {
      * Allows the Player to draw a card from the table or decks (there are 6
      * different possibilities based on goldOrNot and onTableOrDeck)
      *
-     * @param namePlayer    Player who sent the request
-     * @param Gold          If the type of the resourceCard that wants to be drawn is gold or not
-     * @param CardPosition  If the card is taken from the table or not: -1 means from deck, 0 and 1 are the position onTable array
+     * @param namePlayer   Player who sent the request
+     * @param Gold         If the type of the resourceCard that wants to be drawn is
+     *                     gold or not
+     * @param CardPosition If the card is taken from the table or not: -1 means from
+     *                     deck, 0 and 1 are the position onTable array
      * @return
      */
-    public int drawCard(String namePlayer, boolean Gold, int CardPosition) throws WrongGamePhaseException, NoTurnException,
-            NotExistsPlayerException, IndexOutOfBoundsException{
-        //CardPosition has 0, 1 for position of array of cards on table and -1 for drawing from deck
+    public int drawCard(String namePlayer, boolean Gold, int CardPosition)
+            throws WrongGamePhaseException, NoTurnException,
+            NotExistsPlayerException, IndexOutOfBoundsException {
+        // CardPosition has 0, 1 for position of array of cards on table and -1 for
+        // drawing from deck
         Player currentPlayer = getCurrentPlayer();
         if (!isCurrentPlayer(namePlayer, currentPlayer)) {
             throw new NoTurnException();
@@ -283,8 +290,8 @@ public class GameMaster {
                 currentPlayer.takeCard(cardDrawn);
             } else {
                 cardDrawn = onTableGoldCards[CardPosition];
-                if(cardDrawn == null) {
-                    //TODO excpetion
+                if (cardDrawn == null) {
+                    // TODO excpetion
                     throw new IllegalArgumentException("There is no card in that spot on table");
                 }
                 currentPlayer.takeCard(cardDrawn);
@@ -300,8 +307,8 @@ public class GameMaster {
                 currentPlayer.takeCard(cardDrawn);
             } else {
                 cardDrawn = onTableResourceCards[CardPosition];
-                if(cardDrawn == null) {
-                    //TODO excpetion
+                if (cardDrawn == null) {
+                    // TODO excpetion
                     throw new IllegalArgumentException("There is no card in that spot on table");
                 }
                 currentPlayer.takeCard(cardDrawn);
@@ -313,22 +320,25 @@ public class GameMaster {
             }
         }
 
-        //next player will play?
-        if (turnType == TurnType.SECOND_LAST_TURN && getOrderPlayer(currentPlayer.getName()) + 1 == lobby.getPlayers().length) {
-            //if it is the last player in second-last turn cycle, say the next is the last turn
+        // next player will play?
+        if (turnType == TurnType.SECOND_LAST_TURN
+                && getOrderPlayer(currentPlayer.getName()) + 1 == lobby.getPlayers().length) {
+            // if it is the last player in second-last turn cycle, say the next is the last
+            // turn
             turnType = TurnType.LAST_TURN;
             gameState = GameState.PLACING_PHASE;
-        } else if (turnType == TurnType.LAST_TURN && getOrderPlayer(currentPlayer.getName()) + 1 == lobby.getPlayers().length) {
-            //if it is the last player in last turn cycle, go to end mode
+        } else if (turnType == TurnType.LAST_TURN
+                && getOrderPlayer(currentPlayer.getName()) + 1 == lobby.getPlayers().length) {
+            // if it is the last player in last turn cycle, go to end mode
             gameState = GameState.END;
             // TODO fine gioco
         } else if (currentPlayer.getPoints() >= 20 || areTheCardFinished()) {
-            //if a player reached 20 points set this turn cycle as the second-last
-            //TODO fine mazzi e fine partita
-            if(getOrderPlayer(currentPlayer.getName()) + 1 == lobby.getPlayers().length){
+            // if a player reached 20 points set this turn cycle as the second-last
+            // TODO fine mazzi e fine partita
+            if (getOrderPlayer(currentPlayer.getName()) + 1 == lobby.getPlayers().length) {
                 turnType = TurnType.LAST_TURN;
                 gameState = GameState.PLACING_PHASE;
-            }else {
+            } else {
                 turnType = TurnType.SECOND_LAST_TURN;
                 gameState = GameState.PLACING_PHASE;
             }
@@ -387,8 +397,10 @@ public class GameMaster {
     // Finding methods
 
     /**
-     * Given a position it gives attachments to the card, the Corner keys are referred to the Corner of the new card
-     * Notation is x and y based on cartesian axes system rotated of 45 degrees counterclockwise, every card represents a dot with natural coordinates
+     * Given a position it gives attachments to the card, the Corner keys are
+     * referred to the Corner of the new card
+     * Notation is x and y based on cartesian axes system rotated of 45 degrees
+     * counterclockwise, every card represents a dot with natural coordinates
      * Example: starting card is always 0,0 so TOP_LEFT would be 0;1, TOP_RIGHT
      *
      * @param startingCard A card where the recursion will start to find the
@@ -637,8 +649,16 @@ public class GameMaster {
 
     }
 
-    // TODO OBJECTIVE CARD POINTS
-    private int calculateEndGamePoints(ObjectiveType type, int multiplier, Player player) {
+    /**
+     * Calculate the number of points given by an objective card.
+     * 
+     * @param type       type of the objective card.
+     * @param multiplier multiplier of the objective card.
+     * @param player     player who who is getting targeted.
+     * @param kingdom    kingdom of the objective card.
+     * @return number of points to add to the player points
+     */
+    private int calculateEndGamePoints(ObjectiveType type, int multiplier, Player player, Kingdom kingdom) {
         int points = 0;
         switch (type) {
             case TWO_QUILLS:
@@ -651,9 +671,19 @@ public class GameMaster {
                 points = player.getResources().get(Sign.SCROLL) / 2;
                 break;
             case FREE_RESOURCES:
-                break;
+                points = Math.min(player.getResources().get(Sign.QUILL),
+                        Math.min(player.getResources().get(Sign.INKWELL), player.getResources().get(Sign.SCROLL)));
             case TRIS:
+                // Not sure about this: is it one point per tris or what?
+                points = player.getResources().get(fromKingdomToSign(kingdom)) / 3;
                 break;
+            /**
+             * Problems identifying the best combination in multiple points.
+             * For stairs a good idea would be to travel first to the lowest card possible
+             * and then go up (?)
+             * For L formation, the best idea would be to travel to the lowest card and then
+             * go to the right or left (?)
+             */
             case L_FORMATION:
                 break;
             case STAIR:
@@ -664,14 +694,37 @@ public class GameMaster {
     }
 
     /**
-     * Calculates the best combination of ObjectiveCard effects to get major
-     * increase of points with more application of
-     * effects (In case of draw points between players)
-     *
-     * @return ..//TODO OBJECTIVE CARD POINTS
+     * Convert the graph of PlayedCard of a player in a list of PlayedCard
+     * 
+     * @param player player to explore
+     * @return list of played cards
      */
-    private int calculateBestCombination() {
-        return 0;
+    private ArrayList<PlayedCard> getPlayersCards(Player player) {
+        PlayedCard rootCard = player.getRootCard();
+        return exploreGraph(rootCard);
+    }
+
+    /**
+     * Explore the graph of played cards.
+     * 
+     * @param startingCard starting card of the player
+     * @return list of played cards
+     */
+    private ArrayList<PlayedCard> exploreGraph(PlayedCard startingCard) {
+        ArrayList<PlayedCard> cards = new ArrayList<>();
+        Stack<PlayedCard> stack = new Stack<>();
+        stack.push(startingCard);
+        while (!stack.isEmpty()) {
+            PlayedCard card = stack.pop();
+            cards.add(card);
+            for (Corner corner : Corner.values()) {
+                PlayedCard attached = card.getAttached(corner);
+                if (attached != null) {
+                    stack.push(attached);
+                }
+            }
+        }
+        return cards;
     }
 
     // Turn methods
@@ -684,7 +737,8 @@ public class GameMaster {
     }
 
     /**
-     * Calculates the number of cycles made by players, the cycle of setup are not counted
+     * Calculates the number of cycles made by players, the cycle of setup are not
+     * counted
      *
      * @return the cycle of turns made in total
      */
@@ -794,7 +848,7 @@ public class GameMaster {
         return ranking;
     }
 
-    private boolean areTheCardFinished(){
+    private boolean areTheCardFinished() {
         return getKingdomNextCardResourceDeck() == null &&
                 getKingdomNextCardGoldDeck() == null &&
                 getResourceCardOnTable(0) == null && getResourceCardOnTable(1) == null &&
