@@ -687,6 +687,23 @@ public class GameMaster {
             case L_FORMATION:
                 break;
             case STAIR:
+                for (PlayedCard card : getPlayersCards(player)) {
+                    Point position = card.getPosition();
+                    if (card.getCard().getKingdom() == kingdom) {
+                        int x = position.x;
+                        int y = position.y;
+                        int pointsToAdd = 0;
+                        for (PlayedCard cardToCheck : getPlayersCards(player)) {
+                            if (cardToCheck.getCard().getKingdom() == kingdom) {
+                                if (cardToCheck.getPosition().x == x + 1 && cardToCheck.getPosition().y == y
+                                        || cardToCheck.getPosition().x == x && cardToCheck.getPosition().y == y + 1) {
+                                    pointsToAdd++;
+                                }
+                            }
+                        }
+                        points += pointsToAdd;
+                    }
+                }
                 break;
         }
 
