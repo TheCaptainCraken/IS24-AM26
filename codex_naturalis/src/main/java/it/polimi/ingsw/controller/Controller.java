@@ -24,9 +24,9 @@ public class Controller {
     }
 
 
-    public void chooseFirstPlayer(int i) {
-        lobby.chooseFirstPlayer(i);
-    }
+//    public void chooseFirstPlayer(int i) {
+//        lobby.chooseFirstPlayer(i);
+//    }
 
     public void start() {
         lobby.setLock();
@@ -70,8 +70,8 @@ public class Controller {
         return player.getSecretObjective().getId();
     }
 
-    public ... getTable() {
-        return //TODO
-    }
+//    public ... getTable() {
+//        return //TODO
+//    }
 }
 

@@ -5,7 +5,7 @@ import java.util.List;
 
 public class Lobby {
     private ArrayList<Player> players;
-    boolean complete=false;
+    boolean complete = false;
 
     /**It's an holder for the players that permits to check and limit access
      */
@@ -28,7 +28,7 @@ public class Lobby {
         }
         Player newPlayer = new Player(nickname, color);
         players.add(newPlayer);
-        if(players.size()==4){
+        if(players.size() == 4){
             setLock();
         }
     }

@@ -28,6 +28,6 @@ public class SpecialGoldCardTest {
     @Test
     void NormalTest(){
         g1 = new SpecialGoldCard(2, Kingdom.FUNGI,map,0,map1,Countable.CORNER);
-        assertEquals(g1.getThingtoCount(),Countable.CORNER);
+        assertEquals(g1.getThingToCount(),Countable.CORNER);
     }
 }

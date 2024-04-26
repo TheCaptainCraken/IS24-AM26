@@ -204,7 +204,8 @@ public class GameMaster {
      * @param onTableOrDeck If the card is taken from the table or not: 2 means from deck, 0 and 1 are the position onTable array
      * @return
      */
-    public int drawCard(String namePlayer, boolean goldOrNot, int onTableOrDeck) throws NullPointerException, WrongGamePhaseException, NoTurnException, NotExistsPlayerException {
+    public int drawCard(String namePlayer, boolean goldOrNot, int onTableOrDeck) throws NullPointerException, WrongGamePhaseException,
+            NoTurnException, NotExistsPlayerException {
         //onTableOrDeck has 0, 1 for position of array of cards on table and 2 for draw from deck
         Player currentPlayer = getCurrentPlayer();
         if (isCurrentPlayer(namePlayer, currentPlayer)) {
@@ -434,13 +435,13 @@ public class GameMaster {
     private Sign fromKingdomToSign(Kingdom kingdom) throws IllegalArgumentException {
         switch (kingdom) {
             case PLANT:
-                return Sign.PLANT;
+                return Sign.LEAF;
             case ANIMAL:
-                return Sign.ANIMAL;
+                return Sign.WOLF;
             case FUNGI:
-                return Sign.FUNGI;
+                return Sign.MUSHROOM;
             case INSECT:
-                return Sign.INSECT;
+                return Sign.BUTTERFLY;
         }
         throw new IllegalArgumentException("It's not a right Kingdom to convert");
     }
@@ -454,11 +455,11 @@ public class GameMaster {
     private Sign fromCountableToSign(Countable countable) throws IllegalArgumentException {
         switch (countable) {
             case QUILL:
-                return Sign.PLANT;
+                return Sign.QUILL;
             case INKWELL:
-                return Sign.ANIMAL;
+                return Sign.INKWELL;
             case SCROLL:
-                return Sign.FUNGI;
+                return Sign.SCROLL;
         }
         throw new IllegalArgumentException("It's not a right Countable to convert");
     }

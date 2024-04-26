@@ -40,7 +40,7 @@ public class LobbyTest {
     }
     @Test
     @DisplayName("Search player")
-    public void SearchPlayerTest() throws NotExistsPlayerException {
+    public void SearchPlayerTest() throws  NoSuchFieldException {
         Player p1 = lobby.getPlayerFromName("pietro");
         assertEquals("pietro", p1.getName());
 
