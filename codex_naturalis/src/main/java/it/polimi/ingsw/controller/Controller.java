@@ -12,11 +12,16 @@ import java.awt.*;
 import java.util.HashMap;
 
 public class Controller {
+    private static final Controller INSTANCE = new Controller();
+
     Lobby lobby;
     GameMaster game = null;
 
-    public Controller() {
-        lobby = new Lobby();
+    private Controller() {
+    }
+
+    public void initializeLobby(int nPlayers){
+        lobby = new Lobby(nPlayers);
     }
 
     public void addPlayer(String nickname, Color color) {
@@ -73,5 +78,9 @@ public class Controller {
 //    public ... getTable() {
 //        return //TODO
 //    }
+
+    public static Controller getInstance(){
+        return INSTANCE;
+    }
 }
 

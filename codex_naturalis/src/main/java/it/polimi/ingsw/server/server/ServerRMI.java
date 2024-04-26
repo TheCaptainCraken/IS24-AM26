@@ -42,7 +42,7 @@ public class ServerRMI implements Loggable{
     }
 
     @Override
-    public Boolean ping() throws RemoteException {
+    public boolean ping() throws RemoteException {
 
         return true;
     }

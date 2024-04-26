@@ -2,7 +2,9 @@ package it.polimi.ingsw;
 
 import it.polimi.ingsw.model.Color;
 import it.polimi.ingsw.model.exception.FullLobbyException;
+import it.polimi.ingsw.model.exception.LobbyCompleteException;
 import it.polimi.ingsw.model.exception.NotExistsPlayerException;
+import it.polimi.ingsw.model.exception.SameNameException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeAll;
@@ -20,19 +22,19 @@ public class LobbyTest {
     @Test
     @DisplayName("check correct function when lobby is complete")
     public void CheckCorrectFunctionLobbyComplete(){
-        assertThrows(FullLobbyException.class, () -> {
-           Lobby lobby = new Lobby();
-           lobby.addPlayer("pietro", Color.BLUE);
-           lobby.addPlayer("marco", Color.RED);
-           lobby.addPlayer("daniel", Color.GREEN);
-           lobby.addPlayer("arturo", Color.YELLOW);
-           lobby.addPlayer("arturo", Color.YELLOW);
+        assertThrows(LobbyCompleteException.class, () -> {
+            Lobby lobby = new Lobby(4);
+            lobby.addPlayer("pietro", Color.BLUE);
+            lobby.addPlayer("marco", Color.RED);
+            lobby.addPlayer("daniel", Color.GREEN);
+            lobby.addPlayer("arturo", Color.YELLOW);
+            lobby.addPlayer("arturo", Color.YELLOW);
         });
     }
 
     @BeforeAll
-    public static void Setup() throws FullLobbyException {
-        lobby = new Lobby();
+    public static void Setup() throws FullLobbyException, SameNameException, LobbyCompleteException {
+        lobby = new Lobby(4);
         lobby.addPlayer("pietro", Color.BLUE);
         lobby.addPlayer("marco", Color.RED);
         lobby.addPlayer("daniel", Color.GREEN);
@@ -40,7 +42,7 @@ public class LobbyTest {
     }
     @Test
     @DisplayName("Search player")
-    public void SearchPlayerTest() throws  NoSuchFieldException {
+    public void SearchPlayerTest() throws NotExistsPlayerException, NoSuchFieldException {
         Player p1 = lobby.getPlayerFromName("pietro");
         assertEquals("pietro", p1.getName());
 
