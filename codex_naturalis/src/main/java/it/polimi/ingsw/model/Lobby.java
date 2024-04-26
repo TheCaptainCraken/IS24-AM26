@@ -1,6 +1,7 @@
 package it.polimi.ingsw.model;
 
-import it.polimi.ingsw.model.exception.*;
+import it.polimi.ingsw.model.exception.LobbyCompleteException;
+import it.polimi.ingsw.model.exception.SameNameException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -8,21 +9,22 @@ import java.util.Collections;
 public class Lobby {
     private final ArrayList<Player> players;
     private int index;//to letchooseFirstPlayer being reusable
+    private int maxSize;
     boolean complete;
 
-    /**It's a holder for the players that permits to check and limit access
+    /**It's an holder for the players that permits to check and limit access
      */
-    public Lobby(){
-        players = new ArrayList<>();
-        index = 0;
-        complete = false;
+    public Lobby(int maxSize){
+        this.players = new ArrayList<>();
+        this.maxSize = maxSize;
+        this.complete = false;
     }
 
     /**If possible it adds a new player to the lobby with a unique nickname
      * @param nickname nickname of the new Player
      * @param color color of the pin that the player has chosen
      */
-    public void addPlayer(String nickname, Color color) throws LobbyCompleteException, SameNameException{
+    public void addPlayer(String nickname, Color color) throws LobbyCompleteException, SameNameException {
         if(complete){
             throw new LobbyCompleteException();
         }
@@ -33,7 +35,7 @@ public class Lobby {
         }
         Player newPlayer = new Player(nickname, color);
         players.add(newPlayer);
-        if(players.size() == 4){
+        if(players.size()==maxSize){
             setLock();
         }
 
@@ -73,6 +75,6 @@ public class Lobby {
     /** It locks the lobby so nobody can join anymore, the lobby cannot be unlocked
      */
     public void setLock(){
-        complete = true;
+        complete=true;
     }
 }

@@ -31,7 +31,7 @@ public class GameMasterTest {
     @BeforeEach
     public void setUp() throws SameNameException, LobbyCompleteException, IOException, ParseException {
         //create player
-        lobby = new Lobby();
+        lobby = new Lobby(4);//TODO
         lobby.addPlayer("pietro", Color.YELLOW);
         lobby.addPlayer("marco", Color.GREEN);
         lobby.addPlayer("giovanni", Color.RED);
@@ -89,7 +89,7 @@ public class GameMasterTest {
     public void setUp2() throws SameNameException, LobbyCompleteException, IOException, ParseException,
             WrongGamePhaseException, NoTurnException, NotExistsPlayerException {
         //create player
-        lobby2 = new Lobby();
+        lobby2 = new Lobby(4);//TODO
         lobby2.addPlayer("pietro", Color.YELLOW);
         lobby2.addPlayer("marco", Color.GREEN);
 
@@ -323,7 +323,7 @@ public class GameMasterTest {
     public void setUp3() throws SameNameException, LobbyCompleteException, IOException, ParseException,
             WrongGamePhaseException, NoTurnException, NotExistsPlayerException {
         //create player
-        lobby3 = new Lobby();
+        lobby3 = new Lobby(4);//TODO
         lobby3.addPlayer("pietro", Color.YELLOW);
 
         game3 = new GameMaster(lobby3,
@@ -436,7 +436,7 @@ public class GameMasterTest {
     public void setUp4() throws SameNameException, LobbyCompleteException, IOException, ParseException,
             WrongGamePhaseException, NoTurnException, NotExistsPlayerException {
         //create player
-        lobby4 = new Lobby();
+        lobby4 = new Lobby(4);//TODO
         lobby4.addPlayer("pietro", Color.YELLOW);
 
         game4 = new GameMaster(lobby4,
