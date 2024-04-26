@@ -1,0 +1,261 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PlayedCard</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">it.polimi.ingsw.model</a>
+</div>
+
+<h1>Coverage Summary for Class: PlayedCard (it.polimi.ingsw.model)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PlayedCard</td>
+<td class="coverageStat">
+  <span class="percent">
+    70%
+  </span>
+  <span class="absValue">
+    (7/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    90.6%
+  </span>
+  <span class="absValue">
+    (29/32)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">PlayedCard$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    72.7%
+  </span>
+  <span class="absValue">
+    (8/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    90.9%
+  </span>
+  <span class="absValue">
+    (30/33)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package it.polimi.ingsw.model;
+&nbsp;
+&nbsp;import java.awt.*;
+&nbsp;import java.util.HashMap;
+&nbsp;
+&nbsp;
+&nbsp;/** The class is used to represent the card placed onto the board, it&#39;s role is to keep track of the moves that a player makes
+&nbsp; * during the match
+&nbsp; * *@author Arturo*/
+&nbsp;public class PlayedCard {
+&nbsp;    /**It&#39;s the PlayableCard that this instance of PlayedCard references
+&nbsp;     * */
+&nbsp;    private final PlayableCard card;
+&nbsp;
+&nbsp;    /** Keeps track of the cards that are attached to the PlayedCard instance
+&nbsp;     * */
+&nbsp;    private final HashMap&lt;Corner, PlayedCard&gt; attachmentCorners;
+&nbsp;
+&nbsp;    /** Is True if the card has already been used for calculating Objective Scores
+&nbsp;     * */
+&nbsp;    private boolean flagCountedForObjective;
+&nbsp;
+&nbsp;    /** Identifies the side on which the card has been played, true if it&#39;s on its front
+&nbsp;     * */
+&nbsp;    private final boolean isFacingUp;
+&nbsp;
+&nbsp;    /** Records in which turn the card has been played
+&nbsp;     * */
+&nbsp;    private final int turnOfPositioning;
+&nbsp;    /** Identifies the position in which the card is on the board
+&nbsp;     * */
+&nbsp;    private final Point position;
+&nbsp;
+&nbsp;    /**Constructor for the PlayedCard class
+&nbsp;     *
+&nbsp;     * @param cardsToAttach is the map which contains the cards that will have to be attached to our new PlayedCard
+&nbsp;     * */
+<b class="fc">&nbsp;    public PlayedCard(PlayableCard playableCard, HashMap&lt;Corner, PlayedCard&gt; cardsToAttach, boolean side, int turnNumber, Point position) {</b>
+<b class="fc">&nbsp;        this.card = playableCard;</b>
+<b class="fc">&nbsp;        attachmentCorners = new HashMap&lt;&gt;();</b>
+<b class="fc">&nbsp;        this.flagCountedForObjective = false;</b>
+<b class="fc">&nbsp;        this.isFacingUp = side;</b>
+<b class="fc">&nbsp;        this.turnOfPositioning = turnNumber;</b>
+<b class="fc">&nbsp;        this.position = position;</b>
+&nbsp;
+&nbsp;        /** This ForEach cycle iterates on the Keys of the cardsToAttach given in order to fill out attachmentCorners with the PlayedCards
+&nbsp;         * that are attached to this instance of PlayedCard,the newest card is attached first.
+&nbsp;         * */
+<b class="fc">&nbsp;        for(Corner c : cardsToAttach.keySet()){</b>
+<b class="fc">&nbsp;            this.attachCard(c, cardsToAttach.get(c));</b>
+<b class="fc">&nbsp;            if(cardsToAttach.get(c) != null) {</b>
+&nbsp;                //if the card is not null, we attach the card to the corner of the card that is already attached to this
+<b class="fc">&nbsp;                switch (c) {</b>
+&nbsp;                    case TOP_LEFT:
+<b class="fc">&nbsp;                        cardsToAttach.get(c).attachCard(Corner.BOTTOM_RIGHT, this);</b>
+<b class="fc">&nbsp;                        break;</b>
+&nbsp;                    case TOP_RIGHT:
+<b class="fc">&nbsp;                        cardsToAttach.get(c).attachCard(Corner.BOTTOM_LEFT, this);</b>
+<b class="fc">&nbsp;                        break;</b>
+&nbsp;                    case BOTTOM_LEFT:
+<b class="fc">&nbsp;                        cardsToAttach.get(c).attachCard(Corner.TOP_RIGHT, this);</b>
+<b class="fc">&nbsp;                        break;</b>
+&nbsp;                    case BOTTOM_RIGHT:
+<b class="fc">&nbsp;                        cardsToAttach.get(c).attachCard(Corner.TOP_LEFT, this);</b>
+<b class="fc">&nbsp;                        break;</b>
+&nbsp;                    default:
+&nbsp;                        break;
+&nbsp;                }
+&nbsp;            }
+<b class="fc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**@return true if card has already been used for calculating Objective scores
+&nbsp;     * */
+&nbsp;    public boolean isFlagCountedForObjective() {
+<b class="nc">&nbsp;        return flagCountedForObjective;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**@return true if card was played on its front
+&nbsp;     * */
+&nbsp;    public boolean isFacingUp() {
+<b class="fc">&nbsp;        return isFacingUp;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**@return the PlayableCard related to the PlayedCard
+&nbsp;     * */
+&nbsp;    public PlayableCard getCard() {
+<b class="fc">&nbsp;        return card;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**@return the turn in which the card was played
+&nbsp;     * */
+&nbsp;    public int getTurnOfPositioning() {
+<b class="nc">&nbsp;        return turnOfPositioning;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /** updates the status of a PlayedCard&#39;s corners in case it gets attached to a new card
+&nbsp;     * */
+&nbsp;    public void attachCard (Corner corner, PlayedCard playedCard){
+<b class="fc">&nbsp;        this.attachmentCorners.put(corner, playedCard);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**@return the map in which the information on the status of the PlayedCard&#39;s corners is stored
+&nbsp;     * */
+&nbsp;    public HashMap&lt;Corner, PlayedCard&gt; getAttachmentCorners() {
+&nbsp;        //TODO Capire se vogliamo passare l&#39;oggetto o è usiamo un metodo che ritorna l&#39;id e poi risaliamo alla carta,
+&nbsp;        // altrimenti così passiamo un oggetto per valore e si può modificare
+<b class="fc">&nbsp;        HashMap&lt;Corner, PlayedCard&gt; attachmentCornersCopy = new HashMap&lt;&gt;();</b>
+<b class="fc">&nbsp;        for(Corner corner : Corner.values()){</b>
+<b class="fc">&nbsp;            attachmentCornersCopy.put(corner, attachmentCorners.get(corner));</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return attachmentCornersCopy;</b>
+&nbsp;    }
+&nbsp;    /**@return the PlayedCard that has been attached to the corner given to this
+&nbsp;     * */
+&nbsp;    public PlayedCard getAttached(Corner corner){
+<b class="fc">&nbsp;        return attachmentCorners.get(corner);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**@return the coordinates corresponding to the place,related to the StartingCard, in which the card was played
+&nbsp;     * */
+&nbsp;    public Point getPosition() {
+<b class="fc">&nbsp;        return new Point(position.x, position.y);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**records the use of the card in calculating Objective scores by setting the parameter to true
+&nbsp;     * */
+&nbsp;    public void flagWasCountedForObjective() {
+<b class="nc">&nbsp;        this.flagCountedForObjective = true;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-15 18:14</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,288 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Player</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">it.polimi.ingsw.model</a>
+</div>
+
+<h1>Coverage Summary for Class: Player (it.polimi.ingsw.model)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Player</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    82.4%
+  </span>
+  <span class="absValue">
+    (14/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    91.4%
+  </span>
+  <span class="absValue">
+    (32/35)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package it.polimi.ingsw.model;
+&nbsp;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.lang.Math;
+&nbsp;
+&nbsp;/**
+&nbsp; * This is the entity of player.
+&nbsp; * It should have a unique name, a color for the pin and a counter of points. It has also a hashmap for tracking resources.
+&nbsp; * For the game, it has the rootCard(the starting card) and secretObjective.
+&nbsp; * At the start phase, the game master should set rootCard, SecretObjective and the hand of the player(a fixed array of 3 cards).
+&nbsp; * At the beginning of the game, the game master set rootCard, secretObjective and the hand.
+&nbsp; */
+&nbsp;public class Player {
+&nbsp;    private final String name;
+&nbsp;    private int points;
+&nbsp;    private final Color color;
+&nbsp;    private PlayedCard rootCard;
+&nbsp;    private final HashMap&lt;Sign, Integer&gt; resources;
+&nbsp;    private ObjectiveCard secretObjective;
+&nbsp;    private ResourceCard[] hand;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * It is the constructor of Player, it set the  name and the color of the pin
+&nbsp;     * @param name
+&nbsp;     * @param color
+&nbsp;     */
+<b class="fc">&nbsp;    public Player(String name, Color color) {</b>
+<b class="fc">&nbsp;        this.name = name;</b>
+<b class="fc">&nbsp;        this.color = color;</b>
+<b class="fc">&nbsp;        this.points = 0;</b>
+<b class="fc">&nbsp;        resources = new HashMap&lt;&gt;();</b>
+<b class="fc">&nbsp;        for(Sign sign : Sign.values()){</b>
+<b class="fc">&nbsp;            this.resources.put(sign, 0);</b>
+&nbsp;        }
+&nbsp;        int i;
+<b class="fc">&nbsp;        this.hand = new ResourceCard[3];</b>
+<b class="fc">&nbsp;        for(i = 0; i &lt; hand.length; i++){</b>
+<b class="fc">&nbsp;            hand[i] = null;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        this.secretObjective = null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     *   getter of player&#39;s name
+&nbsp;     */
+&nbsp;    public String getName() {
+<b class="fc">&nbsp;        return name;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  getter of player&#39;s points
+&nbsp;     */
+&nbsp;    public int getPoints() {
+<b class="fc">&nbsp;        return points;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * getter of the color of the pin
+&nbsp;     */
+&nbsp;    public Color getColor() {
+<b class="nc">&nbsp;        return color;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * getter of root card, which is the starting card of the game
+&nbsp;     */
+&nbsp;    public PlayedCard getRootCard() {
+<b class="fc">&nbsp;        return rootCard;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * getter of symbol counter. It tracks the resources for gold card and special objects.
+&nbsp;     */
+&nbsp;    public HashMap&lt;Sign, Integer&gt; getResources() {
+<b class="fc">&nbsp;        return resources;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * getter of the secret objective.
+&nbsp;     */
+&nbsp;    public ObjectiveCard getSecretObjective() {
+<b class="nc">&nbsp;        return secretObjective;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * getter of the hand of the player, a fixed array of three resources cards
+&nbsp;     */
+&nbsp;    public ResourceCard[] getHand() {
+<b class="fc">&nbsp;        return hand;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * setter of the root of the player. The game master should pass the front or back of the card, chosen by the player
+&nbsp;     * @param rootCard the front or back of the card, chosen by the player. It&#39;s the starting card.
+&nbsp;     */
+&nbsp;    public void setRootCard(PlayedCard rootCard) {
+<b class="fc">&nbsp;        this.rootCard = rootCard;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * It is the setter of secret objective card, which will randomly be given by the game master
+&nbsp;     * @param secretObjective the secret objective, that gives extra points at the ending of the game
+&nbsp;     */
+&nbsp;    public void setSecretObjective(ObjectiveCard secretObjective) {
+<b class="fc">&nbsp;        this.secretObjective = secretObjective;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * At the beginning of the game, the game master set the hand of each player
+&nbsp;     * @param hand an array of free cards
+&nbsp;     */
+&nbsp;    public void setHand(ResourceCard[] hand){
+<b class="fc">&nbsp;        this.hand = hand;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * this function updates the resources given by a new card put on table
+&nbsp;     * @param sign the type of resource to update
+&nbsp;     * @param numResources how many resources a card gives
+&nbsp;     */
+&nbsp;    public void addResource(Sign sign, Integer numResources){
+<b class="fc">&nbsp;        if(sign != null){</b>
+<b class="fc">&nbsp;            resources.put(sign, resources.get(sign) + numResources);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * this function updates the resources. It subtracts the resources covered by a new card played.
+&nbsp;     * @param sign the type of resource to update
+&nbsp;     * @param numResources how many resources to delete
+&nbsp;     */
+&nbsp;    public void removeResources(Sign sign, Integer numResources){
+<b class="fc">&nbsp;        if(sign != null){</b>
+<b class="fc">&nbsp;            resources.put(sign, resources.get(sign) - numResources);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This function deletes the card given by input. The game Master should call this method to eliminate a card, played on table, from player&#39;s hand.
+&nbsp;     * @param card card played
+&nbsp;     */
+&nbsp;    public void giveCard(ResourceCard card){
+&nbsp;        int i;
+<b class="fc">&nbsp;        for(i = 0; i &lt; 3; i++){</b>
+<b class="fc">&nbsp;            if(hand[i] == card){</b>
+<b class="fc">&nbsp;                hand[i] = null;</b>
+<b class="fc">&nbsp;                break;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;    /**
+&nbsp;     * This function gives to player a new card. The game Master should call this method to give a card to player&#39;s hand. The new card will be put in the only position
+&nbsp;     * in the array where there is value == null. There is only one null position at every player&#39;s round.
+&nbsp;     * @param card the new card drawn
+&nbsp;     */
+&nbsp;    public void takeCard(ResourceCard card){
+&nbsp;        int i;
+<b class="fc">&nbsp;        for(i = 0; i &lt; 3; i++){</b>
+<b class="fc">&nbsp;            if(hand[i] == null){</b>
+<b class="fc">&nbsp;                hand[i] = card;</b>
+<b class="fc">&nbsp;                break;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;    /**
+&nbsp;     * this function sums the new points given by a new played card
+&nbsp;     * @param new_points the points possibly given by a new card or a secret objective
+&nbsp;     */
+&nbsp;    public void addPoints(int new_points){
+&nbsp;        //the player in the game can earn maximum 29 points, no more, see slack
+<b class="fc">&nbsp;        points = Math.min(29, this.points + new_points);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Not in UML; slack professor&#39;s comment: Grazie per la segnalazione! Ho cambiato la mia risposta 1 di conseguenza: ci si ferma a 29 punti prima di sommare le carte obiettivo.
+&nbsp;     * A questo punto si procede con la somma degli obiettivi a fine partita e si segue la regola alla risposta 3 in caso di parità
+&nbsp;     *
+&nbsp;     * Sums the extra points given by the objectiveCard
+&nbsp;     * @param new_points  special points given at the end of the game by ObjectiveCard
+&nbsp;     */
+&nbsp;    public void addObjectivePoints(int new_points){
+<b class="nc">&nbsp;            points += new_points;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-15 18:14</div>
+</div>
+</body>
+</html>

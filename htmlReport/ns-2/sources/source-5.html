@@ -1,0 +1,405 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Deck</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">it.polimi.ingsw.model</a>
+</div>
+
+<h1>Coverage Summary for Class: Deck (it.polimi.ingsw.model)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Deck</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    93.8%
+  </span>
+  <span class="absValue">
+    (15/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    97.8%
+  </span>
+  <span class="absValue">
+    (91/93)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package it.polimi.ingsw.model;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.io.FileNotFoundException;
+&nbsp;import java.io.FileReader;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.Reader;
+&nbsp;
+&nbsp;import org.json.simple.JSONArray;
+&nbsp;import org.json.simple.JSONObject;
+&nbsp;import org.json.simple.parser.JSONParser;
+&nbsp;import org.json.simple.parser.ParseException;
+&nbsp;
+&nbsp;/**
+&nbsp; * This class represents the deck of cards.
+&nbsp; */
+&nbsp;public class Deck {
+&nbsp;    /**
+&nbsp;     * The list of cards in the deck.
+&nbsp;     */
+&nbsp;    private ArrayList&lt;Card&gt; cards;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This constructor generates the deck of cards from a JSON file and shuffles
+&nbsp;     * it.
+&nbsp;     * 
+&nbsp;     * @param cardsFile the path of the JSON file containing the cards.
+&nbsp;     * @throws FileNotFoundException    if the file is not found.
+&nbsp;     * @throws IOException              if an I/O error occurs.
+&nbsp;     * @throws ParseException           if the JSON file is not valid.
+&nbsp;     * @throws IllegalArgumentException if the card prototype is invalid.
+&nbsp;     */
+<b class="fc">&nbsp;    public Deck(String cardsFile) throws FileNotFoundException, IOException, ParseException, IllegalArgumentException {</b>
+<b class="fc">&nbsp;        cards = new ArrayList&lt;Card&gt;();</b>
+<b class="fc">&nbsp;        this.generateDeck(cardsFile);</b>
+<b class="fc">&nbsp;        this.shuffle();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This method generates the deck of cards from a JSON file.
+&nbsp;     * 
+&nbsp;     * @param cardsFile the path of the JSON file containing the cards.
+&nbsp;     * @throws FileNotFoundException    if the file is not found.
+&nbsp;     * @throws IOException              if an I/O error occurs.
+&nbsp;     * @throws ParseException           if the JSON file is not valid.
+&nbsp;     * @throws IllegalArgumentException if the card prototype is invalid.
+&nbsp;     */
+&nbsp;    private void generateDeck(String cardsFile)
+&nbsp;            throws FileNotFoundException, IOException, ParseException, IllegalArgumentException {
+<b class="fc">&nbsp;        JSONParser parser = new JSONParser();</b>
+<b class="fc">&nbsp;        Reader reader = new FileReader(cardsFile);</b>
+&nbsp;
+<b class="fc">&nbsp;        JSONArray cards = (JSONArray) parser.parse(reader);</b>
+<b class="fc">&nbsp;        for (Object card : cards) {</b>
+<b class="fc">&nbsp;            JSONObject cardObject = (JSONObject) card;</b>
+<b class="fc">&nbsp;            String prototype = (String) cardObject.get(&quot;prototype&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;            switch (prototype) {</b>
+&nbsp;                case &quot;OBJECTIVE&quot;:
+<b class="fc">&nbsp;                    insertObjectiveCard(cardObject);</b>
+<b class="fc">&nbsp;                    break;</b>
+&nbsp;                case &quot;RESOURCE&quot;:
+<b class="fc">&nbsp;                    insertResourceCard(cardObject);</b>
+<b class="fc">&nbsp;                    break;</b>
+&nbsp;                case &quot;GOLD&quot;:
+<b class="fc">&nbsp;                    insertGoldCard(cardObject);</b>
+<b class="fc">&nbsp;                    break;</b>
+&nbsp;                case &quot;SPECIAL_GOLD&quot;:
+<b class="fc">&nbsp;                    insertSpecialGoldCard(cardObject);</b>
+<b class="fc">&nbsp;                    break;</b>
+&nbsp;                case &quot;STARTING&quot;:
+<b class="fc">&nbsp;                    insertStartingCard(cardObject);</b>
+<b class="fc">&nbsp;                    break;</b>
+&nbsp;                default:
+<b class="nc">&nbsp;                    throw new IllegalArgumentException(&quot;Invalid card prototype&quot;);</b>
+&nbsp;            }
+<b class="fc">&nbsp;        }</b>
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This method inserts an {@link ObjectiveCard} into the deck.
+&nbsp;     * 
+&nbsp;     * @param cardObject the JSON object representing the card.
+&nbsp;     */
+&nbsp;    private void insertObjectiveCard(JSONObject cardObject) {
+<b class="fc">&nbsp;        int id = extractInteger(cardObject, &quot;id&quot;);</b>
+<b class="fc">&nbsp;        Kingdom kingdom = kingdomOrNull((String) cardObject.get(&quot;kingdom&quot;));</b>
+<b class="fc">&nbsp;        ObjectiveType objectiveType = ObjectiveType.valueOf((String) cardObject.get(&quot;objective-type&quot;));</b>
+<b class="fc">&nbsp;        int multiplier = extractInteger(cardObject, &quot;multiplier&quot;);</b>
+<b class="fc">&nbsp;        this.insert(new ObjectiveCard(id, kingdom, objectiveType, multiplier));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This method inserts a {@link ResourceCard} into the deck.
+&nbsp;     * 
+&nbsp;     * @param cardObject the JSON object representing the card.
+&nbsp;     */
+&nbsp;    private void insertResourceCard(JSONObject cardObject) {
+<b class="fc">&nbsp;        int id = extractInteger(cardObject, &quot;id&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;        int points = extractInteger(cardObject, &quot;points&quot;);</b>
+<b class="fc">&nbsp;        Kingdom kingdom = Kingdom.valueOf((String) cardObject.get(&quot;kingdom&quot;));</b>
+&nbsp;
+<b class="fc">&nbsp;        JSONObject corners = (JSONObject) cardObject.get(&quot;corners&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;        this.insert(new ResourceCard(id, kingdom, getCorners(corners), points));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This method inserts a {@link GoldCard} into the deck.
+&nbsp;     * 
+&nbsp;     * @param cardObject the JSON object representing the card.
+&nbsp;     */
+&nbsp;    private void insertGoldCard(JSONObject cardObject) {
+<b class="fc">&nbsp;        int id = extractInteger(cardObject, &quot;id&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;        Kingdom kingdom = Kingdom.valueOf((String) cardObject.get(&quot;kingdom&quot;));</b>
+<b class="fc">&nbsp;        int points = extractInteger(cardObject, &quot;points&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;        JSONObject corners = (JSONObject) cardObject.get(&quot;corners&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;        this.insert(new GoldCard(id, kingdom, getCorners(corners), points, getRequirements(cardObject)));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This method inserts a {@link SpecialGoldCard} into the deck.
+&nbsp;     * 
+&nbsp;     * @param cardObject the JSON object representing the card.
+&nbsp;     */
+&nbsp;    private void insertSpecialGoldCard(JSONObject cardObject) {
+<b class="fc">&nbsp;        int id = extractInteger(cardObject, &quot;id&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;        Kingdom kingdom = Kingdom.valueOf((String) cardObject.get(&quot;kingdom&quot;));</b>
+<b class="fc">&nbsp;        int points = extractInteger(cardObject, &quot;points&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;        JSONObject corners = (JSONObject) cardObject.get(&quot;corners&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;        Countable thingToCount = Countable.valueOf((String) cardObject.get(&quot;thing-to-count&quot;));</b>
+&nbsp;
+<b class="fc">&nbsp;        this.insert(new SpecialGoldCard(id, kingdom, getCorners(corners), points, getRequirements(cardObject),</b>
+&nbsp;                thingToCount));
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This method inserts a {@link StartingCard} into the deck.
+&nbsp;     * 
+&nbsp;     * @param cardObject the JSON object representing the card.
+&nbsp;     */
+&nbsp;    private void insertStartingCard(JSONObject cardObject) {
+<b class="fc">&nbsp;        int id = extractInteger(cardObject, &quot;id&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;        Kingdom kingdom = kingdomOrNull((String) cardObject.get(&quot;kingdom&quot;));</b>
+&nbsp;
+<b class="fc">&nbsp;        JSONObject frontCorners = (JSONObject) cardObject.get(&quot;front-corners&quot;);</b>
+<b class="fc">&nbsp;        JSONObject backCorners = (JSONObject) cardObject.get(&quot;back-corners&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;        JSONArray bonusResources = (JSONArray) cardObject.get(&quot;bonus-resources&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;        ArrayList&lt;Sign&gt; bonusResourcesList = new ArrayList&lt;Sign&gt;();</b>
+<b class="fc">&nbsp;        for (Object bonusResource : bonusResources) {</b>
+<b class="fc">&nbsp;            bonusResourcesList.add(Sign.valueOf((String) bonusResource));</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;
+<b class="fc">&nbsp;        this.insert(</b>
+<b class="fc">&nbsp;                new StartingCard(id, kingdom, getCorners(frontCorners), getCorners(backCorners), bonusResourcesList));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This method returns the requirements of a card.
+&nbsp;     * 
+&nbsp;     * @param cardObject the JSON object representing the card.
+&nbsp;     * @return the requirements of the card.
+&nbsp;     */
+&nbsp;    private HashMap&lt;Sign, Integer&gt; getRequirements(JSONObject cardObject) {
+<b class="fc">&nbsp;        JSONObject requirementsObject = (JSONObject) cardObject.get(&quot;requirements&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;        int mushroom = extractInteger(requirementsObject, &quot;MUSHROOM&quot;);</b>
+<b class="fc">&nbsp;        int leaf = extractInteger(requirementsObject, &quot;LEAF&quot;);</b>
+<b class="fc">&nbsp;        int wolf = extractInteger(requirementsObject, &quot;WOLF&quot;);</b>
+<b class="fc">&nbsp;        int butterfly = extractInteger(requirementsObject, &quot;BUTTERFLY&quot;);</b>
+<b class="fc">&nbsp;        int quill = extractInteger(requirementsObject, &quot;QUILL&quot;);</b>
+<b class="fc">&nbsp;        int inkwell = extractInteger(requirementsObject, &quot;INKWELL&quot;);</b>
+<b class="fc">&nbsp;        int scroll = extractInteger(requirementsObject, &quot;SCROLL&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;        HashMap&lt;Sign, Integer&gt; requirements = new HashMap&lt;Sign, Integer&gt;();</b>
+&nbsp;
+<b class="fc">&nbsp;        requirements.put(Sign.MUSHROOM, mushroom);</b>
+<b class="fc">&nbsp;        requirements.put(Sign.LEAF, leaf);</b>
+<b class="fc">&nbsp;        requirements.put(Sign.WOLF, wolf);</b>
+<b class="fc">&nbsp;        requirements.put(Sign.BUTTERFLY, butterfly);</b>
+<b class="fc">&nbsp;        requirements.put(Sign.QUILL, quill);</b>
+<b class="fc">&nbsp;        requirements.put(Sign.INKWELL, inkwell);</b>
+<b class="fc">&nbsp;        requirements.put(Sign.SCROLL, scroll);</b>
+&nbsp;
+<b class="fc">&nbsp;        return requirements;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This method returns the corners of a card.
+&nbsp;     * 
+&nbsp;     * @param cornersObject the JSON object representing the corners of the card.
+&nbsp;     * @return the corners of the card.
+&nbsp;     */
+&nbsp;    private HashMap&lt;Corner, Sign&gt; getCorners(JSONObject cornersObject) {
+&nbsp;
+<b class="fc">&nbsp;        Sign topLeft = signOrNull((String) cornersObject.get(&quot;TOP_LEFT&quot;));</b>
+<b class="fc">&nbsp;        Sign topRight = signOrNull((String) cornersObject.get(&quot;TOP_RIGHT&quot;));</b>
+<b class="fc">&nbsp;        Sign bottomLeft = signOrNull((String) cornersObject.get(&quot;BOTTOM_LEFT&quot;));</b>
+<b class="fc">&nbsp;        Sign bottomRight = signOrNull((String) cornersObject.get(&quot;BOTTOM_RIGHT&quot;));</b>
+&nbsp;
+<b class="fc">&nbsp;        HashMap&lt;Corner, Sign&gt; corners = new HashMap&lt;Corner, Sign&gt;();</b>
+&nbsp;
+<b class="fc">&nbsp;        corners.put(Corner.TOP_LEFT, topLeft);</b>
+<b class="fc">&nbsp;        corners.put(Corner.TOP_RIGHT, topRight);</b>
+<b class="fc">&nbsp;        corners.put(Corner.BOTTOM_LEFT, bottomLeft);</b>
+<b class="fc">&nbsp;        corners.put(Corner.BOTTOM_RIGHT, bottomRight);</b>
+&nbsp;
+<b class="fc">&nbsp;        return corners;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This method shuffles the deck.
+&nbsp;     */
+&nbsp;    private void shuffle() {
+<b class="fc">&nbsp;        Collections.shuffle(cards);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This method returns the kingdom of the first card of the deck.
+&nbsp;     * 
+&nbsp;     * @return the {@link Kingdom} of the first card of the deck.
+&nbsp;     */
+&nbsp;    public Kingdom getKingdomFirstCard() {
+<b class="nc">&nbsp;        return cards.get(0).getKingdom();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This method returns the first {@link Card} of the deck and then removes it
+&nbsp;     * from the deck.
+&nbsp;     * 
+&nbsp;     * @return the first {@link Card} of the deck.
+&nbsp;     * 
+&nbsp;     * @throws IndexOutOfBoundsException if the deck is empty.
+&nbsp;     */
+&nbsp;    public Card draw() throws IndexOutOfBoundsException {
+<b class="fc">&nbsp;        return cards.remove(0);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This method adds a {@link Card} to the deck.
+&nbsp;     * 
+&nbsp;     * @param card the {@link Card} to add to the deck.
+&nbsp;     */
+&nbsp;    private void insert(Card card) {
+<b class="fc">&nbsp;        cards.add(card);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This method converts a string to a {@link Kingdom}.
+&nbsp;     * 
+&nbsp;     * @param kingdom the string to convert.
+&nbsp;     * @return the {@link Kingdom} corresponding to the string, or null if the
+&nbsp;     *         string is not a valid kingdom.
+&nbsp;     */
+&nbsp;    private Kingdom kingdomOrNull(String kingdom) {
+&nbsp;        try {
+<b class="fc">&nbsp;            return Kingdom.valueOf(kingdom);</b>
+<b class="fc">&nbsp;        } catch (NullPointerException e) {</b>
+<b class="fc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This method converts a string to a {@link Sign}.
+&nbsp;     * 
+&nbsp;     * @param sign the string to convert.
+&nbsp;     * @return the {@link Sign} corresponding to the string, or null if the string
+&nbsp;     *         is not a valid sign.
+&nbsp;     */
+&nbsp;    private Sign signOrNull(String sign) {
+&nbsp;        try {
+<b class="fc">&nbsp;            return Sign.valueOf(sign);</b>
+<b class="fc">&nbsp;        } catch (NullPointerException e) {</b>
+<b class="fc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This method extracts an integer from a JSON object.
+&nbsp;     * 
+&nbsp;     * @param object the JSON object.
+&nbsp;     * @param field  the field to extract.
+&nbsp;     * @return the integer extracted from the JSON object.
+&nbsp;     */
+&nbsp;    private int extractInteger(JSONObject object, String field) {
+<b class="fc">&nbsp;        return Math.toIntExact((long) object.get(field));</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-15 18:14</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,852 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > GameMaster</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">it.polimi.ingsw.model</a>
+</div>
+
+<h1>Coverage Summary for Class: GameMaster (it.polimi.ingsw.model)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GameMaster</td>
+<td class="coverageStat">
+  <span class="percent">
+    86.7%
+  </span>
+  <span class="absValue">
+    (26/30)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    82.3%
+  </span>
+  <span class="absValue">
+    (204/248)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">GameMaster$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    87.1%
+  </span>
+  <span class="absValue">
+    (27/31)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    82.5%
+  </span>
+  <span class="absValue">
+    (207/251)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package it.polimi.ingsw.model;
+&nbsp;
+&nbsp;import it.polimi.ingsw.model.exception.*;
+&nbsp;import org.json.simple.parser.ParseException;
+&nbsp;
+&nbsp;import java.awt.*;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.*;
+&nbsp;import java.util.HashMap;
+&nbsp;
+&nbsp;public class GameMaster {
+&nbsp;    private int globalTurn;
+&nbsp;    private TurnType turnType;
+&nbsp;    private Lobby lobby;
+&nbsp;    private GameState gameState;
+&nbsp;
+&nbsp;    private Deck resourceDeck;
+&nbsp;    private Deck goldDeck;
+&nbsp;    private Deck startingDeck;
+&nbsp;    private Deck objectiveDeck;
+&nbsp;
+&nbsp;    private ResourceCard[] onTableResourceCards;
+&nbsp;    private GoldCard[] onTableGoldCards;
+&nbsp;    private ObjectiveCard[] onTableObjectiveCards;
+&nbsp;    private StartingCard[] startingCardToPosition;
+&nbsp;    private ObjectiveCard[][] objectiveCardToChoose;
+&nbsp;
+&nbsp;    private ArrayList&lt;Player&gt; ranking;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The general functionalities of the game representing the peer point of the Model, the object is going to speak with the Controller
+&nbsp;     *
+&nbsp;     * @param lobby                      Lobby of user that are going to play
+&nbsp;     * @param jsonResourceCardFileName   json file name to create the resource deck
+&nbsp;     * @param jsonGoldCardFileName       json file name to create the gold deck
+&nbsp;     * @param jsonObjectiveCardFileName  json file name to create the objective deck
+&nbsp;     * @param jsonObjectiveStartFileName json file name to create the starting deck
+&nbsp;     */
+&nbsp;    public GameMaster(Lobby lobby, String jsonResourceCardFileName, String jsonGoldCardFileName, String jsonObjectiveCardFileName,
+<b class="fc">&nbsp;                      String jsonObjectiveStartFileName) throws IOException, ParseException {</b>
+<b class="fc">&nbsp;        this.globalTurn = 0;</b>
+<b class="fc">&nbsp;        this.turnType = TurnType.PLAYING;</b>
+<b class="fc">&nbsp;        this.onTableResourceCards = new ResourceCard[2];</b>
+<b class="fc">&nbsp;        this.onTableGoldCards = new GoldCard[2];</b>
+<b class="fc">&nbsp;        this.onTableObjectiveCards = new ObjectiveCard[2];</b>
+<b class="fc">&nbsp;        this.startingCardToPosition = new StartingCard[lobby.getPlayers().length];</b>
+<b class="fc">&nbsp;        this.objectiveCardToChoose = new ObjectiveCard[lobby.getPlayers().length][2];</b>
+<b class="fc">&nbsp;        this.ranking = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;        this.lobby = lobby;</b>
+<b class="fc">&nbsp;        this.lobby.setLock();</b>
+<b class="fc">&nbsp;        this.gameState = GameState.CHOOSING_ROOT_CARD;</b>
+&nbsp;
+<b class="fc">&nbsp;        this.resourceDeck = new Deck(jsonResourceCardFileName);</b>
+<b class="fc">&nbsp;        this.goldDeck = new Deck(jsonGoldCardFileName);</b>
+<b class="fc">&nbsp;        this.objectiveDeck = new Deck(jsonObjectiveCardFileName);</b>
+<b class="fc">&nbsp;        this.startingDeck = new Deck(jsonObjectiveStartFileName);</b>
+&nbsp;
+&nbsp;        //Set up of the table
+<b class="fc">&nbsp;        setOnTableResourceCard((ResourceCard) resourceDeck.draw(), 0);</b>
+<b class="fc">&nbsp;        setOnTableResourceCard((ResourceCard) resourceDeck.draw(), 1);</b>
+<b class="fc">&nbsp;        setOnTableGoldCard((GoldCard) goldDeck.draw(), 0);</b>
+<b class="fc">&nbsp;        setOnTableGoldCard((GoldCard) goldDeck.draw(), 1);</b>
+<b class="fc">&nbsp;        setOnTableObjectiveCards((ObjectiveCard) objectiveDeck.draw(), 0);</b>
+<b class="fc">&nbsp;        setOnTableObjectiveCards((ObjectiveCard) objectiveDeck.draw(), 1);</b>
+&nbsp;
+&nbsp;        int i, j;
+<b class="fc">&nbsp;        for (i = 0; i &lt; lobby.getPlayers().length; i++) {</b>
+<b class="fc">&nbsp;            startingCardToPosition[i] = (StartingCard) startingDeck.draw();</b>
+&nbsp;        }
+<b class="fc">&nbsp;        for (i = 0; i &lt; lobby.getPlayers().length; i++) {</b>
+<b class="fc">&nbsp;            for (j = 0; j &lt; 2; j++) {</b>
+<b class="fc">&nbsp;                objectiveCardToChoose[i][j] = (ObjectiveCard) objectiveDeck.draw();</b>
+&nbsp;            }
+&nbsp;        }
+<b class="fc">&nbsp;        for(Player player : lobby.getPlayers()){</b>
+<b class="fc">&nbsp;            ResourceCard[] hand = new ResourceCard[3];</b>
+<b class="fc">&nbsp;            hand[0]=(ResourceCard) resourceDeck.draw();</b>
+<b class="fc">&nbsp;            hand[1]=(ResourceCard) resourceDeck.draw();</b>
+<b class="fc">&nbsp;            hand[2]=(ResourceCard) goldDeck.draw();</b>
+<b class="fc">&nbsp;            player.setHand(hand);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * First turn cycle in which every player decides in which side place its StartingCard
+&nbsp;     *
+&nbsp;     * @param namePlayer player who sent the request
+&nbsp;     * @param side       which side the StartingCard has been want placed
+&nbsp;     */
+&nbsp;    public void placeRootCard(String namePlayer, boolean side) throws NoTurnException, WrongGamePhaseException, NotExistsPlayerException {
+<b class="fc">&nbsp;        Player currentPlayer = getCurrentPlayer();</b>
+&nbsp;
+<b class="fc">&nbsp;        if (!isCurrentPlayer(namePlayer, currentPlayer)) {</b>
+<b class="fc">&nbsp;            throw new NoTurnException();</b>
+<b class="fc">&nbsp;        } else if (gameState != GameState.CHOOSING_ROOT_CARD) {</b>
+<b class="nc">&nbsp;            throw new WrongGamePhaseException();</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            HashMap&lt;Corner, PlayedCard&gt; defaultAttachments = new HashMap&lt;&gt;();</b>
+<b class="fc">&nbsp;            StartingCard rootCard = startingCardToPosition[getOrderPlayer(currentPlayer.getName())];</b>
+<b class="fc">&nbsp;            PlayedCard rootCardPlaced = new PlayedCard(rootCard, defaultAttachments, side, 0, new Point(0, 0));</b>
+<b class="fc">&nbsp;            currentPlayer.setRootCard(rootCardPlaced);</b>
+&nbsp;
+<b class="fc">&nbsp;            if(!side){</b>
+<b class="fc">&nbsp;                for(Sign sign : rootCard.getBonusResources()) {</b>
+<b class="fc">&nbsp;                    currentPlayer.addResource(sign, 1);</b>
+<b class="fc">&nbsp;                }</b>
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            nextGlobalTurn();</b>
+<b class="fc">&nbsp;            if (getOrderPlayer(getCurrentPlayer().getName()) == 0) {</b>
+<b class="fc">&nbsp;                gameState = GameState.CHOOSING_OBJECTIVE_CARD;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Second turn cycle in which every player decides which of the two ObjectiveCard pick
+&nbsp;     *
+&nbsp;     * @param namePlayer player who sent the request
+&nbsp;     * @param whichCard  which of the two ObjectiveCard wants to be used
+&nbsp;     */
+&nbsp;    public void chooseObjectiveCard(String namePlayer, int whichCard) throws NoTurnException, WrongGamePhaseException, NotExistsPlayerException {
+<b class="fc">&nbsp;        Player currentPlayer = getCurrentPlayer();</b>
+<b class="fc">&nbsp;        if (!isCurrentPlayer(namePlayer, currentPlayer)) {</b>
+<b class="nc">&nbsp;            throw new NoTurnException();</b>
+<b class="fc">&nbsp;        } else if (gameState != GameState.CHOOSING_OBJECTIVE_CARD) {</b>
+<b class="nc">&nbsp;            throw new WrongGamePhaseException();</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            currentPlayer.setSecretObjective(objectiveCardToChoose[getOrderPlayer(currentPlayer.getName())][whichCard]);</b>
+<b class="fc">&nbsp;            nextGlobalTurn();</b>
+<b class="fc">&nbsp;            if (getOrderPlayer(getCurrentPlayer().getName()) == 0) {</b>
+<b class="fc">&nbsp;                gameState = GameState.PLACING_PHASE;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Let the Player capsule in a PlacedCard connected to the rootCard graph of the Player
+&nbsp;     *
+&nbsp;     * @param namePlayer  Player who sent the request
+&nbsp;     * @param cardToPlace Which card wants to place
+&nbsp;     * @param position    In which position of the table the player wants to be place the card
+&nbsp;     * @param side        To which side wants the player to place the card
+&nbsp;     */
+&nbsp;    public void placeCard(String namePlayer, ResourceCard cardToPlace, Point position, boolean side) throws
+&nbsp;            NoSuchFieldException, IllegalArgumentException, NoTurnException, WrongGamePhaseException, NotEnoughResourcesException, CardPositionException {
+&nbsp;
+&nbsp;        //manage all possible exceptions
+<b class="fc">&nbsp;        Player currentPlayer = getCurrentPlayer();</b>
+<b class="fc">&nbsp;        if (!isCurrentPlayer(namePlayer, currentPlayer)) {</b>
+<b class="nc">&nbsp;            throw new NoTurnException();</b>
+&nbsp;        }
+<b class="fc">&nbsp;        if (gameState != GameState.PLACING_PHASE) {</b>
+<b class="nc">&nbsp;            throw new WrongGamePhaseException();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        //check if the card can be placed in the position
+<b class="fc">&nbsp;        HashMap&lt;Corner, PlayedCard&gt; attachments = isPositionable(currentPlayer.getRootCard(), position);</b>
+&nbsp;        //TODO deve essere gestita qua la exception di CardPositionException credo.
+&nbsp;        //the player positions the card in the back front. The card is one resource and 4 empty corners.
+<b class="fc">&nbsp;        if (!side) {</b>
+<b class="fc">&nbsp;            new PlayedCard(cardToPlace, attachments, side, getTurn(), position);</b>
+<b class="fc">&nbsp;            currentPlayer.addResource(fromKingdomToSign(cardToPlace.getKingdom()), 1);</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            if (cardToPlace instanceof SpecialGoldCard) {</b>
+<b class="fc">&nbsp;                GoldCard goldCard = (SpecialGoldCard) cardToPlace;</b>
+<b class="fc">&nbsp;                if (!requirementsSatisfied(currentPlayer, goldCard)) {</b>
+<b class="nc">&nbsp;                    throw new NotEnoughResourcesException();</b>
+&nbsp;                }
+<b class="fc">&nbsp;            }else if(cardToPlace instanceof GoldCard) {</b>
+<b class="fc">&nbsp;                GoldCard goldCard = (GoldCard) cardToPlace;</b>
+<b class="fc">&nbsp;                if (!requirementsSatisfied(currentPlayer, goldCard)) {</b>
+<b class="nc">&nbsp;                    throw new NotEnoughResourcesException();</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;            //the attachments are of the graph of the player who is playing so there isn-t any reference to Player class in the constructor
+&nbsp;            //TODO ma cosi costruisci solo per le ResourceCard in questo caso??
+<b class="fc">&nbsp;            new PlayedCard(cardToPlace, attachments, side, getTurn(), position);</b>
+<b class="fc">&nbsp;            for (Corner corner : Corner.values()) {</b>
+<b class="fc">&nbsp;                currentPlayer.addResource(cardToPlace.getCorners().get(corner), 1);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;        //remove resources from counter
+<b class="fc">&nbsp;        for (Corner corner : Corner.values()) {</b>
+&nbsp;            //if corner points to null doesn&#39;t remove any resources
+&nbsp;            //TODO
+<b class="fc">&nbsp;            if(attachments.get(corner) != null) {</b>
+<b class="fc">&nbsp;                switch (corner) {</b>
+&nbsp;                    case TOP_LEFT: {
+<b class="fc">&nbsp;                        currentPlayer.removeResources(attachments.get(corner).getCard().getCorners().get(Corner.BOTTOM_RIGHT), 1);</b>
+<b class="fc">&nbsp;                        break;</b>
+&nbsp;                    }
+&nbsp;                    case TOP_RIGHT: {
+<b class="fc">&nbsp;                        currentPlayer.removeResources(attachments.get(corner).getCard().getCorners().get(Corner.BOTTOM_LEFT), 1);</b>
+<b class="fc">&nbsp;                        break;</b>
+&nbsp;                    }
+&nbsp;                    case BOTTOM_LEFT: {
+<b class="fc">&nbsp;                        currentPlayer.removeResources(attachments.get(corner).getCard().getCorners().get(Corner.TOP_RIGHT), 1);</b>
+<b class="fc">&nbsp;                        break;</b>
+&nbsp;                    }
+&nbsp;                    case BOTTOM_RIGHT: {
+<b class="fc">&nbsp;                        currentPlayer.removeResources(attachments.get(corner).getCard().getCorners().get(Corner.TOP_LEFT), 1);</b>
+&nbsp;                        break;
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;        //TODO se è girata non devi aggiungere i punti
+&nbsp;        //At the end because I need to know resources values at the end and how many attachments when I&#39;ve found them
+<b class="fc">&nbsp;        if(side) {</b>
+<b class="fc">&nbsp;            if (cardToPlace instanceof SpecialGoldCard) {</b>
+<b class="fc">&nbsp;                SpecialGoldCard specialGoldCard = (SpecialGoldCard) cardToPlace;</b>
+<b class="fc">&nbsp;                currentPlayer.addPoints(calculatesSpecialGoldPoints(currentPlayer, specialGoldCard, attachments));</b>
+<b class="fc">&nbsp;            } else {</b>
+<b class="fc">&nbsp;                currentPlayer.addPoints(cardToPlace.getPoints());</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        currentPlayer.giveCard(cardToPlace);</b>
+<b class="fc">&nbsp;        gameState = GameState.DRAWING_PHASE;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Allows the Player to draw a card from the table or decks (there are 6 different possibilities based on goldOrNot and onTableOrDeck)
+&nbsp;     *
+&nbsp;     * @param namePlayer    Player who sent the request
+&nbsp;     * @param Gold          If the type of the resourceCard that wants to be drawn is gold or not
+&nbsp;     * @param CardPosition  If the card is taken from the table or not: 2 means from deck, 0 and 1 are the position onTable array
+&nbsp;     * @return
+&nbsp;     */
+&nbsp;    public int drawCard(String namePlayer, boolean Gold, int CardPosition) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException{
+&nbsp;        //CardPosition has 0, 1 for position of array of cards on table and 2 for drawing from deck
+<b class="fc">&nbsp;        Player currentPlayer = getCurrentPlayer();</b>
+<b class="fc">&nbsp;        if (!isCurrentPlayer(namePlayer, currentPlayer)) {</b>
+<b class="fc">&nbsp;            throw new NoTurnException();</b>
+&nbsp;        }
+<b class="fc">&nbsp;        if (gameState != GameState.DRAWING_PHASE) {</b>
+<b class="fc">&nbsp;            throw new WrongGamePhaseException();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        ResourceCard cardDrawn;
+<b class="fc">&nbsp;        if (Gold) {</b>
+<b class="fc">&nbsp;            if (CardPosition == 2) {</b>
+&nbsp;                //TODO FOR THE VIEW la view richiede il nuovo retro di quella in cima e non solo di quella spostata
+<b class="fc">&nbsp;                cardDrawn = (ResourceCard) goldDeck.draw();</b>
+<b class="fc">&nbsp;                currentPlayer.takeCard(cardDrawn);</b>
+&nbsp;            } else {
+<b class="fc">&nbsp;                cardDrawn = onTableGoldCards[CardPosition];</b>
+<b class="fc">&nbsp;                currentPlayer.takeCard(cardDrawn);</b>
+<b class="fc">&nbsp;                onTableGoldCards[CardPosition] = (GoldCard) goldDeck.draw();</b>
+&nbsp;            }
+&nbsp;        } else {
+<b class="fc">&nbsp;            if (CardPosition == 2) {</b>
+&nbsp;                //TODO FOR THE VIEW la view richiede il nuovo retro di quella in cima e non solo di quella spostata
+<b class="fc">&nbsp;                cardDrawn = (ResourceCard) resourceDeck.draw();</b>
+<b class="fc">&nbsp;                currentPlayer.takeCard(cardDrawn);</b>
+&nbsp;            } else {
+<b class="fc">&nbsp;                cardDrawn = onTableResourceCards[CardPosition];</b>
+<b class="fc">&nbsp;                currentPlayer.takeCard(cardDrawn);</b>
+<b class="fc">&nbsp;                onTableResourceCards[CardPosition] = (ResourceCard) resourceDeck.draw();</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        //next player will play?
+<b class="fc">&nbsp;        if (turnType == TurnType.SECOND_LAST_TURN &amp;&amp; getOrderPlayer(currentPlayer.getName()) + 1 == lobby.getPlayers().length) {</b>
+&nbsp;            //if it is the last player in second-last turn cicle, say the next is the last turn
+<b class="nc">&nbsp;            turnType = TurnType.LAST_TURN;</b>
+<b class="nc">&nbsp;            gameState = GameState.PLACING_PHASE;</b>
+<b class="fc">&nbsp;        } else if (turnType == TurnType.LAST_TURN &amp;&amp; getOrderPlayer(currentPlayer.getName()) + 1 == lobby.getPlayers().length) {</b>
+&nbsp;            //if it is the last player in last turn cicle, go to end mode
+<b class="nc">&nbsp;            gameState = GameState.END;</b>
+&nbsp;            //TODO fine gioco
+<b class="fc">&nbsp;        } else if (currentPlayer.getPoints() &gt;= 20) {</b>
+&nbsp;            //if a player reached 20 points set this turn cicle as the second-last
+&nbsp;            //TODO fine mazzi e fine partita
+<b class="nc">&nbsp;            turnType = TurnType.SECOND_LAST_TURN;</b>
+<b class="nc">&nbsp;            gameState = GameState.PLACING_PHASE;</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            gameState = GameState.PLACING_PHASE;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        nextGlobalTurn();</b>
+<b class="fc">&nbsp;        return cardDrawn.getId();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * It runes the final part of the game calculating points of objective players and calculate the ranking list
+&nbsp;     *
+&nbsp;     * @param namePlayer Player who sent the request
+&nbsp;     * @return
+&nbsp;     */
+&nbsp;    //TODO OBJECTIVE CARD POINTS calcolaObiettiviAllaFine
+&nbsp;    public void endGame(String namePlayer) throws WrongGamePhaseException {
+&nbsp;        //Player will click a button to calculate their points. No we can do in drawCard.
+&nbsp;        //TODO OBJECTIVE CARD POINTS rifare senza il calcolo degli stati
+&nbsp;
+<b class="nc">&nbsp;        ArrayList&lt;Integer&gt; numberOfObjectiveForPlayer = new ArrayList&lt;&gt;();//With a linkedhashmap I can&#39;t put before or after an element</b>
+<b class="nc">&nbsp;        if (gameState != GameState.END) {//It just has an anti-cheat purpose</b>
+<b class="nc">&nbsp;            throw new WrongGamePhaseException();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            for (Player player : lobby.getPlayers()) {</b>
+<b class="nc">&nbsp;                int numberOfObjective = calculateBestCombination();</b>
+&nbsp;                //TODO OBJECTIVE CARD POINTS quelli in altro modo
+&nbsp;                //numberOfObjective+=;
+<b class="nc">&nbsp;                boolean toInsert = true;</b>
+&nbsp;                int i;
+<b class="nc">&nbsp;                for (i = 0; i &lt; ranking.size() &amp;&amp; toInsert; i++) {</b>
+<b class="nc">&nbsp;                    if (ranking.get(i).getPoints() &lt; player.getPoints() || (ranking.get(i).getPoints() == player.getPoints()</b>
+<b class="nc">&nbsp;                            &amp;&amp; numberOfObjectiveForPlayer.get(i) &gt; numberOfObjective)) {</b>
+<b class="nc">&nbsp;                        ranking.add(i, player);//aggiungi prima</b>
+<b class="nc">&nbsp;                        numberOfObjectiveForPlayer.add(i, numberOfObjective);</b>
+<b class="nc">&nbsp;                        toInsert = false;</b>
+&nbsp;                    }
+&nbsp;                }
+<b class="nc">&nbsp;                if (toInsert) {</b>
+<b class="nc">&nbsp;                    ranking.add(ranking.size(), player);//aggiungi prima</b>
+<b class="nc">&nbsp;                    numberOfObjectiveForPlayer.add(numberOfObjectiveForPlayer.size(), numberOfObjective);</b>
+&nbsp;                }
+&nbsp;                //TODO OBJECTIVE CARD POINTS finire, qua fare con l&#39;overload dell&#39;interfaccia e poi in questo metodo
+&nbsp;                // si chiameranno i metodi di ricerca di this
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    //Finding methods
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Given a position it gives attachments to the card, the Corner keys are referred to the Corner of the new card
+&nbsp;     * Notation is x and y based on cartesian axes system rotated of 45 degrees counterclockwise, every card represents a dot with natural coordinates
+&nbsp;     * Example: starting card is always 0,0 so TOP_LEFT would be 0;1, TOP_RIGHT //TODO sistema meglio questo commento
+&nbsp;     *
+&nbsp;     * @param startingCard A card where the recursion will start to find the required PlayedCard
+&nbsp;     * @param position  Position that identifies where the next card should be placed
+&nbsp;     * @return Hashmap&lt;Corner, PlayedCard&gt; of the attachments for the card to cardToPlace
+&nbsp;     * @throws NoSuchFieldException
+&nbsp;     */
+&nbsp;    private HashMap&lt;Corner, PlayedCard&gt; isPositionable(PlayedCard startingCard, Point position) throws CardPositionException {
+<b class="fc">&nbsp;        HashMap&lt;Corner, PlayedCard&gt; attachments = new HashMap&lt;&gt;();</b>
+&nbsp;        PlayedCard cardToCheck, newCard;
+<b class="fc">&nbsp;        boolean validPosition = false;</b>
+<b class="fc">&nbsp;        int xPlaceToCheck = 0, yPlaceToCheck = 0;</b>
+&nbsp;
+&nbsp;        //TODO carta già posizionata, e doppia carta uguale si potrebbe fare matematicamente.
+<b class="fc">&nbsp;        newCard = findCard(startingCard, position);</b>
+<b class="fc">&nbsp;        if(newCard != null){</b>
+<b class="fc">&nbsp;            throw new CardPositionException();</b>
+&nbsp;        }
+&nbsp;        //For each corner of the card to be placed, it checks if there is a possible card to attach it. The switch case refers to the new Card.
+<b class="fc">&nbsp;        for (Corner corner : Corner.values()) {</b>
+<b class="fc">&nbsp;            switch (corner) {</b>
+&nbsp;                case TOP_LEFT: {
+<b class="fc">&nbsp;                    xPlaceToCheck = 0;</b>
+<b class="fc">&nbsp;                    yPlaceToCheck = 1;</b>
+<b class="fc">&nbsp;                    break;</b>
+&nbsp;                }
+&nbsp;                case TOP_RIGHT: {
+<b class="fc">&nbsp;                    xPlaceToCheck = 1;</b>
+<b class="fc">&nbsp;                    yPlaceToCheck = 0;</b>
+<b class="fc">&nbsp;                    break;</b>
+&nbsp;                }
+&nbsp;                case BOTTOM_LEFT: {
+<b class="fc">&nbsp;                    xPlaceToCheck = -1;</b>
+<b class="fc">&nbsp;                    yPlaceToCheck = 0;</b>
+<b class="fc">&nbsp;                    break;</b>
+&nbsp;                }
+&nbsp;                case BOTTOM_RIGHT: {
+<b class="fc">&nbsp;                    xPlaceToCheck = 0;</b>
+<b class="fc">&nbsp;                    yPlaceToCheck = -1;</b>
+&nbsp;                    break;
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            cardToCheck = findCard(startingCard, new Point(position.x + xPlaceToCheck, position.y + yPlaceToCheck));</b>
+&nbsp;
+<b class="fc">&nbsp;            if (cardToCheck != null) {</b>
+<b class="fc">&nbsp;                Sign cornerToCheck = null;</b>
+&nbsp;                /*Checks if the corner is valid:
+&nbsp;                * if the card is facing up, it checks the corner of the card to be placed
+&nbsp;                * if the card is facing down, it checks the backside corner of the card to be placed(only for starting card).
+&nbsp;                */
+<b class="fc">&nbsp;                if (cardToCheck.isFacingUp()) {</b>
+<b class="fc">&nbsp;                    switch (corner) {</b>
+&nbsp;                        case TOP_LEFT: {
+<b class="fc">&nbsp;                            cornerToCheck = cardToCheck.getCard().getCorners().get(Corner.BOTTOM_RIGHT);</b>
+<b class="fc">&nbsp;                            break;</b>
+&nbsp;                        }
+&nbsp;                        case TOP_RIGHT: {
+<b class="fc">&nbsp;                            cornerToCheck = cardToCheck.getCard().getCorners().get(Corner.BOTTOM_LEFT);</b>
+<b class="fc">&nbsp;                            break;</b>
+&nbsp;                        }
+&nbsp;                        case BOTTOM_LEFT: {
+<b class="fc">&nbsp;                            cornerToCheck = cardToCheck.getCard().getCorners().get(Corner.TOP_RIGHT);</b>
+<b class="fc">&nbsp;                            break;</b>
+&nbsp;                        }
+&nbsp;                        case BOTTOM_RIGHT: {
+<b class="fc">&nbsp;                            cornerToCheck = cardToCheck.getCard().getCorners().get(Corner.TOP_LEFT);</b>
+<b class="fc">&nbsp;                            break;</b>
+&nbsp;                        }
+&nbsp;                    }
+<b class="fc">&nbsp;                } else if (!cardToCheck.isFacingUp() &amp;&amp; (cardToCheck.getCard() instanceof StartingCard)) {</b>
+&nbsp;                    //it&#39;s a starting card upside down
+<b class="fc">&nbsp;                    switch (corner) {</b>
+&nbsp;                        case TOP_LEFT: {
+<b class="nc">&nbsp;                            cornerToCheck = ((StartingCard) cardToCheck.getCard()).getBacksideCorners().get(Corner.BOTTOM_RIGHT);</b>
+<b class="nc">&nbsp;                            break;</b>
+&nbsp;                        }
+&nbsp;                        case TOP_RIGHT: {
+<b class="nc">&nbsp;                            cornerToCheck = ((StartingCard) cardToCheck.getCard()).getBacksideCorners().get(Corner.BOTTOM_LEFT);</b>
+<b class="nc">&nbsp;                            break;</b>
+&nbsp;                        }
+&nbsp;                        case BOTTOM_LEFT: {
+<b class="fc">&nbsp;                            cornerToCheck = ((StartingCard) cardToCheck.getCard()).getBacksideCorners().get(Corner.TOP_RIGHT);</b>
+<b class="fc">&nbsp;                            break;</b>
+&nbsp;                        }
+&nbsp;                        case BOTTOM_RIGHT: {
+<b class="nc">&nbsp;                            cornerToCheck = ((StartingCard) cardToCheck.getCard()).getBacksideCorners().get(Corner.TOP_LEFT);</b>
+<b class="fc">&nbsp;                            break;</b>
+&nbsp;                        }
+&nbsp;                    }
+&nbsp;                } else {
+<b class="fc">&nbsp;                    cornerToCheck = Sign.EMPTY;</b>
+&nbsp;                }
+&nbsp;                //It verifies if the corner of the card to be placed is compatible with the corner of the card to which it is attached
+<b class="fc">&nbsp;                if (cornerToCheck == null) {</b>
+<b class="nc">&nbsp;                    throw new CardPositionException();</b>
+&nbsp;                }
+<b class="fc">&nbsp;                validPosition = true;</b>
+&nbsp;            }
+<b class="fc">&nbsp;            attachments.put(corner, cardToCheck);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        if (!validPosition) {</b>
+<b class="fc">&nbsp;            throw new CardPositionException();</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return attachments;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Looking at all graph of PlayedCard to find a PlayedCard identified by position
+&nbsp;     *
+&nbsp;     * @param startingCard Where the recursion will start to find the required PlayedCard
+&nbsp;     * @param position
+&nbsp;     * @return method recursiveFindCard //TODO è giusto?
+&nbsp;     */
+&nbsp;    private PlayedCard findCard(PlayedCard startingCard, Point position) {
+<b class="fc">&nbsp;        Stack&lt;PlayedCard&gt; stack = new Stack&lt;&gt;();</b>
+<b class="fc">&nbsp;        return recursiveFindCard(startingCard, position, stack);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called by findCard
+&nbsp;     * Recursive looking at all graph of PlayedCard to find a PlayedCard identified by position
+&nbsp;     *
+&nbsp;     * @param playedCard PlayedCard that I&#39;m visiting
+&nbsp;     * @param position   Position of the card that I&#39;m looking for
+&nbsp;     * @param stack      Stack in which I save already visited cards
+&nbsp;     * @return PlayedCard if exists else null
+&nbsp;     */
+&nbsp;    private PlayedCard recursiveFindCard(PlayedCard playedCard, Point position, Stack&lt;PlayedCard&gt; stack) {
+<b class="fc">&nbsp;        if (playedCard == null) {</b>
+<b class="fc">&nbsp;            return null;</b>
+<b class="fc">&nbsp;        } else if(stack.contains(playedCard)) {</b>
+<b class="fc">&nbsp;            return null;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        else if (playedCard.getPosition().x == position.x &amp;&amp; playedCard.getPosition().y == position.y) {</b>
+<b class="fc">&nbsp;            return playedCard;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        stack.push(playedCard);</b>
+<b class="fc">&nbsp;        for (Corner corner : Corner.values()) {</b>
+<b class="fc">&nbsp;            PlayedCard found = recursiveFindCard(playedCard.getAttached(corner), position, stack);</b>
+<b class="fc">&nbsp;            if (found != null) {</b>
+<b class="fc">&nbsp;                return found;</b>
+&nbsp;            }
+&nbsp;        }
+<b class="fc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Converts Kingdom enum to Sign enum
+&nbsp;     * @param kingdom Kingdom to convert
+&nbsp;     * @return Sign in which the Kingdom has been converted
+&nbsp;     */
+&nbsp;    private Sign fromKingdomToSign(Kingdom kingdom) throws IllegalArgumentException {
+<b class="fc">&nbsp;        switch (kingdom) {</b>
+&nbsp;            case PLANT:
+<b class="fc">&nbsp;                return Sign.LEAF;</b>
+&nbsp;            case ANIMAL:
+<b class="nc">&nbsp;                return Sign.WOLF;</b>
+&nbsp;            case FUNGI:
+<b class="nc">&nbsp;                return Sign.MUSHROOM;</b>
+&nbsp;            case INSECT:
+<b class="fc">&nbsp;                return Sign.BUTTERFLY;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        throw new IllegalArgumentException(&quot;It&#39;s not a right Kingdom to convert&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Converts Countable enum to Sign enum
+&nbsp;     *
+&nbsp;     * @param countable Countable to convert
+&nbsp;     * @return Sign in which the Kingdom has been converted
+&nbsp;     */
+&nbsp;    private Sign fromCountableToSign(Countable countable) throws IllegalArgumentException {
+<b class="fc">&nbsp;        switch (countable) {</b>
+&nbsp;            case QUILL:
+<b class="nc">&nbsp;                return Sign.QUILL;</b>
+&nbsp;            case INKWELL:
+<b class="fc">&nbsp;                return Sign.INKWELL;</b>
+&nbsp;            case SCROLL:
+<b class="nc">&nbsp;                return Sign.SCROLL;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        throw new IllegalArgumentException(&quot;It&#39;s not a right Countable to convert&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Controls if the resources of a Player are enough for the requirements of a GoldCard
+&nbsp;     *
+&nbsp;     * @param player   Player about we want to know if they can place the GoldCard
+&nbsp;     * @param goldCard GoldCard that wants to be placed and has certain requirements
+&nbsp;     * @return
+&nbsp;     */
+&nbsp;    public boolean requirementsSatisfied(Player player, GoldCard goldCard) {
+<b class="fc">&nbsp;        for (Sign sign : Sign.values()) {</b>
+<b class="fc">&nbsp;            if(sign != Sign.EMPTY) {</b>
+<b class="fc">&nbsp;                if (player.getResources().get(sign) &lt; goldCard.getRequirements().get(sign)) {</b>
+<b class="nc">&nbsp;                    return false;</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+<b class="fc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    //Calculate points methods
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Calculate the number of points given by the effect of SpecialGoldCard that is positioned
+&nbsp;     *
+&nbsp;     * @param player          who is trying to position the card to see their resource count
+&nbsp;     * @param specialGoldCard specialGoldCard given to find the effect
+&nbsp;     * @param attachments     other card corners used to calculate the corners covered for Countable.CORNER type
+&nbsp;     * @return number of points to add to the player points
+&nbsp;     * @throws IllegalArgumentException
+&nbsp;     */
+&nbsp;    private int calculatesSpecialGoldPoints(Player player, SpecialGoldCard specialGoldCard, HashMap&lt;Corner, PlayedCard&gt; attachments){
+&nbsp;        int numberOfAttachments;
+<b class="fc">&nbsp;        switch (specialGoldCard.getThingToCount()) {</b>
+&nbsp;            case CORNER: {
+<b class="fc">&nbsp;                numberOfAttachments = 0;</b>
+<b class="fc">&nbsp;                for (PlayedCard playedCard : attachments.values()) {</b>
+<b class="fc">&nbsp;                    if (playedCard != null) {</b>
+<b class="fc">&nbsp;                        numberOfAttachments++;</b>
+&nbsp;                    }
+<b class="fc">&nbsp;                }</b>
+<b class="fc">&nbsp;                return specialGoldCard.getPoints() * numberOfAttachments;</b>
+&nbsp;            }
+&nbsp;            default: {
+<b class="fc">&nbsp;                return specialGoldCard.getPoints() * player.getResources().get(fromCountableToSign(specialGoldCard.getThingToCount()));</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    //TODO OBJECTIVE CARD POINTS
+&nbsp;    private int calculateEndGamePoints(ObjectiveType type, int multiplier) {
+<b class="nc">&nbsp;        return 0;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Calculates the best combination of ObjectiveCard effects to get major increase of points with more application of
+&nbsp;     * effects (In case of draw points between players)
+&nbsp;     *
+&nbsp;     * @return ..//TODO OBJECTIVE CARD POINTS
+&nbsp;     */
+&nbsp;    private int calculateBestCombination() {
+<b class="nc">&nbsp;        return 0;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    //Turn methods
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Pass to the next turn consequentially switching player
+&nbsp;     */
+&nbsp;    private void nextGlobalTurn() {
+<b class="fc">&nbsp;        this.globalTurn++;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Calculates the number of cicles made by players, the cicle of setup are not counted
+&nbsp;     *
+&nbsp;     * @return the cycle of turns made in total
+&nbsp;     */
+&nbsp;    public int getTurn() {
+<b class="fc">&nbsp;        return globalTurn / lobby.getPlayers().length - 1;</b>
+&nbsp;        //non conta giro rootCard (turn = -1) e giro ObjectiveCard (turn = 0)
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Calculates the number of the current player who has the right to play
+&nbsp;     *
+&nbsp;     * @return the current player
+&nbsp;     */
+&nbsp;    public Player getCurrentPlayer() {
+<b class="fc">&nbsp;        return lobby.getPlayers()[globalTurn % (lobby.getPlayers().length)];</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get in which number the player plays respectively in the turn cycle
+&nbsp;     *
+&nbsp;     * @param name player who sent the request
+&nbsp;     * @return get order of player
+&nbsp;     */
+&nbsp;    private int getOrderPlayer(String name) throws NotExistsPlayerException {
+&nbsp;        int i;
+<b class="fc">&nbsp;        for (i = 0; i &lt; lobby.getPlayers().length; i++) {</b>
+<b class="fc">&nbsp;            if (lobby.getPlayers()[i].getName().equals(name)) {</b>
+<b class="fc">&nbsp;                return i;</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        throw new NotExistsPlayerException();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Compares the name of the player who sent the request and who is the turn right now and says if it&#39;s their turn
+&nbsp;     *
+&nbsp;     * @param name          player who sent the request
+&nbsp;     * @param currentPlayer the player who is the turn right now
+&nbsp;     * @return
+&nbsp;     */
+&nbsp;    private boolean isCurrentPlayer(String name, Player currentPlayer) {
+<b class="fc">&nbsp;        return name.equals(currentPlayer.getName());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Place card on the spot on table
+&nbsp;     *
+&nbsp;     * @param resourceCard ResourceCard to position on table
+&nbsp;     * @param place        id of the spot where to place, 0 and 1 are the position onTable array
+&nbsp;     */
+&nbsp;    public void setOnTableResourceCard(ResourceCard resourceCard, int place) {
+<b class="fc">&nbsp;        this.onTableResourceCards[place] = resourceCard;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Place card on the spot on table
+&nbsp;     *
+&nbsp;     * @param goldCard GoldCard to position on table
+&nbsp;     * @param place    id of the spot where to place, 0 and 1 are the position onTable array
+&nbsp;     */
+&nbsp;    public void setOnTableGoldCard(GoldCard goldCard, int place) {
+<b class="fc">&nbsp;        this.onTableGoldCards[place] = goldCard;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Place card on the spot on table (It&#39;s usable only in GameSetup constructor)
+&nbsp;     *
+&nbsp;     * @param objectiveCard ObjectiveCard to position on table
+&nbsp;     * @param place         id of the spot where to place, 0 and 1 are the position onTable array
+&nbsp;     */
+&nbsp;    public void setOnTableObjectiveCards(ObjectiveCard objectiveCard, int place) {
+<b class="fc">&nbsp;        this.onTableObjectiveCards[place] = objectiveCard;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    //Info methods for the view
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Request info about the points of a certain player
+&nbsp;     *
+&nbsp;     * @param namePlayer name of the player about is wanted to get info
+&nbsp;     * @return points of the player
+&nbsp;     */
+&nbsp;    public int getPlayerPoints(String namePlayer) throws NoSuchFieldException {
+<b class="fc">&nbsp;        return lobby.getPlayerFromName(namePlayer).getPoints();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Request info about the resources of a certain player
+&nbsp;     *
+&nbsp;     * @param namePlayer name of the player about is wanted to get info
+&nbsp;     * @return resources of the player
+&nbsp;     */
+&nbsp;    public HashMap&lt;Sign, Integer&gt; getPlayerResources(String namePlayer) throws NoSuchFieldException {
+<b class="fc">&nbsp;        return lobby.getPlayerFromName(namePlayer).getResources();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Give the ranking at the end of the match
+&nbsp;     *
+&nbsp;     * @return List of winners
+&nbsp;     */
+&nbsp;    public ArrayList&lt;Player&gt; getRanking() {
+<b class="nc">&nbsp;        return ranking;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Give the gold card on the table
+&nbsp;     *
+&nbsp;     * @param position position of the card on the table
+&nbsp;     * @return ResourceCard on the table
+&nbsp;     */
+&nbsp;    public GoldCard getGoldCardOnTable(int position) {
+<b class="fc">&nbsp;       return onTableGoldCards[position];</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Card getGoldCardDeck() {
+<b class="fc">&nbsp;        return goldDeck.draw();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Give the resource card on the table
+&nbsp;     *
+&nbsp;     * @param position position of the card on the table
+&nbsp;     * @return ResourceCard on the table
+&nbsp;     */
+&nbsp;    public ResourceCard getResourceCardOnTable(int position) {
+<b class="fc">&nbsp;        return onTableResourceCards[position];</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Card getResourceCardDeck() {
+<b class="fc">&nbsp;        return resourceDeck.draw();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-15 18:14</div>
+</div>
+</body>
+</html>

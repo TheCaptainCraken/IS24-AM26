@@ -1,0 +1,145 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SpecialGoldCard</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">it.polimi.ingsw.model</a>
+</div>
+
+<h1>Coverage Summary for Class: SpecialGoldCard (it.polimi.ingsw.model)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SpecialGoldCard</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package it.polimi.ingsw.model;
+&nbsp;
+&nbsp;import java.util.HashMap;
+&nbsp;
+&nbsp;/**
+&nbsp; * This class represents a special gold card (A gold card that gives points
+&nbsp; * based on counting something like the number of resources the player has at
+&nbsp; * that moment).
+&nbsp; */
+&nbsp;public class SpecialGoldCard extends GoldCard {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The thing to count.
+&nbsp;     */
+&nbsp;    private final Countable thingToCount;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Class constructor.
+&nbsp;     *
+&nbsp;     * @param id           The special gold card&#39;s id.
+&nbsp;     * @param kingdom      The special gold card&#39;s kingdom.
+&nbsp;     * @param frontCorners The special gold card&#39;s corners.
+&nbsp;     * @param points       The special gold card&#39;s points.
+&nbsp;     * @param requirements The special gold card&#39;s requirements.
+&nbsp;     * @param thingToCount The special gold card&#39;s thing to count.
+&nbsp;     */
+&nbsp;    public SpecialGoldCard(int id, Kingdom kingdom, HashMap&lt;Corner, Sign&gt; frontCorners, int points,
+&nbsp;            HashMap&lt;Sign, Integer&gt; requirements, Countable thingToCount) {
+<b class="fc">&nbsp;        super(id, kingdom, frontCorners, points, requirements);</b>
+<b class="fc">&nbsp;        this.thingToCount = thingToCount;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the special gold card&#39;s thing to count.
+&nbsp;     *
+&nbsp;     * @return The special gold card&#39;s thing to count.
+&nbsp;     */
+&nbsp;    public Countable getThingToCount() {
+<b class="fc">&nbsp;        return thingToCount;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-15 18:14</div>
+</div>
+</body>
+</html>
