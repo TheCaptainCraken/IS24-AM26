@@ -369,7 +369,7 @@ public class GameMaster {
             throw new WrongGamePhaseException();
         } else {
             for (Player player : lobby.getPlayers()) {
-                int numberOfObjective = calculateBestCombination();
+                int numberOfObjective = 0;
                 // TODO OBJECTIVE CARD POINTS quelli in altro modo
                 // numberOfObjective+=;
                 boolean toInsert = true;

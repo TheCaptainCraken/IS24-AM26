@@ -22,8 +22,8 @@ public class LobbyTest {
     @Test
     @DisplayName("check correct function when lobby is complete")
     public void CheckCorrectFunctionLobbyComplete(){
-        assertThrows(FullLobbyException.class, () -> {
-           Lobby lobby = new Lobby();
+        assertThrows(LobbyCompleteException.class, () -> {
+           Lobby lobby = new Lobby(4);
            lobby.addPlayer("pietro", Color.BLUE);
            lobby.addPlayer("marco", Color.RED);
            lobby.addPlayer("daniel", Color.GREEN);
@@ -34,7 +34,7 @@ public class LobbyTest {
 
     @BeforeAll
     public static void Setup() throws FullLobbyException, SameNameException, LobbyCompleteException {
-        lobby = new Lobby();
+        lobby = new Lobby(4);
         lobby.addPlayer("pietro", Color.BLUE);
         lobby.addPlayer("marco", Color.RED);
         lobby.addPlayer("daniel", Color.GREEN);
