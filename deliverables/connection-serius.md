@@ -14,7 +14,7 @@ sequenceDiagram
         alt if is the first
             Server ->> Client: First ()
             Client ->> Server: Players (number of players)
-            Server ->> Controller: ???
+            Server ->> Controller: costruisce la lobby
         else if is not the first
             alt if the lobby is not created yet
                 Server ->> Client:  Wait(lobby not created yet) 
@@ -64,8 +64,8 @@ sequenceDiagram
     Server ->> Client: Place (starting card)
     
     Client ->> Server: Place (up or down)
-    Server ->> Controller: Nome ufficiale //TODO
-    Controller ->> Model: Nome ufficiale //TODO
+    Server ->> Controller: PlaceRootCard 
+    Controller ->> Model: PlaceRootCard 
     
     Model ->> Controller: OK
     Controller ->> Server: OK
