@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.util.*;
 import java.util.HashMap;
 
+import javax.swing.text.Position;
+
 public class GameMaster {
     private int globalTurn;
     private TurnType turnType;
@@ -673,8 +675,8 @@ public class GameMaster {
             case FREE_RESOURCES:
                 points = Math.min(player.getResources().get(Sign.QUILL),
                         Math.min(player.getResources().get(Sign.INKWELL), player.getResources().get(Sign.SCROLL)));
+                break;
             case TRIS:
-                // Not sure about this: is it one point per tris or what?
                 points = player.getResources().get(fromKingdomToSign(kingdom)) / 3;
                 break;
             /**
@@ -687,21 +689,44 @@ public class GameMaster {
             case L_FORMATION:
                 break;
             case STAIR:
+                ArrayList<PlayedCard> usedCards = new ArrayList<>();
                 for (PlayedCard card : getPlayersCards(player)) {
                     Point position = card.getPosition();
-                    if (card.getCard().getKingdom() == kingdom) {
-                        int x = position.x;
-                        int y = position.y;
-                        int pointsToAdd = 0;
-                        for (PlayedCard cardToCheck : getPlayersCards(player)) {
-                            if (cardToCheck.getCard().getKingdom() == kingdom) {
-                                if (cardToCheck.getPosition().x == x + 1 && cardToCheck.getPosition().y == y
-                                        || cardToCheck.getPosition().x == x && cardToCheck.getPosition().y == y + 1) {
-                                    pointsToAdd++;
-                                }
+                    if (!usedCards.contains(card) && card.getCard().getKingdom() == kingdom) {
+                        if (card.getCard().getKingdom() == Kingdom.FUNGI
+                                || card.getCard().getKingdom() == Kingdom.ANIMAL) {
+                            Point lowerLeftPosition = (Point) position.clone();
+                            lowerLeftPosition.translate(-1, -1);
+                            PlayedCard lowerLeft = findCard(player.getRootCard(), lowerLeftPosition);
+                            Point upperRightPosition = (Point) position.clone();
+                            upperRightPosition.translate(1, 1);
+                            PlayedCard upperRight = findCard(player.getRootCard(), upperRightPosition);
+
+                            if (lowerLeft != null && upperRight != null && lowerLeft.getCard().getKingdom() == kingdom
+                                    && upperRight.getCard().getKingdom() == kingdom && !usedCards.contains(lowerLeft)
+                                    && !usedCards.contains(upperRight)) {
+                                points++;
+                                usedCards.add(upperRight);
+                                usedCards.add(lowerLeft);
+                                usedCards.add(card);
+                            }
+                        } else {
+                            Point upperLeftPosition = (Point) position.clone();
+                            upperLeftPosition.translate(-1, 1);
+                            PlayedCard upperLeft = findCard(player.getRootCard(), upperLeftPosition);
+                            Point lowerRightPosition = (Point) position.clone();
+                            lowerRightPosition.translate(1, -1);
+                            PlayedCard lowerRight = findCard(player.getRootCard(), lowerRightPosition);
+
+                            if (upperLeft != null && lowerRight != null && upperLeft.getCard().getKingdom() == kingdom
+                                    && lowerRight.getCard().getKingdom() == kingdom && !usedCards.contains(upperLeft)
+                                    && !usedCards.contains(lowerRight)) {
+                                points++;
+                                usedCards.add(lowerRight);
+                                usedCards.add(upperLeft);
+                                usedCards.add(card);
                             }
                         }
-                        points += pointsToAdd;
                     }
                 }
                 break;
