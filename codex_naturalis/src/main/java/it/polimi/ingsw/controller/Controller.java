@@ -15,6 +15,8 @@ public class Controller {
     GameMaster game = null;
 
     private Controller() {
+        lobby = new Lobby();
+        //TODO
     }
 
     public void initializeLobby(int nPlayers) {
@@ -66,6 +68,10 @@ public class Controller {
         return player.getSecretObjective().getId();
     }
 
+    public Player getPlayer(String name) throws NoSuchFieldException {
+        return lobby.getPlayerFromName(name);
+    }
+
 //    public ... getTable() {
 //        return //TODO
 //    }
@@ -80,6 +86,33 @@ public class Controller {
 
     public static Controller getInstance(){
         return INSTANCE;
+    }
+
+    public boolean setColour(String name, Color colour) throws NoSuchFieldException {
+        //TODO color exception
+        lobby.getPlayerFromName(name).setColour(colour);
+        //TODO check if all player have choose a color -> start() return true else return false
+        return false;
+    }
+
+    public Object getPlayersInLobby() {
+        //TODO
+        return null;
+    }
+
+    public boolean start() {
+        //TODO new GameMaster
+        return true;
+    }
+
+    public HashMap<String, Color> getPlayersAndPins() {
+        //TODO
+        return null;
+    }
+
+    public boolean getIsFirst() {
+        //throw la lobby è già chiusa o è piena
+        //TODO
     }
 }
 

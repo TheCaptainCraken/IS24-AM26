@@ -175,4 +175,8 @@ public class Player {
     public void addObjectivePoints(int new_points){
             points += new_points;
     }
+
+    public void setColour(Color colour) {
+        this.color = colour;
+    }
 }

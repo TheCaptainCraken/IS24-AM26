@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model;
 
+import it.polimi.ingsw.model.exception.ClosingLobbyException;
 import it.polimi.ingsw.model.exception.LobbyCompleteException;
 import it.polimi.ingsw.model.exception.SameNameException;
 
@@ -14,7 +15,7 @@ public class Lobby {
 
     /**It's a holder for the players that permits to check and limit access
      */
-    public Lobby(int maxSize){
+    public Lobby(int maxSizesize){
         this.players = new ArrayList<>();
         this.maxSize = maxSize;
         this.complete = false;
@@ -75,6 +76,14 @@ public class Lobby {
         Collections.rotate(players, index);
         Collections.rotate(players, -i);
         index = i;
+    }
+
+    public void setMaxSize(int maxSize) throws ClosingLobbyException {
+        if(complete || maxSize > 4 || maxSize < 2){
+            throw new ClosingLobbyException();
+        }
+        this.maxSize = maxSize;
+        setLock();
     }
 
     /** It locks the lobby so nobody can join anymore, the lobby cannot be unlocked

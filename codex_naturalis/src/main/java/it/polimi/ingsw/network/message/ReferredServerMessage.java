@@ -1,0 +1,14 @@
+package it.polimi.ingsw.network.message;
+
+public abstract class ReferredServerMessage extends ServerMessage {
+    public final String playerInterested;
+
+    public ReferredServerMessage(Boolean isBroadcast, String player) {
+        super(isBroadcast);
+        this.playerInterested = player;
+    }
+
+    public String getPlayerInterested() {
+        return playerInterested;
+    }
+}
