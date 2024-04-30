@@ -89,8 +89,8 @@ sequenceDiagram
 
 ## Game Start
 When the last player joins the lobby, the server must notify the clients that the game is about to start. 
-This transaction is not figured here for simplicity. 
-The server must  notify the clients of the starting card and the common objectives. 
+This transaction is not figured here for simplicity, but is present in the implementation. 
+The server must notify the clients of the starting card and the common objectives. 
 The server must also notify the clients of the cards in the player's hand and the player turn order.
 
 The green box represents the choose of starting card while the blue one is about choosing objective card.
@@ -177,9 +177,9 @@ sequenceDiagram
         Controller ->> Model: PlaceCard(card, position, side)
             alt card error
                 rect rgba(255, 0, 0, 0.5)
-                Model ->> Controller: Error(type of error)
-                Controller ->> Server: Error(type of error)
-                Server ->> Client: Error(type of error)
+                Model ->> Controller: Error(CardPositionException or NotEnoughResourcesException)
+                Controller ->> Server: Error(CardPositionException or NotEnoughResourcesException)
+                Server ->> Client: Error(CardPositionException or NotEnoughResourcesException)
                 end 
             end
         end
@@ -195,9 +195,9 @@ sequenceDiagram
             Controller ->> Model: Draw (from what place)
             alt draw error
                 rect rgba(255, 0, 0, 0.5)
-                Model ->> Controller: Error (type of error)
-                Controller ->> Server: Error (type of error)
-                Server ->> Client: Error (type of error)
+                Model ->> Controller: Error (Place does not have a card)
+                Controller ->> Server: Error (Place does not have a card)
+                Server ->> Client: Error (Place does not have a card)
                 end
             end
         end
@@ -252,10 +252,10 @@ sequenceDiagram
     end
 ```
 ## Connection Lost
-We implement "FA resilienza alle disconessioni", so the game can continue even if a player loses the connection.
+We implement the FA: "Resilienza alle disconessioni", so the game can continue even if a player loses the connection.
 Here is our implementation of the connection lost:
-1. If a client loose connection during pregame, before choosing the colour, the server must notify the 
-other clients that the player has disconnected. The game is closed.
+1. If a client loses the connection during pregame, before choosing the colour, the server must notify the 
+other clients that the player has disconnected. The game is then closed.
 ```mermaid
 sequenceDiagram
     actor Client
@@ -267,15 +267,15 @@ sequenceDiagram
     Server ->> Client: Error (connection lost)
         
 ```
-2. If client lose connection during the game, the server randomly choose what happens to the player status.
-So we can have four cases based on when a client disconnects:
+2. If client loses the connection during the game, the server randomly chooses what happens to the player status.
+There are four cases based on when a client disconnects:
     1. chooseStartingCard
     2. chooseObjectiveCard
     3. placeCard and consequently after "drawCard"
     4. drawCard 
 
-In all the case, the server can modify autonomously the player status, in the model. When the player reconnects, 
-the server must notify the client of the new status. 
+In all of these cases, the server can modify autonomously the player status, by simply choosing which card to play/draw and where, in the model. When the player reconnects, 
+the server must notify the client of the changes that transpired in the game status. 
 ```mermaid
 sequenceDiagram
  actor Client
