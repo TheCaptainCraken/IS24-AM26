@@ -6,7 +6,6 @@ import org.json.simple.parser.ParseException;
 import java.awt.*;
 import java.io.IOException;
 import java.util.*;
-import java.util.HashMap;
 
 import javax.swing.text.Position;
 
@@ -679,16 +678,94 @@ public class GameMaster {
             case TRIS:
                 points = player.getResources().get(fromKingdomToSign(kingdom)) / 3;
                 break;
-            /**
-             * Problems identifying the best combination in multiple points.
-             * For stairs a good idea would be to travel first to the lowest card possible
-             * and then go up (?)
-             * For L formation, the best idea would be to travel to the lowest card and then
-             * go to the right or left (?)
-             */
-            case L_FORMATION:
+            case L_FORMATION: {
+                ArrayList<PlayedCard> usedCards = new ArrayList<>();
+                for (PlayedCard card : getPlayersCards(player)) {
+                    Point position = card.getPosition();
+                    switch (kingdom) {
+                        case FUNGI:
+                            if (!usedCards.contains(card) && card.getCard().getKingdom() == Kingdom.FUNGI) {
+                                Point lowerPosition = (Point) position.clone();
+                                lowerPosition.translate(0, -1);
+                                Point loowerRightPosition = (Point) position.clone();
+                                loowerRightPosition.translate(1, -2);
+                                PlayedCard lower = findCard(player.getRootCard(), lowerPosition);
+                                PlayedCard loowerRight = findCard(player.getRootCard(), loowerRightPosition);
+                                if (lower != null && loowerRight != null && !usedCards.contains(lower)
+                                        && !usedCards.contains(loowerRight)
+                                        && lower.getCard().getKingdom() == Kingdom.FUNGI
+                                        && loowerRight.getCard().getKingdom() == Kingdom.PLANT) {
+                                    points++;
+                                    usedCards.add(card);
+                                    usedCards.add(loowerRight);
+                                    usedCards.add(lower);
+                                }
+                            }
+                            break;
+                        case ANIMAL:
+                            if (!usedCards.contains(card) && card.getCard().getKingdom() == Kingdom.ANIMAL) {
+                                Point lowerPosition = (Point) position.clone();
+                                lowerPosition.translate(0, -1);
+                                Point upperRightPosition = (Point) position.clone();
+                                upperRightPosition.translate(1, 1);
+                                PlayedCard lower = findCard(player.getRootCard(), lowerPosition);
+                                PlayedCard upperRight = findCard(player.getRootCard(), upperRightPosition);
+                                if (lower != null && upperRight != null && !usedCards.contains(lower)
+                                        && !usedCards.contains(upperRight)
+                                        && lower.getCard().getKingdom() == Kingdom.ANIMAL
+                                        && upperRight.getCard().getKingdom() == Kingdom.FUNGI) {
+                                    points++;
+                                    usedCards.add(card);
+                                    usedCards.add(upperRight);
+                                    usedCards.add(lower);
+                                }
+                            }
+                            break;
+                        case PLANT:
+                            if (!usedCards.contains(card) && card.getCard().getKingdom() == Kingdom.PLANT) {
+                                Point lowerPosition = (Point) position.clone();
+                                lowerPosition.translate(0, -1);
+                                Point loowerLeftPosition = (Point) position.clone();
+                                loowerLeftPosition.translate(-1, -2);
+                                PlayedCard lower = findCard(player.getRootCard(), lowerPosition);
+                                PlayedCard loowerLeft = findCard(player.getRootCard(), loowerLeftPosition);
+                                if (lower != null && loowerLeft != null && !usedCards.contains(lower)
+                                        && !usedCards.contains(loowerLeft)
+                                        && lower.getCard().getKingdom() == Kingdom.PLANT
+                                        && loowerLeft.getCard().getKingdom() == Kingdom.INSECT) {
+                                    points++;
+                                    usedCards.add(card);
+                                    usedCards.add(loowerLeft);
+                                    usedCards.add(lower);
+                                }
+                            }
+                            break;
+                        case INSECT:
+                            if (!usedCards.contains(card) && card.getCard().getKingdom() == Kingdom.INSECT) {
+                                Point lowerPosition = (Point) position.clone();
+                                lowerPosition.translate(0, -1);
+                                Point upperLeftPosition = (Point) position.clone();
+                                upperLeftPosition.translate(-1, 1);
+                                PlayedCard lower = findCard(player.getRootCard(), lowerPosition);
+                                PlayedCard upperLeft = findCard(player.getRootCard(), upperLeftPosition);
+                                if (lower != null && upperLeft != null && !usedCards.contains(lower)
+                                        && !usedCards.contains(upperLeft)
+                                        && lower.getCard().getKingdom() == Kingdom.INSECT
+                                        && upperLeft.getCard().getKingdom() == Kingdom.ANIMAL) {
+                                    points++;
+                                    usedCards.add(card);
+                                    usedCards.add(upperLeft);
+                                    usedCards.add(lower);
+                                }
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                }
                 break;
-            case STAIR:
+            }
+            case STAIR: {
                 ArrayList<PlayedCard> usedCards = new ArrayList<>();
                 for (PlayedCard card : getPlayersCards(player)) {
                     Point position = card.getPosition();
@@ -730,6 +807,7 @@ public class GameMaster {
                     }
                 }
                 break;
+            }
         }
 
         return points * multiplier;
@@ -766,6 +844,8 @@ public class GameMaster {
                 }
             }
         }
+        // Sort the cards by ascending y position
+        cards.sort((PlayedCard card1, PlayedCard card2) -> card1.getPosition().y - card2.getPosition().y);
         return cards;
     }
 
