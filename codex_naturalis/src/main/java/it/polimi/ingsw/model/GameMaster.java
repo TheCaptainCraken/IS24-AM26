@@ -253,7 +253,7 @@ public class GameMaster {
                     && getOrderPlayer(currentPlayer.getName()) + 1 == lobby.getPlayers().length) {
                 // if it is the last player in last turn cycle, go to end mode
                 gameState = GameState.END;
-                // TODO chiamata a fine del gioco
+                endGame(); //game transitions into the the calculating phase
             }
         } else {
             gameState = GameState.DRAWING_PHASE;
@@ -292,7 +292,6 @@ public class GameMaster {
             } else {
                 cardDrawn = onTableGoldCards[CardPosition];
                 if (cardDrawn == null) {
-                    // TODO excpetion
                     throw new IllegalArgumentException("There is no card in that spot on table");
                 }
                 currentPlayer.takeCard(cardDrawn);
@@ -309,7 +308,6 @@ public class GameMaster {
             } else {
                 cardDrawn = onTableResourceCards[CardPosition];
                 if (cardDrawn == null) {
-                    // TODO excpetion
                     throw new IllegalArgumentException("There is no card in that spot on table");
                 }
                 currentPlayer.takeCard(cardDrawn);
@@ -332,7 +330,7 @@ public class GameMaster {
                 && getOrderPlayer(currentPlayer.getName()) + 1 == lobby.getPlayers().length) {
             // if it is the last player in last turn cycle, go to end mode
             gameState = GameState.END;
-            // TODO fine gioco
+            endGame();//game transitions into the the calculating phase
         } else if (currentPlayer.getPoints() >= 20 || areTheCardFinished()) {
             // if a player reached 20 points set this turn cycle as the second-last
             // TODO fine mazzi e fine partita
@@ -352,46 +350,45 @@ public class GameMaster {
     }
 
     /**
-     * It runes the final part of the game calculating points of objective players
-     * and calculate the ranking list
-     *
-     * @param namePlayer Player who sent the request
-     * @return
+     *Represents the last part of the game, in which the points gained
+     * from fulfilling the objectives are calculated.
      */
-    // TODO OBJECTIVE CARD POINTS calcolaObiettiviAllaFine
-    public void endGame(String namePlayer) throws WrongGamePhaseException {
-        // Player will click a button to calculate their points. No we can do in
-        // drawCard.
-        // TODO OBJECTIVE CARD POINTS rifare senza il calcolo degli stati
-
-        ArrayList<Integer> numberOfObjectiveForPlayer = new ArrayList<>();// With a linkedhashmap I can't put before or
-                                                                          // after an element
+    public void endGame() throws WrongGamePhaseException {
         if (gameState != GameState.END) {// It just has an anti-cheat purpose
             throw new WrongGamePhaseException();
         } else {
             for (Player player : lobby.getPlayers()) {
-                int numberOfObjective = 0;
-                // TODO OBJECTIVE CARD POINTS quelli in altro modo
-                // numberOfObjective+=;
-                boolean toInsert = true;
-                int i;
-                for (i = 0; i < ranking.size() && toInsert; i++) {
-                    if (ranking.get(i).getPoints() < player.getPoints()
-                            || (ranking.get(i).getPoints() == player.getPoints()
-                                    && numberOfObjectiveForPlayer.get(i) > numberOfObjective)) {
-                        ranking.add(i, player);// aggiungi prima
-                        numberOfObjectiveForPlayer.add(i, numberOfObjective);
-                        toInsert = false;
+                //int numberOfObjective = 0;
+                ObjectiveCard secret = player.getSecretObjective();
+                int newPoints = calculateEndGamePoints(secret.getType(),secret.getMultiplier(),player,secret.getKingdom()); //secret objective is calculated first
+                player.addObjectivePoints(newPoints);
+                for(ObjectiveCard card : onTableObjectiveCards){
+                    newPoints = calculateEndGamePoints(card.getType(),card.getMultiplier(),player,card.getKingdom());
+                    player.addObjectivePoints(newPoints);
+                }
+                ranking.add(player);
+            }
+            Collections.sort(ranking, new Comparator<Player>() {
+                @Override
+                public int compare(Player p1, Player p2) {
+                    int sum1 = p1.getPoints() + p1.getObjectivePoints();
+                    int sum2 = p2.getPoints() + p2.getObjectivePoints();
+                    if(sum1 == sum2) {
+
+                        return Integer.compare(p1.getObjectivePoints(),p2.getObjectivePoints());
+                    } else if(sum1 > sum2){
+                        return 1;
+                    } else {
+                        return -1;
                     }
                 }
-                if (toInsert) {
-                    ranking.add(ranking.size(), player);// aggiungi prima
-                    numberOfObjectiveForPlayer.add(numberOfObjectiveForPlayer.size(), numberOfObjective);
-                }
-                // TODO OBJECTIVE CARD POINTS finire, qua fare con l'overload dell'interfaccia e
-                // poi in questo metodo
-                // si chiameranno i metodi di ricerca di this
-            }
+            });
+            /*quello che ho appena fatto è stato creare un'anonymous function per ordinare la lista
+            * in un colpo solo usando sort(), in alternativa avrei dovuto creare una classe apposita per fare
+            * l'overriding di compare, per usarlo solo qui (abbastanza inutile)*/
+
+
+            //funzione ordina ranking e non restituisce nulla, ci penserà il controller a chiedere il ranking e decretare il vincitore
         }
     }
 

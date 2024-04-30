@@ -13,6 +13,7 @@ import java.lang.Math;
 public class Player {
     private final String name;
     private int points;
+    private int objectivePoints;
     private final Color color;
     private PlayedCard rootCard;
     private final HashMap<Sign, Integer> resources;
@@ -28,6 +29,7 @@ public class Player {
         this.name = name;
         this.color = color;
         this.points = 0;
+        this.objectivePoints = 0;
         resources = new HashMap<>();
         for(Sign sign : Sign.values()){
             this.resources.put(sign, 0);
@@ -172,13 +174,17 @@ public class Player {
     }
 
     /**
-     * Not in UML; slack professor's comment: Grazie per la segnalazione! Ho cambiato la mia risposta 1 di conseguenza: ci si ferma a 29 punti prima di sommare le carte obiettivo.
+     * slack professor's comment: Grazie per la segnalazione! Ho cambiato la mia risposta 1 di conseguenza: ci si ferma a 29 punti prima di sommare le carte obiettivo.
      * A questo punto si procede con la somma degli obiettivi a fine partita e si segue la regola alla risposta 3 in caso di parità
      *
      * Sums the extra points given by the objectiveCard
      * @param new_points  special points given at the end of the game by ObjectiveCard
      */
     public void addObjectivePoints(int new_points){
-            points += new_points;
+            objectivePoints += new_points;
+    }
+
+    public int getObjectivePoints() {
+        return objectivePoints;
     }
 }
