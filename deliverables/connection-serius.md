@@ -17,18 +17,36 @@ sequenceDiagram
     participant Server
     participant Controller
 
-    Client ->> Server: Ping(connection)
+   loop until name is correct 
+      rect rgba(0, 255, 0, 0.2)
+         Client ->> Server: Login (username)
+         Server ->> Controller: Login (username)
+         Controller ->> Model: AddPlayer(username)
+
+         alt username already taken
+            rect rgba(255, 0, 0, 0.6)
+               Model ->> Controller: Error(username already taken)
+               Controller ->> Server: Error(username already taken)
+               Server ->> Client: Error(username already taken)
+            end
+         end
+      end
+   end
     alt if lobby is unlocked
         alt if is the first
             rect rgba(0, 255, 0, 0.2)
+            Model ->> Controller: First()
+            Controller ->> Server: First()
             Server ->> Client: First ()
             Client ->> Server: Players (number of players)
             Server ->> Controller: CreateLobby()
             Controller  ->> Model: Lobby(number of players)
             end
         else if is not the first
-            rect rgba(255, 165, 0, 1)
+            rect rgba(255, 165, 0, 0.7)
             alt if the lobby is not created yet
+                Model ->> Controller: Wait()
+                Controller ->> Server: Wait()
                 Server ->> Client:  Wait(lobby not created yet) 
             end  
             end
@@ -40,35 +58,27 @@ sequenceDiagram
         Server ->> Client: Ok, answer
         end
         alt if admitted
-            loop until login successful
-                rect rgba(0, 255, 0, 0.2)
-                Client ->> Server: Login (username)
-                Server ->> Controller: Login (username)
-                    alt username already taken
-                        rect rgba(255, 0, 0, 0.6)
-                        Controller ->> Server: Error(username already taken)
-                        Server ->> Client: Error(username already taken)
-                        end
-                    end
-            end
               loop until colour is accepted
               rect rgba(0, 255, 0, 0.2)
-                  Controller ->> Server: Ok (available colour pins)
-                  Server ->> Client: Ok (available colour pins)
+                  Model ->> Controller: ChooseColour (available colour pins)
+                  Controller ->> Server: RefreshUsers (available colour pins)
+                  Server ->> Client: RefreshUsers (available colour pins)
                   Client ->> Server: Colour (chosen colour)
                   Server ->> Controller: Colour (chosen colour)
-                  Controller ->> Model: addPlayer(nickname, colour)
+                  Controller ->> Model: SetColour(nickname, colour)
                   alt colour already taken
                     rect rgba(255, 0, 0, 0.6)
+                    Model ->> Controller: Error (colour already taken)  
                     Controller ->> Server: Error (colour already taken)
                     Server ->> Client: Error (colour already taken) 
                     end
                   end
                   end
             end
-            end
         else if not admitted
             rect rgba(255, 0, 0, 0.6)
+            Model ->> Controller: Error (lobby is full)
+            Controller ->> Server: Error (lobby is full)
             Server ->> Client: Error (lobby is full)
             end
         end
@@ -76,12 +86,17 @@ sequenceDiagram
         Model ->> Controller: Ok(number of players, name)
         Controller ->> Server: Ok(number of players, name)
         Server ->> Client: Ok (number of players in the lobby, name)
-        Server ->> Client: Game starts()
+        
+        Model ->> Controller: GameStart()
+        Controller ->> Server: GameStart()
+        Server ->> Client: GameStart()
+        
         end
         
-    else if lobby is locked
+    else else if lobby is locked
         rect rgba(255, 0, 0, 0.6)
-        Server ->> Client: Error (lobby is locked)
+        Controller ->> Server: Error (lobby is locked, a game already started
+        Server ->> Client: Error (lobby is locked, a game already started)
         end
     end
 
@@ -262,8 +277,8 @@ sequenceDiagram
     participant Server
     
     Client ->> Server: Connect(name)
-    note right of Client: Timeout for choosing number of player, name or colour
-    note right of Client: To all others clients connected
+    note over Server, Client: Timeout for choosing number of player, name or colour
+    note right of Client: To all others clients connected we send a message that the player has disconnected
     Server ->> Client: Error (connection lost)
         
 ```
