@@ -3,10 +3,7 @@ package it.polimi.ingsw.controller;
 
 import it.polimi.ingsw.model.*;
 import it.polimi.ingsw.model.Color;
-import it.polimi.ingsw.model.exception.NoTurnException;
-import it.polimi.ingsw.model.exception.NotEnoughResourcesException;
-import it.polimi.ingsw.model.exception.NotExistsPlayerException;
-import it.polimi.ingsw.model.exception.WrongGamePhaseException;
+import it.polimi.ingsw.model.exception.*;
 
 import java.awt.*;
 import java.util.HashMap;
@@ -20,23 +17,17 @@ public class Controller {
     private Controller() {
     }
 
-    public void initializeLobby(int nPlayers){
+    public void initializeLobby(int nPlayers) {
         lobby = new Lobby(nPlayers);
     }
 
-    public void addPlayer(String nickname, Color color) {
-        lobby.addPlayer(nickname, color);
+    public void addPlayer(String nickname) throws SameNameException, LobbyCompleteException {
+        lobby.addPlayer(nickname);
     }
-
 
 //    public void chooseFirstPlayer(int i) {
 //        lobby.chooseFirstPlayer(i);
 //    }
-
-    public void start() {
-        lobby.setLock();
-        game = new GameMaster(lobby, "f1", "f2", "f3", "f4");
-    }
 
     public void placeRootCard(String player, boolean side) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException {
         game.placeRootCard(player, side);
@@ -78,6 +69,14 @@ public class Controller {
 //    public ... getTable() {
 //        return //TODO
 //    }
+
+    public int getNumberOfPlayers(){
+        return lobby.getSize();
+    }
+
+    public boolean lobbyLocked(){
+        return lobby.getLock();
+    }
 
     public static Controller getInstance(){
         return INSTANCE;

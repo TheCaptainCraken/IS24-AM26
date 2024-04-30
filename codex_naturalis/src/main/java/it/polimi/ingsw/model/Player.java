@@ -13,7 +13,7 @@ import java.lang.Math;
 public class Player {
     private final String name;
     private int points;
-    private final Color color;
+    private Color color;
     private PlayedCard rootCard;
     private final HashMap<Sign, Integer> resources;
     private ObjectiveCard secretObjective;
@@ -22,11 +22,9 @@ public class Player {
     /**
      * It is the constructor of Player, it set the  name and the color of the pin
      * @param name
-     * @param color
      */
-    public Player(String name, Color color) {
+    public Player(String name) {
         this.name = name;
-        this.color = color;
         this.points = 0;
         resources = new HashMap<>();
         for(Sign sign : Sign.values()){

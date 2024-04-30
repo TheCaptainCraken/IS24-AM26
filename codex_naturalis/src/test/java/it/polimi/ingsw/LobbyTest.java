@@ -24,21 +24,21 @@ public class LobbyTest {
     public void CheckCorrectFunctionLobbyComplete(){
         assertThrows(LobbyCompleteException.class, () -> {
             Lobby lobby = new Lobby(4);
-            lobby.addPlayer("pietro", Color.BLUE);
-            lobby.addPlayer("marco", Color.RED);
-            lobby.addPlayer("daniel", Color.GREEN);
-            lobby.addPlayer("arturo", Color.YELLOW);
-            lobby.addPlayer("arturo", Color.YELLOW);
+            lobby.addPlayer("pietro");
+            lobby.addPlayer("marco");
+            lobby.addPlayer("daniel");
+            lobby.addPlayer("arturo");
+            lobby.addPlayer("arturo");
         });
     }
 
     @BeforeAll
     public static void Setup() throws FullLobbyException, SameNameException, LobbyCompleteException {
         lobby = new Lobby(4);
-        lobby.addPlayer("pietro", Color.BLUE);
-        lobby.addPlayer("marco", Color.RED);
-        lobby.addPlayer("daniel", Color.GREEN);
-        lobby.addPlayer("arturo", Color.YELLOW);
+        lobby.addPlayer("pietro");
+        lobby.addPlayer("marco");
+        lobby.addPlayer("daniel");
+        lobby.addPlayer("arturo");
     }
     @Test
     @DisplayName("Search player")

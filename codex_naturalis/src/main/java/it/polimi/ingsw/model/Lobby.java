@@ -12,7 +12,7 @@ public class Lobby {
     private int maxSize;
     boolean complete;
 
-    /**It's an holder for the players that permits to check and limit access
+    /**It's a holder for the players that permits to check and limit access
      */
     public Lobby(int maxSize){
         this.players = new ArrayList<>();
@@ -22,9 +22,8 @@ public class Lobby {
 
     /**If possible it adds a new player to the lobby with a unique nickname
      * @param nickname nickname of the new Player
-     * @param color color of the pin that the player has chosen
      */
-    public void addPlayer(String nickname, Color color) throws LobbyCompleteException, SameNameException {
+    public void addPlayer(String nickname) throws LobbyCompleteException, SameNameException {
         if(complete){
             throw new LobbyCompleteException();
         }
@@ -33,20 +32,26 @@ public class Lobby {
                 throw new SameNameException();
             }
         }
-        Player newPlayer = new Player(nickname, color);
+        Player newPlayer = new Player(nickname);
+
         players.add(newPlayer);
         if(players.size()==maxSize){
             setLock();
         }
 
-        //TODO bisognerebbe settare casualmente il giocatore iniziale. Non deve essere sempre il primo aggiunto, basta anche uno shuffle.
+        //TODO bisognerebbe settare casualmente il giocatore iniziale.
+        // Non deve essere sempre il primo aggiunto, basta anche uno shuffle.
     }
 
     /**Get a fixed array of players
      * @return an array of players
      */
     public Player[] getPlayers() {
-        return players.toArray( new Player[players.size()]);
+        return players.toArray(new Player[players.size()]);
+    }
+
+    public int getSize(){
+        return players.size();
     }
 
     /**Given a  nickname it returns the player with that unique nickname
@@ -75,6 +80,10 @@ public class Lobby {
     /** It locks the lobby so nobody can join anymore, the lobby cannot be unlocked
      */
     public void setLock(){
-        complete=true;
+        complete = true;
+    }
+
+    public boolean getLock() {
+        return complete;
     }
 }
