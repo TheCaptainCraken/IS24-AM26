@@ -3,7 +3,9 @@ package it.polimi.ingsw.network.client;
 import it.polimi.ingsw.controller.Controller;//TODO lato client
 import it.polimi.ingsw.model.Color;
 import it.polimi.ingsw.model.exception.LobbyCompleteException;
+import it.polimi.ingsw.model.exception.NotExistsPlayerException;
 import it.polimi.ingsw.model.exception.SameNameException;
+import it.polimi.ingsw.network.exception.NoConnectionException;
 import it.polimi.ingsw.network.server.LoggableServer;
 
 import java.rmi.NotBoundException;
@@ -28,7 +30,9 @@ public class ClientRMI{
         System.out.println("Hello, World!");
     }
 
-    public void login(String nickname) throws RemoteException, SameNameException, LobbyCompleteException {
+    public void login(String nickname) throws
+            RemoteException, SameNameException, LobbyCompleteException, NoConnectionException {
+
         try {
             registry = LocateRegistry.getRegistry("127.0.0.1", PORT);
             stub = (LoggableServer) registry.lookup("Loggable");
@@ -60,8 +64,10 @@ public class ClientRMI{
         controller.error(issue);
     }
 
-    public void insertNumberOfPlayers(int numberOfPlayers) throws RemoteException {
+    public void insertNumberOfPlayers(int numberOfPlayers) throws RemoteException, NotExistsPlayerException, NoSuchFieldException {
         stub.insertNumberOfPlayers(numberOfPlayers);
+        //TODO try/catch
+
         lobbyIsReady = true;
     }
 
@@ -87,5 +93,9 @@ public class ClientRMI{
     public void chooseSideStartingCard(boolean side){
         stub.chooseSideStartingCard();
         controller.setSideStartingCard(side);
+    }
+
+    public void getStartingCard(int rootCard) {
+        //TODO
     }
 }

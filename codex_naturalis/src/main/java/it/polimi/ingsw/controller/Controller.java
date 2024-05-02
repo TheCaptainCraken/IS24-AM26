@@ -14,22 +14,13 @@ public class Controller {
     Lobby lobby;
     GameMaster game = null;
 
-    private Controller() {
-        lobby = new Lobby();
-        //TODO
-    }
-
-    public void initializeLobby(int nPlayers) {
-        lobby = new Lobby(nPlayers);
+    public void initializeLobby(int numPlayers) {
+        lobby = new Lobby(numPlayers);
     }
 
     public void addPlayer(String nickname) throws SameNameException, LobbyCompleteException {
         lobby.addPlayer(nickname);
     }
-
-//    public void chooseFirstPlayer(int i) {
-//        lobby.chooseFirstPlayer(i);
-//    }
 
     public void placeRootCard(String player, boolean side) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException {
         game.placeRootCard(player, side);
@@ -60,7 +51,8 @@ public class Controller {
         return game.getCurrentPlayer().getName();
     }
 
-    public int getStartingCard(Player player) {//TODO from string
+    public int getRootCard(String name) throws NoSuchFieldException {
+        Player player = lobby.getPlayerFromName(name);
         return player.getRootCard().getCard().getId();
     }
 
@@ -71,10 +63,6 @@ public class Controller {
     public Player getPlayer(String name) throws NoSuchFieldException {
         return lobby.getPlayerFromName(name);
     }
-
-//    public ... getTable() {
-//        return //TODO
-//    }
 
     public int getNumberOfPlayers(){
         return lobby.getSize();
@@ -88,11 +76,22 @@ public class Controller {
         return INSTANCE;
     }
 
-    public boolean setColour(String name, Color colour) throws NoSuchFieldException {
-        //TODO color exception
+    public boolean setColour(String name, Color colour) throws NoSuchFieldException, ColorAlreadyTakenException {
+        //TODO controll input
+        for(Player player : lobby.getPlayers()){
+            if(player.getColor() == colour){
+                throw new ColorAlreadyTakenException();
+            }
+        }
+
         lobby.getPlayerFromName(name).setColour(colour);
-        //TODO check if all player have choose a color -> start() return true else return false
-        return false;
+        //Check if all players have chosen a color
+        for (Player player : lobby.getPlayers()) {
+            if (player.getColor() == null) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public Object getPlayersInLobby() {
@@ -106,13 +105,25 @@ public class Controller {
     }
 
     public HashMap<String, Color> getPlayersAndPins() {
-        //TODO
-        return null;
+        HashMap<String, Color> PlayerAndPin= new HashMap<>();
+        for(Player player : lobby.getPlayers()) {
+            PlayerAndPin.put(player.getName(), player.getColor());
+        }
+        return PlayerAndPin;
     }
 
-    public boolean getIsFirst() {
-        //throw la lobby è già chiusa o è piena
-        //TODO
+    public boolean getIsFirst(String nickname) {
+        return lobby.getPlayers()[0].getName().equals(nickname);
+    }
+
+    public boolean endStartingPhase() {
+        int i;
+        for (i = 0; i < lobby.getSize(); i++) {
+            if (lobby.getPlayers()[i].getRootCard() == null) {
+                return false;
+            }
+        }
+        return true;
     }
 }
 

@@ -27,34 +27,34 @@ public class PlayerTest {
     }
     @Test
     public void playerConstructor() {
-        Player p1 = new Player("Pietro", Color.BLUE);
+        Player p1 = new Player("Pietro");
         assert p1.getName().equals("Pietro");
         assert p1.getColor() == Color.BLUE;
     }
     @Test
     @DisplayName("test of points")
     public void UpdatePointsCorrectly(){
-        Player p1 = new Player("Pietro", Color.BLUE);
+        Player p1 = new Player("Pietro");
         p1.addPoints(29);
         assert p1.getPoints() == 29;
 
-        Player p2 = new Player("Pietro", Color.BLUE);
+        Player p2 = new Player("Pietro");
         p2.addPoints(15);
         assert p2.getPoints() == 15;
         p2.addPoints(15);
         assert p2.getPoints() == 29;
 
-        Player p3 = new Player("Pietro", Color.BLUE);
+        Player p3 = new Player("Pietro");
         p3.addPoints(28);
         p3.addPoints(1);
         assert p3.getPoints() == 29;
 
-        Player p4 = new Player("Pietro", Color.BLUE);
+        Player p4 = new Player("Pietro");
         p4.addPoints(29);
         p4.addPoints(1);
         assert p4.getPoints() == 29;
 
-        Player p5 = new Player("Pietro", Color.BLUE);
+        Player p5 = new Player("Pietro");
         p5.addPoints(0);
         p5.addPoints(0);
         assert p5.getPoints() == 0;
@@ -65,7 +65,7 @@ public class PlayerTest {
     @Test
     @DisplayName("resources update")
     public void checkRegularUpdateOfResources(){
-        Player p1 = new Player("Pietro", Color.BLUE);
+        Player p1 = new Player("Pietro");
         p1.addResource(Sign.BUTTERFLY, 5);
         assert p1.getResources().get(Sign.BUTTERFLY) == 5;
         p1.removeResources(Sign.BUTTERFLY, 5);
@@ -78,7 +78,7 @@ public class PlayerTest {
     @Test
     @DisplayName("test of player's hand")
     public void checkTakeCard(){
-        Player p1 = new Player("Pietro", Color.BLUE);
+        Player p1 = new Player("Pietro");
         p1.takeCard(card1);
         p1.takeCard(card2);
         p1.takeCard(card3);
@@ -90,7 +90,7 @@ public class PlayerTest {
     @Test
     @DisplayName("remove cards")
     public void RemoveCardCorrectly(){
-        Player p1 = new Player("Pietro", Color.BLUE);
+        Player p1 = new Player("Pietro");
         p1.takeCard(card1);
         p1.takeCard(card2);
         p1.takeCard(card3);
