@@ -3,6 +3,7 @@ package it.polimi.ingsw.network.server;
 import it.polimi.ingsw.controller.Controller;
 import it.polimi.ingsw.model.Color;
 import it.polimi.ingsw.model.exception.*;
+import it.polimi.ingsw.network.client.ClientRMI;
 import it.polimi.ingsw.network.client.LoggableClient;
 
 import java.rmi.AlreadyBoundException;
@@ -17,7 +18,7 @@ public class ServerRMI implements LoggableServer {
     static int PORT = 1234;
     Controller controller = Controller.getInstance();
     int numberOfPlayers = 0;//TODO I can do a method to get it
-    HashMap<String, LoggableClient> connections = new HashMap<>();//TODO understand RMI
+    HashMap<String, ClientRMI> connections = new HashMap<>();//TODO understand RMI
 
     public static void main(String[] args) throws RemoteException {
         System.out.println("Hello, World!");
@@ -56,11 +57,9 @@ public class ServerRMI implements LoggableServer {
     int portAvailable = 41999;
 
     @Override
-    public boolean ping(String nickname, String ip) throws RemoteException, SameNameException, LobbyCompleteException, NotBoundException {
+    public boolean isFirst(ClientRMI clientRMI, String nickname) throws RemoteException, SameNameException, LobbyCompleteException, NotBoundException {
         controller.addPlayer(nickname);
-        Registry registryForSingleClient = LocateRegistry.getRegistry(ip, 0);
-        LoggableClient stub = (LoggableClient) registryForSingleClient.lookup("Loggable");
-        connections.put(nickname, stub);
+        connections.put(nickname, clientRMI);
         refreshUsers();
         return controller.getIsFirst();
     }
@@ -72,7 +71,7 @@ public class ServerRMI implements LoggableServer {
         HashMap<String, Color> playersInLobby = null;
         for(String nickname : connections.keySet()){
             if(controller.getPlayer(nickname) == null){
-                connections.get(nickname).disconnect(nickname, "Lobby has been fulled with number of parameters chosen by the first player");
+                connections.get(nickname).disconnect("Lobby has been fulled with number of parameters chosen by the first player");
                 connections.remove(nickname);
             }else{
                 connections.get(nickname).stopWaiting(nickname);
@@ -87,16 +86,31 @@ public class ServerRMI implements LoggableServer {
 //            controller.getUsers().get(nickname).setColor(null);
 //        }
         if(controller.setColour(nickname, color)){
-            for(LoggableClient connection : connections.values()){
-                connection.startGame();
+            for(String nicknameRefresh : connections.keySet()){
+                connections.get(nicknameRefresh).sendInfoOnTable();//TODO
+                connections.get(nicknameRefresh).getStartingCard(controller.getStartingCard(nicknameRefresh));
             }
         }
         refreshUsers();
     }
 
     public void refreshUsers(){
-        for (LoggableClient connection : connections.values()){
-            connection.refreshUsers(controller.getPlayersAndPins());//Color could be null
+        HashMap<String, Color> playersAndPins = controller.getPlayersAndPins()
+        for (ClientRMI connection : connections.values()){
+            connection.refreshUsers(playersAndPins);//Color could be null
+        }
+    }
+
+    //GAME START
+
+    public void chooseSideStartingCard(String nickname, boolean side) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException {
+        controller.placeRootCard(nickname, side);
+        if(controller.allPlayerHaveChoosenSideStartingCard()){
+            for(String nicknameRefresh : connections.keySet()){
+                connections.get(nicknameRefresh).sendInfoOnTable();//TODO
+                connections.get(nicknameRefresh).getStartingCard(controller.getStartingCard(nicknameRefresh));
+            }
+
         }
     }
 }

@@ -7,7 +7,7 @@ import java.rmi.RemoteException;
 import java.util.HashMap;
 
 public interface LoggableClient extends Remote {
-    void disconnect(String issue) throws RemoteException;
+    void login(String issue) throws RemoteException;
     void stopWaiting(String nickname) throws RemoteException;
     void refreshUsers(HashMap<String, Color> users) throws RemoteException;
     void startGame() throws RemoteException;

@@ -60,7 +60,7 @@ public class Controller {
         return game.getCurrentPlayer().getName();
     }
 
-    public int getStartingCard(Player player) {
+    public int getStartingCard(Player player) {//TODO from string
         return player.getRootCard().getCard().getId();
     }
 
