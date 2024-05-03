@@ -5,6 +5,7 @@ import it.polimi.ingsw.model.Color;
 import it.polimi.ingsw.model.Kingdom;
 import it.polimi.ingsw.model.exception.*;
 import it.polimi.ingsw.network.client.ClientRMI;
+import it.polimi.ingsw.network.client.LoggableClient;
 
 import java.awt.*;
 import java.rmi.AlreadyBoundException;
@@ -16,10 +17,10 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
 
 public class ServerRMI implements LoggableServer {
-    static int PORT = 1234;
+    static int PORT = 1234; //TODO porta dinamica
     Controller controller = Controller.getInstance();
     int numberOfPlayers = 0;//TODO I can do a method to get it
-    HashMap<String, ClientRMI> connections = new HashMap<>();//TODO understand RMI
+    HashMap<String, ClientRMI> connections = new HashMap<>();
 
     public static void main(String[] args) throws RemoteException {
         System.out.println("Hello, World!");
@@ -62,7 +63,7 @@ public class ServerRMI implements LoggableServer {
         controller.addPlayer(nickname);
         connections.put(nickname, clientRMI);
         refreshUsers();
-        return controller.getIsFirst();
+        return controller.getIsFirst(nickname);
     }
 
     @Override
@@ -82,14 +83,15 @@ public class ServerRMI implements LoggableServer {
     }
 
     @Override
-    public void chooseColor(String nickname, Color color) throws RemoteException, NoSuchFieldException, PinNotAvailableException {
+    public void chooseColor(String nickname, Color color) throws RemoteException, NoSuchFieldException,
+             ColorAlreadyTakenException {
 //        if(controller.getUsers().get(nickname).getColor() == color){
 //            controller.getUsers().get(nickname).setColor(null);
 //        }
         if(controller.setColour(nickname, color)){
             for(String nicknameRefresh : connections.keySet()){
                 connections.get(nicknameRefresh).sendInfoOnTable();//TODO
-                connections.get(nicknameRefresh).showStartingCard(controller.getStartingCard(nicknameRefresh));
+                connections.get(nicknameRefresh).getStartingCard(controller.getRootCard(nicknameRefresh));
             }
         }
         refreshUsers();

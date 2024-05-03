@@ -7,6 +7,10 @@ import it.polimi.ingsw.model.Kingdom;
 import it.polimi.ingsw.model.Sign;
 import it.polimi.ingsw.model.exception.*;
 import it.polimi.ingsw.network.exception.NoConnectionException;
+import it.polimi.ingsw.model.exception.LobbyCompleteException;
+import it.polimi.ingsw.model.exception.NotExistsPlayerException;
+import it.polimi.ingsw.model.exception.SameNameException;
+import it.polimi.ingsw.network.exception.NoConnectionException;
 import it.polimi.ingsw.network.server.LoggableServer;
 
 import java.awt.*;
@@ -64,8 +68,10 @@ public class ClientRMI{
         controller.error(issue);
     }
 
-    public void insertNumberOfPlayers(int numberOfPlayers) throws RemoteException, NoSuchFieldException {
+    public void insertNumberOfPlayers(int numberOfPlayers) throws RemoteException, NotExistsPlayerException, NoSuchFieldException {
         stub.insertNumberOfPlayers(numberOfPlayers);
+        //TODO try/catch
+
         lobbyIsReady = true;
     }
 

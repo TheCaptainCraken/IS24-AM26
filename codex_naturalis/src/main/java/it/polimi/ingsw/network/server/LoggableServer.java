@@ -3,6 +3,9 @@ package it.polimi.ingsw.network.server;
 import it.polimi.ingsw.model.Color;
 import it.polimi.ingsw.model.exception.*;
 import it.polimi.ingsw.network.client.ClientRMI;
+import it.polimi.ingsw.model.exception.LobbyCompleteException;
+import it.polimi.ingsw.model.exception.PinNotAvailableException;
+import it.polimi.ingsw.model.exception.SameNameException;
 
 import java.awt.*;
 import java.rmi.Remote;
