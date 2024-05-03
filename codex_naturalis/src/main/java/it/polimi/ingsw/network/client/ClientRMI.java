@@ -146,11 +146,7 @@ public class ClientRMI{
     }
 
     public void drawCard(String nickname, boolean gold, int onTableOrDeck) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException {
-        stub.drawCard(nickname, gold, onTableOrDeck);
-    }
-
-    //Different methods so client doesn't receive id of an hidden card
-    public void drawnCard(String nickname, int cardId){
+        int cardId = stub.drawCard(nickname, gold, onTableOrDeck);
         controller.drawCard(nickname, cardId);//it should understand where to place it
     }
 

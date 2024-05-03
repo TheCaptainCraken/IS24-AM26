@@ -151,14 +151,12 @@ public class ServerRMI implements LoggableServer {
     }
 
     @Override
-    public void drawCard(String nickname, boolean gold, int onTableOrDeck) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException {
+    public int drawCard(String nickname, boolean gold, int onTableOrDeck) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException {
         int cardId = controller.drawCard(nickname, gold, onTableOrDeck);
         int newCardId = controller.newCardOnTable(gold, onTableOrDeck);
         Kingdom headDeck = controller.getHeadDeck(gold);
         for(String nicknameRefresh : connections.keySet()){
-            if(nickname.equals(nicknameRefresh)){
-                connections.get(nickname).drawnCard(nickname, cardId);//TODO maybe also gold, it depende on enumeration
-            }else{
+            if(!nickname.equals(nicknameRefresh)){
                 connections.get(nicknameRefresh).showHiddenHand(nicknameRefresh, controller.getHiddenHand(nickname));//bad but easier
             }
             connections.get(nicknameRefresh).moveCard(newCardId, headDeck, gold, onTableOrDeck);
@@ -169,5 +167,6 @@ public class ServerRMI implements LoggableServer {
                 connections.get(nicknameRefresh).showEndGame(controller.getExtraPoints(), controller.getRanking());
             }
         }
+        return cardId;
     }
 }
