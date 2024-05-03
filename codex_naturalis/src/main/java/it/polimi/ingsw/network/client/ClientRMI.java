@@ -83,7 +83,7 @@ public class ClientRMI{
         controller.refreshUsers(playersAndPins);
     }
 
-    public void pickColor(Color color) throws PinNotAvailableException, RemoteException, NoSuchFieldException {
+    public void pickColor(Color color) throws PinNotAvailableException, RemoteException, NoSuchFieldException, ColorAlreadyTakenException {
         //TODO call controller ok client
         stub.chooseColor(controller.getNickname(), color);
     }

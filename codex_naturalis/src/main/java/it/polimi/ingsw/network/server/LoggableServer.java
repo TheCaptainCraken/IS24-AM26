@@ -17,7 +17,7 @@ public interface LoggableServer extends Remote {
 
     void insertNumberOfPlayers(int numberOfPlayers) throws RemoteException, NoSuchFieldException;
 
-    void chooseColor(String nickname, Color color) throws RemoteException, NoSuchFieldException, PinNotAvailableException;
+    void chooseColor(String nickname, Color color) throws RemoteException, NoSuchFieldException, PinNotAvailableException, ColorAlreadyTakenException;
 
     void chooseSideStartingCard(String nickname, boolean side) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException ;
 

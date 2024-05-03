@@ -63,7 +63,7 @@ public class ServerRMI implements LoggableServer {
         controller.addPlayer(nickname);
         connections.put(nickname, clientRMI);
         refreshUsers();
-        return controller.getIsFirst(nickname);
+        return controller.getIsFirst();
     }
 
     @Override
@@ -91,7 +91,7 @@ public class ServerRMI implements LoggableServer {
         if(controller.setColour(nickname, color)){
             for(String nicknameRefresh : connections.keySet()){
                 connections.get(nicknameRefresh).sendInfoOnTable();//TODO
-                connections.get(nicknameRefresh).getStartingCard(controller.getRootCard(nicknameRefresh));
+                connections.get(nicknameRefresh).showStartingCard(controller.getStartingCard(nicknameRefresh));
             }
         }
         refreshUsers();

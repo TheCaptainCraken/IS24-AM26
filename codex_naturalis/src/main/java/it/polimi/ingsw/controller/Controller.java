@@ -14,8 +14,9 @@ public class Controller {
     Lobby lobby;
     GameMaster game = null;
 
-    public void initializeLobby(int numPlayers) {
-        lobby = new Lobby(numPlayers);
+    public void initializeLobby(int numPlayers) throws ClosingLobbyException {
+        lobby = new Lobby();
+        lobby.setMaxSize(numPlayers);
     }
 
     public void addPlayer(String nickname) throws SameNameException, LobbyCompleteException {
@@ -30,9 +31,9 @@ public class Controller {
         game.chooseObjectiveCard(player, whichCard);
     }
 
-    public void placeCard(String player, ResourceCard cardToPlace, Point position, boolean side) throws WrongGamePhaseException,
+    public void placeCard(String player, int cardId, Point position, boolean side) throws WrongGamePhaseException,
             NoTurnException, NoSuchFieldException, NotEnoughResourcesException {
-        game.placeCard(player, cardToPlace, position, side);
+        game.placeCard(player, cardId, position, side);
     }
 
     public int drawCard(String player, boolean gold, int position) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException {
