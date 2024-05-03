@@ -1,11 +1,12 @@
 package it.polimi.ingsw.network.server;
 
-import it.polimi.ingsw.controller.Controller;
+import it.polimi.ingsw.controller.server.Controller;
 import it.polimi.ingsw.model.Color;
+import it.polimi.ingsw.model.Kingdom;
 import it.polimi.ingsw.model.exception.*;
 import it.polimi.ingsw.network.client.ClientRMI;
-import it.polimi.ingsw.network.client.LoggableClient;
 
+import java.awt.*;
 import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -57,7 +58,7 @@ public class ServerRMI implements LoggableServer {
     int portAvailable = 41999;
 
     @Override
-    public boolean isFirst(ClientRMI clientRMI, String nickname) throws RemoteException, SameNameException, LobbyCompleteException, NotBoundException {
+    public boolean isFirst(ClientRMI clientRMI, String nickname) throws RemoteException, SameNameException, LobbyCompleteException {
         controller.addPlayer(nickname);
         connections.put(nickname, clientRMI);
         refreshUsers();
@@ -88,14 +89,14 @@ public class ServerRMI implements LoggableServer {
         if(controller.setColour(nickname, color)){
             for(String nicknameRefresh : connections.keySet()){
                 connections.get(nicknameRefresh).sendInfoOnTable();//TODO
-                connections.get(nicknameRefresh).getStartingCard(controller.getStartingCard(nicknameRefresh));
+                connections.get(nicknameRefresh).showStartingCard(controller.getStartingCard(nicknameRefresh));
             }
         }
         refreshUsers();
     }
 
     public void refreshUsers(){
-        HashMap<String, Color> playersAndPins = controller.getPlayersAndPins()
+        HashMap<String, Color> playersAndPins = controller.getPlayersAndPins();
         for (ClientRMI connection : connections.values()){
             connection.refreshUsers(playersAndPins);//Color could be null
         }
@@ -103,14 +104,68 @@ public class ServerRMI implements LoggableServer {
 
     //GAME START
 
-    public void chooseSideStartingCard(String nickname, boolean side) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException {
-        controller.placeRootCard(nickname, side);
-        if(controller.allPlayerHaveChoosenSideStartingCard()){
-            for(String nicknameRefresh : connections.keySet()){
-                connections.get(nicknameRefresh).sendInfoOnTable();//TODO
-                connections.get(nicknameRefresh).getStartingCard(controller.getStartingCard(nicknameRefresh));
-            }
 
+    //We could optimize and use a unique function without any
+    @Override
+    public void chooseSideStartingCard(String nickname, boolean side) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException {
+        int cardId = controller.placeRootCard(nickname, side);
+        boolean allWithRootCardPlaced = controller.areAllRootCardPlaced();
+        for(String nicknameRefresh : connections.keySet()){
+            connections.get(nicknameRefresh).placeCard(nickname, cardId, new Point(0,0), side, controller.getPlayerResources(nickname), controller.getPlayerPoints(nickname));
+            if(allWithRootCardPlaced){
+                connections.get(nicknameRefresh).showObjectiveCards(controller.getObjectiveCards());
+                connections.get(nicknameRefresh).showSecretObjectiveCards(controller.getSecretObjectiveCards(nicknameRefresh));
+            }
+        }
+    }
+
+    public void chooseSecretObjectiveCard(String nickname, int indexCard) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException {
+        controller.chooseObjectiveCard(nickname, indexCard);
+        boolean allWithSecretObjectiveCardChosen = controller.areAllSecretObjectiveCardChosen();
+        for(String nicknameRefresh : connections.keySet()){
+            if(nickname.equals(nicknameRefresh)){
+                connections.get(nickname).showHand(nickname, controller.getHand(nickname));
+            }else{
+                connections.get(nicknameRefresh).showHiddenHand(nicknameRefresh, controller.getHiddenHand(nickname));
+            }
+            if(allWithSecretObjectiveCardChosen){
+                connections.get(nicknameRefresh).refreshTurnInfo(controller.getCurrentPlayer(), controller.getGameState());
+            }
+        }
+    }
+
+    @Override
+    public void placeCard(String nickname, int indexHand, Point position, boolean side) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException, NotEnoughResourcesException {
+        int cardId = controller.placeCard(nickname, indexHand, position, side);
+        for(String nicknameRefresh : connections.keySet()){
+            connections.get(nicknameRefresh).placeCard(nickname, cardId, position, side, controller.getPlayerResources(nickname), controller.getPlayerPoints(nickname));
+            connections.get(nicknameRefresh).refreshTurnInfo(controller.getCurrentPlayer(), controller.getGameState());
+        }
+        if(controller.isEndGame()){
+            for(String nicknameRefresh : connections.keySet()){
+                connections.get(nicknameRefresh).showEndGame(controller.getExtraPoints(), controller.getRanking());
+            }
+        }
+    }
+
+    @Override
+    public void drawCard(String nickname, boolean gold, int onTableOrDeck) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException {
+        int cardId = controller.drawCard(nickname, gold, onTableOrDeck);
+        int newCardId = controller.newCardOnTable(gold, onTableOrDeck);
+        Kingdom headDeck = controller.getHeadDeck(gold);
+        for(String nicknameRefresh : connections.keySet()){
+            if(nickname.equals(nicknameRefresh)){
+                connections.get(nickname).drawnCard(nickname, cardId);//TODO maybe also gold, it depende on enumeration
+            }else{
+                connections.get(nicknameRefresh).showHiddenHand(nicknameRefresh, controller.getHiddenHand(nickname));//bad but easier
+            }
+            connections.get(nicknameRefresh).moveCard(newCardId, headDeck, gold, onTableOrDeck);
+            connections.get(nicknameRefresh).refreshTurnInfo(controller.getCurrentPlayer(), controller.getGameState());
+        }
+        if(controller.isEndGame()){
+            for(String nicknameRefresh : connections.keySet()){
+                connections.get(nicknameRefresh).showEndGame(controller.getExtraPoints(), controller.getRanking());
+            }
         }
     }
 }

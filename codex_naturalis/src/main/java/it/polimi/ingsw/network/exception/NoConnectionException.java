@@ -1,4 +1,4 @@
 package it.polimi.ingsw.network.exception;
 
-public class NoConnectionException {
+public class NoConnectionException extends Throwable {
 }

@@ -15,9 +15,8 @@ public class Lobby {
 
     /**It's a holder for the players that permits to check and limit access
      */
-    public Lobby(int maxSizesize){
+    public Lobby(){
         this.players = new ArrayList<>();
-        this.maxSize = maxSize;
         this.complete = false;
     }
 

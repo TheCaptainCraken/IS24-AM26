@@ -1,11 +1,15 @@
 package it.polimi.ingsw.network.client;
 
-import it.polimi.ingsw.controller.Controller;//TODO lato client
+import it.polimi.ingsw.controller.client.Controller;
 import it.polimi.ingsw.model.Color;
-import it.polimi.ingsw.model.exception.LobbyCompleteException;
-import it.polimi.ingsw.model.exception.SameNameException;
+import it.polimi.ingsw.model.GameState;
+import it.polimi.ingsw.model.Kingdom;
+import it.polimi.ingsw.model.Sign;
+import it.polimi.ingsw.model.exception.*;
+import it.polimi.ingsw.network.exception.NoConnectionException;
 import it.polimi.ingsw.network.server.LoggableServer;
 
+import java.awt.*;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -28,7 +32,7 @@ public class ClientRMI{
         System.out.println("Hello, World!");
     }
 
-    public void login(String nickname) throws RemoteException, SameNameException, LobbyCompleteException {
+    public void login(String nickname) throws RemoteException, SameNameException, LobbyCompleteException, NoConnectionException {
         try {
             registry = LocateRegistry.getRegistry("127.0.0.1", PORT);
             stub = (LoggableServer) registry.lookup("Loggable");
@@ -60,7 +64,7 @@ public class ClientRMI{
         controller.error(issue);
     }
 
-    public void insertNumberOfPlayers(int numberOfPlayers) throws RemoteException {
+    public void insertNumberOfPlayers(int numberOfPlayers) throws RemoteException, NoSuchFieldException {
         stub.insertNumberOfPlayers(numberOfPlayers);
         lobbyIsReady = true;
     }
@@ -73,7 +77,7 @@ public class ClientRMI{
         controller.refreshUsers(playersAndPins);
     }
 
-    public void pickColor(Color color) {
+    public void pickColor(Color color) throws PinNotAvailableException, RemoteException, NoSuchFieldException {
         //TODO call controller ok client
         stub.chooseColor(controller.getNickname(), color);
     }
@@ -81,11 +85,80 @@ public class ClientRMI{
     //GAME START
 
     public void sendInfoOnTable(){
-        controller.sendInforOnTable();
+        controller.sendInfoOnTable();
     }
 
-    public void chooseSideStartingCard(boolean side){
-        stub.chooseSideStartingCard();
-        controller.setSideStartingCard(side);
+    public void showStartingCard(int startingCardId){
+        controller.showStartingCard(startingCardId);
+    }
+
+    //Called by the user (they have .getNickname())
+    public void chooseSideStartingCard(boolean side) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException {
+        stub.chooseSideStartingCard(controller.getNickname(), side);
+        //It places it from the server
+    }
+
+    public void showObjectiveCards(Integer[] objectiveCardIds){
+        controller.showObjectiveCards(objectiveCardIds);
+    }
+
+    public void showSecretObjectiveCards(Integer[] objectiveCardIds){
+        controller.showSecretObjectiveCards(objectiveCardIds);
+    }
+
+    //Called by the user (they have .getNickname())
+    public void chooseSecretObjectiveCard(int indexCard) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException {//0 or 1
+        stub.chooseSecretObjectiveCard(controller.getNickname(), indexCard);
+        controller.setSecretObjectiveCard(indexCard);
+    }
+
+    public void showHand(String nickname, Integer[] hand){
+        controller.getHand(nickname, hand);
+    }
+
+    public void showHiddenHand(String nickname, Kingdom[] hand){
+        controller.getHiddenHand(hand);
+    }
+
+//Game Flow
+    public void refreshTurnInfo(String currentPlayer, GameState gameState){
+        controller.refreshTurnInfo(currentPlayer, gameState);
+    }
+
+
+    //Called by the user (they have .getNickname())
+    public void playCard(int indexHand, Point position, boolean side) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException, NotEnoughResourcesException {
+        stub.placeCard(controller.getNickname(), indexHand, position, side);
+    }
+
+
+    //Called for playCard() and for chooseSideStartingCard()
+    public void placeCard(String nickname, int id, Point position, boolean side, HashMap<Sign, Integer> resources, int points){
+        controller.placeCard(nickname, id, position, side);//TODO is unique for type of card?
+        controller.updateResources(nickname, resources);
+        controller.updateScore(nickname, points);
+    }
+
+    public void drawCard(String nickname, boolean gold, int onTableOrDeck) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException {
+        stub.drawCard(nickname, gold, onTableOrDeck);
+    }
+
+    //Different methods so client doesn't receive id of an hidden card
+    public void drawnCard(String nickname, int cardId){
+        controller.drawCard(nickname, cardId);//it should understand where to place it
+    }
+
+//    public void showHiddenDrawnCardHand(String nickname, Kingdom[] hand){
+//        controller.getHiddenHand(hand);
+//    }
+
+    public void moveCard(int newCardId, Kingdom headDeck, boolean gold, int onTableOrDeck){
+        controller.newCardOnTable(newCardId, gold, onTableOrDeck);
+        controller.newHeadDeck(headDeck, gold, onTableOrDeck);
+    }
+
+    public void showEndGame(HashMap<String, Integer> extraPoints, HashMap<String, Integer> ranking){
+        controller.showExtraPoints(extraPoints);
+        controller.showRanking(ranking);
     }
 }

@@ -78,7 +78,7 @@ public class GameMaster {
      * @param namePlayer player who sent the request
      * @param side       which side the StartingCard has been want placed
      */
-    public void placeRootCard(String namePlayer, boolean side) throws NoTurnException, WrongGamePhaseException, NotExistsPlayerException {
+    public int placeRootCard(String namePlayer, boolean side) throws NoTurnException, WrongGamePhaseException, NotExistsPlayerException {
         Player currentPlayer = getCurrentPlayer();
 
         if (!isCurrentPlayer(namePlayer, currentPlayer)) {
@@ -103,6 +103,7 @@ public class GameMaster {
             if (getOrderPlayer(getCurrentPlayer().getName()) == 0) {
                 gameState = GameState.CHOOSING_OBJECTIVE_CARD;
             }
+            return rootCard.getId();
         }
     }
 
@@ -131,11 +132,11 @@ public class GameMaster {
      * Let the Player capsule in a PlacedCard connected to the rootCard graph of the Player
      *
      * @param namePlayer  Player who sent the request
-     * @param cardToPlace Which card wants to place
+     * @param indexHand   Which card wants to place from hand
      * @param position    In which position of the table the player wants to be place the card
      * @param side        To which side wants the player to place the card
      */
-    public void placeCard(String namePlayer, ResourceCard cardToPlace, Point position, boolean side) throws
+    public int placeCard(String namePlayer, int indexHand, Point position, boolean side) throws
             NoSuchFieldException, IllegalArgumentException, NoTurnException, WrongGamePhaseException, NotEnoughResourcesException {
 
         Player currentPlayer = getCurrentPlayer();
@@ -147,6 +148,7 @@ public class GameMaster {
         }
 
         HashMap<Corner, PlayedCard> attachments = isPositionable(currentPlayer.getRootCard(), position);
+        ResourceCard cardToPlace = currentPlayer.getHand()[indexHand];
         //the player positions the card in the back front. The card is one resource and 4 empty corners.
         if (!side) {
             new PlayedCard(cardToPlace, attachments, side, getTurn(), position);
@@ -194,6 +196,7 @@ public class GameMaster {
         }
         currentPlayer.giveCard(cardToPlace);
         gameState = GameState.DRAWING_PHASE;
+        return cardToPlace.getId();
     }
 
     /**
@@ -201,7 +204,7 @@ public class GameMaster {
      *
      * @param namePlayer    Player who sent the request
      * @param goldOrNot     If the type of the resourceCard that wants to be drawn is gold or not
-     * @param onTableOrDeck If the card is taken from the table or not: 2 means from deck, 0 and 1 are the position onTable array
+     * @param onTableOrDeck If the card is taken from the table or not: -1 means from deck, 0 and 1 are the position onTable array
      * @return
      */
     public int drawCard(String namePlayer, boolean goldOrNot, int onTableOrDeck) throws NullPointerException, WrongGamePhaseException,
@@ -216,7 +219,7 @@ public class GameMaster {
         }
         ResourceCard cardDrawn;
         if (goldOrNot) {
-            if (onTableOrDeck == 2) {//TODO FOR THE VIEW la view richiede il nuovo retro di quella in cima e non solo di quella spostata
+            if (onTableOrDeck == -1) {//TODO FOR THE VIEW la view richiede il nuovo retro di quella in cima e non solo di quella spostata
                 cardDrawn = (ResourceCard) goldDeck.draw();
                 currentPlayer.takeCard(cardDrawn);
             } else {
@@ -225,7 +228,7 @@ public class GameMaster {
                 onTableGoldCards[onTableOrDeck] = (GoldCard) goldDeck.draw();
             }
         } else {
-            if (onTableOrDeck == 2) {//TODO FOR THE VIEW la view richiede il nuovo retro di quella in cima e non solo di quella spostata
+            if (onTableOrDeck == -1) {//TODO FOR THE VIEW la view richiede il nuovo retro di quella in cima e non solo di quella spostata
                 cardDrawn = (ResourceCard) resourceDeck.draw();
                 currentPlayer.takeCard(cardDrawn);
             } else {
@@ -249,7 +252,6 @@ public class GameMaster {
             gameState = GameState.PLACING_PHASE;
         }
         nextGlobalTurn();
-
         return cardDrawn.getId(); //TODO Check ritornare solo l'id alla view
     }
 
