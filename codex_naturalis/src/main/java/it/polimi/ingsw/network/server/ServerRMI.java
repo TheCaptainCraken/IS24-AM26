@@ -5,11 +5,9 @@ import it.polimi.ingsw.model.Color;
 import it.polimi.ingsw.model.Kingdom;
 import it.polimi.ingsw.model.exception.*;
 import it.polimi.ingsw.network.client.ClientRMI;
-import it.polimi.ingsw.network.client.LoggableClient;
 
 import java.awt.*;
 import java.rmi.AlreadyBoundException;
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -63,12 +61,13 @@ public class ServerRMI implements LoggableServer {
         controller.addPlayer(nickname);
         connections.put(nickname, clientRMI);
         refreshUsers();
-        return controller.getIsFirst();
+        return controller.getIsFirst(nickname);
     }
 
     @Override
-    public void insertNumberOfPlayers(int numberOfPlayers) throws RemoteException, NoSuchFieldException {
-        controller.initializeLobby(numberOfPlayers);//TODO remove all players before
+    public void insertNumberOfPlayers(int numberOfPlayers) throws RemoteException, NoSuchFieldException, ClosingLobbyException {
+        controller.initializeLobby(numberOfPlayers);
+        //TODO remove all players before
         //Deletes all other connections that are not in the lobby
         HashMap<String, Color> playersInLobby = null;
         for(String nickname : connections.keySet()){
@@ -85,9 +84,6 @@ public class ServerRMI implements LoggableServer {
     @Override
     public void chooseColor(String nickname, Color color) throws RemoteException, NoSuchFieldException,
              ColorAlreadyTakenException {
-//        if(controller.getUsers().get(nickname).getColor() == color){
-//            controller.getUsers().get(nickname).setColor(null);
-//        }
         if(controller.setColour(nickname, color)){
             for(String nicknameRefresh : connections.keySet()){
                 connections.get(nicknameRefresh).sendInfoOnTable();//TODO
@@ -109,9 +105,11 @@ public class ServerRMI implements LoggableServer {
 
     //We could optimize and use a unique function without any
     @Override
-    public void chooseSideStartingCard(String nickname, boolean side) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException {
+    public void chooseSideStartingCard(String nickname, boolean side)
+            throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException {
         int cardId = controller.placeRootCard(nickname, side);
         boolean allWithRootCardPlaced = controller.areAllRootCardPlaced();
+        //commento...
         for(String nicknameRefresh : connections.keySet()){
             connections.get(nicknameRefresh).placeCard(nickname, cardId, new Point(0,0), side, controller.getPlayerResources(nickname), controller.getPlayerPoints(nickname));
             if(allWithRootCardPlaced){
@@ -121,9 +119,11 @@ public class ServerRMI implements LoggableServer {
         }
     }
 
-    public void chooseSecretObjectiveCard(String nickname, int indexCard) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException {
+    public void chooseSecretObjectiveCard(String nickname, int indexCard)
+            throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException {
         controller.chooseObjectiveCard(nickname, indexCard);
         boolean allWithSecretObjectiveCardChosen = controller.areAllSecretObjectiveCardChosen();
+
         for(String nicknameRefresh : connections.keySet()){
             if(nickname.equals(nicknameRefresh)){
                 connections.get(nickname).showHand(nickname, controller.getHand(nickname));
@@ -137,12 +137,14 @@ public class ServerRMI implements LoggableServer {
     }
 
     @Override
-    public void placeCard(String nickname, int indexHand, Point position, boolean side) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException, NotEnoughResourcesException {
+    public void placeCard(String nickname, int indexHand, Point position, boolean side)
+            throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException, NotEnoughResourcesException {
         int cardId = controller.placeCard(nickname, indexHand, position, side);
         for(String nicknameRefresh : connections.keySet()){
             connections.get(nicknameRefresh).placeCard(nickname, cardId, position, side, controller.getPlayerResources(nickname), controller.getPlayerPoints(nickname));
             connections.get(nicknameRefresh).refreshTurnInfo(controller.getCurrentPlayer(), controller.getGameState());
         }
+
         if(controller.isEndGame()){
             for(String nicknameRefresh : connections.keySet()){
                 connections.get(nicknameRefresh).showEndGame(controller.getExtraPoints(), controller.getRanking());
@@ -151,10 +153,12 @@ public class ServerRMI implements LoggableServer {
     }
 
     @Override
-    public int drawCard(String nickname, boolean gold, int onTableOrDeck) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException {
+    public int drawCard(String nickname, boolean gold, int onTableOrDeck)
+            throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException {
         int cardId = controller.drawCard(nickname, gold, onTableOrDeck);
         int newCardId = controller.newCardOnTable(gold, onTableOrDeck);
         Kingdom headDeck = controller.getHeadDeck(gold);
+
         for(String nicknameRefresh : connections.keySet()){
             if(!nickname.equals(nicknameRefresh)){
                 connections.get(nicknameRefresh).showHiddenHand(nicknameRefresh, controller.getHiddenHand(nickname));//bad but easier
@@ -162,6 +166,7 @@ public class ServerRMI implements LoggableServer {
             connections.get(nicknameRefresh).moveCard(newCardId, headDeck, gold, onTableOrDeck);
             connections.get(nicknameRefresh).refreshTurnInfo(controller.getCurrentPlayer(), controller.getGameState());
         }
+
         if(controller.isEndGame()){
             for(String nicknameRefresh : connections.keySet()){
                 connections.get(nicknameRefresh).showEndGame(controller.getExtraPoints(), controller.getRanking());

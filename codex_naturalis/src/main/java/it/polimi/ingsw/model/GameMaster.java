@@ -412,7 +412,7 @@ public class GameMaster {
      * @param playedCard PlayedCard that I'm visiting
      * @param position   Position of the card that I-m looking for
      * @param stack      Stack in which I save already visited cards
-     * @return PlayedCard if exists else null//TODO needs the logic?
+     * @return PlayedCard if exists else null//
      */
     private PlayedCard recursiveFindCard(PlayedCard playedCard, Point position, Stack<PlayedCard> stack) {
         if (stack.search(playedCard) > 0 || playedCard == null) {
@@ -641,4 +641,17 @@ public class GameMaster {
         return ranking;
     }
 
+    public GameState getState() {
+        return gameState;
+    }
+
+    public int getCard(boolean gold, int onTableOrDeck) {
+        if (gold)
+        {
+            return onTableGoldCards[onTableOrDeck].getId();
+        } else {
+            return onTableResourceCards[onTableOrDeck].getId();
+            }
+        }
 }
+

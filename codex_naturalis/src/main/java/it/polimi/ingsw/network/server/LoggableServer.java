@@ -15,15 +15,15 @@ public interface LoggableServer extends Remote {
 
     boolean isFirst(ClientRMI clientRMI, String nickname) throws RemoteException, SameNameException, LobbyCompleteException;
 
-    void insertNumberOfPlayers(int numberOfPlayers) throws RemoteException, NoSuchFieldException;
+    void insertNumberOfPlayers(int numberOfPlayers) throws RemoteException, NoSuchFieldException, ClosingLobbyException;
 
     void chooseColor(String nickname, Color color) throws RemoteException, NoSuchFieldException, PinNotAvailableException, ColorAlreadyTakenException;
 
     void chooseSideStartingCard(String nickname, boolean side) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException ;
 
-    void chooseSecretObjectiveCard(String nickname, int indexCard) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException;
+    void chooseSecretObjectiveCard(String nickname, int indexCard) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException;
 
     void placeCard(String nickname, int indexHand, Point position, boolean side) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException, NotEnoughResourcesException ;
 
-    int drawCard(String nickname, boolean gold, int onTableOrDeck) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException ;
+    int drawCard(String nickname, boolean gold, int onTableOrDeck) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException;
 }

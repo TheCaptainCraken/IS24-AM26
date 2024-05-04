@@ -35,7 +35,7 @@ public class Lobby {
         Player newPlayer = new Player(nickname);
 
         players.add(newPlayer);
-        if(players.size()==maxSize){
+        if(players.size() == maxSize){
             setLock();
         }
 
@@ -82,7 +82,6 @@ public class Lobby {
             throw new ClosingLobbyException();
         }
         this.maxSize = maxSize;
-        setLock();
     }
 
     /** It locks the lobby so nobody can join anymore, the lobby cannot be unlocked
@@ -94,4 +93,5 @@ public class Lobby {
     public boolean getLock() {
         return complete;
     }
+
 }
