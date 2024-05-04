@@ -4,7 +4,6 @@ import it.polimi.ingsw.model.Color;
 import it.polimi.ingsw.model.exception.*;
 import it.polimi.ingsw.network.client.ClientRMI;
 import it.polimi.ingsw.model.exception.LobbyCompleteException;
-import it.polimi.ingsw.model.exception.PinNotAvailableException;
 import it.polimi.ingsw.model.exception.SameNameException;
 
 import java.awt.*;
@@ -17,7 +16,7 @@ public interface LoggableServer extends Remote {
 
     void insertNumberOfPlayers(int numberOfPlayers) throws RemoteException, NoSuchFieldException, ClosingLobbyException;
 
-    void chooseColor(String nickname, Color color) throws RemoteException, NoSuchFieldException, PinNotAvailableException, ColorAlreadyTakenException;
+    void chooseColor(String nickname, Color color) throws RemoteException, NoSuchFieldException, ColorAlreadyTakenException;
 
     void chooseSideStartingCard(String nickname, boolean side) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException ;
 

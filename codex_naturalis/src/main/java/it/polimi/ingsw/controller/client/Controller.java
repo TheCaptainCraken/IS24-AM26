@@ -4,14 +4,28 @@ import it.polimi.ingsw.model.Color;
 import it.polimi.ingsw.model.GameState;
 import it.polimi.ingsw.model.Kingdom;
 import it.polimi.ingsw.model.Sign;
+import it.polimi.ingsw.network.client.ClientRMI;
+import it.polimi.ingsw.network.client.NetworkInterface;
 
 import java.awt.*;
 import java.util.HashMap;
 
 public class Controller {
-    public void askNumberOfPlayer() {
+    private String nickname;
+    private NetworkInterface connection;
+
+    public void createInstanceOfConnection(String typeOfConnection){
+        if(typeOfConnection=="RMI"){
+            connection = new ClientRMI();
+        }else if(typeOfConnection=="Socket"){
+            //onnection = new ClientSocket();
+        }
     }
 
+    public void askNumberOfPlayer() {
+        //metodo view stampa messaggio
+        //input --> controller --> server(rmi o socket)
+    }
     public void waitLobby() {
     }
 

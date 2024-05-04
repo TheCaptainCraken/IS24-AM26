@@ -92,8 +92,7 @@ public class Controller {
      */
     public int placeCard(String player, int indexHand, Point position, boolean side) throws WrongGamePhaseException,
             NoTurnException, NoSuchFieldException, NotEnoughResourcesException {
-        int cardId = game.placeCard(player, indexHand, position, side);
-        return cardId;
+        return  game.placeCard(player, indexHand, position, side);
     }
 
     /**
@@ -166,7 +165,6 @@ public class Controller {
      * @return Whether all players have chosen a color.
      */
     public boolean setColour(String name, Color colour) throws NoSuchFieldException, ColorAlreadyTakenException {
-        //TODO input errato
         for(Player player : lobby.getPlayers()){
             if(player.getColor() == colour){
                 throw new ColorAlreadyTakenException();
@@ -246,7 +244,7 @@ public class Controller {
     }
 
     public Integer[] getSecretObjectiveCards(String nicknameRefresh) {
-        //TODO percheè array di Integer?
+        //TODO
         return null;
     }
     /**
@@ -323,7 +321,7 @@ public class Controller {
         for(Player player : lobby.getPlayers()) {
            extraPoints.put(player.getName(), player.getPoints());
         }
-        return null;
+        return extraPoints;
     }
 
     public HashMap<String, Integer> getRanking() {
