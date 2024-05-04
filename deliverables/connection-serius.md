@@ -33,39 +33,38 @@ sequenceDiagram
       end
    end
     alt if lobby is unlocked
-        alt if is the first
             rect rgba(0, 255, 0, 0.2)
-            Model ->> Controller: First()
-            Controller ->> Server: First()
-            Server ->> Client: First ()
-            Client ->> Server: Players (number of players)
-            Server ->> Controller: CreateLobby()
-            Controller  ->> Model: Lobby(number of players)
+            Model ->> Controller: isFirst()
+            Controller ->> Server: isFirst()
+            Server ->> Client: isFirst ()
             end
+       alt if is the first
+            Client ->> Server: insertNumberOfPlayers(number of players)
+            Server ->> Controller: initializeLobby(number of players)
+            Controller  ->> Model: SetMaxSize(number of players)
         else if is not the first
             rect rgba(255, 165, 0, 0.7)
             alt if the lobby is not created yet
-                Model ->> Controller: Wait()
-                Controller ->> Server: Wait()
                 Server ->> Client:  Wait(lobby not created yet) 
             end  
+            end
+            alt if the lobby is created but you're not allowed to enter 
+                Server ->> Client:  disconnect(lobby is full)
             end
         end
 
         rect rgba(0, 255, 0, 0.2)
-        Model ->> Controller: Lobby created()
-        Controller ->> Server: Lobby created()
-        Server ->> Client: Ok, answer
+        Server ->> Client: StopWaiting()
         end
         alt if admitted
               loop until colour is accepted
               rect rgba(0, 255, 0, 0.2)
-                  Model ->> Controller: ChooseColour (available colour pins)
-                  Controller ->> Server: RefreshUsers (available colour pins)
+                  Model ->> Controller: GetPlayersAndPins (available colour pins)
+                  Controller ->> Server: GetPlayersAndPins (available colour pins)
                   Server ->> Client: RefreshUsers (available colour pins)
-                  Client ->> Server: Colour (chosen colour)
-                  Server ->> Controller: Colour (chosen colour)
-                  Controller ->> Model: SetColour(nickname, colour)
+                  Client ->> Server: pickColor(name, color)
+                  Server ->> Controller: chooseColor(name, color)
+                  Controller ->> Model: SetColor(color)
                   alt colour already taken
                     rect rgba(255, 0, 0, 0.6)
                     Model ->> Controller: Error (colour already taken)  
@@ -95,7 +94,8 @@ sequenceDiagram
         
     else else if lobby is locked
         rect rgba(255, 0, 0, 0.6)
-        Controller ->> Server: Error (lobby is locked, a game already started
+        Model ->> Controller: Error (lobby is locked, a game already started)
+        Controller ->> Server: Error (lobby is locked, a game already started)
         Server ->> Client: Error (lobby is locked, a game already started)
         end
     end
