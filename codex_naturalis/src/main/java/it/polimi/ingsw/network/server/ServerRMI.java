@@ -65,7 +65,7 @@ public class ServerRMI implements LoggableServer {
     }
 
     @Override
-    public void insertNumberOfPlayers(int numberOfPlayers) throws RemoteException, NoSuchFieldException, ClosingLobbyException {
+    public void insertNumberOfPlayers(int numberOfPlayers) throws RemoteException, NoSuchFieldException, ClosingLobbyException, SameNameException, LobbyCompleteException {
         controller.initializeLobby(numberOfPlayers);
         //TODO remove all players before
         //Deletes all other connections that are not in the lobby
@@ -75,6 +75,7 @@ public class ServerRMI implements LoggableServer {
                 connections.get(nickname).disconnect("Lobby has been fulled with number of parameters chosen by the first player");
                 connections.remove(nickname);
             }else{
+                controller.addPlayer(nickname);
                 connections.get(nickname).stopWaiting(nickname);
             }
         }
@@ -131,6 +132,7 @@ public class ServerRMI implements LoggableServer {
                 connections.get(nicknameRefresh).showHiddenHand(nicknameRefresh, controller.getHiddenHand(nickname));
             }
             if(allWithSecretObjectiveCardChosen){
+                connections.get(nicknameRefresh).getIsFirst(controller.getFirstPlayer());
                 connections.get(nicknameRefresh).refreshTurnInfo(controller.getCurrentPlayer(), controller.getGameState());
             }
         }

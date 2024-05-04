@@ -194,13 +194,7 @@ public class Controller {
      * @return A map of players and their pins.
      */
     public HashMap<String, Color> getPlayersAndPins() {
-        HashMap<String, Color> PlayerAndPin = new HashMap<>();
-
-        for(Player player : lobby.getPlayers()) {
-            PlayerAndPin.put(player.getName(), player.getColor());
-        }
-
-        return PlayerAndPin;
+        return lobby.getPlayersAndPins();
     }
 
     /**
@@ -334,6 +328,11 @@ public class Controller {
         //also after placing card? data diagram says so but code doesn't work in this way
         //TODO yes
         return false;
+    }
+
+    public String getFirstPlayer() {
+        //TODO
+        return null;
     }
 }
 

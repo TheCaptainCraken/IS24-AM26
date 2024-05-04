@@ -70,7 +70,7 @@ public class ClientRMI extends NetworkInterface {
 
     @Override
     public void insertNumberOfPlayers(int numberOfPlayers) throws RemoteException,
-            NoSuchFieldException, ClosingLobbyException {
+            NoSuchFieldException, ClosingLobbyException, SameNameException, LobbyCompleteException {
         stub.insertNumberOfPlayers(numberOfPlayers);
         //TODO try/catch
 
@@ -181,5 +181,9 @@ public class ClientRMI extends NetworkInterface {
     public void showEndGame(HashMap<String, Integer> extraPoints, HashMap<String, Integer> ranking){
         controller.showExtraPoints(extraPoints);
         controller.showRanking(ranking);
+    }
+
+    public void getIsFirst(String firstPlayer) {
+        controller.getIsFirst(firstPlayer);
     }
 }

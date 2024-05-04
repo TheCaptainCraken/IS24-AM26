@@ -92,4 +92,7 @@ public class Controller {
 
     public void showRanking(HashMap<String, Integer> ranking) {
     }
+
+    public void getIsFirst(String firstPlayer) {
+    }
 }

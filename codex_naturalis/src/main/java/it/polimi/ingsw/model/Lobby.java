@@ -6,6 +6,7 @@ import it.polimi.ingsw.model.exception.SameNameException;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 
 public class Lobby {
     private final ArrayList<Player> players;
@@ -94,4 +95,13 @@ public class Lobby {
         return complete;
     }
 
+    public HashMap<String, Color> getPlayersAndPins() {
+        HashMap<String, Color> PlayerAndPin = new HashMap<>();
+
+        for(Player player : players) {
+            PlayerAndPin.put(player.getName(), player.getColor());
+        }
+
+        return PlayerAndPin;
+    }
 }
