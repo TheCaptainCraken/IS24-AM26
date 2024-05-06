@@ -7,9 +7,6 @@ import it.polimi.ingsw.model.Kingdom;
 import it.polimi.ingsw.model.Sign;
 import it.polimi.ingsw.model.exception.*;
 import it.polimi.ingsw.network.exception.NoConnectionException;
-import it.polimi.ingsw.model.exception.LobbyCompleteException;
-import it.polimi.ingsw.model.exception.NotExistsPlayerException;
-import it.polimi.ingsw.model.exception.SameNameException;
 import it.polimi.ingsw.network.server.LoggableServer;
 
 import java.awt.*;
@@ -22,7 +19,6 @@ import java.util.HashMap;
 public class ClientRMI extends InterfaceClient {
     int PORT = 1234;
     Controller controller;
-    //TODO check if is to do a singletone
     LoggableServer stub = null;
     Registry registry = null;
     ClientRMI obj = new ClientRMI();//
@@ -91,8 +87,6 @@ public class ClientRMI extends InterfaceClient {
         stub.chooseColor(controller.getNickname(), color);
     }
 
-    //GAME START
-
     @Override
     public void sendInfoOnTable(){
         controller.sendInfoOnTable();
@@ -107,7 +101,6 @@ public class ClientRMI extends InterfaceClient {
     @Override
     public void chooseSideStartingCard(boolean side) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException {
         stub.chooseSideStartingCard(controller.getNickname(), side);
-        //It places it from the server
     }
 
     @Override
@@ -139,7 +132,6 @@ public class ClientRMI extends InterfaceClient {
     }
 
     @Override
-    //Game Flow
     public void refreshTurnInfo(String currentPlayer, GameState gameState){
         controller.refreshTurnInfo(currentPlayer, gameState);
     }
@@ -153,7 +145,7 @@ public class ClientRMI extends InterfaceClient {
     @Override
     //Called for playCard() and for chooseSideStartingCard()
     public void placeCard(String nickname, int id, Point position, boolean side, HashMap<Sign, Integer> resources, int points){
-        controller.placeCard(nickname, id, position, side);//TODO is unique for type of card?
+        controller.placeCard(nickname, id, position, side);
         controller.updateResources(nickname, resources);
         controller.updateScore(nickname, points);
     }

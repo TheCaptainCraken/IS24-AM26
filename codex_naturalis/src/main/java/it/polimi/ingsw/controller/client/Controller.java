@@ -34,7 +34,7 @@ public class Controller {
             connection = new ClientRMI();
         }else if(typeOfConnection.equals("Socket")){
             //TODO
-            //onnection = new ClientSocket();
+            //connection = new ClientSocket();
         }
     }
 
@@ -83,7 +83,7 @@ public class Controller {
     public void showSecretObjectiveCards(Integer[] objectiveCardIds) {
     }
 
-    public void setSecretObjectiveCard(int indexCard) {//It's personal
+    public void setSecretObjectiveCard(int indexCard) {
     }
 
     //TODO quelle di tutti
@@ -126,7 +126,7 @@ public class Controller {
     public void getIsFirst(String firstPlayer) {
     }
 
-
+    //parte client connect server. Chiamata dal client
     //TODO metodi chiamata server
     public void login(String nickname) {
         try{
@@ -143,6 +143,7 @@ public class Controller {
     }
 
     public void insertNumberOfPlayers(int numberOfPlayers) {
+        //TODO correct player to ask for number of players. First player?
         try{
             connection.insertNumberOfPlayers(numberOfPlayers);
         } catch (RemoteException e) {
@@ -204,13 +205,13 @@ public class Controller {
         } catch (WrongGamePhaseException e) {
             //TODO
         } catch (NoTurnException e) {
-            //TODO
+            view.noTurn();
         } catch (NotExistsPlayerException e) {
             //TODO
         } catch (NoSuchFieldException e) {
             //TODO
         } catch (NotEnoughResourcesException e) {
-            //TODO
+            view.notEnoughResources();
         }
     }
 

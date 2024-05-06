@@ -48,4 +48,13 @@ public class Tui {
         System.out.println("The color you chose is already taken. Please choose another one");
         //TODO colori disponibili
     }
+
+    public void noTurn() {
+        System.out.println("It's not your turn. You can't perform this action");
+    }
+
+    public void notEnoughResources() {
+        System.out.println("You don't have enough resources to perform this action");
+        //TODO show resources
+    }
 }
