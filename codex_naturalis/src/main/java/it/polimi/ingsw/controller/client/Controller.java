@@ -6,6 +6,7 @@ import it.polimi.ingsw.model.Kingdom;
 import it.polimi.ingsw.model.Sign;
 import it.polimi.ingsw.network.client.ClientRMI;
 import it.polimi.ingsw.network.client.NetworkInterface;
+import it.polimi.ingsw.view.Tui;
 
 import java.awt.*;
 import java.util.HashMap;
@@ -13,32 +14,45 @@ import java.util.HashMap;
 public class Controller {
     private String nickname;
     private NetworkInterface connection;
+    private Tui view;
+
+    public void setView(String typeOfView) {
+        if(typeOfView.equals("TUI")){
+            view = new Tui();
+        }else if(typeOfView.equals("GUI")){
+            //TODO
+            //view = new GUI();
+        }
+    }
 
     public void createInstanceOfConnection(String typeOfConnection){
-        if(typeOfConnection=="RMI"){
+        if(typeOfConnection.equals("RMI")){
             connection = new ClientRMI();
-        }else if(typeOfConnection=="Socket"){
+        }else if(typeOfConnection.equals("Socket")){
+            //TODO
             //onnection = new ClientSocket();
         }
     }
 
     public void askNumberOfPlayer() {
-        //metodo view stampa messaggio
-        //input --> controller --> server(rmi o socket)
+        view.askNumberOfPlayer();
     }
+
     public void waitLobby() {
+        view.waitLobby();
     }
 
     public void stopWaiting() {
+        view.stopWaiting();
     }
 
-    public void error(String issue) {
-    }
 
     public void setNickname(String nickname) {
+
     }
 
     public void refreshUsers(HashMap<String, Color> playersAndPins) {
+        view.refreshUsers(playersAndPins);
     }
 
     public String getNickname() {
@@ -49,6 +63,7 @@ public class Controller {
     }
 
     public void showStartingCard(int startingCardId) {
+        view.showStartingCard(startingCardId);
     }
 
     public void showObjectiveCards(Integer[] objectiveCardIds) {
@@ -94,5 +109,9 @@ public class Controller {
     }
 
     public void getIsFirst(String firstPlayer) {
+    }
+
+    public void disconnect() {
+        view.disconnect();
     }
 }

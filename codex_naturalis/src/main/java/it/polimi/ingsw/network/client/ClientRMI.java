@@ -21,7 +21,8 @@ import java.util.HashMap;
 
 public class ClientRMI extends NetworkInterface {
     int PORT = 1234;
-    Controller controller;//TODO check if is to do a singletone
+    Controller controller;
+    //TODO check if is to do a singletone
     LoggableServer stub = null;
     Registry registry = null;
     //Serving stuffs
@@ -29,11 +30,9 @@ public class ClientRMI extends NetworkInterface {
     ClientRMI obj = new ClientRMI();//
     boolean lobbyIsReady = false;
 
+    //TODO costruttore
 
-    public static void main(String[] args) throws RemoteException {
-        System.out.println("Hello, World!");
-    }
-
+    //TODO for call server, sistemare anche questo quindi. Che senso ha lobby is ready?
     @Override
     public void login(String nickname) throws RemoteException, SameNameException, LobbyCompleteException, NoConnectionException {
         try {
@@ -50,9 +49,8 @@ public class ClientRMI extends NetworkInterface {
             throw new NoConnectionException();
         }
         boolean isFirst = stub.isFirst(this, nickname);
-        //chiama chiedi numberOfPlayer o waiting
-        System.out.println("Is first: " + isFirst);
-        if (isFirst) {//This should be changed
+        if (isFirst) {
+            //This should be changed
             controller.askNumberOfPlayer();
         }else{
             if(lobbyIsReady){
@@ -64,17 +62,18 @@ public class ClientRMI extends NetworkInterface {
     }
 
     @Override
-    public void disconnect(String issue) throws RemoteException {
-        controller.error(issue);
+    public void disconnect() throws RemoteException {
+        controller.disconnect();
     }
 
+    //TODO for call server
     @Override
     public void insertNumberOfPlayers(int numberOfPlayers) throws RemoteException,
             NoSuchFieldException, ClosingLobbyException, SameNameException, LobbyCompleteException {
         stub.insertNumberOfPlayers(numberOfPlayers);
         //TODO try/catch
 
-        lobbyIsReady = true;
+        lobbyIsReady = true; //TODO sbagliato
     }
 
     @Override
@@ -87,6 +86,7 @@ public class ClientRMI extends NetworkInterface {
         controller.refreshUsers(playersAndPins);
     }
 
+    //TODO for call server
     @Override
     public void pickColor(Color color) throws ColorAlreadyTakenException, RemoteException, NoSuchFieldException, ColorAlreadyTakenException {
         //TODO call controller ok client
@@ -105,6 +105,7 @@ public class ClientRMI extends NetworkInterface {
         controller.showStartingCard(startingCardId);
     }
 
+    //TODO for call server
     @Override
     //Called by the user (they have .getNickname())
     public void chooseSideStartingCard(boolean side) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException {
@@ -122,8 +123,8 @@ public class ClientRMI extends NetworkInterface {
         controller.showSecretObjectiveCards(objectiveCardIds);
     }
 
+    //TODO for call server
     @Override
-    //Called by the user (they have .getNickname())
     public void chooseSecretObjectiveCard(int indexCard)
             throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException {//0 or 1
         stub.chooseSecretObjectiveCard(controller.getNickname(), indexCard);
@@ -141,13 +142,13 @@ public class ClientRMI extends NetworkInterface {
     }
 
     @Override
-//Game Flow
+    //Game Flow
     public void refreshTurnInfo(String currentPlayer, GameState gameState){
         controller.refreshTurnInfo(currentPlayer, gameState);
     }
 
+    //TODO for call server
     @Override
-    //Called by the user (they have .getNickname())
     public void playCard(int indexHand, Point position, boolean side) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException, NotEnoughResourcesException {
         stub.placeCard(controller.getNickname(), indexHand, position, side);
     }
@@ -160,16 +161,13 @@ public class ClientRMI extends NetworkInterface {
         controller.updateScore(nickname, points);
     }
 
+    //TODO for call server
     @Override
     public void drawCard(String nickname, boolean gold, int onTableOrDeck)
             throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException {
         int cardId = stub.drawCard(nickname, gold, onTableOrDeck);
         controller.drawCard(nickname, cardId);//it should understand where to place it
     }
-
-//    public void showHiddenDrawnCardHand(String nickname, Kingdom[] hand){
-//        controller.getHiddenHand(hand);
-//    }
 
     @Override
     public void moveCard(int newCardId, Kingdom headDeck, boolean gold, int onTableOrDeck){
@@ -183,6 +181,7 @@ public class ClientRMI extends NetworkInterface {
         controller.showRanking(ranking);
     }
 
+    //TODO
     public void getIsFirst(String firstPlayer) {
         controller.getIsFirst(firstPlayer);
     }

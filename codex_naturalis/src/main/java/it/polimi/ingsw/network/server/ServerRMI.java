@@ -72,7 +72,7 @@ public class ServerRMI implements LoggableServer {
         HashMap<String, Color> playersInLobby = null;
         for(String nickname : connections.keySet()){
             if(controller.getPlayer(nickname) == null){
-                connections.get(nickname).disconnect("Lobby has been fulled with number of parameters chosen by the first player");
+                connections.get(nickname).disconnect();
                 connections.remove(nickname);
             }else{
                 controller.addPlayer(nickname);
@@ -97,7 +97,7 @@ public class ServerRMI implements LoggableServer {
     public void refreshUsers(){
         HashMap<String, Color> playersAndPins = controller.getPlayersAndPins();
         for (ClientRMI connection : connections.values()){
-            connection.refreshUsers(playersAndPins);//Color could be null
+            connection.refreshUsers(playersAndPins);
         }
     }
 
