@@ -16,7 +16,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.HashMap;
 
-public class ClientRMI extends InterfaceClient {
+public class ClientRMI implements InterfaceClient {
     int PORT = 1234;
     Controller controller;
     LoggableServer stub = null;
