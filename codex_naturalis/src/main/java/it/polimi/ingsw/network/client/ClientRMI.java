@@ -19,14 +19,12 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.HashMap;
 
-public class ClientRMI extends NetworkInterface {
+public class ClientRMI extends InterfaceClient {
     int PORT = 1234;
     Controller controller;
     //TODO check if is to do a singletone
     LoggableServer stub = null;
     Registry registry = null;
-    //Serving stuffs
-    LoggableClient clientSkeleton =  null;
     ClientRMI obj = new ClientRMI();//
     boolean lobbyIsReady = false;
 
@@ -88,7 +86,7 @@ public class ClientRMI extends NetworkInterface {
 
     //TODO for call server
     @Override
-    public void pickColor(Color color) throws ColorAlreadyTakenException, RemoteException, NoSuchFieldException, ColorAlreadyTakenException {
+    public void chooseColor(Color color) throws ColorAlreadyTakenException, RemoteException, NoSuchFieldException, ColorAlreadyTakenException {
         //TODO call controller ok client
         stub.chooseColor(controller.getNickname(), color);
     }
@@ -107,7 +105,6 @@ public class ClientRMI extends NetworkInterface {
 
     //TODO for call server
     @Override
-    //Called by the user (they have .getNickname())
     public void chooseSideStartingCard(boolean side) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException {
         stub.chooseSideStartingCard(controller.getNickname(), side);
         //It places it from the server
@@ -161,12 +158,12 @@ public class ClientRMI extends NetworkInterface {
         controller.updateScore(nickname, points);
     }
 
-    //TODO for call server
+    //TODO for call server, sistema con daniel
     @Override
     public void drawCard(String nickname, boolean gold, int onTableOrDeck)
             throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException {
         int cardId = stub.drawCard(nickname, gold, onTableOrDeck);
-        controller.drawCard(nickname, cardId);//it should understand where to place it
+        controller.drawCard(nickname, cardId);
     }
 
     @Override

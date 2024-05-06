@@ -35,4 +35,17 @@ public class Tui {
         //TODO get card from id
         System.out.println("The starting card is: " + startingCardId);
     }
+
+    public void sameName(String nickname) {
+        System.out.println("The nickname " + nickname + " is already taken. Please choose another one");
+    }
+
+    public void lobbyComplete() {
+        System.out.println("The lobby is full. No other players can join");
+    }
+
+    public void colorAlreadyTaken() {
+        System.out.println("The color you chose is already taken. Please choose another one");
+        //TODO colori disponibili
+    }
 }
