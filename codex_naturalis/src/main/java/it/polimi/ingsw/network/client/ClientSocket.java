@@ -1,0 +1,94 @@
+package it.polimi.ingsw.network.client;
+
+import it.polimi.ingsw.controller.client.Controller;
+import it.polimi.ingsw.model.Color;
+import it.polimi.ingsw.model.GameState;
+import it.polimi.ingsw.model.Kingdom;
+import it.polimi.ingsw.model.Sign;
+import it.polimi.ingsw.model.exception.*;
+import it.polimi.ingsw.network.exception.NoConnectionException;
+
+import java.awt.*;
+import java.rmi.RemoteException;
+import java.util.HashMap;
+import java.net.*;
+
+public class ClientSocket implements InterfaceClient{
+   // String url;
+   // final int port;
+    Controller controller;
+
+    /*public ClientSocket(String url, int port) {
+        this.url = url;
+        this.port = port;
+    }  li metto qui poichè non siamo ancora sicuri di come gestire la questione IP/port */
+
+
+    @Override
+    public void disconnect() throws RemoteException {
+
+    }
+
+
+    @Override
+    public void stopWaiting(String nickname) throws RemoteException {
+
+    }
+
+    @Override
+    public void refreshUsers(HashMap<String, Color> playersAndPins) {
+
+    }
+
+    @Override
+    public void sendInfoOnTable() {
+
+    }
+
+    @Override
+    public void showStartingCard(int startingCardId) {
+
+    }
+
+
+    @Override
+    public void showObjectiveCards(Integer[] objectiveCardIds) {
+
+    }
+
+    @Override
+    public void showSecretObjectiveCards(Integer[] objectiveCardIds) {
+
+    }
+
+    @Override
+    public void showHand(String nickname, Integer[] hand) {
+
+    }
+
+    @Override
+    public void showHiddenHand(String nickname, Kingdom[] hand) {
+
+    }
+
+    @Override
+    public void refreshTurnInfo(String currentPlayer, GameState gameState) {
+
+    }
+
+
+    @Override
+    public void placeCard(String nickname, int id, Point position, boolean side, HashMap<Sign, Integer> resources, int points) {
+
+    }
+
+    @Override
+    public void moveCard(int newCardId, Kingdom headDeck, boolean gold, int onTableOrDeck) {
+
+    }
+
+    @Override
+    public void showEndGame(HashMap<String, Integer> extraPoints, HashMap<String, Integer> ranking) {
+
+    }
+}
