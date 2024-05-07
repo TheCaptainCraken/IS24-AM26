@@ -25,8 +25,6 @@ public class ClientRMI implements InterfaceClient {
 
     //TODO costruttore
 
-    //TODO for call server, sistemare anche questo quindi. Che senso ha lobby is ready?
-    @Override
     public void login(String nickname) throws RemoteException, SameNameException, LobbyCompleteException, NoConnectionException {
         try {
             registry = LocateRegistry.getRegistry("127.0.0.1", PORT);
@@ -54,17 +52,41 @@ public class ClientRMI implements InterfaceClient {
         }
     }
 
-    @Override
-    public void disconnect() throws RemoteException {
-        controller.disconnect();
-    }
-
-    //TODO for call server
-    @Override
     public void insertNumberOfPlayers(int numberOfPlayers) throws RemoteException,
             NoSuchFieldException, ClosingLobbyException, SameNameException, LobbyCompleteException {
         stub.insertNumberOfPlayers(numberOfPlayers);
-        //TODO try/catch
+    }
+
+
+    public void chooseColor(Color color) throws ColorAlreadyTakenException, RemoteException, NoSuchFieldException, ColorAlreadyTakenException {
+        //TODO call controller ok client
+        stub.chooseColor(controller.getNickname(), color);
+    }
+
+
+    public void chooseSideStartingCard(boolean side) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException {
+        stub.chooseSideStartingCard(controller.getNickname(), side);
+    }
+
+    public void chooseSecretObjectiveCard(int indexCard)
+            throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException {//0 or 1
+        stub.chooseSecretObjectiveCard(controller.getNickname(), indexCard);
+        controller.setSecretObjectiveCard(indexCard);
+    }
+
+    public void playCard(int indexHand, Point position, boolean side) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException, NotEnoughResourcesException {
+        stub.placeCard(controller.getNickname(), indexHand, position, side);
+    }
+
+    public void drawCard(String nickname, boolean gold, int onTableOrDeck)
+            throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException {
+        int cardId = stub.drawCard(nickname, gold, onTableOrDeck);
+        controller.drawCard(nickname, cardId);
+    }
+
+    @Override
+    public void disconnect() throws RemoteException {
+        controller.disconnect();
     }
 
     @Override
@@ -77,13 +99,6 @@ public class ClientRMI implements InterfaceClient {
         controller.refreshUsers(playersAndPins);
     }
 
-    //TODO for call server
-    @Override
-    public void chooseColor(Color color) throws ColorAlreadyTakenException, RemoteException, NoSuchFieldException, ColorAlreadyTakenException {
-        //TODO call controller ok client
-        stub.chooseColor(controller.getNickname(), color);
-    }
-
     @Override
     public void sendInfoOnTable(){
         controller.sendInfoOnTable();
@@ -94,12 +109,6 @@ public class ClientRMI implements InterfaceClient {
         controller.showStartingCard(startingCardId);
     }
 
-    //TODO for call server
-    @Override
-    public void chooseSideStartingCard(boolean side) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException {
-        stub.chooseSideStartingCard(controller.getNickname(), side);
-    }
-
     @Override
     public void showObjectiveCards(Integer[] objectiveCardIds){
         controller.showObjectiveCards(objectiveCardIds);
@@ -108,14 +117,6 @@ public class ClientRMI implements InterfaceClient {
     @Override
     public void showSecretObjectiveCards(Integer[] objectiveCardIds){
         controller.showSecretObjectiveCards(objectiveCardIds);
-    }
-
-    //TODO for call server
-    @Override
-    public void chooseSecretObjectiveCard(int indexCard)
-            throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException {//0 or 1
-        stub.chooseSecretObjectiveCard(controller.getNickname(), indexCard);
-        controller.setSecretObjectiveCard(indexCard);
     }
 
     @Override
@@ -133,26 +134,12 @@ public class ClientRMI implements InterfaceClient {
         controller.refreshTurnInfo(currentPlayer, gameState);
     }
 
-    //TODO for call server
-    @Override
-    public void playCard(int indexHand, Point position, boolean side) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException, NotEnoughResourcesException {
-        stub.placeCard(controller.getNickname(), indexHand, position, side);
-    }
-
     @Override
     //Called for playCard() and for chooseSideStartingCard()
     public void placeCard(String nickname, int id, Point position, boolean side, HashMap<Sign, Integer> resources, int points){
         controller.placeCard(nickname, id, position, side);
         controller.updateResources(nickname, resources);
         controller.updateScore(nickname, points);
-    }
-
-    //TODO for call server, sistema con daniel
-    @Override
-    public void drawCard(String nickname, boolean gold, int onTableOrDeck)
-            throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException {
-        int cardId = stub.drawCard(nickname, gold, onTableOrDeck);
-        controller.drawCard(nickname, cardId);
     }
 
     @Override
@@ -167,7 +154,7 @@ public class ClientRMI implements InterfaceClient {
         controller.showRanking(ranking);
     }
 
-    //TODO
+    //TODO, serve connessione
     public void getIsFirst(String firstPlayer) {
         controller.getIsFirst(firstPlayer);
     }

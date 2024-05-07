@@ -13,54 +13,30 @@ import java.util.HashMap;
 
 public interface InterfaceClient {
 
-    public void login(String nickname) throws RemoteException, SameNameException, LobbyCompleteException, NoConnectionException;
+    void disconnect() throws RemoteException;
 
-    public void disconnect() throws RemoteException;
+    void stopWaiting(String nickname) throws RemoteException;
 
-    public void insertNumberOfPlayers(int numberOfPlayers) throws RemoteException,
-            NoSuchFieldException, ClosingLobbyException, SameNameException, LobbyCompleteException;
+    void refreshUsers(HashMap<String, Color> playersAndPins);
 
-    public void stopWaiting(String nickname) throws RemoteException;
+    void sendInfoOnTable();
 
-    public void refreshUsers(HashMap<String, Color> playersAndPins);
+    void showStartingCard(int startingCardId);
 
-    public void chooseColor(Color color) throws ColorAlreadyTakenException, RemoteException, NoSuchFieldException, ColorAlreadyTakenException;
+    void showObjectiveCards(Integer[] objectiveCardIds);
 
-    //GAME START
+    void showSecretObjectiveCards(Integer[] objectiveCardIds);
 
-    public void sendInfoOnTable();
+    void showHand(String nickname, Integer[] hand);
 
-    public void showStartingCard(int startingCardId);
+    void showHiddenHand(String nickname, Kingdom[] hand);
 
-    //Called by the user (they have .getNickname())
-    public void chooseSideStartingCard(boolean side) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException;
+    void refreshTurnInfo(String currentPlayer, GameState gameState);
 
-    public void showObjectiveCards(Integer[] objectiveCardIds);
+    void placeCard(String nickname, int id, Point position, boolean side, HashMap<Sign, Integer> resources, int points);
 
-    public void showSecretObjectiveCards(Integer[] objectiveCardIds);
+    void moveCard(int newCardId, Kingdom headDeck, boolean gold, int onTableOrDeck);
 
-    //Called by the user (they have .getNickname())
-    public void chooseSecretObjectiveCard(int indexCard)
-            throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException;
-
-    public void showHand(String nickname, Integer[] hand);
-
-    public void showHiddenHand(String nickname, Kingdom[] hand);
-
-    //Game Flow
-    public void refreshTurnInfo(String currentPlayer, GameState gameState);
-
-    //Called by the user (they have .getNickname())
-    public void playCard(int indexHand, Point position, boolean side) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException, NotEnoughResourcesException;
-
-    //Called for playCard() and for chooseSideStartingCard()
-    public void placeCard(String nickname, int id, Point position, boolean side, HashMap<Sign, Integer> resources, int points);
-
-    public void drawCard(String nickname, boolean gold, int onTableOrDeck)
-            throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException;
-
-    public void moveCard(int newCardId, Kingdom headDeck, boolean gold, int onTableOrDeck);
-
-    public void showEndGame(HashMap<String, Integer> extraPoints, HashMap<String, Integer> ranking);
+    void showEndGame(HashMap<String, Integer> extraPoints, HashMap<String, Integer> ranking);
 }
 
