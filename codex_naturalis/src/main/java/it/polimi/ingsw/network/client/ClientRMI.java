@@ -6,7 +6,6 @@ import it.polimi.ingsw.model.GameState;
 import it.polimi.ingsw.model.Kingdom;
 import it.polimi.ingsw.model.Sign;
 import it.polimi.ingsw.model.exception.*;
-import it.polimi.ingsw.network.exception.NoConnectionException;
 import it.polimi.ingsw.network.server.LoggableServer;
 
 import java.awt.*;
@@ -16,7 +15,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.HashMap;
 
-public class ClientRMI implements InterfaceClient {
+public class ClientRMI extends InterfaceClient {
     int PORT = 1234;
     Controller controller;
     LoggableServer stub = null;
@@ -25,7 +24,7 @@ public class ClientRMI implements InterfaceClient {
 
     //TODO costruttore
 
-    public void login(String nickname) throws RemoteException, SameNameException, LobbyCompleteException, NoConnectionException {
+    public void login(String nickname) throws RemoteException, SameNameException, LobbyCompleteException {
         try {
             registry = LocateRegistry.getRegistry("127.0.0.1", PORT);
             stub = (LoggableServer) registry.lookup("Loggable");
@@ -36,9 +35,7 @@ public class ClientRMI implements InterfaceClient {
             System.out.println("Client exception: " + e.toString());
             throw new RuntimeException(e);
         }
-        if(stub == null){
-            throw new NoConnectionException();
-        }
+
         boolean isFirst = stub.isFirst(this, nickname);
         if (isFirst) {
             //This should be changed
@@ -58,7 +55,7 @@ public class ClientRMI implements InterfaceClient {
     }
 
 
-    public void chooseColor(Color color) throws ColorAlreadyTakenException, RemoteException, NoSuchFieldException, ColorAlreadyTakenException {
+    public void chooseColor(Color color) throws  RemoteException, NoSuchFieldException, ColorAlreadyTakenException {
         //TODO call controller ok client
         stub.chooseColor(controller.getNickname(), color);
     }
@@ -69,9 +66,9 @@ public class ClientRMI implements InterfaceClient {
     }
 
     public void chooseSecretObjectiveCard(int indexCard)
-            throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException {//0 or 1
+            throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException {
         stub.chooseSecretObjectiveCard(controller.getNickname(), indexCard);
-        controller.setSecretObjectiveCard(indexCard);
+        controller.showSecretObjectiveCard(indexCard);
     }
 
     public void playCard(int indexHand, Point position, boolean side) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException, NotEnoughResourcesException {
@@ -85,12 +82,12 @@ public class ClientRMI implements InterfaceClient {
     }
 
     @Override
-    public void disconnect() throws RemoteException {
+    public void disconnect() {
         controller.disconnect();
     }
 
     @Override
-    public void stopWaiting(String nickname) throws RemoteException {
+    public void stopWaiting(String nickname) {
         controller.setNickname(nickname);
     }
 
@@ -135,7 +132,6 @@ public class ClientRMI implements InterfaceClient {
     }
 
     @Override
-    //Called for playCard() and for chooseSideStartingCard()
     public void placeCard(String nickname, int id, Point position, boolean side, HashMap<Sign, Integer> resources, int points){
         controller.placeCard(nickname, id, position, side);
         controller.updateResources(nickname, resources);

@@ -8,7 +8,6 @@ import it.polimi.ingsw.model.exception.*;
 
 import it.polimi.ingsw.network.client.ClientRMI;
 import it.polimi.ingsw.network.client.InterfaceClient;
-import it.polimi.ingsw.network.exception.NoConnectionException;
 import it.polimi.ingsw.view.Tui;
 
 import java.awt.*;
@@ -19,6 +18,10 @@ public class Controller {
     private String nickname;
     private InterfaceClient connection;
     private Tui view;
+
+    public Controller(){
+        //TODO
+    }
 
     public void setView(String typeOfView) {
         if(typeOfView.equals("TUI")){
@@ -50,9 +53,13 @@ public class Controller {
         view.stopWaiting();
     }
 
-    //TODO
-    public void setNickname(String nickname) {
 
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public String getNickname() {
+        return nickname;
     }
 
     public void refreshUsers(HashMap<String, Color> playersAndPins) {
@@ -63,64 +70,68 @@ public class Controller {
         view.disconnect();
     }
 
-    public String getNickname() {
-        return null;
-    }
-
-    //TODO also for controller server
     public void sendInfoOnTable() {
+        view.sendInfoOnTable();
     }
 
     public void showStartingCard(int startingCardId) {
         view.showStartingCard(startingCardId);
     }
 
-    //TODO quelle di tutti
     public void showObjectiveCards(Integer[] objectiveCardIds) {
+        view.printObjectiveCards(objectiveCardIds);
     }
 
-    //TODO per scegliere le due
     public void showSecretObjectiveCards(Integer[] objectiveCardIds) {
+        view.printSecretObjectiveCards(objectiveCardIds);
     }
 
-    public void setSecretObjectiveCard(int indexCard) {
+    public void showSecretObjectiveCard(int indexCard) {
+        view.showSecretObjectiveCard(indexCard);
     }
 
-    //TODO quelle di tutti
     public void getHand(String nickname, Integer[] hand) {
+        //TODO no print immediata
     }
 
     public void getHiddenHand(Kingdom[] hand) {
+        //TODO print immediata
     }
 
-    //TODO current player e fase di gioco
     public void refreshTurnInfo(String currentPlayer, GameState gameState) {
+        view.refreshTurnInfo(currentPlayer, gameState);
     }
 
-    //TODO generica per tutti i giocatori
     public void placeCard(String nickname, int id, Point position, boolean side) {
+        //TODO no print immediata, valuta cosa succede
     }
 
-    //TODO generica per tutti i giocatori
     public void updateResources(String nickname, HashMap<Sign, Integer> resources) {
+        //TODO no print immediata
     }
-    //TODO generica per tutti i giocatori
+
     public void updateScore(String nickname, int points) {
+        view.updateScore(nickname, points);
     }
-    //TODO generica per tutti i giocatori
+
     public void drawCard(String nickname, int cardId) {
+        //TODO capire se fare print immediata o meno
     }
-    //TODO generica per tutti i giocatori
+
     public void newCardOnTable(int newCardId, boolean gold, int onTableOrDeck) {
+        //TODO no print immediata
     }
-    //TODO generica per tutti i giocatori
+
     public void newHeadDeck(Kingdom headDeck, boolean gold, int onTableOrDeck) {
+        //TODO no print immediata
     }
-    //TODO generica per tutti i giocatori
+
     public void showExtraPoints(HashMap<String, Integer> extraPoints) {
+        view.showExtraPoints(extraPoints);
     }
-    //TODO generica per tutti i giocatori
+
     public void showRanking(HashMap<String, Integer> ranking) {
+        view.showRanking(ranking);
     }
     //TODO generica per tutti i giocatori
     public void getIsFirst(String firstPlayer) {
@@ -135,10 +146,8 @@ public class Controller {
             view.sameName(nickname);
         } catch (LobbyCompleteException e){
             view.lobbyComplete();
-        } catch (NoConnectionException e){
-            //TODO
         } catch (RemoteException e) {
-            //TODO;
+            view.noConnection();
         }
     }
 
@@ -147,7 +156,7 @@ public class Controller {
         try{
             connection.insertNumberOfPlayers(numberOfPlayers);
         } catch (RemoteException e) {
-            //TODO
+            view.noConnection();
         } catch (NoSuchFieldException e) {
             //TODO
         } catch (ClosingLobbyException e) {
@@ -163,7 +172,7 @@ public class Controller {
         try{
             connection.chooseColor(color);
         } catch (RemoteException e) {
-            //TODO
+            view.noConnection();
         } catch (NoSuchFieldException e) {
             //TODO
         } catch (ColorAlreadyTakenException e) {
@@ -175,11 +184,11 @@ public class Controller {
         try{
             connection.chooseSideStartingCard(side);
         } catch (WrongGamePhaseException e) {
-            //TODO
+            view.wrongGamePhase();
         } catch (NoTurnException e) {
-            //TODO
+            view.noTurn();
         } catch (NotExistsPlayerException e) {
-            //TODO
+            view.noPlayer();
         } catch (NoSuchFieldException e) {
             //TODO
         }
@@ -189,11 +198,11 @@ public class Controller {
         try{
             connection.chooseSecretObjectiveCard(indexCard);
         } catch (WrongGamePhaseException e) {
-            //TODO
+            view.wrongGamePhase();
         } catch (NoTurnException e) {
-            //TODO
+            view.noTurn();
         } catch (NotExistsPlayerException e) {
-            //TODO
+            view.noPlayer();
         } catch (NoSuchFieldException e) {
             //TODO
         }
@@ -203,11 +212,11 @@ public class Controller {
         try{
             connection.playCard(indexHand, position, side);
         } catch (WrongGamePhaseException e) {
-            //TODO
+            view.wrongGamePhase();
         } catch (NoTurnException e) {
             view.noTurn();
         } catch (NotExistsPlayerException e) {
-            //TODO
+            view.noPlayer();
         } catch (NoSuchFieldException e) {
             //TODO
         } catch (NotEnoughResourcesException e) {
@@ -215,5 +224,34 @@ public class Controller {
         }
     }
 
-    //TODO drawCard
+    public void setSecretObjectiveCard(int indexCard) {
+        try {
+            connection.chooseSecretObjectiveCard(indexCard);
+        } catch (WrongGamePhaseException e) {
+            view.wrongGamePhase();
+        } catch (NoTurnException e) {
+            view.noTurn();
+        } catch (NotExistsPlayerException e) {
+            view.noPlayer();
+        } catch (NoSuchFieldException e) {
+            //TODO
+        }
+
+    }
+
+    public void drawCard(String nickname, boolean gold, int onTableOrDeck) {
+        try{
+            connection.drawCard(nickname, gold, onTableOrDeck);
+//            drawCard(nickname, cardId);
+        } catch (WrongGamePhaseException e) {
+            view.wrongGamePhase();
+        } catch (NoTurnException e) {
+            view.noTurn();
+        } catch (NotExistsPlayerException e) {
+            view.noPlayer();
+        } catch (NoSuchFieldException e) {
+            //TODO;
+        }
+    }
+
 }

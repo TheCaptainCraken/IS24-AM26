@@ -1,7 +1,10 @@
 package it.polimi.ingsw.model;
 
 import it.polimi.ingsw.model.exception.*;
+import org.json.simple.parser.ParseException;
+
 import java.awt.*;
+import java.io.IOException;
 import java.util.*;
 import java.util.HashMap;
 
@@ -32,7 +35,7 @@ public class GameMaster {
      * @param jsonObjectiveCardFileName  json file name to create the objective deck
      * @param jsonObjectiveStartFileName json file name to create the starting deck
      */
-    public GameMaster(Lobby lobby, String jsonResourceCardFileName, String jsonGoldCardFileName, String jsonObjectiveCardFileName, String jsonObjectiveStartFileName) {
+    public GameMaster(Lobby lobby, String jsonResourceCardFileName, String jsonGoldCardFileName, String jsonObjectiveCardFileName, String jsonObjectiveStartFileName) throws IOException, ParseException {
         this.globalTurn = 0;
         this.flagTurnRemained = 2;
         this.turnType = TurnType.PLAYING;
@@ -41,7 +44,7 @@ public class GameMaster {
         this.lobby.setLock();
         this.gameState = GameState.CHOOSING_ROOT_CARD;
 
-        this.resourceDeck = new Deck(jsonResourceCardFileName);// mettiamo direttamente il nome del json e poi calcoliamo quanto è grande?
+        this.resourceDeck = new Deck(jsonResourceCardFileName);
         this.goldDeck = new Deck(jsonGoldCardFileName);
         this.objectiveDeck = new Deck(jsonObjectiveCardFileName);
         this.startingDeck = new Deck(jsonObjectiveStartFileName);
@@ -618,7 +621,7 @@ public class GameMaster {
      * @param namePlayer name of the player about is wanted to get info
      * @return points of the player
      */
-    public int getPlayerPoints(String namePlayer) throws NoSuchFieldException {
+    public int getPlayerPoints(String namePlayer) throws NoSuchFieldException, NoNameException {
         return lobby.getPlayerFromName(namePlayer).getPoints();
     }
 
@@ -628,7 +631,7 @@ public class GameMaster {
      * @param namePlayer name of the player about is wanted to get info
      * @return resources of the player
      */
-    public HashMap<Sign, Integer> getPlayerResources(String namePlayer) throws NoSuchFieldException {
+    public HashMap<Sign, Integer> getPlayerResources(String namePlayer) throws NoSuchFieldException, NoNameException {
         return lobby.getPlayerFromName(namePlayer).getResources();
     }
 

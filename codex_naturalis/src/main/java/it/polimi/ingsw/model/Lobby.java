@@ -3,6 +3,7 @@ package it.polimi.ingsw.model;
 import it.polimi.ingsw.model.exception.ClosingLobbyException;
 import it.polimi.ingsw.model.exception.LobbyCompleteException;
 import it.polimi.ingsw.model.exception.SameNameException;
+import it.polimi.ingsw.model.exception.NoNameException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,7 +35,6 @@ public class Lobby {
             }
         }
         Player newPlayer = new Player(nickname);
-
         players.add(newPlayer);
         if(players.size() == maxSize){
             setLock();
@@ -59,13 +59,13 @@ public class Lobby {
      * @param nickname nickname of the Player we want to get
      * @return the Player with the given nickname
      */
-    public Player getPlayerFromName(String nickname) throws NoSuchFieldException {//TODO clone
+    public Player getPlayerFromName(String nickname) throws NoNameException {
         for(Player player : getPlayers()){
             if(player.getName().equals(nickname)){
                 return player;
             }
         }
-        throw new NoSuchFieldException("There's no Player with the given nickname");
+        throw new NoNameException();
     }
 
     /**Set the first player

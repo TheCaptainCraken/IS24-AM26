@@ -5,38 +5,84 @@ import it.polimi.ingsw.model.GameState;
 import it.polimi.ingsw.model.Kingdom;
 import it.polimi.ingsw.model.Sign;
 import it.polimi.ingsw.model.exception.*;
-import it.polimi.ingsw.network.exception.NoConnectionException;
 
 import java.awt.*;
 import java.rmi.RemoteException;
 import java.util.HashMap;
 
-public interface InterfaceClient {
+public abstract class InterfaceClient {
 
-    void disconnect() throws RemoteException;
+    public void disconnect() {
 
-    void stopWaiting(String nickname) throws RemoteException;
+    }
 
-    void refreshUsers(HashMap<String, Color> playersAndPins);
+    public void stopWaiting(String nickname) {
 
-    void sendInfoOnTable();
+    }
 
-    void showStartingCard(int startingCardId);
+    public void refreshUsers(HashMap<String, Color> playersAndPins) {
 
-    void showObjectiveCards(Integer[] objectiveCardIds);
+    }
 
-    void showSecretObjectiveCards(Integer[] objectiveCardIds);
+    public void sendInfoOnTable() {
 
-    void showHand(String nickname, Integer[] hand);
+    }
 
-    void showHiddenHand(String nickname, Kingdom[] hand);
+    public void showStartingCard(int startingCardId) {
 
-    void refreshTurnInfo(String currentPlayer, GameState gameState);
+    }
 
-    void placeCard(String nickname, int id, Point position, boolean side, HashMap<Sign, Integer> resources, int points);
+    public void showObjectiveCards(Integer[] objectiveCardIds) {
 
-    void moveCard(int newCardId, Kingdom headDeck, boolean gold, int onTableOrDeck);
+    }
 
-    void showEndGame(HashMap<String, Integer> extraPoints, HashMap<String, Integer> ranking);
+    public void showSecretObjectiveCards(Integer[] objectiveCardIds) {
+
+    }
+
+    public void showHand(String nickname, Integer[] hand) {
+
+    }
+
+    public void showHiddenHand(String nickname, Kingdom[] hand) {
+
+    }
+
+    public void refreshTurnInfo(String currentPlayer, GameState gameState) {
+
+    }
+
+    public void placeCard(String nickname, int id, Point position, boolean side, HashMap<Sign, Integer> resources, int points) {
+
+    }
+
+    public void moveCard(int newCardId, Kingdom headDeck, boolean gold, int onTableOrDeck) {
+
+    }
+
+    public void showEndGame(HashMap<String, Integer> extraPoints, HashMap<String, Integer> ranking) {
+
+    }
+
+    public void insertNumberOfPlayers(int numberOfPlayers) throws RemoteException, NoSuchFieldException, ClosingLobbyException, SameNameException, LobbyCompleteException {
+    }
+
+    public void chooseColor(Color color) throws ColorAlreadyTakenException, RemoteException, NoSuchFieldException {
+    }
+
+    public void chooseSideStartingCard(boolean side) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException {
+    }
+
+    public void chooseSecretObjectiveCard(int indexCard) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException {
+    }
+
+    public void playCard(int indexHand, Point position, boolean side) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException, NotEnoughResourcesException {
+    }
+
+    public void login(String nickname) throws RemoteException, SameNameException, LobbyCompleteException {
+    }
+
+    public void drawCard(String nickname, boolean gold, int onTableOrDeck) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException {
+    }
 }
 
