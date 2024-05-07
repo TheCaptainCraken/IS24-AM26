@@ -21,7 +21,7 @@ classDiagram
         + chooseObjectiveCard(String namePlayer, int whichCard)
         + placeCard(String namePlayer, PlayableCard cardToPlace, Point position, boolean side)
         + drawCard(String namePlayer, boolean goldOrNot, int ontTableOrDeck) : ResourceCard
-        + calculateEndGamePoints()
+        + endGame() 
         + getWinners() : ArrayList~Player~
         - fromKingdomToSign(Kingdom kingdom) : Sign
         - isPositionable(PlayedCard startingCard, PlayableCard cardToPLlace, Point position) : HashMap~Corner, PlayedCard~
@@ -37,7 +37,7 @@ classDiagram
         + setOnTableObjectCard(ObjectCard ObjectCard, int place)
         + getPlayerPoints(String name) : int
         + getPlayerResources(String name) : HashMap~Sign, Integer~
-        - calculateSpecialGoldPoints(GoldCard card) : int
+        - calculateSpecialGoldPoints(Player player, GoldCard card) : int
     }
     GameMaster --* Lobby : manages
     GameMaster --* Player : manages
@@ -73,7 +73,7 @@ classDiagram
     class Player {
         - name: String
         - points: int
-        - hand: ArrayList~Card~
+        - hand: Array ~Card~
         - color: Color
         - rootCard: StartingCard 
         - secretObjective: ObjectiveCard
@@ -94,6 +94,7 @@ classDiagram
         + giveCard(ResourceCard card)
         + takeCard(ResourceCard card)
         + addPoints(int points)
+        + addObjectivePoints(int points)
     }
     Player --* Card : has in their hand 
     Player --* Color : has color

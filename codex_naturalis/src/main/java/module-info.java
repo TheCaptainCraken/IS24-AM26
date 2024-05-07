@@ -3,6 +3,7 @@ module it.polimi.ingsw {
 
     requires javafx.controls;
     requires javafx.fxml;
+    requires json.simple;
     requires java.desktop;
     requires java.rmi;
 
