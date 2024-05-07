@@ -1,10 +1,10 @@
 package it.polimi.ingsw.model;
 
 public enum Sign {
-    MUSHROOM,
     LEAF,
-    BUTTERFLY,
     WOLF,
+    MUSHROOM,
+    BUTTERFLY,
     QUILL,
     INKWELL,
     SCROLL,

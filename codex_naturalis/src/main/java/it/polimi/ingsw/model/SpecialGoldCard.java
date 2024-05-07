@@ -35,7 +35,7 @@ public class SpecialGoldCard extends GoldCard {
      *
      * @return The special gold card's thing to count.
      */
-    public Countable getThingtoCount() {
+    public Countable getThingToCount() {
         return thingToCount;
     }
 }

@@ -35,7 +35,7 @@ public class PlayedCard {
      *
      * @param cardsToAttach is the map which contains the cards that will have to be attached to our new PlayedCard
      * */
-    public PlayedCard(PlayableCard playableCard, HashMap<Corner,PlayedCard> cardsToAttach,boolean side, int turnNumber, Point position) {
+    public PlayedCard(PlayableCard playableCard, HashMap<Corner, PlayedCard> cardsToAttach, boolean side, int turnNumber, Point position) {
         this.card = playableCard;
         attachmentCorners = new HashMap<>();
         this.flagCountedForObjective = false;
@@ -43,26 +43,29 @@ public class PlayedCard {
         this.turnOfPositioning = turnNumber;
         this.position = position;
 
-        /**This ForEach cycle iterates on the Keys of the cardsToAttach given in order to fill out attachmentCorners with the PlayedCards
+        /** This ForEach cycle iterates on the Keys of the cardsToAttach given in order to fill out attachmentCorners with the PlayedCards
          * that are attached to this instance of PlayedCard,the newest card is attached first.
          * */
         for(Corner c : cardsToAttach.keySet()){
-            this.attachCard(c,cardsToAttach.get(c));
-            switch (c) {
-                case TOP_LEFT:
-                    cardsToAttach.get(c).attachCard(Corner.BOTTOM_RIGHT,this);
-                    break;
-                case TOP_RIGHT:
-                    cardsToAttach.get(c).attachCard(Corner.BOTTOM_LEFT,this);
-                    break;
-                case BOTTOM_LEFT:
-                    cardsToAttach.get(c).attachCard(Corner.TOP_RIGHT,this);
-                    break;
-                case BOTTOM_RIGHT:
-                    cardsToAttach.get(c).attachCard(Corner.TOP_LEFT,this);
-                    break;
-                default:
-                    break;
+            this.attachCard(c, cardsToAttach.get(c));
+            if(cardsToAttach.get(c) != null) {
+                //if the card is not null, we attach the card to the corner of the card that is already attached to this
+                switch (c) {
+                    case TOP_LEFT:
+                        cardsToAttach.get(c).attachCard(Corner.BOTTOM_RIGHT, this);
+                        break;
+                    case TOP_RIGHT:
+                        cardsToAttach.get(c).attachCard(Corner.BOTTOM_LEFT, this);
+                        break;
+                    case BOTTOM_LEFT:
+                        cardsToAttach.get(c).attachCard(Corner.TOP_RIGHT, this);
+                        break;
+                    case BOTTOM_RIGHT:
+                        cardsToAttach.get(c).attachCard(Corner.TOP_LEFT, this);
+                        break;
+                    default:
+                        break;
+                }
             }
         }
     }
@@ -99,7 +102,9 @@ public class PlayedCard {
 
     /**@return the map in which the information on the status of the PlayedCard's corners is stored
      * */
-    public HashMap<Corner, PlayedCard> getAttachmentCorners() {//TODO Capire se vogliamo passare l'oggetto o è usiamo un metodo che ritorna l'id e poi risaliamo alla carta, altrimenti così passiamo un oggetto per valore e si può modificare
+    public HashMap<Corner, PlayedCard> getAttachmentCorners() {
+        //TODO Capire se vogliamo passare l'oggetto o è usiamo un metodo che ritorna l'id e poi risaliamo alla carta,
+        // altrimenti così passiamo un oggetto per valore e si può modificare
         HashMap<Corner, PlayedCard> attachmentCornersCopy = new HashMap<>();
         for(Corner corner : Corner.values()){
             attachmentCornersCopy.put(corner, attachmentCorners.get(corner));
@@ -111,9 +116,7 @@ public class PlayedCard {
     public PlayedCard getAttached(Corner corner){
         return attachmentCorners.get(corner);
     }
-    /*public PlayedCard clone(PlayedCard p){
-        return new PlayedCard(p.getCard(),p.getAttachmentCorners(),p.isFacingUp,p.getTurnOfPositioning(),p.getPosition());
-    }*/
+
     /**@return the coordinates corresponding to the place,related to the StartingCard, in which the card was played
      * */
     public Point getPosition() {

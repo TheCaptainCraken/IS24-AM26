@@ -152,7 +152,7 @@ public class Deck {
     private void insertStartingCard(JSONObject cardObject) {
         int id = extractInteger(cardObject, "id");
 
-        Kingdom kingdom = Kingdom.valueOf((String) cardObject.get("kingdom"));
+        Kingdom kingdom = kingdomOrNull((String) cardObject.get("kingdom"));
 
         JSONObject frontCorners = (JSONObject) cardObject.get("front-corners");
         JSONObject backCorners = (JSONObject) cardObject.get("back-corners");
@@ -233,7 +233,7 @@ public class Deck {
      * 
      * @return the {@link Kingdom} of the first card of the deck.
      */
-    public Kingdom getKingdomFirstCard() {
+    public Kingdom getKingdomFirstCard() throws IndexOutOfBoundsException{
         return cards.get(0).getKingdom();
     }
 
@@ -246,7 +246,11 @@ public class Deck {
      * @throws IndexOutOfBoundsException if the deck is empty.
      */
     public Card draw() throws IndexOutOfBoundsException {
-        return cards.remove(0);
+        try{
+            return cards.remove(0);
+        }catch(IndexOutOfBoundsException e){
+            throw new IndexOutOfBoundsException("The deck is empty");//just to add the message
+        }
     }
 
     /**
