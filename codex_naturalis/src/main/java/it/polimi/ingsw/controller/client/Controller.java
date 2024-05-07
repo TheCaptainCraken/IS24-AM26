@@ -133,9 +133,9 @@ public class Controller {
             connection.login(nickname);
         } catch (SameNameException e) {
             view.sameName(nickname);
-        }catch (LobbyCompleteException e){
+        } catch (LobbyCompleteException e){
             view.lobbyComplete();
-        }catch (NoConnectionException e){
+        } catch (NoConnectionException e){
             //TODO
         } catch (RemoteException e) {
             //TODO;

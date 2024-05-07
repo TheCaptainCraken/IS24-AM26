@@ -21,8 +21,7 @@ public class ClientRMI implements InterfaceClient {
     Controller controller;
     LoggableServer stub = null;
     Registry registry = null;
-    ClientRMI obj = new ClientRMI();//
-    boolean lobbyIsReady = false;
+    ClientRMI obj = new ClientRMI();
 
     //TODO costruttore
 
@@ -47,7 +46,7 @@ public class ClientRMI implements InterfaceClient {
             //This should be changed
             controller.askNumberOfPlayer();
         }else{
-            if(lobbyIsReady){
+            if(stub.lobbyIsReady()){
                 controller.waitLobby();
             }else{
                 controller.stopWaiting();
@@ -66,8 +65,6 @@ public class ClientRMI implements InterfaceClient {
             NoSuchFieldException, ClosingLobbyException, SameNameException, LobbyCompleteException {
         stub.insertNumberOfPlayers(numberOfPlayers);
         //TODO try/catch
-
-        lobbyIsReady = true; //TODO sbagliato
     }
 
     @Override

@@ -15,13 +15,10 @@ public interface InterfaceClient {
 
     public void login(String nickname) throws RemoteException, SameNameException, LobbyCompleteException, NoConnectionException;
 
-
     public void disconnect() throws RemoteException;
-
 
     public void insertNumberOfPlayers(int numberOfPlayers) throws RemoteException,
             NoSuchFieldException, ClosingLobbyException, SameNameException, LobbyCompleteException;
-
 
     public void stopWaiting(String nickname) throws RemoteException;
 
@@ -53,10 +50,8 @@ public interface InterfaceClient {
     //Game Flow
     public void refreshTurnInfo(String currentPlayer, GameState gameState);
 
-
     //Called by the user (they have .getNickname())
     public void playCard(int indexHand, Point position, boolean side) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException, NotEnoughResourcesException;
-
 
     //Called for playCard() and for chooseSideStartingCard()
     public void placeCard(String nickname, int id, Point position, boolean side, HashMap<Sign, Integer> resources, int points);

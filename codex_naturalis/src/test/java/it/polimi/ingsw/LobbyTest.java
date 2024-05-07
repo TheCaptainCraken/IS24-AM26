@@ -23,7 +23,7 @@ public class LobbyTest {
     @DisplayName("check correct function when lobby is complete")
     public void CheckCorrectFunctionLobbyComplete(){
         assertThrows(LobbyCompleteException.class, () -> {
-            Lobby lobby = new Lobby(4);
+            Lobby lobby = new Lobby();
             lobby.addPlayer("pietro");
             lobby.addPlayer("marco");
             lobby.addPlayer("daniel");
@@ -34,12 +34,13 @@ public class LobbyTest {
 
     @BeforeAll
     public static void Setup() throws FullLobbyException, SameNameException, LobbyCompleteException {
-        lobby = new Lobby(4);
+        lobby = new Lobby();
         lobby.addPlayer("pietro");
         lobby.addPlayer("marco");
         lobby.addPlayer("daniel");
         lobby.addPlayer("arturo");
     }
+
     @Test
     @DisplayName("Search player")
     public void SearchPlayerTest() throws NotExistsPlayerException, NoSuchFieldException {

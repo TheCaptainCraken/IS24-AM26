@@ -19,6 +19,7 @@ public class ServerRMI implements LoggableServer {
     Controller controller = Controller.getInstance();
     int numberOfPlayers = 0;//TODO I can do a method to get it
     HashMap<String, ClientRMI> connections = new HashMap<>();
+    boolean lobbyIsReady = false;
 
     public static void main(String[] args) throws RemoteException {
         System.out.println("Hello, World!");
@@ -65,6 +66,11 @@ public class ServerRMI implements LoggableServer {
     }
 
     @Override
+    public boolean lobbyIsReady() throws RemoteException {
+        return lobbyIsReady;
+    }
+
+    @Override
     public void insertNumberOfPlayers(int numberOfPlayers) throws RemoteException, NoSuchFieldException, ClosingLobbyException, SameNameException, LobbyCompleteException {
         controller.initializeLobby(numberOfPlayers);
         //TODO remove all players before
@@ -79,6 +85,7 @@ public class ServerRMI implements LoggableServer {
                 connections.get(nickname).stopWaiting(nickname);
             }
         }
+        lobbyIsReady=true;
         refreshUsers();
     }
 
