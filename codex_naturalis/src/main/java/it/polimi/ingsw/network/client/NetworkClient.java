@@ -10,7 +10,7 @@ import java.awt.*;
 import java.rmi.RemoteException;
 import java.util.HashMap;
 
-public abstract class InterfaceClient {
+public abstract class NetworkClient {
 
     public void disconnect() {
 
@@ -64,25 +64,25 @@ public abstract class InterfaceClient {
 
     }
 
-    public void insertNumberOfPlayers(int numberOfPlayers) throws RemoteException, NoSuchFieldException, ClosingLobbyException, SameNameException, LobbyCompleteException {
+    public void insertNumberOfPlayers(int numberOfPlayers) throws RemoteException, ClosingLobbyException, SameNameException, LobbyCompleteException, NoNameException {
     }
 
-    public void chooseColor(Color color) throws ColorAlreadyTakenException, RemoteException, NoSuchFieldException {
+    public void chooseColor(Color color) throws ColorAlreadyTakenException, RemoteException,  NoNameException {
     }
 
-    public void chooseSideStartingCard(boolean side) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException {
+    public void chooseSideStartingCard(boolean side) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException,  NoNameException {
     }
 
-    public void chooseSecretObjectiveCard(int indexCard) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException {
+    public void chooseSecretObjectiveCard(int indexCard) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException,  NoNameException {
     }
 
-    public void playCard(int indexHand, Point position, boolean side) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException, NotEnoughResourcesException {
+    public void playCard(int indexHand, Point position, boolean side) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException,  NotEnoughResourcesException, NoNameException, CardPositionException {
     }
 
     public void login(String nickname) throws RemoteException, SameNameException, LobbyCompleteException {
     }
 
-    public void drawCard(String nickname, boolean gold, int onTableOrDeck) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException {
+    public void drawCard(String nickname, boolean gold, int onTableOrDeck) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException,  NoNameException {
     }
 }
 

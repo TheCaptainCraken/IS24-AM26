@@ -4,34 +4,30 @@ import it.polimi.ingsw.model.Card;
 import it.polimi.ingsw.model.*;
 import it.polimi.ingsw.model.Color;
 import it.polimi.ingsw.model.GameState;
-import it.polimi.ingsw.model.PlayableCard;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Stack;
+import java.util.Objects;
 
 public class Tui {
     private final ArrayList<String> availableColors;
     private final ArrayList<Card> Cards;
     private final ArrayList<Card> StartingCards;
     private final ArrayList<Card> ObjectiveCards;
-    private HashMap<String, Integer> points;
+    private HashMap<String, Integer> score;
+    private HashMap<String, HashMap<Sign, Integer>> AllResources;
 
 
     public Tui(){
         //TODO colori
         //TODO vari deck
         availableColors = new ArrayList<>();
-        availableColors.add("RED");
-        availableColors.add("YELLOW");
-        availableColors.add("GREEN");
-        availableColors.add("BLUE");
 
         Cards = new ArrayList<>();
         StartingCards = new ArrayList<>();
         ObjectiveCards = new ArrayList<>();
-        points = new HashMap<>();
+        score = new HashMap<>();
+        AllResources = new HashMap<>();
     }
 
     public void askNumberOfPlayer() {
@@ -51,8 +47,13 @@ public class Tui {
     public void refreshUsers(HashMap<String, Color> playersAndPins) {
         System.out.println("The players in the lobby are:");
         for (String nickname : playersAndPins.keySet()) {
-            //TODO color could be null
-            System.out.println(nickname + " - " + playersAndPins.get(nickname));
+            Color color = playersAndPins.get(nickname);
+            System.out.println(nickname + " - " + Objects.requireNonNullElse(color, "no color"));
+        }
+        //TODO ask daniel
+        for(String name : playersAndPins.keySet()){
+            score.put(name, 0);
+            AllResources.put(name, new HashMap<>()); //TODO controllare
         }
     }
 
@@ -75,25 +76,87 @@ public class Tui {
 
     public void colorAlreadyTaken() {
         System.out.println("The color you chose is already taken. Please choose another one");
-        //TODO colori disponibili
     }
 
     public void noTurn() {
         System.out.println("It's not your turn. You can't perform this action");
     }
 
-    public void notEnoughResources() {
+    public void notEnoughResources(String name) {
         System.out.println("You don't have enough resources to perform this action");
-        //TODO show resources
+        showResourcesPlayer(name);
     }
 
-    public PlayedCard getTable(String nickname) {
-        //TODO get the table (RootCard) of the player with the given nickname
-        return null;
+    public void noConnection() {
+        System.out.println("You are not connected to the server. Please retry");
     }
 
-    public void defaultMenu(){
-        //TODO prints the default menu
+    public void sendInfoOnTable() {
+    }
+
+    public void printObjectiveCards(Integer[] objectiveCardIds) {
+    }
+
+    public void printSecretObjectiveCards(Integer[] objectiveCardIds) {
+    }
+
+    public void showSecretObjectiveCard(int indexCard) {
+    }
+
+    public void refreshTurnInfo(String currentPlayer, GameState gameState) {
+        System.out.println("It's " + currentPlayer + "'s turn");
+        System.out.println("The game phase is: " + gameState);
+    }
+
+    public void updateScore(String nickname, int points) {
+        Integer newPoint = Integer.valueOf(points);
+        score.put(nickname, newPoint);
+    }
+
+    public void showExtraPoints(HashMap<String, Integer> extraPoints) {
+        System.out.println("The points made by ObjectiveCards are:");
+        for(String player: extraPoints.keySet()) {
+            System.out.println(player + " - " + extraPoints.get(player));
+        }
+    }
+
+    public void showRanking(HashMap<String, Integer> ranking) {
+        System.out.println("The ranking is:");
+        for(String player: ranking.keySet()) {
+            System.out.println(player + " - " + ranking.get(player));
+        }
+    }
+
+    public void wrongGamePhase() {
+        System.out.println("You can't perform this action in this game phase");
+    }
+
+    public void noPlayer() {
+        System.out.println("The player doesn't exist");
+    }
+
+    public void closingLobbyError() {
+        System.out.println("The input is not correct. Please retry");
+    }
+
+    public void updateResources(String nickname, HashMap<Sign, Integer> resources){
+       AllResources.put(nickname, resources);
+    }
+
+    public void showResources() {
+        for(String player: AllResources.keySet()){
+            System.out.println(player + " has:");
+            for(Sign sign: AllResources.get(player).keySet()){
+                System.out.println(sign + " - " + AllResources.get(player).get(sign));
+            }
+        }
+    }
+
+    private void showResourcesPlayer(String nickname) {
+        System.out.println("You have the following resources:");
+        for(Sign sign: AllResources.get(nickname).keySet()){
+            System.out.println(sign + " - " + AllResources.get(nickname).get(sign));
+        }
     }
 
     public void getView(String nickname){
@@ -140,14 +203,14 @@ public class Tui {
         }
         HashMap<Corner, String[]> arrows = createArrows(attachments, focusedCard);
 
-        for(int i=0; i<7; i++){
+        for(int i = 0; i < 7; i++){
             toPrint += attachmentsStrings.get(Corner.TOP_LEFT)[i]+"                             "+attachmentsStrings.get(Corner.TOP_RIGHT)[i]+"\n";
         }
         toPrint += "                             "+arrows.get(Corner.TOP_LEFT)[0]+"                             "+arrows.get(Corner.TOP_RIGHT)[0]+"                             "+"\n";
         toPrint += "                             "+arrows.get(Corner.TOP_LEFT)[1]+"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"+arrows.get(Corner.TOP_RIGHT)[1]+"                             "+"\n";
         toPrint += "                             "+arrows.get(Corner.TOP_LEFT)[2]+"                             "+arrows.get(Corner.TOP_RIGHT)[2]+"                             "+"\n";
 
-        for(int i=0; i<7; i++){
+        for(int i = 0; i < 7; i++){
             toPrint += "                             "+" ~ "+attachmentsStrings.get(Corner.TOP_LEFT)[i]+" ~ "+"                             "+"\n";
         }
         toPrint += "                             "+arrows.get(Corner.BOTTOM_LEFT)[0]+"                             "+arrows.get(Corner.BOTTOM_RIGHT)[0]+"                             "+"\n";
@@ -162,8 +225,8 @@ public class Tui {
     public String[] printCard(PlayedCard card) {
         HashMap<Corner, String> corner = new HashMap<>();
         String midSignsString;
-        if(card==null){
-            midSignsString="empty";
+        if(card == null){
+            midSignsString = "empty";
         }else{
             ArrayList<Sign> midSigns = new ArrayList<>();
             if (card.isFacingUp()) {
@@ -287,7 +350,7 @@ public class Tui {
      * @return Sign in which the Kingdom has been converted
      */
     private Sign fromKingdomToSign(Kingdom kingdom) throws IllegalArgumentException {
-        switch (kingdom) {
+        switch (kingdom){
             case PLANT:
                 return Sign.LEAF;
             case ANIMAL:
@@ -299,4 +362,17 @@ public class Tui {
         }
         throw new IllegalArgumentException("It's not a right Kingdom to convert");
     }
+
+
+    public PlayedCard getTable(String nickname) {
+        //TODO get the table (RootCard) of the player with the given nickname
+        return null;
+    }
+
+    public void defaultMenu(){
+        //TODO prints the default menu
+    }
+
+
+
 }

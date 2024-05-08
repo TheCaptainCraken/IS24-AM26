@@ -15,7 +15,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.HashMap;
 
-public class ClientRMI extends InterfaceClient {
+public class ClientRMI extends NetworkClient {
     int PORT = 1234;
     Controller controller;
     LoggableServer stub = null;
@@ -50,33 +50,33 @@ public class ClientRMI extends InterfaceClient {
     }
 
     public void insertNumberOfPlayers(int numberOfPlayers) throws RemoteException,
-            NoSuchFieldException, ClosingLobbyException, SameNameException, LobbyCompleteException {
+            ClosingLobbyException, SameNameException, LobbyCompleteException, NoNameException {
         stub.insertNumberOfPlayers(numberOfPlayers);
     }
 
 
-    public void chooseColor(Color color) throws  RemoteException, NoSuchFieldException, ColorAlreadyTakenException {
+    public void chooseColor(Color color) throws RemoteException,  ColorAlreadyTakenException, NoNameException {
         //TODO call controller ok client
         stub.chooseColor(controller.getNickname(), color);
     }
 
 
-    public void chooseSideStartingCard(boolean side) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException {
+    public void chooseSideStartingCard(boolean side) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoNameException {
         stub.chooseSideStartingCard(controller.getNickname(), side);
     }
 
     public void chooseSecretObjectiveCard(int indexCard)
-            throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException {
+            throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException,  NoNameException {
         stub.chooseSecretObjectiveCard(controller.getNickname(), indexCard);
         controller.showSecretObjectiveCard(indexCard);
     }
 
-    public void playCard(int indexHand, Point position, boolean side) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException, NotEnoughResourcesException {
+    public void playCard(int indexHand, Point position, boolean side) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException,  NotEnoughResourcesException, NoNameException, CardPositionException {
         stub.placeCard(controller.getNickname(), indexHand, position, side);
     }
 
     public void drawCard(String nickname, boolean gold, int onTableOrDeck)
-            throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException {
+            throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoNameException {
         int cardId = stub.drawCard(nickname, gold, onTableOrDeck);
         controller.drawCard(nickname, cardId);
     }

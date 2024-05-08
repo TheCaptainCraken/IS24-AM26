@@ -1,10 +1,7 @@
 package it.polimi.ingsw;
 
 import it.polimi.ingsw.model.Color;
-import it.polimi.ingsw.model.exception.FullLobbyException;
-import it.polimi.ingsw.model.exception.LobbyCompleteException;
-import it.polimi.ingsw.model.exception.NotExistsPlayerException;
-import it.polimi.ingsw.model.exception.SameNameException;
+import it.polimi.ingsw.model.exception.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeAll;
@@ -22,7 +19,7 @@ public class LobbyTest {
     @Test
     @DisplayName("check correct function when lobby is complete")
     public void CheckCorrectFunctionLobbyComplete(){
-        assertThrows(LobbyCompleteException.class, () -> {
+        assertThrows(SameNameException.class, () -> {
             Lobby lobby = new Lobby();
             lobby.addPlayer("pietro");
             lobby.addPlayer("marco");
@@ -33,7 +30,7 @@ public class LobbyTest {
     }
 
     @BeforeAll
-    public static void Setup() throws FullLobbyException, SameNameException, LobbyCompleteException {
+    public static void Setup() throws  SameNameException, LobbyCompleteException {
         lobby = new Lobby();
         lobby.addPlayer("pietro");
         lobby.addPlayer("marco");
@@ -43,7 +40,7 @@ public class LobbyTest {
 
     @Test
     @DisplayName("Search player")
-    public void SearchPlayerTest() throws NotExistsPlayerException, NoSuchFieldException {
+    public void SearchPlayerTest() throws  NoNameException {
         Player p1 = lobby.getPlayerFromName("pietro");
         assertEquals("pietro", p1.getName());
 

@@ -7,7 +7,7 @@ import it.polimi.ingsw.model.Sign;
 import it.polimi.ingsw.model.exception.*;
 
 import it.polimi.ingsw.network.client.ClientRMI;
-import it.polimi.ingsw.network.client.InterfaceClient;
+import it.polimi.ingsw.network.client.NetworkClient;
 import it.polimi.ingsw.view.Tui;
 
 import java.awt.*;
@@ -16,7 +16,7 @@ import java.util.HashMap;
 
 public class Controller {
     private String nickname;
-    private InterfaceClient connection;
+    private NetworkClient connection;
     private Tui view;
 
     public Controller(){
@@ -107,7 +107,7 @@ public class Controller {
     }
 
     public void updateResources(String nickname, HashMap<Sign, Integer> resources) {
-        //TODO no print immediata
+        view.updateResources(nickname, resources);
     }
 
     public void updateScore(String nickname, int points) {
@@ -157,14 +157,14 @@ public class Controller {
             connection.insertNumberOfPlayers(numberOfPlayers);
         } catch (RemoteException e) {
             view.noConnection();
-        } catch (NoSuchFieldException e) {
-            //TODO
         } catch (ClosingLobbyException e) {
-            //TODO
+            view.closingLobbyError();
         } catch (SameNameException e) {
             //TODO
         } catch (LobbyCompleteException e) {
             //TODO
+        } catch (NoNameException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -173,10 +173,10 @@ public class Controller {
             connection.chooseColor(color);
         } catch (RemoteException e) {
             view.noConnection();
-        } catch (NoSuchFieldException e) {
-            //TODO
         } catch (ColorAlreadyTakenException e) {
             view.colorAlreadyTaken();
+        } catch (NoNameException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -189,8 +189,8 @@ public class Controller {
             view.noTurn();
         } catch (NotExistsPlayerException e) {
             view.noPlayer();
-        } catch (NoSuchFieldException e) {
-            //TODO
+        } catch (NoNameException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -203,8 +203,8 @@ public class Controller {
             view.noTurn();
         } catch (NotExistsPlayerException e) {
             view.noPlayer();
-        } catch (NoSuchFieldException e) {
-            //TODO
+        } catch (NoNameException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -217,10 +217,12 @@ public class Controller {
             view.noTurn();
         } catch (NotExistsPlayerException e) {
             view.noPlayer();
-        } catch (NoSuchFieldException e) {
-            //TODO
         } catch (NotEnoughResourcesException e) {
-            view.notEnoughResources();
+            view.notEnoughResources(nickname);
+        } catch (NoNameException e) {
+            //TODO
+        } catch (CardPositionException e) {
+           //TODO
         }
     }
 
@@ -233,8 +235,8 @@ public class Controller {
             view.noTurn();
         } catch (NotExistsPlayerException e) {
             view.noPlayer();
-        } catch (NoSuchFieldException e) {
-            //TODO
+        } catch (NoNameException e) {
+            throw new RuntimeException(e);
         }
 
     }
@@ -242,15 +244,15 @@ public class Controller {
     public void drawCard(String nickname, boolean gold, int onTableOrDeck) {
         try{
             connection.drawCard(nickname, gold, onTableOrDeck);
-//            drawCard(nickname, cardId);
+           // drawCard(nickname, cardId);
         } catch (WrongGamePhaseException e) {
             view.wrongGamePhase();
         } catch (NoTurnException e) {
             view.noTurn();
         } catch (NotExistsPlayerException e) {
             view.noPlayer();
-        } catch (NoSuchFieldException e) {
-            //TODO;
+        } catch (NoNameException e) {
+            throw new RuntimeException(e);
         }
     }
 

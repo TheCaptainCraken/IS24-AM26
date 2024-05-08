@@ -16,15 +16,16 @@ public interface LoggableServer extends Remote {
 
     boolean lobbyIsReady() throws RemoteException;
 
-    void insertNumberOfPlayers(int numberOfPlayers) throws RemoteException, NoSuchFieldException, ClosingLobbyException, SameNameException, LobbyCompleteException;
+    void insertNumberOfPlayers(int numberOfPlayers) throws RemoteException, ClosingLobbyException, SameNameException, LobbyCompleteException, NoNameException;
 
-    void chooseColor(String nickname, Color color) throws RemoteException, NoSuchFieldException, ColorAlreadyTakenException;
+    void chooseColor(String nickname, Color color) throws RemoteException, ColorAlreadyTakenException, NoNameException;
 
-    void chooseSideStartingCard(String nickname, boolean side) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException ;
+    void chooseSideStartingCard(String nickname, boolean side) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException,  NoNameException;
 
-    void chooseSecretObjectiveCard(String nickname, int indexCard) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException;
+    void chooseSecretObjectiveCard(String nickname, int indexCard) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException,  NoNameException;
 
-    void placeCard(String nickname, int indexHand, Point position, boolean side) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException, NotEnoughResourcesException ;
+    void placeCard(String nickname, int indexHand, Point position, boolean side)
+            throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NotEnoughResourcesException, NoNameException, CardPositionException;
 
-    int drawCard(String nickname, boolean gold, int onTableOrDeck) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException;
+    int drawCard(String nickname, boolean gold, int onTableOrDeck) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException,  NoNameException;
 }

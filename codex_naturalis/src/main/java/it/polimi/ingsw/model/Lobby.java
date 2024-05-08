@@ -39,6 +39,7 @@ public class Lobby {
         }
         Player newPlayer = new Player(nickname);
         players.add(newPlayer);
+
         if(players.size() == maxSize){
             setLock();
         }

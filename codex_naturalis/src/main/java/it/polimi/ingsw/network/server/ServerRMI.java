@@ -71,7 +71,9 @@ public class ServerRMI implements LoggableServer {
     }
 
     @Override
-    public void insertNumberOfPlayers(int numberOfPlayers) throws RemoteException, NoSuchFieldException, ClosingLobbyException, SameNameException, LobbyCompleteException {
+    public void insertNumberOfPlayers(int numberOfPlayers) throws
+            RemoteException, ClosingLobbyException, SameNameException, LobbyCompleteException, NoNameException {
+
         controller.initializeLobby(numberOfPlayers);
         //TODO remove all players before
         //Deletes all other connections that are not in the lobby
@@ -85,13 +87,14 @@ public class ServerRMI implements LoggableServer {
                 connections.get(nickname).stopWaiting(nickname);
             }
         }
-        lobbyIsReady=true;
+        lobbyIsReady = true;
+
         refreshUsers();
     }
 
     @Override
-    public void chooseColor(String nickname, Color color) throws RemoteException, NoSuchFieldException,
-             ColorAlreadyTakenException {
+    public void chooseColor(String nickname, Color color) throws RemoteException,
+            ColorAlreadyTakenException, NoNameException {
         if(controller.setColour(nickname, color)){
             for(String nicknameRefresh : connections.keySet()){
                 connections.get(nicknameRefresh).sendInfoOnTable();//TODO
@@ -114,7 +117,7 @@ public class ServerRMI implements LoggableServer {
     //We could optimize and use a unique function without any
     @Override
     public void chooseSideStartingCard(String nickname, boolean side)
-            throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException {
+            throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoNameException {
         int cardId = controller.placeRootCard(nickname, side);
         boolean allWithRootCardPlaced = controller.areAllRootCardPlaced();
         //commento...
@@ -128,7 +131,7 @@ public class ServerRMI implements LoggableServer {
     }
 
     public void chooseSecretObjectiveCard(String nickname, int indexCard)
-            throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException {
+            throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoNameException {
         controller.chooseObjectiveCard(nickname, indexCard);
         boolean allWithSecretObjectiveCardChosen = controller.areAllSecretObjectiveCardChosen();
 
@@ -147,7 +150,9 @@ public class ServerRMI implements LoggableServer {
 
     @Override
     public void placeCard(String nickname, int indexHand, Point position, boolean side)
-            throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException, NotEnoughResourcesException {
+            throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException,
+            NotEnoughResourcesException, NoNameException, CardPositionException {
+
         int cardId = controller.placeCard(nickname, indexHand, position, side);
         for(String nicknameRefresh : connections.keySet()){
             connections.get(nicknameRefresh).placeCard(nickname, cardId, position, side, controller.getPlayerResources(nickname), controller.getPlayerPoints(nickname));
@@ -163,14 +168,14 @@ public class ServerRMI implements LoggableServer {
 
     @Override
     public int drawCard(String nickname, boolean gold, int onTableOrDeck)
-            throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException {
+            throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoNameException {
         int cardId = controller.drawCard(nickname, gold, onTableOrDeck);
         int newCardId = controller.newCardOnTable(gold, onTableOrDeck);
         Kingdom headDeck = controller.getHeadDeck(gold);
 
         for(String nicknameRefresh : connections.keySet()){
             if(!nickname.equals(nicknameRefresh)){
-                connections.get(nicknameRefresh).showHiddenHand(nicknameRefresh, controller.getHiddenHand(nickname));//bad but easier
+                connections.get(nicknameRefresh).showHiddenHand(nicknameRefresh, controller.getHiddenHand(nickname));
             }
             connections.get(nicknameRefresh).moveCard(newCardId, headDeck, gold, onTableOrDeck);
             connections.get(nicknameRefresh).refreshTurnInfo(controller.getCurrentPlayer(), controller.getGameState());

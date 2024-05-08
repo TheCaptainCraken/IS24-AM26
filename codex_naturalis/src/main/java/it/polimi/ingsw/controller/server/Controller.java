@@ -86,13 +86,12 @@ public class Controller {
      * @param side The side of the card.
      * @throws WrongGamePhaseException If the game is not in the correct phase.
      * @throws NoTurnException If it's not the player's turn.
-     * @throws NoSuchFieldException If the field does not exist.
      * @throws NotEnoughResourcesException If the player does not have enough resources.
      * @return The id of the placed card.
      */
     public int placeCard(String player, int indexHand, Point position, boolean side) throws WrongGamePhaseException,
-            NoTurnException, NoSuchFieldException, NotEnoughResourcesException {
-        return  game.placeCard(player, indexHand, position, side);
+            NoTurnException, NotEnoughResourcesException, NotExistsPlayerException, CardPositionException {
+        return game.placeCard(player, indexHand, position, side);
     }
 
     /**
@@ -112,20 +111,20 @@ public class Controller {
     /**
      * Gets the points of a player.
      * @param player The player's name.
-     * @throws NoSuchFieldException If the field does not exist.
+     * @throws NoNameException If the field does not exist.
      * @return The player's points.
      */
-    public int getPlayerPoints(String player) throws NoSuchFieldException {
+    public int getPlayerPoints(String player) throws NoNameException {
         return lobby.getPlayerFromName(player).getPoints();
     }
 
     /**
      * Gets the resources of a player.
      * @param player The player's name.
-     * @throws NoSuchFieldException If the field does not exist.
+     * @throws NoNameException If the field does not exist.
      * @return A map of the player's resources.
      */
-    public HashMap<Sign, Integer> getPlayerResources(String player) throws NoSuchFieldException {
+    public HashMap<Sign, Integer> getPlayerResources(String player) throws NoNameException {
         return lobby.getPlayerFromName(player).getResources();
     }
 
@@ -140,19 +139,19 @@ public class Controller {
     /**
      * Gets the id of the starting card of a player.
      * @param nickname The player's nickname.
-     * @throws NoSuchFieldException If the field does not exist.
+     * @throws NoNameException If the field does not exist.
      * @return The id of the starting card.
      */
-    public int getStartingCard(String nickname) throws NoSuchFieldException {
+    public int getStartingCard(String nickname) throws NoNameException {
         return lobby.getPlayerFromName(nickname).getRootCard().getCard().getId();
     }
     /**
      * Gets a player.
      * @param nickname The player's nickname.
-     * @throws NoSuchFieldException If the field does not exist.
+     * @throws NoNameException If the field does not exist.
      * @return The player.
      */
-    public Player getPlayer(String nickname) throws NoSuchFieldException {
+    public Player getPlayer(String nickname) throws NoNameException {
         return lobby.getPlayerFromName(nickname);
     }
 
@@ -160,11 +159,11 @@ public class Controller {
      * Sets the color for a player.
      * @param name The player's name.
      * @param colour The color to set.
-     * @throws NoSuchFieldException If the field does not exist.
+     * @throws NoNameException If the field does not exist.
      * @throws ColorAlreadyTakenException If the color is already taken.
      * @return Whether all players have chosen a color.
      */
-    public boolean setColour(String name, Color colour) throws NoSuchFieldException, ColorAlreadyTakenException {
+    public boolean setColour(String name, Color colour) throws ColorAlreadyTakenException, NoNameException {
         for(Player player : lobby.getPlayers()){
             if(player.getColor() == colour){
                 throw new ColorAlreadyTakenException();
@@ -267,10 +266,10 @@ public class Controller {
     /**
      * Gets the hand of a player.
      * @param nickname The player's nickname.
-     * @throws NoSuchFieldException If the field does not exist.
+     * @throws NoNameException If the field does not exist.
      * @return The hand of the player.
      */
-    public Integer[] getHand(String nickname) throws NoSuchFieldException {
+    public Integer[] getHand(String nickname) throws NoNameException {
         Player player = lobby.getPlayerFromName(nickname);
         int i;
         Integer[] hand = new Integer[3];
@@ -284,10 +283,10 @@ public class Controller {
     /**
      * Gets the back card of player's hand.
      * @param nickname The player's nickname.
-     * @throws NoSuchFieldException If the field does not exist.
+     * @throws NoNameException If the field does not exist.
      * @return The hidden hand of the player.
      */
-    public Kingdom[] getHiddenHand(String nickname) throws NoSuchFieldException {
+    public Kingdom[] getHiddenHand(String nickname) throws NoNameException {
         Player player = lobby.getPlayerFromName(nickname);
         Kingdom[] hiddenHand = new Kingdom[3];
         int i;

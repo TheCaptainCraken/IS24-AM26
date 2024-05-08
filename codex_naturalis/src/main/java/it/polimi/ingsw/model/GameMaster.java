@@ -159,8 +159,8 @@ public class GameMaster {
      *                    place the card
      * @param side        To which side wants the player to place the card
      */
-    public int placeCard(String namePlayer, ResourceCard cardToPlace, Point position, boolean side)
-            throws NoSuchFieldException, IllegalArgumentException, NoTurnException, WrongGamePhaseException,
+    public int placeCard(String namePlayer, int index, Point position, boolean side)
+            throws  NoTurnException, WrongGamePhaseException,
             NotEnoughResourcesException, CardPositionException, NotExistsPlayerException {
 
         // manage all possible exceptions
@@ -173,6 +173,8 @@ public class GameMaster {
         }
 
         // check if the card can be placed in the position
+        ResourceCard cardToPlace = currentPlayer.getHand()[index];
+
         HashMap<Corner, PlayedCard> attachments = isPositionable(currentPlayer.getRootCard(), position);
         //the player positions the card in the back front. The card is one resource and 4 empty corners.
         if (!side) {
@@ -229,7 +231,7 @@ public class GameMaster {
                 }
             }
         }
-        // TODO se è girata non devi aggiungere i punti
+
         // At the end because I need to know resources values at the end and how many
         // attachments when I've found them
         if (side) {
@@ -243,7 +245,7 @@ public class GameMaster {
 
         currentPlayer.giveCard(cardToPlace);
         gameState = GameState.DRAWING_PHASE;
-        return cardToPlace.getId();
+
         if (areTheCardFinished()) {
             // only when the card are finished and the game is in the final phase
             nextGlobalTurn();
@@ -261,6 +263,8 @@ public class GameMaster {
         } else {
             gameState = GameState.DRAWING_PHASE;
         }
+
+        return cardToPlace.getId();
     }
 
     /**
@@ -336,7 +340,6 @@ public class GameMaster {
             endGame();//game transitions into the the calculating phase
         } else if (currentPlayer.getPoints() >= 20 || areTheCardFinished()) {
             // if a player reached 20 points set this turn cycle as the second-last
-            // TODO fine mazzi e fine partita
             if (getOrderPlayer(currentPlayer.getName()) + 1 == lobby.getPlayers().length) {
                 turnType = TurnType.LAST_TURN;
                 gameState = GameState.PLACING_PHASE;
@@ -357,7 +360,7 @@ public class GameMaster {
      * from fulfilling the objectives are calculated.
      */
     public void endGame() throws WrongGamePhaseException {
-        if (gameState != GameState.END) {// It just has an anti-cheat purpose
+        if (gameState != GameState.END) {
             throw new WrongGamePhaseException();
         } else {
             for (Player player : lobby.getPlayers()) {
@@ -410,7 +413,6 @@ public class GameMaster {
      *                     placed
      * @return Hashmap<Corner, PlayedCard> of the attachments for the card to
      *         cardToPlace
-     * @throws NoSuchFieldException
      */
     private HashMap<Corner, PlayedCard> isPositionable(PlayedCard startingCard, Point position)
             throws CardPositionException {
@@ -947,7 +949,7 @@ public class GameMaster {
      * @param namePlayer name of the player about is wanted to get info
      * @return points of the player
      */
-    public int getPlayerPoints(String namePlayer) throws NoSuchFieldException, NoNameException {
+    public int getPlayerPoints(String namePlayer) throws NoNameException {
         return lobby.getPlayerFromName(namePlayer).getPoints();
     }
 
@@ -957,7 +959,7 @@ public class GameMaster {
      * @param namePlayer name of the player about is wanted to get info
      * @return resources of the player
      */
-    public HashMap<Sign, Integer> getPlayerResources(String namePlayer) throws NoSuchFieldException, NoNameException {
+    public HashMap<Sign, Integer> getPlayerResources(String namePlayer) throws  NoNameException {
         return lobby.getPlayerFromName(namePlayer).getResources();
     }
 

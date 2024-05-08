@@ -5,15 +5,11 @@ import it.polimi.ingsw.model.Color;
 import it.polimi.ingsw.model.GameState;
 import it.polimi.ingsw.model.Kingdom;
 import it.polimi.ingsw.model.Sign;
-import it.polimi.ingsw.model.exception.*;
-import it.polimi.ingsw.network.exception.NoConnectionException;
 
 import java.awt.*;
-import java.rmi.RemoteException;
 import java.util.HashMap;
-import java.net.*;
 
-public class ClientSocket implements InterfaceClient{
+public class ClientSocket extends NetworkClient {
    // String url;
    // final int port;
     Controller controller;
@@ -25,13 +21,13 @@ public class ClientSocket implements InterfaceClient{
 
 
     @Override
-    public void disconnect() throws RemoteException {
+    public void disconnect(){
 
     }
 
 
     @Override
-    public void stopWaiting(String nickname) throws RemoteException {
+    public void stopWaiting(String nickname) {
 
     }
 
