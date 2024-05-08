@@ -5,6 +5,9 @@ import it.polimi.ingsw.model.exception.LobbyCompleteException;
 import it.polimi.ingsw.model.exception.SameNameException;
 import it.polimi.ingsw.model.exception.NoNameException;
 
+import it.polimi.ingsw.model.exception.LobbyCompleteException;
+import it.polimi.ingsw.model.exception.SameNameException;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;

@@ -14,6 +14,7 @@ public class Player {
     private final String name;
     private int points;
     private Color color;
+    private int objectivePoints;
     private PlayedCard rootCard;
     private final HashMap<Sign, Integer> resources;
     private ObjectiveCard secretObjective;
@@ -26,6 +27,7 @@ public class Player {
     public Player(String name) {
         this.name = name;
         this.points = 0;
+        this.objectivePoints = 0;
         resources = new HashMap<>();
         for(Sign sign : Sign.values()){
             this.resources.put(sign, 0);
@@ -117,7 +119,9 @@ public class Player {
      * @param numResources how many resources a card gives
      */
     public void addResource(Sign sign, Integer numResources){
-        resources.put(sign, resources.get(sign) + numResources);
+        if(sign != null){
+            resources.put(sign, resources.get(sign) + numResources);
+        }
     }
 
     /**
@@ -126,7 +130,9 @@ public class Player {
      * @param numResources how many resources to delete
      */
     public void removeResources(Sign sign, Integer numResources){
-        resources.put(sign, resources.get(sign) - numResources);
+        if(sign != null){
+            resources.put(sign, resources.get(sign) - numResources);
+        }
     }
 
     /**
@@ -166,14 +172,18 @@ public class Player {
     }
 
     /**
-     * Not in UML; slack professor's comment: Grazie per la segnalazione! Ho cambiato la mia risposta 1 di conseguenza: ci si ferma a 29 punti prima di sommare le carte obiettivo.
+     * slack professor's comment: Grazie per la segnalazione! Ho cambiato la mia risposta 1 di conseguenza: ci si ferma a 29 punti prima di sommare le carte obiettivo.
      * A questo punto si procede con la somma degli obiettivi a fine partita e si segue la regola alla risposta 3 in caso di parità
      *
      * Sums the extra points given by the objectiveCard
      * @param new_points  special points given at the end of the game by ObjectiveCard
      */
     public void addObjectivePoints(int new_points){
-            points += new_points;
+            objectivePoints += new_points;
+    }
+
+    public int getObjectivePoints() {
+        return objectivePoints;
     }
 
     public void setColour(Color colour) {

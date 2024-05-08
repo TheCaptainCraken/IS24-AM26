@@ -48,9 +48,9 @@
     "prototype": "SPECIAL_GOLD",
     "points": 1,
     "kingdom": "FUNGI",
-    "thing-to-count": "STROLL",
+    "thing-to-count": "SCROLL",
     "corners": {
-      "TOP_LEFT": "STROLL",
+      "TOP_LEFT": "SCROLL",
       "TOP_RIGHT": "EMPTY",
       "BOTTOM_LEFT": "EMPTY",
       "BOTTOM_RIGHT": null
@@ -242,10 +242,10 @@
     "prototype": "SPECIAL_GOLD",
     "points": 1,
     "kingdom": "PLANT",
-    "thing-to-count": "STROLL",
+    "thing-to-count": "SCROLL",
     "corners": {
       "TOP_LEFT": "EMPTY",
-      "TOP_RIGHT": "STROLL",
+      "TOP_RIGHT": "SCROLL",
       "BOTTOM_LEFT": null,
       "BOTTOM_RIGHT": "EMPTY"
     },
@@ -458,12 +458,12 @@
     "prototype": "SPECIAL_GOLD",
     "points": 1,
     "kingdom": "ANIMAL",
-    "thing-to-count": "STROLL",
+    "thing-to-count": "SCROLL",
     "corners": {
       "TOP_LEFT": null,
       "TOP_RIGHT": "EMPTY",
       "BOTTOM_LEFT": "EMPTY",
-      "BOTTOM_RIGHT": "STROLL"
+      "BOTTOM_RIGHT": "SCROLL"
     },
     "requirements": {
       "MUSHROOM": 0,
@@ -670,11 +670,11 @@
     "prototype": "SPECIAL_GOLD",
     "points": 1,
     "kingdom": "INSECT",
-    "thing-to-count": "STROLL",
+    "thing-to-count": "SCROLL",
     "corners": {
       "TOP_LEFT": "EMPTY",
       "TOP_RIGHT": null,
-      "BOTTOM_LEFT": "STROLL",
+      "BOTTOM_LEFT": "SCROLL",
       "BOTTOM_RIGHT": "EMPTY"
     },
     "requirements": {

@@ -25,7 +25,7 @@ public class Deck {
     /**
      * This constructor generates the deck of cards from a JSON file and shuffles
      * it.
-     *
+     * 
      * @param cardsFile the path of the JSON file containing the cards.
      * @throws FileNotFoundException    if the file is not found.
      * @throws IOException              if an I/O error occurs.
@@ -40,7 +40,7 @@ public class Deck {
 
     /**
      * This method generates the deck of cards from a JSON file.
-     *
+     * 
      * @param cardsFile the path of the JSON file containing the cards.
      * @throws FileNotFoundException    if the file is not found.
      * @throws IOException              if an I/O error occurs.
@@ -82,7 +82,7 @@ public class Deck {
 
     /**
      * This method inserts an {@link ObjectiveCard} into the deck.
-     *
+     * 
      * @param cardObject the JSON object representing the card.
      */
     private void insertObjectiveCard(JSONObject cardObject) {
@@ -95,7 +95,7 @@ public class Deck {
 
     /**
      * This method inserts a {@link ResourceCard} into the deck.
-     *
+     * 
      * @param cardObject the JSON object representing the card.
      */
     private void insertResourceCard(JSONObject cardObject) {
@@ -111,7 +111,7 @@ public class Deck {
 
     /**
      * This method inserts a {@link GoldCard} into the deck.
-     *
+     * 
      * @param cardObject the JSON object representing the card.
      */
     private void insertGoldCard(JSONObject cardObject) {
@@ -127,7 +127,7 @@ public class Deck {
 
     /**
      * This method inserts a {@link SpecialGoldCard} into the deck.
-     *
+     * 
      * @param cardObject the JSON object representing the card.
      */
     private void insertSpecialGoldCard(JSONObject cardObject) {
@@ -146,13 +146,13 @@ public class Deck {
 
     /**
      * This method inserts a {@link StartingCard} into the deck.
-     *
+     * 
      * @param cardObject the JSON object representing the card.
      */
     private void insertStartingCard(JSONObject cardObject) {
         int id = extractInteger(cardObject, "id");
 
-        Kingdom kingdom = Kingdom.valueOf((String) cardObject.get("kingdom"));
+        Kingdom kingdom = kingdomOrNull((String) cardObject.get("kingdom"));
 
         JSONObject frontCorners = (JSONObject) cardObject.get("front-corners");
         JSONObject backCorners = (JSONObject) cardObject.get("back-corners");
@@ -170,7 +170,7 @@ public class Deck {
 
     /**
      * This method returns the requirements of a card.
-     *
+     * 
      * @param cardObject the JSON object representing the card.
      * @return the requirements of the card.
      */
@@ -200,7 +200,7 @@ public class Deck {
 
     /**
      * This method returns the corners of a card.
-     *
+     * 
      * @param cornersObject the JSON object representing the corners of the card.
      * @return the corners of the card.
      */
@@ -230,28 +230,32 @@ public class Deck {
 
     /**
      * This method returns the kingdom of the first card of the deck.
-     *
+     * 
      * @return the {@link Kingdom} of the first card of the deck.
      */
-    public Kingdom getKingdomFirstCard() {
+    public Kingdom getKingdomFirstCard() throws IndexOutOfBoundsException{
         return cards.get(0).getKingdom();
     }
 
     /**
      * This method returns the first {@link Card} of the deck and then removes it
      * from the deck.
-     *
+     * 
      * @return the first {@link Card} of the deck.
-     *
+     * 
      * @throws IndexOutOfBoundsException if the deck is empty.
      */
     public Card draw() throws IndexOutOfBoundsException {
-        return cards.remove(0);
+        try{
+            return cards.remove(0);
+        }catch(IndexOutOfBoundsException e){
+            throw new IndexOutOfBoundsException("The deck is empty");//just to add the message
+        }
     }
 
     /**
      * This method adds a {@link Card} to the deck.
-     *
+     * 
      * @param card the {@link Card} to add to the deck.
      */
     private void insert(Card card) {
@@ -260,7 +264,7 @@ public class Deck {
 
     /**
      * This method converts a string to a {@link Kingdom}.
-     *
+     * 
      * @param kingdom the string to convert.
      * @return the {@link Kingdom} corresponding to the string, or null if the
      *         string is not a valid kingdom.
@@ -275,7 +279,7 @@ public class Deck {
 
     /**
      * This method converts a string to a {@link Sign}.
-     *
+     * 
      * @param sign the string to convert.
      * @return the {@link Sign} corresponding to the string, or null if the string
      *         is not a valid sign.
@@ -290,7 +294,7 @@ public class Deck {
 
     /**
      * This method extracts an integer from a JSON object.
-     *
+     * 
      * @param object the JSON object.
      * @param field  the field to extract.
      * @return the integer extracted from the JSON object.

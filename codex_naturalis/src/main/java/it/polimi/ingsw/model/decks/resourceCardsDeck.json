@@ -218,7 +218,7 @@
   {
     "prototype": "RESOURCE",
     "id": 35,
-    "kingdom": "plant",
+    "kingdom": "PLANT",
     "points": 1,
     "corners": {
       "TOP_LEFT": "EMPTY",
