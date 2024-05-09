@@ -7,6 +7,7 @@ import it.polimi.ingsw.model.Sign;
 import it.polimi.ingsw.model.exception.*;
 
 import it.polimi.ingsw.network.client.ClientRMI;
+import it.polimi.ingsw.network.client.ClientSocket;
 import it.polimi.ingsw.network.client.NetworkClient;
 import it.polimi.ingsw.view.Tui;
 
@@ -36,70 +37,135 @@ public class Controller {
         if(typeOfConnection.equals("RMI")){
             connection = new ClientRMI();
         }else if(typeOfConnection.equals("Socket")){
-            //TODO
-            //connection = new ClientSocket();
+            connection = new ClientSocket();
         }
     }
 
+    /**
+     * Sets the nickname of the player.
+     * @param nickname
+     */
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    /**
+     * Returns the nickname of the player.
+     * @return nickname
+     */
+    public String getNickname() {
+        return nickname;
+    }
+
+
+    /**
+     * Triggers the view to ask the user for the number of players.
+     *
+     * This method is used to prompt the user to input the number of players that will be participating in the game.
+     * The actual input is handled by the view (TUI or GUI).
+     */
     public void askNumberOfPlayer() {
         view.askNumberOfPlayer();
     }
-
+    /**
+     * Triggers the view to display a waiting message to the user.
+     *
+     * This method is used to inform the user that they are waiting for other players to join the game lobby.
+     * The actual display of the waiting message is handled by the view (TUI or GUI).
+     */
     public void waitLobby() {
         view.waitLobby();
     }
 
+    /**
+     * Triggers the view to stop displaying the waiting message.
+     *
+     * This method is used to inform the user that the waiting phase is over and the game is starting.
+     * The actual removal of the waiting message is handled by the view (TUI or GUI).
+     */
     public void stopWaiting() {
         view.stopWaiting();
     }
 
 
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
-    }
-
-    public String getNickname() {
-        return nickname;
-    }
-
+    /**
+     * Triggers the view to refresh the display of users.
+     *
+     * This method is used to update the display of users and their associated colors in the game.
+     * The actual display update is handled by the view (TUI or GUI).
+     *
+     * @param playersAndPins A HashMap where the keys are the nicknames of the players and the values are their associated colors.
+     */
     public void refreshUsers(HashMap<String, Color> playersAndPins) {
         view.refreshUsers(playersAndPins);
     }
 
+    /**
+     * Triggers the view to handle the disconnection of the user.
+     *
+     * This method is used to inform the user that they have been disconnected from the game.
+     */
     public void disconnect() {
         view.disconnect();
     }
 
     public void sendInfoOnTable() {
-        view.sendInfoOnTable();
+        view.showCommonTable();
     }
-
+    /**
+     * Triggers the view to display the starting card to the user.
+     *
+     * This method is used to inform the user about their starting card in the game.
+     * The actual display of the starting card is handled by the view (TUI or GUI).
+     *
+     * @param startingCardId The ID of the starting card.
+     */
     public void showStartingCard(int startingCardId) {
         view.showStartingCard(startingCardId);
     }
-
+    /**
+     * Triggers the view to display the objective cards to the user.
+     *
+     * This method is used to inform the user about their objective cards in the game.
+     * The actual display of the objective cards is handled by the view (TUI or GUI).
+     *
+     * @param objectiveCardIds The IDs of the objective cards.
+     */
     public void showObjectiveCards(Integer[] objectiveCardIds) {
-        view.printObjectiveCards(objectiveCardIds);
+        view.showCommonObjectives(objectiveCardIds);
     }
 
-    public void showSecretObjectiveCards(Integer[] objectiveCardIds) {
-        view.printSecretObjectiveCards(objectiveCardIds);
-    }
-
+    /**
+     * Triggers the view to display the secret objective card to the user.
+     * This method is used to inform the user about their secret objective card in the game.
+     * The actual display of the secret objective card is handled by the view (TUI or GUI).
+     *
+     * @param indexCard The index of the secret objective card.
+     */
     public void showSecretObjectiveCard(int indexCard) {
         view.showSecretObjectiveCard(indexCard);
     }
 
     public void updateHand(String nickname, Integer[] hand) {
-        //TODO update
+        view.updateHand(nickname, hand);
     }
 
     public void updateHiddenHand(String nickname, Kingdom[] hand) {
-        //TODO update
+        view.updateHiddenHand(nickname, hand);
     }
 
+    /**
+     * Triggers the view to refresh the turn information.
+     *
+     * This method is used to update the display of the current player and the game state.
+     * The actual display update is handled by the view (TUI or GUI).
+     *
+     * @param currentPlayer The nickname of the current player.
+     * @param gameState The current state of the game.
+     */
     public void refreshTurnInfo(String currentPlayer, GameState gameState) {
-        view.refreshTurnInfo(currentPlayer, gameState);
+        view.showTurnInfo(currentPlayer, gameState);
+        //TODO capire chiamate con Daniel
     }
 
     public void placeCard(String nickname, int id, Point position, boolean side) {
@@ -118,26 +184,52 @@ public class Controller {
         //TODO salvare la carta
     }
 
-    public void newCardOnTable(int newCardId, boolean gold, int onTableOrDeck) {
-        //TODO no print immediata
+    public void updateCardOnTable(int newCardId, boolean gold, int onTableOrDeck) {
+        //TODO salva in memoria
     }
 
-    public void newHeadDeck(Kingdom headDeck, boolean gold, int onTableOrDeck) {
-        //TODO no print immediata
+    public void updateHeadDeck(Kingdom headDeck, boolean gold, int onTableOrDeck) {
+        //TODO salva in memoria
     }
 
+    /**
+     * Triggers the view to display the extra points to the user.
+     *
+     * This method is used to inform the user about their extra points in the game.
+     * The actual display of the extra points is handled by the view (TUI or GUI).
+     *
+     * @param extraPoints A HashMap where the keys are the nicknames of the players and the values are their associated extra points.
+     */
     public void showExtraPoints(HashMap<String, Integer> extraPoints) {
         view.showExtraPoints(extraPoints);
     }
 
+    /**
+     * Triggers the view to display the ranking to the user.
+     *
+     * This method is used to inform the user about the ranking in the game.
+     * The actual display of the ranking is handled by the view (TUI or GUI).
+     *
+     * @param ranking A HashMap where the keys are the nicknames of the players and the values are their associated scores.
+     */
     public void showRanking(HashMap<String, Integer> ranking) {
         view.showRanking(ranking);
     }
-    //TODO generica per tutti i giocatori
+
     public void getIsFirst(String firstPlayer) {
     }
 
-    //parte client connect server. Chiamata dal client
+    /**
+     *
+     */
+    /**
+     * Logs in the player to the game.
+     *
+     * This method is used to log in the player to the game by using the connection object.
+     * The actual login is handled by the connection object.
+     *
+     * @param nickname The nickname of the player.
+     */
     public void login(String nickname) {
         try{
             connection.login(nickname);
@@ -150,6 +242,14 @@ public class Controller {
         }
     }
 
+    /**
+     * Sets the number of players in the game.
+     *
+     * This method is used to set the number of players that will be participating in the game.
+     * The actual setting of the number of players is handled by the connection object.
+     *
+     * @param numberOfPlayers The number of players.
+     */
     public void insertNumberOfPlayers(int numberOfPlayers) {
         try{
             connection.insertNumberOfPlayers(numberOfPlayers);
@@ -166,6 +266,14 @@ public class Controller {
         }
     }
 
+    /**
+     * Sets the color of the player in the game.
+     *
+     * This method is used to set the color of the player in the game.
+     * The actual setting of the color is handled by the connection object.
+     *
+     * @param color The color chosen by the player.
+     */
     public void chooseColor(Color color) {
         try{
             connection.chooseColor(color);
@@ -177,7 +285,14 @@ public class Controller {
             view.noPlayer();
         }
     }
-
+    /**
+     * Sets the side of the starting card for the player in the game.
+     *
+     * This method is used to set the side of the starting card for the player in the game.
+     * The actual setting of the side is handled by the connection object.
+     *
+     * @param side The side chosen by the player.
+     */
     public void chooseSideStartingCard(boolean side) {
         try{
             connection.chooseSideStartingCard(side);
@@ -190,6 +305,14 @@ public class Controller {
         }
     }
 
+    /**
+     * Sets the secret objective card for the player in the game.
+     *
+     * This method is used to set the secret objective card for the player in the game.
+     * The actual setting of the card is handled by the connection object.
+     *
+     * @param indexCard The index of the secret objective card chosen by the player.
+     */
     public void chooseSecretObjectiveCard(int indexCard) {
         try{
             connection.chooseSecretObjectiveCard(indexCard);
@@ -203,6 +326,16 @@ public class Controller {
         }
     }
 
+    /**
+     * Plays a card in the game.
+     *
+     * This method is used to play a card in the game.
+     * The actual playing of the card is handled by the connection object.
+     *
+     * @param indexHand The index of the card in the player's hand.
+     * @param position The position where the card will be placed.
+     * @param side The side of the card.
+     */
     public void playCard(int indexHand, Point position, boolean side) {
         try{
             connection.playCard(indexHand, position, side);
@@ -218,7 +351,14 @@ public class Controller {
             view.cardPositionError();
         }
     }
-
+    /**
+     * Sets the secret objective card for the player in the game.
+     *
+     * This method is used to set the secret objective card for the player in the game.
+     * The actual setting of the card is handled by the connection object.
+     *
+     * @param indexCard The index of the secret objective card.
+     */
     public void setSecretObjectiveCard(int indexCard) {
         try {
             connection.chooseSecretObjectiveCard(indexCard);
@@ -231,7 +371,16 @@ public class Controller {
         }
 
     }
-
+    /**
+     * Draws a card in the game.
+     *
+     * This method is used to draw a card in the game.
+     * The actual drawing of the card is handled by the connection object.
+     *
+     * @param nickname The nickname of the player.
+     * @param gold The gold status of the card.
+     * @param onTableOrDeck The location from where the card is drawn.
+     */
     public void drawCard(String nickname, boolean gold, int onTableOrDeck) {
         try{
             connection.drawCard(nickname, gold, onTableOrDeck);
@@ -240,7 +389,7 @@ public class Controller {
         } catch (NoTurnException e) {
             view.noTurn();
         } catch (NoNameException e) {
-            throw new RuntimeException(e);
+            view.noPlayer();
         }
     }
 

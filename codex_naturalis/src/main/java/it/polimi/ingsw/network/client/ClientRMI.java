@@ -28,10 +28,8 @@ public class ClientRMI extends NetworkClient {
         try {
             registry = LocateRegistry.getRegistry("127.0.0.1", PORT);
             stub = (LoggableServer) registry.lookup("Loggable");
-        } catch (RemoteException e) {
-            System.out.println("Client exception: " + e.toString());
-            e.printStackTrace();
-        } catch (NotBoundException e) {
+        }
+        catch (NotBoundException e) {
             System.out.println("Client exception: " + e.toString());
             throw new RuntimeException(e);
         }
@@ -140,8 +138,8 @@ public class ClientRMI extends NetworkClient {
 
     @Override
     public void moveCard(int newCardId, Kingdom headDeck, boolean gold, int onTableOrDeck){
-        controller.newCardOnTable(newCardId, gold, onTableOrDeck);
-        controller.newHeadDeck(headDeck, gold, onTableOrDeck);
+        controller.updateCardOnTable(newCardId, gold, onTableOrDeck);
+        controller.updateHeadDeck(headDeck, gold, onTableOrDeck);
     }
 
     @Override

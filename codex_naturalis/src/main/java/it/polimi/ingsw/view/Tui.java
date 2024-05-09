@@ -7,6 +7,7 @@ import it.polimi.ingsw.model.GameState;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
 
 public class Tui {
@@ -64,8 +65,23 @@ public class Tui {
     }
 
     public void showStartingCard(int startingCardId) {
-        //TODO get card from id
-        System.out.println("The starting card is: " + startingCardId);
+        PlayedCard card;
+        ArrayList<String[]> cards = new ArrayList<>();
+        int i;
+
+        //Convert the PlayedCard into a string to print it
+        for(i = 0; i < 2; i++) {
+            //cards.add() //TOD0 funzione JsonCarta
+        }
+
+        System.out.println("Choose the side of the staring Card. The one on the left is the top, the one on the right is the back");
+        //TODO cosa scrivere
+        for(i = 0; i < 7; i++) {
+            for(String[] carta : cards) {
+                System.out.print(carta[i]);
+                System.out.print("   ");
+            }
+        }
     }
 
     public void sameName(String nickname) {
@@ -93,22 +109,119 @@ public class Tui {
         System.out.println("You are not connected to the server. Please retry");
     }
 
-    public void sendInfoOnTable() {
+    public void showCommonTable() {
+        //TODO
     }
 
-    public void printObjectiveCards(Integer[] objectiveCardIds) {
-        //TODO funzione per prendere le carte dagli id
+    public void showCommonObjectives(Integer[] objectiveCardIds) {
+        //TODO get card from index
+        List<String[]> cards = new ArrayList<>();
+        for(Integer cardId: objectiveCardIds){
+            //TODO card fromId
+            cards.add(createObjectiveCardToPrint(cardId));
+        }
 
+        int size = cards.get(0).length;
+        int i;
 
+        for(i = 0; i < size; i++) {
+            for(String[] carta : cards) {
+                System.out.print(carta[i]);
+                System.out.print("   ");
+            }
+        }
+        System.out.println();
     }
 
-    public void printSecretObjectiveCards(Integer[] objectiveCardIds) {
-    }
-
+    /**
+     * Prints the secret objective card of the player.
+     *
+     * This method takes an index of a card as input, retrieves the corresponding card
+     * and prints the representation of the card on the console. The representation of the card
+     * is an array of strings, with each string representing a row of the card.
+     *
+     * @param indexCard The index of the secret objective card to print.
+     */
     public void showSecretObjectiveCard(int indexCard) {
+        System.out.println("This is your secret objective card: ");
+        String[] secretObjective = createObjectiveCardToPrint(indexCard);
+        for(String row: secretObjective){
+            System.out.println(row);
+        }
+
     }
 
-    public void refreshTurnInfo(String currentPlayer, GameState gameState) {
+    public String[] createObjectiveCardToPrint(int indexCard) {
+        ObjectiveCard card = null; //TODO get card from index
+        String[] objective;
+
+        if(indexCard == 9 || indexCard == 11) {
+            objective = new String[]{
+                 "      *** ",
+                 "   ***    ",
+                 "***       ",
+            };
+        }else if(indexCard == 10 || indexCard == 12) {
+            objective = new String[]{
+                    "***       ",
+                    "   ***    ",
+                    "      *** ",
+            };
+        }else if(indexCard == 13) {
+            objective = new String[]{
+                    "***       ",
+                    "***       ",
+                    "   ***    ",
+            };
+        }else if(indexCard == 14) {
+            objective = new String[]{
+                    "   ***    ",
+                    "       ***",
+                    "       ***",
+            };
+        }else if(indexCard == 15) {
+            objective = new String[]{
+                    "    ***   ",
+                    "***       ",
+                    "***       ",
+            };
+        }else if(indexCard == 16) { objective = new String[]{
+                "   ***    ",
+                "   ***    ",
+                "***       ",
+            };
+        }else if(card.getKingdom() != null){
+            objective = new String[]{
+                    " " + card.getType() + " ",
+                    " " + card.getKingdom() + " ",
+                    "              "
+                 };
+        }else {
+            objective = new String[]{
+                    "  "+card.getType()+"  ",
+                    "  ********  ",
+                    "  ********  "
+            };
+        }
+
+        //TODO sistemare layout provandolo. Da fare per ogni carta
+
+
+        return new String[]{
+                "┌---------------------------┐",
+                "|             "+card.getMultiplier()+"              |",
+                "|             "+card.getKingdom()+"                  |",
+                "|                           |",
+                "|             "+objective[0]+"              |",
+                "|             "+objective[1]+"              |",
+                "|             "+objective[2]+"              |",
+                "|                           |",
+                "└---------------------------┘",
+        };
+    }
+
+
+    public void showTurnInfo(String currentPlayer, GameState gameState) {
         System.out.println("It's " + currentPlayer + "'s turn");
         System.out.println("The game phase is: " + gameState);
     }
@@ -116,6 +229,11 @@ public class Tui {
     public void updateScore(String nickname, int points) {
         Integer newPoint = Integer.valueOf(points);
         score.put(nickname, newPoint);
+        //TODO non qui
+    }
+
+    public void updateResources(String nickname, HashMap<Sign, Integer> resources){
+        AllResources.put(nickname, resources);
     }
 
     public void showExtraPoints(HashMap<String, Integer> extraPoints) {
@@ -144,11 +262,7 @@ public class Tui {
         System.out.println("The input is not correct. Please retry");
     }
 
-    public void updateResources(String nickname, HashMap<Sign, Integer> resources){
-       AllResources.put(nickname, resources);
-    }
-
-    public void showResources() {
+    public void showResourcesAllPlayer() {
         for(String player: AllResources.keySet()){
             System.out.println(player + " has:");
             for(Sign sign: AllResources.get(player).keySet()){
@@ -164,11 +278,11 @@ public class Tui {
         }
     }
 
-    public void getView(String nickname){
-        printView(getTable(nickname));
+    public void printTableAreaOfPlayer(String nickname){
+        printTableArea(getTable(nickname));
     }
 
-    public void printView(PlayedCard card){
+    public void printTableArea(PlayedCard card){
         if(card == null){
             System.out.println("There is no card in this place");
             defaultMenu();
@@ -183,16 +297,16 @@ public class Tui {
         char option = 's';//TODO Scanf con prossima opzione
         switch(option){
             case 'q':
-                printView(card.getAttachmentCorners().get(Corner.TOP_LEFT));
+                printTableArea(card.getAttachmentCorners().get(Corner.TOP_LEFT));
                 break;
             case 'e':
-                printView(card.getAttachmentCorners().get(Corner.TOP_RIGHT));
+                printTableArea(card.getAttachmentCorners().get(Corner.TOP_RIGHT));
                 break;
             case 'z':
-                printView(card.getAttachmentCorners().get(Corner.BOTTOM_LEFT));
+                printTableArea(card.getAttachmentCorners().get(Corner.BOTTOM_LEFT));
                 break;
             case 'c':
-                printView(card.getAttachmentCorners().get(Corner.BOTTOM_RIGHT));
+                printTableArea(card.getAttachmentCorners().get(Corner.BOTTOM_RIGHT));
                 break;
             default:
                 defaultMenu();
@@ -204,7 +318,7 @@ public class Tui {
         HashMap<Corner, PlayedCard> attachments = focusedCard.getAttachmentCorners();
         HashMap<Corner, String[]> attachmentsStrings = new HashMap<>();
         for(Corner c : attachments.keySet()){
-            attachmentsStrings.put(c, printCard(attachments.get(c)));
+            attachmentsStrings.put(c, printResourceCard(attachments.get(c)));
         }
         HashMap<Corner, String[]> arrows = createArrows(attachments, focusedCard);
 
@@ -227,7 +341,7 @@ public class Tui {
         return toPrint;
     }
 
-    public String[] printCard(PlayedCard card) {
+    public String[] printResourceCard(PlayedCard card) {
         HashMap<Corner, String> corner = new HashMap<>();
         String midSignsString;
         if(card == null){
@@ -384,22 +498,55 @@ public class Tui {
     }
 
     public void showHiddenHand(String nickname, HashMap<String, ArrayList<PlayedCard>> hiddenCards) {
+        //TODO da id a playedCard, chi lo fa
         ArrayList<String[]> cards = new ArrayList<>();
         for(String player: hiddenCards.keySet()){
             System.out.println(player + " has:");
             for(PlayedCard card: hiddenCards.get(player)){
-                cards.add(printCard(card));
+                cards.add(printResourceCard(card));
             }
 
-            for(String[] card: cards) System.out.print(card);
+            int i;
+            int size = cards.get(0).length;
+            for(i = 0; i < size; i++) {
+                for (String[] card : cards) {
+                    System.out.print(card[i]);
+                    System.out.print("   ");
+                }
+            }
             System.out.println();
         }
     }
 
     public void showHand(String nickname, Integer[] hand) {
-        //TODO da id a playedCard
-        //TODO saresti te, cambiare scritta
+        PlayedCard card = null;
+        ArrayList<String[]> cards = new ArrayList<>();
+        for(Integer cardId: hand){
+            //TODO card fromId
+            cards.add(printResourceCard(card));
+        }
+
+        //TODO fare unica funzione private
+
+        int i;
+        int size = cards.get(0).length;
+        for (i = 0; i < size; i++) {
+            for (String[] carte : cards) {
+                System.out.print(carte[i]);
+                System.out.print("   ");
+            }
+        }
+        System.out.println();
     }
 
+    public void updateHand(String nickname, Integer[] hand) {
+        //TODO mettere in memoria. Questo dovrebbe essere disponibile per TUI/GUI
+    }
+
+    public void updateHiddenHand(String nickname, Kingdom[] hand) {
+        //TODO mettere in memoria
+    }
 }
+
+
 
