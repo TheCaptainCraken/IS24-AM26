@@ -92,7 +92,7 @@ public class GameMaster {
      * @param side       which side the StartingCard has been want placed
      */
     public int placeRootCard(String namePlayer, boolean side)
-            throws NoTurnException, WrongGamePhaseException, NotExistsPlayerException {
+            throws NoTurnException, WrongGamePhaseException, NoNameException {
         Player currentPlayer = getCurrentPlayer();
 
         if (!isCurrentPlayer(namePlayer, currentPlayer)) {
@@ -134,7 +134,7 @@ public class GameMaster {
      * @param whichCard  which of the two ObjectiveCard wants to be used
      */
     public void chooseObjectiveCard(String namePlayer, int whichCard)
-            throws NoTurnException, WrongGamePhaseException, NotExistsPlayerException {
+            throws NoTurnException, WrongGamePhaseException, NoNameException {
         Player currentPlayer = getCurrentPlayer();
         if (!isCurrentPlayer(namePlayer, currentPlayer)) {
             throw new NoTurnException();
@@ -161,7 +161,7 @@ public class GameMaster {
      */
     public int placeCard(String namePlayer, int index, Point position, boolean side)
             throws  NoTurnException, WrongGamePhaseException,
-            NotEnoughResourcesException, CardPositionException, NotExistsPlayerException {
+            NotEnoughResourcesException, CardPositionException, NoNameException {
 
         // manage all possible exceptions
         Player currentPlayer = getCurrentPlayer();
@@ -280,7 +280,7 @@ public class GameMaster {
      */
     public int drawCard(String namePlayer, boolean Gold, int CardPosition)
             throws WrongGamePhaseException, NoTurnException,
-            NotExistsPlayerException, IndexOutOfBoundsException {
+             IndexOutOfBoundsException, NoNameException{
         // CardPosition has 0, 1 for position of array of cards on table and -1 for
         // drawing from deck
         Player currentPlayer = getCurrentPlayer();
@@ -885,14 +885,14 @@ public class GameMaster {
      * @param name player who sent the request
      * @return get order of player
      */
-    private int getOrderPlayer(String name) throws NotExistsPlayerException {
+    private int getOrderPlayer(String name) throws NoNameException {
         int i;
         for (i = 0; i < lobby.getPlayers().length; i++) {
             if (lobby.getPlayers()[i].getName().equals(name)) {
                 return i;
             }
         }
-        throw new NotExistsPlayerException();
+        throw new NoNameException();
     }
 
     /**

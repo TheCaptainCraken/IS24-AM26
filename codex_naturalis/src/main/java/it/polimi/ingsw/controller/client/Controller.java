@@ -90,12 +90,12 @@ public class Controller {
         view.showSecretObjectiveCard(indexCard);
     }
 
-    public void getHand(String nickname, Integer[] hand) {
-        //TODO no print immediata
+    public void updateHand(String nickname, Integer[] hand) {
+        //TODO update
     }
 
-    public void getHiddenHand(Kingdom[] hand) {
-        //TODO print immediata
+    public void updateHiddenHand(String nickname, Kingdom[] hand) {
+        //TODO update
     }
 
     public void refreshTurnInfo(String currentPlayer, GameState gameState) {
@@ -115,7 +115,7 @@ public class Controller {
     }
 
     public void drawCard(String nickname, int cardId) {
-        //TODO capire se fare print immediata o meno
+        //TODO salvare la carta
     }
 
     public void newCardOnTable(int newCardId, boolean gold, int onTableOrDeck) {
@@ -138,7 +138,6 @@ public class Controller {
     }
 
     //parte client connect server. Chiamata dal client
-    //TODO metodi chiamata server
     public void login(String nickname) {
         try{
             connection.login(nickname);
@@ -152,7 +151,6 @@ public class Controller {
     }
 
     public void insertNumberOfPlayers(int numberOfPlayers) {
-        //TODO correct player to ask for number of players. First player?
         try{
             connection.insertNumberOfPlayers(numberOfPlayers);
         } catch (RemoteException e) {
@@ -160,11 +158,11 @@ public class Controller {
         } catch (ClosingLobbyException e) {
             view.closingLobbyError();
         } catch (SameNameException e) {
-            //TODO
+            view.sameName(nickname);
         } catch (LobbyCompleteException e) {
-            //TODO
+            view.lobbyComplete();
         } catch (NoNameException e) {
-            throw new RuntimeException(e);
+            view.noPlayer();
         }
     }
 
@@ -176,7 +174,7 @@ public class Controller {
         } catch (ColorAlreadyTakenException e) {
             view.colorAlreadyTaken();
         } catch (NoNameException e) {
-            throw new RuntimeException(e);
+            view.noPlayer();
         }
     }
 
@@ -187,10 +185,8 @@ public class Controller {
             view.wrongGamePhase();
         } catch (NoTurnException e) {
             view.noTurn();
-        } catch (NotExistsPlayerException e) {
-            view.noPlayer();
         } catch (NoNameException e) {
-            throw new RuntimeException(e);
+            view.noPlayer();
         }
     }
 
@@ -201,10 +197,9 @@ public class Controller {
             view.wrongGamePhase();
         } catch (NoTurnException e) {
             view.noTurn();
-        } catch (NotExistsPlayerException e) {
+        }
+        catch (NoNameException e) {
             view.noPlayer();
-        } catch (NoNameException e) {
-            throw new RuntimeException(e);
         }
     }
 
@@ -215,14 +210,12 @@ public class Controller {
             view.wrongGamePhase();
         } catch (NoTurnException e) {
             view.noTurn();
-        } catch (NotExistsPlayerException e) {
-            view.noPlayer();
         } catch (NotEnoughResourcesException e) {
             view.notEnoughResources(nickname);
         } catch (NoNameException e) {
-            //TODO
+            view.noPlayer();
         } catch (CardPositionException e) {
-           //TODO
+            view.cardPositionError();
         }
     }
 
@@ -233,10 +226,8 @@ public class Controller {
             view.wrongGamePhase();
         } catch (NoTurnException e) {
             view.noTurn();
-        } catch (NotExistsPlayerException e) {
-            view.noPlayer();
         } catch (NoNameException e) {
-            throw new RuntimeException(e);
+            view.noPlayer();
         }
 
     }
@@ -244,13 +235,10 @@ public class Controller {
     public void drawCard(String nickname, boolean gold, int onTableOrDeck) {
         try{
             connection.drawCard(nickname, gold, onTableOrDeck);
-           // drawCard(nickname, cardId);
         } catch (WrongGamePhaseException e) {
             view.wrongGamePhase();
         } catch (NoTurnException e) {
             view.noTurn();
-        } catch (NotExistsPlayerException e) {
-            view.noPlayer();
         } catch (NoNameException e) {
             throw new RuntimeException(e);
         }

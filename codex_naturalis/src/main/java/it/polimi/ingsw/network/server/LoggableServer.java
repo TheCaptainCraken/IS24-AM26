@@ -20,12 +20,12 @@ public interface LoggableServer extends Remote {
 
     void chooseColor(String nickname, Color color) throws RemoteException, ColorAlreadyTakenException, NoNameException;
 
-    void chooseSideStartingCard(String nickname, boolean side) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException,  NoNameException;
+    void chooseSideStartingCard(String nickname, boolean side) throws WrongGamePhaseException, NoTurnException,  NoNameException;
 
-    void chooseSecretObjectiveCard(String nickname, int indexCard) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException,  NoNameException;
+    void chooseSecretObjectiveCard(String nickname, int indexCard) throws WrongGamePhaseException, NoTurnException, NoNameException;
 
     void placeCard(String nickname, int indexHand, Point position, boolean side)
-            throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NotEnoughResourcesException, NoNameException, CardPositionException;
+            throws WrongGamePhaseException, NoTurnException, NotEnoughResourcesException, NoNameException, CardPositionException;
 
-    int drawCard(String nickname, boolean gold, int onTableOrDeck) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException,  NoNameException;
+    int drawCard(String nickname, boolean gold, int onTableOrDeck) throws WrongGamePhaseException, NoTurnException,  NoNameException;
 }

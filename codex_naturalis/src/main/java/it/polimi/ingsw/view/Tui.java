@@ -14,8 +14,10 @@ public class Tui {
     private final ArrayList<Card> Cards;
     private final ArrayList<Card> StartingCards;
     private final ArrayList<Card> ObjectiveCards;
+
     private HashMap<String, Integer> score;
     private HashMap<String, HashMap<Sign, Integer>> AllResources;
+    private HashMap<String, ArrayList<PlayedCard>> hiddenCard;
 
 
     public Tui(){
@@ -95,6 +97,9 @@ public class Tui {
     }
 
     public void printObjectiveCards(Integer[] objectiveCardIds) {
+        //TODO funzione per prendere le carte dagli id
+
+
     }
 
     public void printSecretObjectiveCards(Integer[] objectiveCardIds) {
@@ -374,5 +379,27 @@ public class Tui {
     }
 
 
+    public void cardPositionError() {
+        System.out.println("You can't position the card there. Please try another position");
+    }
+
+    public void showHiddenHand(String nickname, HashMap<String, ArrayList<PlayedCard>> hiddenCards) {
+        ArrayList<String[]> cards = new ArrayList<>();
+        for(String player: hiddenCards.keySet()){
+            System.out.println(player + " has:");
+            for(PlayedCard card: hiddenCards.get(player)){
+                cards.add(printCard(card));
+            }
+
+            for(String[] card: cards) System.out.print(card);
+            System.out.println();
+        }
+    }
+
+    public void showHand(String nickname, Integer[] hand) {
+        //TODO da id a playedCard
+        //TODO saresti te, cambiare scritta
+    }
 
 }
+

@@ -59,10 +59,9 @@ public class Controller {
      * @param side The side of the card.
      * @throws WrongGamePhaseException If the game is not in the correct phase.
      * @throws NoTurnException If it's not the player's turn.
-     * @throws NotExistsPlayerException If the player does not exist.
      * @return The id of the placed card.
      */
-    public int placeRootCard(String player, boolean side) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException {
+    public int placeRootCard(String player, boolean side) throws WrongGamePhaseException, NoTurnException, NoNameException {
         return game.placeRootCard(player, side);
     }
 
@@ -72,9 +71,8 @@ public class Controller {
      * @param whichCard The index of the card to choose.
      * @throws WrongGamePhaseException If the game is not in the correct phase.
      * @throws NoTurnException If it's not the player's turn.
-     * @throws NotExistsPlayerException If the player does not exist.
      */
-    public void chooseObjectiveCard(String player, int whichCard) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException {
+    public void chooseObjectiveCard(String player, int whichCard) throws WrongGamePhaseException, NoTurnException, NoNameException {
         game.chooseObjectiveCard(player, whichCard);
     }
 
@@ -87,10 +85,11 @@ public class Controller {
      * @throws WrongGamePhaseException If the game is not in the correct phase.
      * @throws NoTurnException If it's not the player's turn.
      * @throws NotEnoughResourcesException If the player does not have enough resources.
+     * @throws NoNameException If the field does not exist.
      * @return The id of the placed card.
      */
     public int placeCard(String player, int indexHand, Point position, boolean side) throws WrongGamePhaseException,
-            NoTurnException, NotEnoughResourcesException, NotExistsPlayerException, CardPositionException {
+            NoTurnException, NotEnoughResourcesException, NoNameException, CardPositionException {
         return game.placeCard(player, indexHand, position, side);
     }
 
@@ -101,10 +100,9 @@ public class Controller {
      * @param onTableOrDeck The index of the card on the table or deck.
      * @throws WrongGamePhaseException If the game is not in the correct phase.
      * @throws NoTurnException If it's not the player's turn.
-     * @throws NotExistsPlayerException If the player does not exist.
      * @return The id of the drawn card.
      */
-    public int drawCard(String player, boolean gold, int onTableOrDeck) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException {
+    public int drawCard(String player, boolean gold, int onTableOrDeck) throws WrongGamePhaseException, NoTurnException, NoNameException {
         return game.drawCard(player, gold, onTableOrDeck);
     }
 

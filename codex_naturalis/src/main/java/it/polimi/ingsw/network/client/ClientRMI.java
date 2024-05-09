@@ -50,7 +50,7 @@ public class ClientRMI extends NetworkClient {
     }
 
     public void insertNumberOfPlayers(int numberOfPlayers) throws RemoteException,
-            ClosingLobbyException, SameNameException, LobbyCompleteException, NoNameException {
+            SameNameException, LobbyCompleteException, NoNameException, ClosingLobbyException {
         stub.insertNumberOfPlayers(numberOfPlayers);
     }
 
@@ -61,22 +61,22 @@ public class ClientRMI extends NetworkClient {
     }
 
 
-    public void chooseSideStartingCard(boolean side) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoNameException {
+    public void chooseSideStartingCard(boolean side) throws WrongGamePhaseException, NoTurnException, NoNameException {
         stub.chooseSideStartingCard(controller.getNickname(), side);
     }
 
     public void chooseSecretObjectiveCard(int indexCard)
-            throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException,  NoNameException {
+            throws WrongGamePhaseException, NoTurnException,  NoNameException {
         stub.chooseSecretObjectiveCard(controller.getNickname(), indexCard);
         controller.showSecretObjectiveCard(indexCard);
     }
 
-    public void playCard(int indexHand, Point position, boolean side) throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException,  NotEnoughResourcesException, NoNameException, CardPositionException {
+    public void playCard(int indexHand, Point position, boolean side) throws WrongGamePhaseException, NoTurnException, NoNameException,  NotEnoughResourcesException, NoNameException, CardPositionException {
         stub.placeCard(controller.getNickname(), indexHand, position, side);
     }
 
     public void drawCard(String nickname, boolean gold, int onTableOrDeck)
-            throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoNameException {
+            throws WrongGamePhaseException, NoTurnException, NoNameException {
         int cardId = stub.drawCard(nickname, gold, onTableOrDeck);
         controller.drawCard(nickname, cardId);
     }
@@ -118,12 +118,12 @@ public class ClientRMI extends NetworkClient {
 
     @Override
     public void showHand(String nickname, Integer[] hand){
-        controller.getHand(nickname, hand);
+        controller.updateHand(nickname, hand);
     }
 
     @Override
     public void showHiddenHand(String nickname, Kingdom[] hand){
-        controller.getHiddenHand(hand);
+        controller.updateHiddenHand(nickname, hand);
     }
 
     @Override

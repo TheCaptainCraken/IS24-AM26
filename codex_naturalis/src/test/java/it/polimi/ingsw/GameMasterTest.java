@@ -64,12 +64,12 @@ public class GameMasterTest {
 
     @Test
     @DisplayName("Exception not current player for placeRootCard")
-    public void NotCurrentPlayerTest() throws IOException, ParseException, WrongGamePhaseException, NoTurnException, NotExistsPlayerException {
+    public void NotCurrentPlayerTest() throws IOException, ParseException, WrongGamePhaseException, NoTurnException, NoNameException {
         assertThrows(NoTurnException.class, ()->game.placeRootCard("marco", false));
     }
 
     @Test
-    public void PlayingPhaseTest() throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException {
+    public void PlayingPhaseTest() throws WrongGamePhaseException, NoTurnException, NoNameException {
         int i;
         Player startingPlayer = game.getCurrentPlayer();
         for(i = 0; i < lobby.getPlayers().length; i++){
@@ -87,7 +87,7 @@ public class GameMasterTest {
     //These are test for draw card. I use just one player to easily test the methods
     @BeforeEach
     public void setUp2() throws SameNameException, LobbyCompleteException, IOException, ParseException,
-            WrongGamePhaseException, NoTurnException, NotExistsPlayerException {
+            WrongGamePhaseException, NoTurnException, NoNameException {
         //create player
         lobby2 = new Lobby();//TODO
         lobby2.addPlayer("pietro");
@@ -112,7 +112,7 @@ public class GameMasterTest {
     //Test of drawCard
     @Test
     @DisplayName("No turn exception for draw card test")
-    public void drawNoTurnTest() throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException, NotEnoughResourcesException {
+    public void drawNoTurnTest() throws WrongGamePhaseException, NoTurnException,  NoSuchFieldException, NotEnoughResourcesException {
         assertThrows(
                 NoTurnException.class,
                 () -> game2.drawCard("marco", true, 1)
@@ -121,7 +121,7 @@ public class GameMasterTest {
 
     @Test
     @DisplayName("Not right phase exception for draw card test")
-    public void drawNotRightPhaseTest() throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoSuchFieldException, NotEnoughResourcesException {
+    public void drawNotRightPhaseTest() throws WrongGamePhaseException, NoTurnException, NoNameException, NotEnoughResourcesException {
         assertThrows(
                 WrongGamePhaseException.class,
                 () -> game2.drawCard("pietro", true, 1)
@@ -130,8 +130,8 @@ public class GameMasterTest {
 
     @Test
     @DisplayName("Correct position of drawn card test")
-    public void drawCardTest() throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException,
-            NoSuchFieldException, NotEnoughResourcesException, CardPositionException {
+    public void drawCardTest() throws WrongGamePhaseException, NoTurnException, NoNameException,
+             NotEnoughResourcesException, CardPositionException {
         game2.placeCard("pietro", 0, new Point(1, 0), true);
         int CardId = game2.drawCard("pietro", true, 1);
         assertEquals(CardId, lobby2.getPlayers()[0].getHand()[0].getId());
@@ -146,8 +146,8 @@ public class GameMasterTest {
 
     @Test
     @DisplayName("Test of drawCard position 0")
-    public void drawCardPositionZeroTest() throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException,
-            NoSuchFieldException, NotEnoughResourcesException, CardPositionException {
+    public void drawCardPositionZeroTest() throws WrongGamePhaseException, NoTurnException, NoNameException,
+             NotEnoughResourcesException, CardPositionException {
         game2.placeCard("pietro", 0, new Point(1, 0), true);
         int CardId = game2.drawCard("pietro", true, 0);
         assertEquals(CardId, lobby2.getPlayers()[0].getHand()[0].getId());
@@ -163,8 +163,8 @@ public class GameMasterTest {
 
     @Test
     @DisplayName("Test of drawCard position 1")
-    public void drawCardPositionOneTest() throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException,
-            NoSuchFieldException, NotEnoughResourcesException, CardPositionException {
+    public void drawCardPositionOneTest() throws WrongGamePhaseException, NoTurnException, NoNameException,
+             NotEnoughResourcesException, CardPositionException {
         game2.placeCard("pietro", 1, new Point(1, 0), true);
         int CardId = game2.drawCard("pietro", true, 1);
         assertEquals(CardId, lobby2.getPlayers()[0].getHand()[1].getId());
@@ -179,8 +179,8 @@ public class GameMasterTest {
 
     @Test
     @DisplayName("Test of drawCard position 2")
-    public void drawCardTestPositionTwo() throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException,
-            NoSuchFieldException, NotEnoughResourcesException, CardPositionException {
+    public void drawCardTestPositionTwo() throws WrongGamePhaseException, NoTurnException, NoNameException,
+            NotEnoughResourcesException, CardPositionException {
         game2.placeCard("pietro",2, new Point(1, 0), true);
         int CardId = game2.drawCard("pietro", true, -1);
         assertEquals(CardId, lobby2.getPlayers()[0].getHand()[2].getId());
@@ -195,8 +195,8 @@ public class GameMasterTest {
 
     @Test
     @DisplayName("Test of drawCard position 0 resource card")
-    public void drawResourceCardTestPositionZeroTest() throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException,
-            NoSuchFieldException, NotEnoughResourcesException, CardPositionException {
+    public void drawResourceCardTestPositionZeroTest() throws WrongGamePhaseException, NoTurnException, NoNameException,
+            NotEnoughResourcesException, CardPositionException {
         game2.placeCard("pietro", 0, new Point(1, 0), true);
         int CardId = game2.drawCard("pietro", false, 0);
         assertEquals(CardId, lobby2.getPlayers()[0].getHand()[0].getId());
@@ -211,7 +211,7 @@ public class GameMasterTest {
 
     @Test
     @DisplayName("Test of drawCard position 1 resource card")
-    public void drawResourceCardTestPositionOneTest() throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException,
+    public void drawResourceCardTestPositionOneTest() throws WrongGamePhaseException, NoTurnException, NoNameException,
             NoSuchFieldException, NotEnoughResourcesException, CardPositionException {
         game2.placeCard("pietro", 1, new Point(1, 0), true);
         int CardId = game2.drawCard("pietro", false, 1);
@@ -227,7 +227,7 @@ public class GameMasterTest {
 
     @Test
     @DisplayName("Test of drawCard position 2 resource card")
-    public void drawResourceCardTestPositionTwoTest() throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException,
+    public void drawResourceCardTestPositionTwoTest() throws WrongGamePhaseException, NoTurnException, NoNameException,
             NoSuchFieldException, NotEnoughResourcesException, CardPositionException {
         game2.placeCard("pietro", 2, new Point(1, 0), true);
         int CardId = game2.drawCard("pietro", false, -1);
@@ -243,7 +243,7 @@ public class GameMasterTest {
 
     //Test for isPositionable
     @Test
-    public void PlaceTopLeft() throws WrongGamePhaseException, NoTurnException, NoSuchFieldException, NotEnoughResourcesException, CardPositionException, NotExistsPlayerException {
+    public void PlaceTopLeft() throws WrongGamePhaseException, NoTurnException, NoNameException, NotEnoughResourcesException, CardPositionException {
         int Card = lobby2.getPlayers()[0].getHand()[0].getId();
         Point position = new Point(0, 1);
         game2.placeCard("pietro", 0, position, true);
@@ -254,7 +254,7 @@ public class GameMasterTest {
                 lobby2.getPlayers()[0].getRootCard().getAttachmentCorners().get(Corner.TOP_LEFT).getAttachmentCorners().get(Corner.BOTTOM_RIGHT).getCard().getId());
     }
     @Test
-    public void PlaceTopRight() throws WrongGamePhaseException, NoTurnException, NoSuchFieldException, NotEnoughResourcesException, CardPositionException, NotExistsPlayerException {
+    public void PlaceTopRight() throws WrongGamePhaseException, NoTurnException,  NotEnoughResourcesException, CardPositionException, NoNameException {
         int Card = lobby2.getPlayers()[0].getHand()[0].getId();
         Point position = new Point(1, 0);
         game2.placeCard("pietro", 0, position, true);
@@ -263,7 +263,7 @@ public class GameMasterTest {
                 lobby2.getPlayers()[0].getRootCard().getAttachmentCorners().get(Corner.TOP_RIGHT).getAttachmentCorners().get(Corner.BOTTOM_LEFT).getCard().getId());
     }
     @Test
-    public void PlaceBottomLeft() throws WrongGamePhaseException, NoTurnException, NoSuchFieldException, NotEnoughResourcesException, CardPositionException, NotExistsPlayerException {
+    public void PlaceBottomLeft() throws WrongGamePhaseException, NoTurnException, NoNameException, NotEnoughResourcesException, CardPositionException {
         int Card = lobby2.getPlayers()[0].getHand()[0].getId();
         Point position = new Point(-1, 0);
         game2.placeCard("pietro", 0, position, true);
@@ -272,7 +272,7 @@ public class GameMasterTest {
                 lobby2.getPlayers()[0].getRootCard().getAttachmentCorners().get(Corner.BOTTOM_LEFT).getAttachmentCorners().get(Corner.TOP_RIGHT).getCard().getId());
     }
     @Test
-    public void PlaceBottomRight() throws WrongGamePhaseException, NoTurnException, NoSuchFieldException, NotEnoughResourcesException, CardPositionException, NotExistsPlayerException {
+    public void PlaceBottomRight() throws WrongGamePhaseException, NoTurnException,  NotEnoughResourcesException, CardPositionException, NoNameException {
         int Card = lobby2.getPlayers()[0].getHand()[0].getId();
         Point position = new Point(0, -1);
         game2.placeCard("pietro", 0, position, true);
@@ -292,8 +292,8 @@ public class GameMasterTest {
     }
 
     @Test
-    public void CardAlreadyThere() throws WrongGamePhaseException, NoTurnException, NoSuchFieldException,
-            NotEnoughResourcesException, CardPositionException, NotExistsPlayerException {
+    public void CardAlreadyThere() throws WrongGamePhaseException, NoTurnException,
+            NotEnoughResourcesException, CardPositionException, NoNameException {
         game2.placeCard("pietro", 2, new Point(1, 0), false);
         game2.drawCard("pietro", true, -1);
 
@@ -321,7 +321,7 @@ public class GameMasterTest {
    }
     @BeforeEach
     public void setUp3() throws SameNameException, LobbyCompleteException, IOException, ParseException,
-            WrongGamePhaseException, NoTurnException, NotExistsPlayerException {
+            WrongGamePhaseException, NoTurnException, NoNameException {
         //create player
         lobby3 = new Lobby();
         lobby3.addPlayer("pietro");
@@ -339,8 +339,8 @@ public class GameMasterTest {
 
     @Test
     @DisplayName("Card is Attached to 2 cards")
-    public void TwoAttachments() throws WrongGamePhaseException, NoTurnException, NoSuchFieldException,
-            NotEnoughResourcesException, CardPositionException, NotExistsPlayerException {
+    public void TwoAttachments() throws WrongGamePhaseException, NoTurnException,
+            NotEnoughResourcesException, CardPositionException, NoNameException {
 
         int Card = game3.getCurrentPlayer().getHand()[0].getId();
         game3.placeCard("pietro", 0, new Point(1, 0), false);
@@ -358,8 +358,8 @@ public class GameMasterTest {
 
     @Test
     @DisplayName("Card is Attached to 3 cards")
-    public void ThreeAttachments() throws WrongGamePhaseException, NoTurnException, NoSuchFieldException,
-            NotEnoughResourcesException, CardPositionException, NotExistsPlayerException {
+    public void ThreeAttachments() throws WrongGamePhaseException, NoTurnException,
+            NotEnoughResourcesException, CardPositionException, NoNameException {
 
         int Card = game3.getCurrentPlayer().getHand()[0].getId();
         game3.placeCard("pietro",0, new Point(1, 0), false);
@@ -390,8 +390,8 @@ public class GameMasterTest {
 
     @Test
     @DisplayName("Card is Attached to 4 cards")
-    public void FourAttachments() throws WrongGamePhaseException, NoTurnException, NoSuchFieldException,
-            NotEnoughResourcesException, CardPositionException, NotExistsPlayerException {
+    public void FourAttachments() throws WrongGamePhaseException, NoTurnException,
+            NotEnoughResourcesException, CardPositionException, NoNameException {
 
         int Card = game3.getCurrentPlayer().getHand()[0].getId();
         game3.placeCard("pietro", 0, new Point(1, 0), false);
@@ -434,7 +434,7 @@ public class GameMasterTest {
 
     @BeforeEach
     public void setUp4() throws SameNameException, LobbyCompleteException, IOException, ParseException,
-            WrongGamePhaseException, NoTurnException, NotExistsPlayerException {
+            WrongGamePhaseException, NoTurnException, NoNameException {
         //create player
         lobby4 = new Lobby();
         lobby4.addPlayer("pietro");
@@ -460,8 +460,8 @@ public class GameMasterTest {
 
     @Test
     @DisplayName("Test for updatingPoints")
-    public void UpdatePoints() throws WrongGamePhaseException, NoTurnException, NoSuchFieldException,
-            NotEnoughResourcesException, NotExistsPlayerException, CardPositionException {
+    public void UpdatePoints() throws WrongGamePhaseException, NoTurnException,
+            NotEnoughResourcesException, NoNameException, CardPositionException {
         assertEquals(0 , lobby4.getPlayers()[0].getPoints());
         game4.placeCard("pietro", 0, new Point(1, 0), true);
 
@@ -532,7 +532,7 @@ public class GameMasterTest {
     @Test
     @DisplayName("Test for Decks Emptying")
     public void deckEmpty_FullLobby() throws IOException, ParseException, WrongGamePhaseException, NoTurnException,
-            NotExistsPlayerException, NoSuchFieldException, NotEnoughResourcesException, CardPositionException {
+            NoNameException, NotEnoughResourcesException, CardPositionException {
         GameMaster game = new GameMaster(lobby,
                 alternatebasePath + "test_resourceDeck2.json",
                 alternatebasePath + "test_goldDeck2.json",
@@ -605,7 +605,7 @@ public class GameMasterTest {
     @Test
     @DisplayName("End game tris test")
     public void endGameTrisTest() throws WrongGamePhaseException, NoTurnException,
-            NoSuchFieldException, NotEnoughResourcesException, NotExistsPlayerException, CardPositionException, NoNameException {
+             NotEnoughResourcesException,  CardPositionException, NoNameException {
         int i, j, z, a ;
         j = 0;
         z = 1;
@@ -628,8 +628,8 @@ public class GameMasterTest {
     }
 
     @Test
-    public void TrisTest() throws WrongGamePhaseException, NoTurnException, NoSuchFieldException,
-            NotEnoughResourcesException, NotExistsPlayerException, CardPositionException, NoNameException {
+    public void TrisTest() throws WrongGamePhaseException, NoTurnException,
+            NotEnoughResourcesException, CardPositionException, NoNameException {
         game4.placeCard("pietro", 0, new Point(0, 1), false);
         game4.drawCard("pietro", false, 0);
 

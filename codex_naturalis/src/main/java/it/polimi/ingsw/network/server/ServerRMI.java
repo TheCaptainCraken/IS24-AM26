@@ -117,7 +117,7 @@ public class ServerRMI implements LoggableServer {
     //We could optimize and use a unique function without any
     @Override
     public void chooseSideStartingCard(String nickname, boolean side)
-            throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoNameException {
+            throws WrongGamePhaseException, NoTurnException, NoNameException {
         int cardId = controller.placeRootCard(nickname, side);
         boolean allWithRootCardPlaced = controller.areAllRootCardPlaced();
         //commento...
@@ -131,7 +131,7 @@ public class ServerRMI implements LoggableServer {
     }
 
     public void chooseSecretObjectiveCard(String nickname, int indexCard)
-            throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoNameException {
+            throws WrongGamePhaseException, NoTurnException, NoNameException {
         controller.chooseObjectiveCard(nickname, indexCard);
         boolean allWithSecretObjectiveCardChosen = controller.areAllSecretObjectiveCardChosen();
 
@@ -150,7 +150,7 @@ public class ServerRMI implements LoggableServer {
 
     @Override
     public void placeCard(String nickname, int indexHand, Point position, boolean side)
-            throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException,
+            throws WrongGamePhaseException, NoTurnException,
             NotEnoughResourcesException, NoNameException, CardPositionException {
 
         int cardId = controller.placeCard(nickname, indexHand, position, side);
@@ -168,7 +168,7 @@ public class ServerRMI implements LoggableServer {
 
     @Override
     public int drawCard(String nickname, boolean gold, int onTableOrDeck)
-            throws WrongGamePhaseException, NoTurnException, NotExistsPlayerException, NoNameException {
+            throws WrongGamePhaseException, NoTurnException, NoNameException {
         int cardId = controller.drawCard(nickname, gold, onTableOrDeck);
         int newCardId = controller.newCardOnTable(gold, onTableOrDeck);
         Kingdom headDeck = controller.getHeadDeck(gold);
