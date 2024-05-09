@@ -175,7 +175,7 @@ public class Tui {
                 "(top left) q   e (top right)\n" +
                 "             s (quit)  \n" +
                 "(bot left) z   c (bot right)\n");
-        char option='s';//TODO Scanf con prossima opzione
+        char option = 's';//TODO Scanf con prossima opzione
         switch(option){
             case 'q':
                 printView(card.getAttachmentCorners().get(Corner.TOP_LEFT));
