@@ -111,7 +111,7 @@ public class ClientRMI extends NetworkClient {
 
     @Override
     public void showSecretObjectiveCards(Integer[] objectiveCardIds){
-        controller.showSecretObjectiveCards(objectiveCardIds);
+        controller.showObjectiveCards(objectiveCardIds);
     }
 
     @Override
