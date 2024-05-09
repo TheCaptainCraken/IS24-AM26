@@ -1,12 +1,11 @@
 package it.polimi.ingsw.network.client;
 
 import it.polimi.ingsw.controller.client.Controller;
+import it.polimi.ingsw.model.*;
 import it.polimi.ingsw.model.Color;
-import it.polimi.ingsw.model.GameState;
-import it.polimi.ingsw.model.Kingdom;
-import it.polimi.ingsw.model.Sign;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class ClientSocket extends NetworkClient {
@@ -84,7 +83,7 @@ public class ClientSocket extends NetworkClient {
     }
 
     @Override
-    public void showEndGame(HashMap<String, Integer> extraPoints, HashMap<String, Integer> ranking) {
+    public void showEndGame(HashMap<String, Integer> extraPoints, ArrayList<Player> ranking) {
 
     }
 }

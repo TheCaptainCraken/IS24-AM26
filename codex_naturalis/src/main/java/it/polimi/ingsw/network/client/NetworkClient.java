@@ -1,13 +1,12 @@
 package it.polimi.ingsw.network.client;
 
+import it.polimi.ingsw.model.*;
 import it.polimi.ingsw.model.Color;
-import it.polimi.ingsw.model.GameState;
-import it.polimi.ingsw.model.Kingdom;
-import it.polimi.ingsw.model.Sign;
 import it.polimi.ingsw.model.exception.*;
 
 import java.awt.*;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public abstract class NetworkClient {
@@ -49,9 +48,8 @@ public abstract class NetworkClient {
     public void moveCard(int newCardId, Kingdom headDeck, boolean gold, int onTableOrDeck) {
     }
 
-    public void showEndGame(HashMap<String, Integer> extraPoints, HashMap<String, Integer> ranking) {
+    public void showEndGame(HashMap<String, Integer> extraPoints, ArrayList<Player> ranking) {
     }
-
 
     //metodi che il client chiama il server.
     public void insertNumberOfPlayers(int numberOfPlayers) throws RemoteException, ClosingLobbyException, SameNameException, LobbyCompleteException, NoNameException {

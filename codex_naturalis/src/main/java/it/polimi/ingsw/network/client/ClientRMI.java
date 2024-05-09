@@ -1,10 +1,8 @@
 package it.polimi.ingsw.network.client;
 
 import it.polimi.ingsw.controller.client.Controller;
+import it.polimi.ingsw.model.*;
 import it.polimi.ingsw.model.Color;
-import it.polimi.ingsw.model.GameState;
-import it.polimi.ingsw.model.Kingdom;
-import it.polimi.ingsw.model.Sign;
 import it.polimi.ingsw.model.exception.*;
 import it.polimi.ingsw.network.server.LoggableServer;
 
@@ -13,6 +11,7 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class ClientRMI extends NetworkClient {
@@ -143,7 +142,7 @@ public class ClientRMI extends NetworkClient {
     }
 
     @Override
-    public void showEndGame(HashMap<String, Integer> extraPoints, HashMap<String, Integer> ranking){
+    public void showEndGame(HashMap<String, Integer> extraPoints, ArrayList<Player> ranking){
         controller.showExtraPoints(extraPoints);
         controller.showRanking(ranking);
     }

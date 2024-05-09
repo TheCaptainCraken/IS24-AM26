@@ -13,6 +13,7 @@ import it.polimi.ingsw.view.Tui;
 
 import java.awt.*;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Controller {
@@ -212,7 +213,7 @@ public class Controller {
      *
      * @param ranking A HashMap where the keys are the nicknames of the players and the values are their associated scores.
      */
-    public void showRanking(HashMap<String, Integer> ranking) {
+    public void showRanking(ArrayList ranking) {
         view.showRanking(ranking);
     }
 

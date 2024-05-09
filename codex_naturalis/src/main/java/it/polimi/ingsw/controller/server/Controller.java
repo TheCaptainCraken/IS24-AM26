@@ -8,6 +8,7 @@ import org.json.simple.parser.ParseException;
 
 import java.awt.*;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 
@@ -343,9 +344,10 @@ public class Controller {
         return extraPoints;
     }
 
-    public HashMap<String, Integer> getRanking() {
-        HashMap<String, Integer> ranking = new HashMap<>();
-        return null;
+    public ArrayList<Player> getRanking() {
+        ArrayList<Player> ranking = game.getRanking();
+
+        return ranking;
     }
 
     public boolean isEndGame() {

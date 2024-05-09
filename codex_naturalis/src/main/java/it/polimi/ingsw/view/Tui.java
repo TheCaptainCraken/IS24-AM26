@@ -243,10 +243,10 @@ public class Tui {
         }
     }
 
-    public void showRanking(HashMap<String, Integer> ranking) {
+    public void showRanking(ArrayList<Player> ranking) {
         System.out.println("The ranking is:");
-        for(String player: ranking.keySet()) {
-            System.out.println(player + " - " + ranking.get(player));
+        for(Player player: ranking) {
+            System.out.println(player);
         }
     }
 
