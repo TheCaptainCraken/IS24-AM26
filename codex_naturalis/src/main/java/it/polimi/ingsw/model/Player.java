@@ -13,8 +13,8 @@ import java.lang.Math;
 public class Player {
     private final String name;
     private int points;
-    private Color color;
     private int objectivePoints;
+    private Color color;
     private PlayedCard rootCard;
     private final HashMap<Sign, Integer> resources;
     private ObjectiveCard secretObjective;

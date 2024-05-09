@@ -124,8 +124,8 @@ public class ServerRMI implements LoggableServer {
         for(String nicknameRefresh : connections.keySet()){
             connections.get(nicknameRefresh).placeCard(nickname, cardId, new Point(0,0), side, controller.getPlayerResources(nickname), controller.getPlayerPoints(nickname));
             if(allWithRootCardPlaced){
-                connections.get(nicknameRefresh).showObjectiveCards(controller.getObjectiveCards());
-                connections.get(nicknameRefresh).showSecretObjectiveCards(controller.getSecretObjectiveCards(nicknameRefresh));
+                connections.get(nicknameRefresh).showObjectiveCards(controller.getCommonObjectiveCards());
+                connections.get(nicknameRefresh).showSecretObjectiveCards(controller.getSecretObjectiveCardsToChoose(nicknameRefresh));
             }
         }
     }

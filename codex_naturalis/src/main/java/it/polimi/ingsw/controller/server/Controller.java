@@ -4,8 +4,10 @@ package it.polimi.ingsw.controller.server;
 import it.polimi.ingsw.model.*;
 import it.polimi.ingsw.model.Color;
 import it.polimi.ingsw.model.exception.*;
+import org.json.simple.parser.ParseException;
 
 import java.awt.*;
+import java.io.IOException;
 import java.util.HashMap;
 
 
@@ -14,6 +16,7 @@ import java.util.HashMap;
  * It manages the game flow and interactions between server and the game model.
  */
 public class Controller {
+    static String basePath = "src/main/java/it/polimi/ingsw/model/decks/";
     private static final Controller INSTANCE = new Controller();
 
     Lobby lobby;
@@ -33,7 +36,6 @@ public class Controller {
      */
     private Controller() {
         lobby = new Lobby();
-        //TODO max size Lobby
     }
     /**
      * Initializes the lobby with a maximum number of players.
@@ -42,6 +44,29 @@ public class Controller {
      */
     public void initializeLobby(int nPlayers) throws ClosingLobbyException {
         lobby.setMaxSize(nPlayers);
+    }
+
+    /**
+     * Initializes the GameMaster object which manages the game flow.
+     *
+     * This method is used to create a new GameMaster object with the lobby and the paths to the decks of cards.
+     * The actual initialization of the GameMaster is handled by the GameMaster's constructor.
+     *
+     * @throws IOException If the file is not found.
+     * @throws ParseException If the file is not valid.
+     */
+    public void start() {
+        try {
+            game = new GameMaster(lobby,
+                    basePath + "resourceCardsDeck.json",
+                    basePath + "goldCardsDeck.json",
+                    basePath + "objectiveCardsDeck.json",
+                    basePath + "startingCardsDeck.json");
+        } catch (IOException e) {
+            System.out.println("the file is not found");
+        } catch (ParseException e) {
+            System.out.println("the file is not valid");
+        }
     }
     /**
      * Adds a player to the lobby.
@@ -166,9 +191,11 @@ public class Controller {
             if(player.getColor() == colour){
                 throw new ColorAlreadyTakenException();
             }
+            //TODO controllo input
         }
 
         lobby.getPlayerFromName(name).setColour(colour);
+
         //Check if all players have chosen a color
         for (Player player : lobby.getPlayers()) {
             if (player.getColor() == null) {
@@ -179,11 +206,6 @@ public class Controller {
         start();
         //TODO better way to check if all players have chosen a color
         return true;
-    }
-
-
-    public void start() {
-  //      game = new GameMaster(lobby,);
     }
 
     /**
@@ -229,14 +251,21 @@ public class Controller {
         return true;
     }
 
-    public Integer[] getObjectiveCards() {
-        //TODO, pubbliche??
-        return null;
+    public Integer[] getCommonObjectiveCards() {
+        Integer[] objectiveCards = new Integer[2];
+        objectiveCards[0] = game.getObjectiveCard(0).getId();
+        objectiveCards[1] = game.getObjectiveCard(1).getId();
+
+        return objectiveCards;
     }
 
-    public Integer[] getSecretObjectiveCards(String nicknameRefresh) {
-        //TODO
-        return null;
+    public Integer[] getSecretObjectiveCardsToChoose(String name) throws NoNameException {
+        Integer[] secretObjectiveCards = new Integer[2];
+        int position = game.getOrderPlayer(name);
+        secretObjectiveCards[0] = game.getObjectiveCardToChoose(position, 0).getId();
+        secretObjectiveCards[1] = game.getObjectiveCardToChoose(position, 1).getId();
+
+        return secretObjectiveCards;
     }
     /**
      * Gets the head of the deck.
@@ -307,23 +336,19 @@ public class Controller {
      * @return A map of the players and their extra points.
      */
     public HashMap<String, Integer> getExtraPoints() {
-        //TODO sostituire con extra points
         HashMap<String, Integer> extraPoints = new HashMap<>();
         for(Player player : lobby.getPlayers()) {
-           extraPoints.put(player.getName(), player.getPoints());
+           extraPoints.put(player.getName(), player.getObjectivePoints());
         }
         return extraPoints;
     }
 
     public HashMap<String, Integer> getRanking() {
-        //TODO
+        HashMap<String, Integer> ranking = new HashMap<>();
         return null;
     }
 
     public boolean isEndGame() {
-        //TODO Check conditions where this happens
-        //also after placing card? data diagram says so but code doesn't work in this way
-        //TODO yes
         return false;
     }
 

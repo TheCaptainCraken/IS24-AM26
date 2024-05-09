@@ -13,57 +13,47 @@ import java.util.HashMap;
 public abstract class NetworkClient {
 
     public void disconnect() {
-
     }
 
     public void stopWaiting(String nickname) {
-
     }
 
     public void refreshUsers(HashMap<String, Color> playersAndPins) {
-
     }
 
     public void sendInfoOnTable() {
-
+        //TODO
     }
 
     public void showStartingCard(int startingCardId) {
-
     }
 
     public void showObjectiveCards(Integer[] objectiveCardIds) {
-
     }
 
     public void showSecretObjectiveCards(Integer[] objectiveCardIds) {
-
     }
 
     public void showHand(String nickname, Integer[] hand) {
-
     }
 
     public void showHiddenHand(String nickname, Kingdom[] hand) {
-
     }
 
     public void refreshTurnInfo(String currentPlayer, GameState gameState) {
-
     }
 
     public void placeCard(String nickname, int id, Point position, boolean side, HashMap<Sign, Integer> resources, int points) {
-
     }
 
     public void moveCard(int newCardId, Kingdom headDeck, boolean gold, int onTableOrDeck) {
-
     }
 
     public void showEndGame(HashMap<String, Integer> extraPoints, HashMap<String, Integer> ranking) {
-
     }
 
+
+    //metodi che il client chiama il server.
     public void insertNumberOfPlayers(int numberOfPlayers) throws RemoteException, ClosingLobbyException, SameNameException, LobbyCompleteException, NoNameException {
     }
 

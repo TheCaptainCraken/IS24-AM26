@@ -7,8 +7,6 @@ import java.awt.*;
 import java.io.IOException;
 import java.util.*;
 
-import javax.swing.text.Position;
-
 public class GameMaster {
     private int globalTurn;
     private TurnType turnType;
@@ -885,7 +883,7 @@ public class GameMaster {
      * @param name player who sent the request
      * @return get order of player
      */
-    private int getOrderPlayer(String name) throws NoNameException {
+    public int getOrderPlayer(String name) throws NoNameException {
         int i;
         for (i = 0; i < lobby.getPlayers().length; i++) {
             if (lobby.getPlayers()[i].getName().equals(name)) {
@@ -1049,5 +1047,21 @@ public class GameMaster {
             return onTableResourceCards[onTableOrDeck].getId();
             }
         }
+
+    /**
+     * Retrieves an objective card from the table in the game.
+     *
+     * This method is used to retrieve an objective card from the table in the game.
+     *
+     * @param i The index of the objective card on the table.
+     * @return The objective card at the specified index on the table.
+     */
+    public Card getObjectiveCard(int i) {
+        return onTableObjectiveCards[i];
+    }
+
+    public ObjectiveCard getObjectiveCardToChoose(int i, int j) {
+        return objectiveCardToChoose[i][j];
+    }
 }
 
