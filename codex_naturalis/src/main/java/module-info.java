@@ -11,4 +11,5 @@ module it.polimi.ingsw {
 
     exports it.polimi.ingsw;
     exports it.polimi.ingsw.network.server;
+    exports it.polimi.ingsw.network.server.rmi;
 }

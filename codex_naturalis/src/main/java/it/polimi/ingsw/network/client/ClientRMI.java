@@ -4,7 +4,7 @@ import it.polimi.ingsw.controller.client.Controller;
 import it.polimi.ingsw.model.*;
 import it.polimi.ingsw.model.Color;
 import it.polimi.ingsw.model.exception.*;
-import it.polimi.ingsw.network.server.LoggableServer;
+import it.polimi.ingsw.network.server.rmi.LoggableServer;
 
 import java.awt.*;
 import java.rmi.NotBoundException;
