@@ -1,5 +1,6 @@
 package it.polimi.ingsw.network.messages.server.gameflow;
 
+import it.polimi.ingsw.controller.client.Controller;
 import it.polimi.ingsw.model.Sign;
 import it.polimi.ingsw.network.messages.server.ServerMessage;
 
@@ -20,5 +21,10 @@ public class RefreshedResources extends ServerMessage {
 
     public HashMap<Sign, Integer> getResources() {
         return resources;
+    }
+
+    @Override
+    public void callController(Controller controller) {
+        controller.updateResources(nickname,resources);
     }
 }

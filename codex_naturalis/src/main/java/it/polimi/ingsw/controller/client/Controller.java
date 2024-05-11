@@ -38,7 +38,8 @@ public class Controller {
         if(typeOfConnection.equals("RMI")){
             connection = new ClientRMI();
         }else if(typeOfConnection.equals("Socket")){
-            connection = new ClientSocket();
+            connection = new ClientSocket("placeholder",69);
+            //TODO vanno aggiunti address e port al costruttore, il primo sarà una costante salvata nel codice l'altro sarà generato automaticamente
         }
     }
 
@@ -112,7 +113,7 @@ public class Controller {
 
     public void sendInfoOnTable() {
         view.showCommonTable();
-    }
+    } //TODO
     /**
      * Triggers the view to display the starting card to the user.
      *
@@ -189,7 +190,7 @@ public class Controller {
         //TODO salva in memoria
     }
 
-    public void updateHeadDeck(Kingdom headDeck, boolean gold, int onTableOrDeck) {
+    public void updateHeadDeck(Kingdom headDeck, boolean gold) {
         //TODO salva in memoria
     }
 

@@ -1,5 +1,6 @@
 package it.polimi.ingsw.network.messages.server.gameflow;
 
+import it.polimi.ingsw.controller.client.Controller;
 import it.polimi.ingsw.model.Kingdom;
 import it.polimi.ingsw.network.messages.server.ServerMessage;
 
@@ -18,5 +19,10 @@ public class ShowNewKingdomDeck extends ServerMessage {
 
     public boolean isGold() {
         return gold;
+    }
+
+    @Override
+    public void callController(Controller controller) {
+        controller.updateHeadDeck(kingdom,gold);
     }
 }

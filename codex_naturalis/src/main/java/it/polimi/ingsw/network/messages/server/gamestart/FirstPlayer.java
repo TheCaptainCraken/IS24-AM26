@@ -1,5 +1,6 @@
 package it.polimi.ingsw.network.messages.server.gamestart;
 
+import it.polimi.ingsw.controller.client.Controller;
 import it.polimi.ingsw.network.messages.server.ServerMessage;
 
 public class FirstPlayer extends ServerMessage {
@@ -11,5 +12,10 @@ public class FirstPlayer extends ServerMessage {
 
     public String getNickname() {
         return nickname;
+    }
+
+    @Override
+    public void callController(Controller controller) {
+        controller.getIsFirst(nickname);
     }
 }

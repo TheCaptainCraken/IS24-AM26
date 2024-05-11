@@ -1,5 +1,6 @@
 package it.polimi.ingsw.network.messages.server.gameflow;
 
+import it.polimi.ingsw.controller.client.Controller;
 import it.polimi.ingsw.model.GameState;
 import it.polimi.ingsw.network.messages.server.ServerMessage;
 
@@ -18,5 +19,10 @@ public class TurnInfo extends ServerMessage {
 
     public GameState getState() {
         return state;
+    }
+
+    @Override
+    public void callController(Controller controller) {
+        controller.refreshTurnInfo(currentPlayer,state);
     }
 }

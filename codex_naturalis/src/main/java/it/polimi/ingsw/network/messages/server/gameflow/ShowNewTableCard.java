@@ -1,5 +1,6 @@
 package it.polimi.ingsw.network.messages.server.gameflow;
 
+import it.polimi.ingsw.controller.client.Controller;
 import it.polimi.ingsw.network.messages.server.ServerMessage;
 
 public class ShowNewTableCard extends ServerMessage {
@@ -24,5 +25,10 @@ public class ShowNewTableCard extends ServerMessage {
 
     public int getOnTableOrDeck() {
         return onTableOrDeck;
+    }
+
+    @Override
+    public void callController(Controller controller) {
+        controller.updateCardOnTable(idCard,gold,onTableOrDeck);
     }
 }
