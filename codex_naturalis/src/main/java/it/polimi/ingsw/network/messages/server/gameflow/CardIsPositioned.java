@@ -1,5 +1,6 @@
 package it.polimi.ingsw.network.messages.server.gameflow;
 
+import it.polimi.ingsw.controller.client.Controller;
 import it.polimi.ingsw.network.messages.server.ServerMessage;
 
 import java.awt.*;
@@ -31,5 +32,10 @@ public class CardIsPositioned extends ServerMessage {
 
     public boolean isSide() {
         return side;
+    }
+
+    @Override
+    public void callController(Controller controller) {
+        controller.placeCard(nickname,cardId,position,side);
     }
 }

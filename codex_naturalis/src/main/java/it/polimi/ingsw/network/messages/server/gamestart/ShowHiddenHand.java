@@ -1,5 +1,6 @@
 package it.polimi.ingsw.network.messages.server.gamestart;
 
+import it.polimi.ingsw.controller.client.Controller;
 import it.polimi.ingsw.model.Kingdom;
 import it.polimi.ingsw.network.messages.server.ServerMessage;
 
@@ -20,5 +21,11 @@ public class ShowHiddenHand extends ServerMessage {
 
     public ArrayList<Kingdom> getHand() {
         return hand;
+    }
+
+    @Override
+    public void callController(Controller controller) {
+        Kingdom[] array = hand.toArray(new Kingdom[0]);
+        controller.updateHiddenHand(nickname,array);
     }
 }

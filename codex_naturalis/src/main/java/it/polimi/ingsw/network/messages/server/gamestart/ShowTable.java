@@ -1,5 +1,6 @@
 package it.polimi.ingsw.network.messages.server.gamestart;
 
+import it.polimi.ingsw.controller.client.Controller;
 import it.polimi.ingsw.model.Kingdom;
 import it.polimi.ingsw.network.messages.server.ServerMessage;
 
@@ -43,5 +44,10 @@ public class ShowTable extends ServerMessage {
 
     public Kingdom getGoldDeck() {
         return goldDeck;
+    }
+
+    @Override
+    public void callController(Controller controller) {
+        controller.sendInfoOnTable(); //metodo ha probabilmente una signature incompleta
     }
 }

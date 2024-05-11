@@ -1,5 +1,6 @@
 package it.polimi.ingsw.network.messages.server.endgame;
 
+import it.polimi.ingsw.controller.client.Controller;
 import it.polimi.ingsw.model.Player;
 import it.polimi.ingsw.network.messages.server.ServerMessage;
 
@@ -14,5 +15,10 @@ public class ShowRanking extends ServerMessage {
 
     public ArrayList<Player> getRanking() {
         return ranking;
+    }
+
+    @Override
+    public void callController(Controller controller) {
+        controller.showRanking(ranking);
     }
 }

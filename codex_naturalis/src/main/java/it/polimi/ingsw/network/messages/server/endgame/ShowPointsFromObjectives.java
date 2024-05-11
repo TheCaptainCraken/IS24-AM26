@@ -1,5 +1,6 @@
 package it.polimi.ingsw.network.messages.server.endgame;
 
+import it.polimi.ingsw.controller.client.Controller;
 import it.polimi.ingsw.network.messages.server.ServerMessage;
 
 import java.util.HashMap;
@@ -13,5 +14,10 @@ public class ShowPointsFromObjectives extends ServerMessage {
 
     public HashMap<String, Integer> getExtraPoints() {
         return extraPoints;
+    }
+
+    @Override
+    public void callController(Controller controller) {
+        controller.showExtraPoints(extraPoints);
     }
 }

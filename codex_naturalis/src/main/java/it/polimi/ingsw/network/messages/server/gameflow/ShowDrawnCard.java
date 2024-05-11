@@ -1,5 +1,6 @@
 package it.polimi.ingsw.network.messages.server.gameflow;
 
+import it.polimi.ingsw.controller.client.Controller;
 import it.polimi.ingsw.network.messages.server.ServerMessage;
 
 public class ShowDrawnCard extends ServerMessage {
@@ -17,5 +18,10 @@ public class ShowDrawnCard extends ServerMessage {
 
     public String getNickname() {
         return nickname;
+    }
+
+    @Override
+    public void callController(Controller controller) {
+        controller.drawCard(nickname,cardId);
     }
 }

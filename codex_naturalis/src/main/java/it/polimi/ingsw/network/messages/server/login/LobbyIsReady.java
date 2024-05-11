@@ -1,5 +1,6 @@
 package it.polimi.ingsw.network.messages.server.login;
 
+import it.polimi.ingsw.controller.client.Controller;
 import it.polimi.ingsw.network.messages.server.ServerMessage;
 
 public class LobbyIsReady extends ServerMessage {
@@ -11,5 +12,14 @@ public class LobbyIsReady extends ServerMessage {
 
     public boolean isReady() {
         return isReady;
+    }
+
+    @Override
+    public void callController(Controller controller) {
+        if(isReady) {
+            controller.stopWaiting();
+        } else{
+            controller.waitLobby();
+        }
     }
 }

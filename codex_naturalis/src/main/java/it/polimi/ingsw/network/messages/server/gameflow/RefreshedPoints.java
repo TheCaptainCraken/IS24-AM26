@@ -1,5 +1,6 @@
 package it.polimi.ingsw.network.messages.server.gameflow;
 
+import it.polimi.ingsw.controller.client.Controller;
 import it.polimi.ingsw.network.messages.server.ServerMessage;
 
 public class RefreshedPoints extends ServerMessage {
@@ -18,5 +19,10 @@ public class RefreshedPoints extends ServerMessage {
 
     public int getPoints() {
         return points;
+    }
+
+    @Override
+    public void callController(Controller controller) {
+        controller.updateScore(nickname,points);
     }
 }

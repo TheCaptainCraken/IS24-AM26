@@ -1,5 +1,6 @@
 package it.polimi.ingsw.network.messages.server.gamestart;
 
+import it.polimi.ingsw.controller.client.Controller;
 import it.polimi.ingsw.network.messages.server.ServerMessage;
 
 import java.util.ArrayList;
@@ -19,5 +20,11 @@ public class ShowHand extends ServerMessage {
 
     public ArrayList<Integer> getCardsInHand() {
         return cardsInHand;
+    }
+
+    @Override
+    public void callController(Controller controller) {
+        Integer[] array = cardsInHand.toArray(new Integer[0]);
+        controller.updateHand(nickname,array);
     }
 }
