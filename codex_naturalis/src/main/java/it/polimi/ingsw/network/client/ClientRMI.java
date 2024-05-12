@@ -5,6 +5,7 @@ import it.polimi.ingsw.model.*;
 import it.polimi.ingsw.model.Color;
 import it.polimi.ingsw.model.exception.*;
 import it.polimi.ingsw.network.server.rmi.LoggableServer;
+import javafx.util.Pair;
 
 import java.awt.*;
 import java.rmi.NotBoundException;
@@ -119,7 +120,7 @@ public class ClientRMI extends NetworkClient {
     }
 
     @Override
-    public void showHiddenHand(String nickname, Kingdom[] hand){
+    public void showHiddenHand(String nickname, Pair<Kingdom, Boolean>[] hand){
         controller.updateHiddenHand(nickname, hand);
     }
 
@@ -138,7 +139,7 @@ public class ClientRMI extends NetworkClient {
     @Override
     public void moveCard(int newCardId, Kingdom headDeck, boolean gold, int onTableOrDeck){
         controller.updateCardOnTable(newCardId, gold, onTableOrDeck);
-        controller.updateHeadDeck(headDeck, gold, onTableOrDeck);
+        controller.updateHeadDeck(headDeck, gold);
     }
 
     @Override

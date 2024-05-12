@@ -3,6 +3,7 @@ package it.polimi.ingsw.network.client;
 import it.polimi.ingsw.model.*;
 import it.polimi.ingsw.model.Color;
 import it.polimi.ingsw.model.exception.*;
+import javafx.util.Pair;
 
 import java.awt.*;
 import java.rmi.RemoteException;
@@ -36,7 +37,7 @@ public abstract class NetworkClient {
     public void showHand(String nickname, Integer[] hand) {
     }
 
-    public void showHiddenHand(String nickname, Kingdom[] hand) {
+    public void showHiddenHand(String nickname, Pair<Kingdom, Boolean>[] hand) {
     }
 
     public void refreshTurnInfo(String currentPlayer, GameState gameState) {

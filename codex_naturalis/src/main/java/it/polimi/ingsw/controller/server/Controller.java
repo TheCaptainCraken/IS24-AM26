@@ -4,12 +4,14 @@ package it.polimi.ingsw.controller.server;
 import it.polimi.ingsw.model.*;
 import it.polimi.ingsw.model.Color;
 import it.polimi.ingsw.model.exception.*;
+import javafx.util.Pair;
 import org.json.simple.parser.ParseException;
 
 import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 
 /**
@@ -315,13 +317,13 @@ public class Controller {
      * @throws NoNameException If the field does not exist.
      * @return The hidden hand of the player.
      */
-    public Kingdom[] getHiddenHand(String nickname) throws NoNameException {
+    public Pair<Kingdom, Boolean>[] getHiddenHand(String nickname) throws NoNameException {
         Player player = lobby.getPlayerFromName(nickname);
-        Kingdom[] hiddenHand = new Kingdom[3];
+        Pair<Kingdom, Boolean>[] hiddenHand = new Pair[3];
         int i;
 
         for(i = 0; i < 3; i++){
-            hiddenHand[i] = player.getHand()[i].getKingdom();
+            hiddenHand[i] = new Pair(player.getHand()[i].getKingdom(), (player.getHand()[i] instanceof GoldCard));
         }
         return hiddenHand;
     }
@@ -358,6 +360,10 @@ public class Controller {
     public String getFirstPlayer() {
         //TODO
         return null;
+    }
+
+    public boolean isLobbyLocked(){
+        return lobby.getLock();
     }
 }
 

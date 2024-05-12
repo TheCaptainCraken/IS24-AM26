@@ -19,20 +19,17 @@ import java.util.HashMap;
 public class ServerRMI extends NetworkPlug implements LoggableServer {
     static int PORT = 1234; //TODO porta dinamica
     int numberOfPlayers = 0;//TODO I can do a method to get it
-   //HashMap<String, ClientRMI> connections = new HashMap<>();
-    //Controller.getInstance is used directly in it
-    //TODO move all connections here again
-    //TODO getConnections()
+    HashMap<String, ClientRMI> connections = new HashMap<>();
     //TODO call broadcast methods
-
-
 
     public static void main(String[] args) throws RemoteException {
     }
 
     public ServerRMI() throws RemoteException {
         super();
-        NetworkHandler.getInstance().addNetworkPlug(this);
+
+        NetworkHandler.getInstance().addNetworkPlug("RMI", this);
+
         System.out.println("Hello, World!");
         LoggableServer serverSkeleton = null;//https://www.baeldung.com/java-rmi
         ServerRMI obj = new ServerRMI();
@@ -71,9 +68,14 @@ public class ServerRMI extends NetworkPlug implements LoggableServer {
     @Override
     public boolean isFirst(ClientRMI clientRMI, String nickname) throws RemoteException, SameNameException, LobbyCompleteException {
         Controller.getInstance().addPlayer(nickname);
-        NetworkHandler.getInstance().addConnection(this, nickname, clientRMI);
+        connections.put(nickname, clientRMI);
         refreshUsers();
         return Controller.getInstance().getIsFirst(nickname);
+    }
+
+    @Override
+    public boolean lobbyIsReady() throws RemoteException {
+        return Controller.getInstance().isLobbyLocked();
     }
 
     @Override
@@ -83,47 +85,37 @@ public class ServerRMI extends NetworkPlug implements LoggableServer {
         Controller.getInstance().initializeLobby(numberOfPlayers);
         //TODO remove all players before
         //Deletes all other connections that are not in the lobby
-        HashMap<String, Color> playersInLobby = null;
-        for(String nickname : connections.keySet()){
-            if(Controller.getInstance().getPlayer(nickname) == null){
-                connections.get(nickname).disconnect();
-                connections.remove(nickname);
-            }else{
-                Controller.getInstance().addPlayer(nickname);
-                connections.get(nickname).stopWaiting(nickname);
-            }
-        }
-        finalizingNumberOfPlayers();
-        refreshUsers();
+
+        NetworkHandler.getInstance().finalizingNumberOfPlayersBroadcast(numberOfPlayers);
+        NetworkHandler.getInstance().refreshUsersBroadcast();
     }
 
     @Override
-    protected void finalizingNumberOfPlayers(){
-
+    protected void finalizingNumberOfPlayers() throws NoNameException, SameNameException, LobbyCompleteException {
     }
 
     @Override
     public void chooseColor(String nickname, Color color) throws RemoteException,
             ColorAlreadyTakenException, NoNameException {
         if(Controller.getInstance().setColour(nickname, color)){
-            gameIsStarting();
+            NetworkHandler.getInstance().gameIsStartingBroadcast();
         }
-        refreshUsers();
+        NetworkHandler.getInstance().refreshUsersBroadcast();
     }
 
     @Override
-    protected void gameIsStarting(){
-        for(String nicknameRefresh : NetworkHandler.getInstance().getConnections(this).keySet()){
-            ((ClientRMI) NetworkHandler.getInstance().getConnections(this).get(nicknameRefresh)).sendInfoOnTable();//TODO
-            ((ClientRMI) NetworkHandler.getInstance().getConnections(this).get(nicknameRefresh)).showStartingCard(controller.getStartingCard(nicknameRefresh));
+    protected void gameIsStarting() throws NoNameException {
+        for(String nicknameRefresh : connections.keySet()){
+            connections.get(nicknameRefresh).sendInfoOnTable();//TODO
+            connections.get(nicknameRefresh).showStartingCard(Controller.getInstance().getStartingCard(nicknameRefresh));
         }
     }
 
     @Override
     protected void refreshUsers(){
         HashMap<String, Color> playersAndPins = Controller.getInstance().getPlayersAndPins();
-        for (Object connection : NetworkHandler.getInstance().getConnections(this).values()){
-            ((ClientRMI) connection).refreshUsers(playersAndPins);
+        for (ClientRMI connection : connections.values()){
+            connection.refreshUsers(playersAndPins);
         }
     }
 
@@ -136,17 +128,16 @@ public class ServerRMI extends NetworkPlug implements LoggableServer {
         int cardId = Controller.getInstance().placeRootCard(nickname, side);
         boolean allWithRootCardPlaced = Controller.getInstance().areAllRootCardPlaced();
         //commento...
-        sendingPlacedRootCardAndWhenCompleteObjectiveCards(nickname, side, cardId, allWithRootCardPlaced);
+        NetworkHandler.getInstance().sendingPlacedRootCardAndWhenCompleteObjectiveCardsBroadcast(nickname, side, cardId, allWithRootCardPlaced);
     }
 
     @Override
     public void sendingPlacedRootCardAndWhenCompleteObjectiveCards(String nickname, boolean side, int cardId, boolean allWithRootCardPlaced) throws NoNameException {
-        for(String nicknameRefresh : NetworkHandler.getInstance().getConnections(this).keySet()){
-            ClientRMI connection = (ClientRMI) NetworkHandler.getInstance().getConnections(this).get(nicknameRefresh);
-            connection.placeCard(nickname, cardId, new Point(0,0), side, Controller.getInstance().getPlayerResources(nickname), controller.getPlayerPoints(nickname));
+        for(String nicknameRefresh : connections.keySet()){
+            connections.get(nicknameRefresh).placeCard(nickname, cardId, new Point(0,0), side, Controller.getInstance().getPlayerResources(nickname), Controller.getInstance().getPlayerPoints(nickname));
             if(allWithRootCardPlaced){
-                connection.showObjectiveCards(Controller.getInstance().getCommonObjectiveCards());
-                connection.showSecretObjectiveCards(Controller.getInstance().getSecretObjectiveCardsToChoose(nicknameRefresh));
+                connections.get(nicknameRefresh).showObjectiveCards(Controller.getInstance().getCommonObjectiveCards());
+                connections.get(nicknameRefresh).showSecretObjectiveCards(Controller.getInstance().getSecretObjectiveCardsToChoose(nicknameRefresh));
             }
         }
     }
@@ -155,21 +146,20 @@ public class ServerRMI extends NetworkPlug implements LoggableServer {
             throws WrongGamePhaseException, NoTurnException, NoNameException {
         Controller.getInstance().chooseObjectiveCard(nickname, indexCard);
         boolean allWithSecretObjectiveCardChosen = Controller.getInstance().areAllSecretObjectiveCardChosen();
-        sendingHandsAndWhenSecretObjectiveCardsCompleteStartGameFlow(nickname, allWithSecretObjectiveCardChosen);
+        NetworkHandler.getInstance().sendingHandsAndWhenSecretObjectiveCardsCompleteStartGameFlowBroadcast(nickname, allWithSecretObjectiveCardChosen);
     }
 
     @Override
     protected void sendingHandsAndWhenSecretObjectiveCardsCompleteStartGameFlow(String nickname, boolean allWithSecretObjectiveCardChosen) throws NoNameException {
-        for(String nicknameRefresh : NetworkHandler.getInstance().getConnections(this).keySet()){
-            ClientRMI connection = (ClientRMI) (ClientRMI) NetworkHandler.getInstance().getConnections(this).get(nicknameRefresh);
+        for(String nicknameRefresh : connections.keySet()){
             if(nickname.equals(nicknameRefresh)){
-                connection.showHand(nickname, Controller.getInstance().getHand(nickname));
+                connections.get(nicknameRefresh).showHand(nickname, Controller.getInstance().getHand(nickname));
             }else{
-                connection.showHiddenHand(nicknameRefresh, Controller.getInstance().getHiddenHand(nickname));
+                connections.get(nicknameRefresh).showHiddenHand(nicknameRefresh, Controller.getInstance().getHiddenHand(nickname));
             }
             if(allWithSecretObjectiveCardChosen){
-                connection.getIsFirst(Controller.getInstance().getFirstPlayer());
-                connection.refreshTurnInfo(Controller.getInstance().getCurrentPlayer(), Controller.getInstance().getGameState());
+                connections.get(nicknameRefresh).getIsFirst(Controller.getInstance().getFirstPlayer());
+                connections.get(nicknameRefresh).refreshTurnInfo(Controller.getInstance().getCurrentPlayer(), Controller.getInstance().getGameState());
             }
         }
     }
@@ -180,15 +170,15 @@ public class ServerRMI extends NetworkPlug implements LoggableServer {
             NotEnoughResourcesException, NoNameException, CardPositionException {
 
         int cardId = Controller.getInstance().placeCard(nickname, indexHand, position, side);
-        sendPlacedCard(nickname, cardId, position, side);
+        NetworkHandler.getInstance().sendPlacedCardBroadcast(nickname, cardId, position, side);
 
         if(Controller.getInstance().isEndGame()){
-            sendEndGame();
+            NetworkHandler.getInstance().sendEndGameBroadcast();
         }
     }
 
     @Override
-    protected void sendPlacedCard(String nickname, int cardId, Point position, boolean side){
+    protected void sendPlacedCard(String nickname, int cardId, Point position, boolean side) throws NoNameException {
         for(String nicknameRefresh : connections.keySet()){
             connections.get(nicknameRefresh).placeCard(nickname, cardId, position, side, Controller.getInstance().getPlayerResources(nickname), Controller.getInstance().getPlayerPoints(nickname));
             connections.get(nicknameRefresh).refreshTurnInfo(Controller.getInstance().getCurrentPlayer(), Controller.getInstance().getGameState());
@@ -202,19 +192,19 @@ public class ServerRMI extends NetworkPlug implements LoggableServer {
         int newCardId = Controller.getInstance().newCardOnTable(gold, onTableOrDeck);
         Kingdom headDeck = Controller.getInstance().getHeadDeck(gold);
 
-        sendDrawnCard(nickname, newCardId, headDeck, gold, onTableOrDeck);
+        NetworkHandler.getInstance().sendDrawnCardBroadcast(nickname, newCardId, headDeck, gold, onTableOrDeck);
 
         if(Controller.getInstance().isEndGame()){
-            sendEndGame();
+            NetworkHandler.getInstance().sendEndGameBroadcast();
         }
         return cardId;
     }
 
     @Override
-    protected void sendDrawnCard(String nickname, int newCardId, Kingdom headDeck, boolean gold, int onTableOrDeck){
+    protected void sendDrawnCard(String nickname, int newCardId, Kingdom headDeck, boolean gold, int onTableOrDeck) throws NoNameException {
         for(String nicknameRefresh : connections.keySet()){
             if(!nickname.equals(nicknameRefresh)){
-                connections.get(nicknameRefresh).showHiddenHand(nicknameRefresh, Controller.getInstance().getHiddenHand(nickname));///TODO add to client
+                connections.get(nicknameRefresh).showHiddenHand(nicknameRefresh, Controller.getInstance().getHiddenHand(nickname));
             }
             connections.get(nicknameRefresh).moveCard(newCardId, headDeck, gold, onTableOrDeck);
             connections.get(nicknameRefresh).refreshTurnInfo(Controller.getInstance().getCurrentPlayer(), Controller.getInstance().getGameState());

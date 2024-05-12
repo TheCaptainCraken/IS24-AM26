@@ -4,6 +4,7 @@ import it.polimi.ingsw.model.Card;
 import it.polimi.ingsw.model.*;
 import it.polimi.ingsw.model.Color;
 import it.polimi.ingsw.model.GameState;
+import javafx.util.Pair;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -543,7 +544,7 @@ public class Tui {
         //TODO mettere in memoria. Questo dovrebbe essere disponibile per TUI/GUI
     }
 
-    public void updateHiddenHand(String nickname, Kingdom[] hand) {
+    public void updateHiddenHand(String nickname, Pair<Kingdom, Boolean>[] hand) {
         //TODO mettere in memoria
     }
 }

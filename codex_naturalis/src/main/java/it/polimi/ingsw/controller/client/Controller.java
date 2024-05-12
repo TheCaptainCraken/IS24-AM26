@@ -10,6 +10,7 @@ import it.polimi.ingsw.network.client.ClientRMI;
 import it.polimi.ingsw.network.client.ClientSocket;
 import it.polimi.ingsw.network.client.NetworkClient;
 import it.polimi.ingsw.view.Tui;
+import javafx.util.Pair;
 
 import java.awt.*;
 import java.rmi.RemoteException;
@@ -152,7 +153,7 @@ public class Controller {
         view.updateHand(nickname, hand);
     }
 
-    public void updateHiddenHand(String nickname, Kingdom[] hand) {
+    public void updateHiddenHand(String nickname, Pair<Kingdom, Boolean>[] hand) {
         view.updateHiddenHand(nickname, hand);
     }
 
