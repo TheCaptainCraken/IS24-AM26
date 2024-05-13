@@ -38,6 +38,13 @@ public class Deck {
         this.shuffle();
     }
 
+    //TODO javaddock
+    public Deck(String cardsFile, boolean toFile) throws FileNotFoundException, IOException, ParseException, IllegalArgumentException {
+        cards = new ArrayList<Card>();
+        this.generateDeck(cardsFile);
+    }
+
+
     /**
      * This method generates the deck of cards from a JSON file.
      * 
@@ -235,6 +242,10 @@ public class Deck {
      */
     public Kingdom getKingdomFirstCard() throws IndexOutOfBoundsException{
         return cards.get(0).getKingdom();
+    }
+
+    public Card getCard(int position) throws IndexOutOfBoundsException{
+        return cards.get(position);
     }
 
     /**

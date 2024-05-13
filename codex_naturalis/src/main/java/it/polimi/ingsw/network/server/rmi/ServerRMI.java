@@ -105,8 +105,19 @@ public class ServerRMI extends NetworkPlug implements LoggableServer {
 
     @Override
     protected void gameIsStarting() throws NoNameException {
+        Integer[] resourceCards = new Integer[2];
+        resourceCards[0] = Controller.getInstance().getResourceCards(0);
+        resourceCards[1] = Controller.getInstance().getResourceCards(1);
+
+        Integer[] goldCard = new Integer[2];
+        goldCard[0] = Controller.getInstance().getGoldCard(0);
+        goldCard[1] = Controller.getInstance().getGoldCard(1);
+
+        Kingdom goldCardOnDeck = Controller.getInstance().getHeadDeck(true);
+        Kingdom resourceCardOnDeck = Controller.getInstance().getHeadDeck(false);
+
         for(String nicknameRefresh : connections.keySet()){
-            connections.get(nicknameRefresh).sendInfoOnTable();//TODO
+            connections.get(nicknameRefresh).sendInfoOnTable(resourceCards, goldCard, resourceCardOnDeck, goldCardOnDeck);
             connections.get(nicknameRefresh).showStartingCard(Controller.getInstance().getStartingCard(nicknameRefresh));
         }
     }
@@ -127,8 +138,8 @@ public class ServerRMI extends NetworkPlug implements LoggableServer {
             throws WrongGamePhaseException, NoTurnException, NoNameException {
         int cardId = Controller.getInstance().placeRootCard(nickname, side);
         boolean allWithRootCardPlaced = Controller.getInstance().areAllRootCardPlaced();
-        //commento...
-        NetworkHandler.getInstance().sendingPlacedRootCardAndWhenCompleteObjectiveCardsBroadcast(nickname, side, cardId, allWithRootCardPlaced);
+        NetworkHandler.getInstance().
+                sendingPlacedRootCardAndWhenCompleteObjectiveCardsBroadcast(nickname, side, cardId, allWithRootCardPlaced);
     }
 
     @Override
@@ -136,8 +147,10 @@ public class ServerRMI extends NetworkPlug implements LoggableServer {
         for(String nicknameRefresh : connections.keySet()){
             connections.get(nicknameRefresh).placeCard(nickname, cardId, new Point(0,0), side, Controller.getInstance().getPlayerResources(nickname), Controller.getInstance().getPlayerPoints(nickname));
             if(allWithRootCardPlaced){
-                connections.get(nicknameRefresh).showObjectiveCards(Controller.getInstance().getCommonObjectiveCards());
-                connections.get(nicknameRefresh).showSecretObjectiveCards(Controller.getInstance().getSecretObjectiveCardsToChoose(nicknameRefresh));
+                connections.get(nicknameRefresh).
+                        showObjectiveCards(Controller.getInstance().getCommonObjectiveCards());
+                connections.get(nicknameRefresh).
+                        showSecretObjectiveCards(Controller.getInstance().getSecretObjectiveCardsToChoose(nicknameRefresh));
             }
         }
     }
@@ -146,7 +159,8 @@ public class ServerRMI extends NetworkPlug implements LoggableServer {
             throws WrongGamePhaseException, NoTurnException, NoNameException {
         Controller.getInstance().chooseObjectiveCard(nickname, indexCard);
         boolean allWithSecretObjectiveCardChosen = Controller.getInstance().areAllSecretObjectiveCardChosen();
-        NetworkHandler.getInstance().sendingHandsAndWhenSecretObjectiveCardsCompleteStartGameFlowBroadcast(nickname, allWithSecretObjectiveCardChosen);
+        NetworkHandler.getInstance().
+                sendingHandsAndWhenSecretObjectiveCardsCompleteStartGameFlowBroadcast(nickname, allWithSecretObjectiveCardChosen);
     }
 
     @Override
@@ -159,7 +173,8 @@ public class ServerRMI extends NetworkPlug implements LoggableServer {
             }
             if(allWithSecretObjectiveCardChosen){
                 connections.get(nicknameRefresh).getIsFirst(Controller.getInstance().getFirstPlayer());
-                connections.get(nicknameRefresh).refreshTurnInfo(Controller.getInstance().getCurrentPlayer(), Controller.getInstance().getGameState());
+                connections.get(nicknameRefresh).
+                        refreshTurnInfo(Controller.getInstance().getCurrentPlayer(), Controller.getInstance().getGameState());
             }
         }
     }
@@ -181,7 +196,8 @@ public class ServerRMI extends NetworkPlug implements LoggableServer {
     protected void sendPlacedCard(String nickname, int cardId, Point position, boolean side) throws NoNameException {
         for(String nicknameRefresh : connections.keySet()){
             connections.get(nicknameRefresh).placeCard(nickname, cardId, position, side, Controller.getInstance().getPlayerResources(nickname), Controller.getInstance().getPlayerPoints(nickname));
-            connections.get(nicknameRefresh).refreshTurnInfo(Controller.getInstance().getCurrentPlayer(), Controller.getInstance().getGameState());
+            connections.get(nicknameRefresh).
+                    refreshTurnInfo(Controller.getInstance().getCurrentPlayer(), Controller.getInstance().getGameState());
         }
     }
 
@@ -207,14 +223,16 @@ public class ServerRMI extends NetworkPlug implements LoggableServer {
                 connections.get(nicknameRefresh).showHiddenHand(nicknameRefresh, Controller.getInstance().getHiddenHand(nickname));
             }
             connections.get(nicknameRefresh).moveCard(newCardId, headDeck, gold, onTableOrDeck);
-            connections.get(nicknameRefresh).refreshTurnInfo(Controller.getInstance().getCurrentPlayer(), Controller.getInstance().getGameState());
+            connections.get(nicknameRefresh).
+                    refreshTurnInfo(Controller.getInstance().getCurrentPlayer(), Controller.getInstance().getGameState());
         }
     }
 
     @Override
     protected void sendEndGame(){
         for(String nicknameRefresh : connections.keySet()){
-            connections.get(nicknameRefresh).showEndGame(Controller.getInstance().getExtraPoints(), Controller.getInstance().getRanking());
+            connections.get(nicknameRefresh).
+                    showEndGame(Controller.getInstance().getExtraPoints(), Controller.getInstance().getRanking());
         }
     }
 }

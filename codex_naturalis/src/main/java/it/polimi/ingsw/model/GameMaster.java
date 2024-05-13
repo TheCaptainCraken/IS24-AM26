@@ -421,6 +421,13 @@ public class GameMaster {
 
         // For each corner of the card to be placed, it checks if there is a possible
         // card to attach it. The switch case refers to the new Card.
+
+
+        newCard = findCard(startingCard, position);
+        if (newCard != null) {
+            throw new CardPositionException();
+        }
+
         for (Corner corner : Corner.values()) {
             switch (corner) {
                 case TOP_LEFT: {
@@ -445,10 +452,6 @@ public class GameMaster {
                 }
             }
 
-            newCard = findCard(startingCard, position);
-            if (newCard != null) {
-                throw new CardPositionException();
-            }
             cardToCheck = findCard(startingCard, new Point(position.x + xPlaceToCheck, position.y + yPlaceToCheck));
 
             if (cardToCheck != null) {
@@ -1062,6 +1065,22 @@ public class GameMaster {
 
     public ObjectiveCard getObjectiveCardToChoose(int i, int j) {
         return objectiveCardToChoose[i][j];
+    }
+
+    public Kingdom getHeadDeck(boolean gold) {
+        if (gold) {
+            return goldDeck.getKingdomFirstCard();
+        } else {
+            return resourceDeck.getKingdomFirstCard();
+        }
+    }
+
+    public Card getResourceCard(int position) {
+        return onTableResourceCards[position];
+    }
+
+    public Card getGoldCard(int position) {
+        return onTableGoldCards[position];
     }
 }
 

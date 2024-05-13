@@ -2,9 +2,9 @@ package it.polimi.ingsw.network.server.rmi;
 
 import it.polimi.ingsw.model.Color;
 import it.polimi.ingsw.model.exception.*;
-import it.polimi.ingsw.network.client.ClientRMI;
 import it.polimi.ingsw.model.exception.LobbyCompleteException;
 import it.polimi.ingsw.model.exception.SameNameException;
+import it.polimi.ingsw.network.client.ClientRMI;
 
 import java.awt.*;
 import java.rmi.Remote;

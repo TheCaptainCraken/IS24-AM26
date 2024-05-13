@@ -36,6 +36,6 @@ public class CardIsPositioned extends ServerMessage {
 
     @Override
     public void callController(Controller controller) {
-        controller.placeCard(nickname,cardId,position,side);
+        controller.updatePlaceCard(nickname,cardId,position,side);
     }
 }

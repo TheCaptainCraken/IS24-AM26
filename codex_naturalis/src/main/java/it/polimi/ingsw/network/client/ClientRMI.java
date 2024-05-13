@@ -15,12 +15,11 @@ import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class ClientRMI extends NetworkClient {
+public class ClientRMI extends NetworkClient implements RMIClientInterface {
     int PORT = 1234;
     Controller controller;
     LoggableServer stub = null;
     Registry registry = null;
-    ClientRMI obj = new ClientRMI();
 
     //TODO costruttore
 
@@ -76,15 +75,13 @@ public class ClientRMI extends NetworkClient {
     public void drawCard(String nickname, boolean gold, int onTableOrDeck)
             throws WrongGamePhaseException, NoTurnException, NoNameException {
         int cardId = stub.drawCard(nickname, gold, onTableOrDeck);
-        controller.drawCard(nickname, cardId);
+        controller.updateDrawCard(nickname, cardId);
     }
 
-    @Override
     public void disconnect() {
         controller.disconnect();
     }
 
-    @Override
     public void stopWaiting(String nickname) {
         controller.setNickname(nickname);
     }
@@ -95,8 +92,8 @@ public class ClientRMI extends NetworkClient {
     }
 
     @Override
-    public void sendInfoOnTable(){
-        controller.sendInfoOnTable();
+    public void sendInfoOnTable(Integer[] resourceCards, Integer[] goldCard, Kingdom resourceCardOnDeck, Kingdom goldCardOnDeck){
+        controller.sendInfoOnTable(resourceCards, goldCard, resourceCardOnDeck, goldCardOnDeck);
     }
 
     @Override
@@ -111,7 +108,7 @@ public class ClientRMI extends NetworkClient {
 
     @Override
     public void showSecretObjectiveCards(Integer[] objectiveCardIds){
-        controller.showObjectiveCards(objectiveCardIds);
+        controller.showSecretObjectiveCardsToChoose(objectiveCardIds);
     }
 
     @Override
@@ -131,24 +128,22 @@ public class ClientRMI extends NetworkClient {
 
     @Override
     public void placeCard(String nickname, int id, Point position, boolean side, HashMap<Sign, Integer> resources, int points){
-        controller.placeCard(nickname, id, position, side);
+        controller.updatePlaceCard(nickname, id, position, side);
         controller.updateResources(nickname, resources);
         controller.updateScore(nickname, points);
     }
-
     @Override
     public void moveCard(int newCardId, Kingdom headDeck, boolean gold, int onTableOrDeck){
         controller.updateCardOnTable(newCardId, gold, onTableOrDeck);
         controller.updateHeadDeck(headDeck, gold);
     }
-
     @Override
     public void showEndGame(HashMap<String, Integer> extraPoints, ArrayList<Player> ranking){
         controller.showExtraPoints(extraPoints);
         controller.showRanking(ranking);
     }
 
-    //TODO, serve connessione
+    @Override
     public void getIsFirst(String firstPlayer) {
         controller.getIsFirst(firstPlayer);
     }

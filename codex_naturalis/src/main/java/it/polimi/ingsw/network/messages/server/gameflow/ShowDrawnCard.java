@@ -22,6 +22,6 @@ public class ShowDrawnCard extends ServerMessage {
 
     @Override
     public void callController(Controller controller) {
-        controller.drawCard(nickname,cardId);
+        controller.updateDrawCard(nickname,cardId);
     }
 }

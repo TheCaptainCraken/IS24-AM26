@@ -9,6 +9,7 @@ import it.polimi.ingsw.model.exception.*;
 import it.polimi.ingsw.network.client.ClientRMI;
 import it.polimi.ingsw.network.client.ClientSocket;
 import it.polimi.ingsw.network.client.NetworkClient;
+import it.polimi.ingsw.view.LittleModel;
 import it.polimi.ingsw.view.Tui;
 import javafx.util.Pair;
 
@@ -21,6 +22,7 @@ public class Controller {
     private String nickname;
     private NetworkClient connection;
     private Tui view;
+    private LittleModel model;
 
     public Controller(){
         //TODO
@@ -40,7 +42,8 @@ public class Controller {
             connection = new ClientRMI();
         }else if(typeOfConnection.equals("Socket")){
             connection = new ClientSocket("placeholder",69);
-            //TODO vanno aggiunti address e port al costruttore, il primo sarà una costante salvata nel codice l'altro sarà generato automaticamente
+            //TODO vanno aggiunti address e port al costruttore,
+            // il primo sarà una costante salvata nel codice l'altro sarà generato automaticamente
         }
     }
 
@@ -68,7 +71,7 @@ public class Controller {
      * The actual input is handled by the view (TUI or GUI).
      */
     public void askNumberOfPlayer() {
-        view.askNumberOfPlayer();
+        view.showInsertNumberOfPlayer();
     }
     /**
      * Triggers the view to display a waiting message to the user.
@@ -112,9 +115,9 @@ public class Controller {
         view.disconnect();
     }
 
-    public void sendInfoOnTable() {
-        view.showCommonTable();
-    } //TODO
+    public void sendInfoOnTable(Integer[] resourceCards, Integer[] goldCard, Kingdom resourceCardOnDeck, Kingdom goldCardOnDeck) {
+        view.showCommonTable(resourceCards, goldCard, resourceCardOnDeck, goldCardOnDeck);
+    }
     /**
      * Triggers the view to display the starting card to the user.
      *
@@ -126,6 +129,7 @@ public class Controller {
     public void showStartingCard(int startingCardId) {
         view.showStartingCard(startingCardId);
     }
+
     /**
      * Triggers the view to display the objective cards to the user.
      *
@@ -149,13 +153,6 @@ public class Controller {
         view.showSecretObjectiveCard(indexCard);
     }
 
-    public void updateHand(String nickname, Integer[] hand) {
-        view.updateHand(nickname, hand);
-    }
-
-    public void updateHiddenHand(String nickname, Pair<Kingdom, Boolean>[] hand) {
-        view.updateHiddenHand(nickname, hand);
-    }
 
     /**
      * Triggers the view to refresh the turn information.
@@ -169,30 +166,6 @@ public class Controller {
     public void refreshTurnInfo(String currentPlayer, GameState gameState) {
         view.showTurnInfo(currentPlayer, gameState);
         //TODO capire chiamate con Daniel
-    }
-
-    public void placeCard(String nickname, int id, Point position, boolean side) {
-        //TODO no print immediata, valuta cosa succede
-    }
-
-    public void updateResources(String nickname, HashMap<Sign, Integer> resources) {
-        view.updateResources(nickname, resources);
-    }
-
-    public void updateScore(String nickname, int points) {
-        view.updateScore(nickname, points);
-    }
-
-    public void drawCard(String nickname, int cardId) {
-        //TODO salvare la carta
-    }
-
-    public void updateCardOnTable(int newCardId, boolean gold, int onTableOrDeck) {
-        //TODO salva in memoria
-    }
-
-    public void updateHeadDeck(Kingdom headDeck, boolean gold) {
-        //TODO salva in memoria
     }
 
     /**
@@ -219,12 +192,40 @@ public class Controller {
         view.showRanking(ranking);
     }
 
-    public void getIsFirst(String firstPlayer) {
+    public void updatePlaceCard(String nickname, int id, Point position, boolean side) {
+        model.updatePlaceCard(nickname, id, position, side);
     }
 
-    /**
-     *
-     */
+    public void updateResources(String nickname, HashMap<Sign, Integer> resources) {
+        model.updateResources(nickname, resources);
+    }
+
+    public void updateDrawCard(String nickname, int cardId) {
+        model.updateDrawCard(nickname, cardId);
+    }
+
+    public void updateScore(String nickname, int points) {
+        model.updateScore(nickname, points);
+    }
+
+    public void updateHeadDeck(Kingdom headDeck, boolean gold) {
+        model.updateHeadDeck(headDeck, gold);
+    }
+
+    public void updateCardOnTable(int newCardId, boolean gold, int onTableOrDeck) {
+        model.updateCardOnTable(newCardId, gold, onTableOrDeck);
+    }
+    public void updateHand(String nickname, Integer[] hand) {
+        model.updateHand(nickname, hand);
+    }
+
+    public void updateHiddenHand(String nickname, Pair<Kingdom, Boolean>[] hand) {
+        model.updateHiddenHand(nickname, hand);
+    }
+    public void getIsFirst(String firstPlayer) {
+        //TODO cosa facciamo qua?
+    }
+
     /**
      * Logs in the player to the game.
      *
@@ -396,4 +397,7 @@ public class Controller {
         }
     }
 
+    public void showSecretObjectiveCardsToChoose(Integer[] objectiveCardIds) {
+        view.showSecretObjectiveCardsToChoose(objectiveCardIds);
+    }
 }

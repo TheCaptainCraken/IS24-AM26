@@ -26,6 +26,6 @@ public class ShowHiddenHand extends ServerMessage {
     @Override
     public void callController(Controller controller) {
         Kingdom[] array = hand.toArray(new Kingdom[0]);
-        controller.updateHiddenHand(nickname,array);
+        controller.updateHiddenHand(nickname, array);
     }
 }

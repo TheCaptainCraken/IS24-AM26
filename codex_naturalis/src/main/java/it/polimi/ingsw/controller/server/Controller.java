@@ -11,7 +11,6 @@ import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 
 
 /**
@@ -38,8 +37,7 @@ public class Controller {
      * Private constructor for the singleton pattern.
      * Initializes the lobby.
      */
-    private Controller() {
-        lobby = new Lobby();
+    private Controller() { lobby = new Lobby();
     }
     /**
      * Initializes the lobby with a maximum number of players.
@@ -195,7 +193,6 @@ public class Controller {
             if(player.getColor() == colour){
                 throw new ColorAlreadyTakenException();
             }
-            //TODO controllo input
         }
 
         lobby.getPlayerFromName(name).setColour(colour);
@@ -208,7 +205,6 @@ public class Controller {
         }
 
         start();
-        //TODO better way to check if all players have chosen a color
         return true;
     }
 
@@ -277,8 +273,7 @@ public class Controller {
      * @return The head of the deck.
      */
     public Kingdom getHeadDeck(boolean gold) {
-        //TODO
-        return null;
+        return game.getHeadDeck(gold);
     }
 
     /**
@@ -346,24 +341,46 @@ public class Controller {
         }
         return extraPoints;
     }
-
+    /**
+     * Returns the ranking of players.
+     * @return An ArrayList of players sorted by their ranking.
+     */
     public ArrayList<Player> getRanking() {
-        ArrayList<Player> ranking = game.getRanking();
-
-        return ranking;
+        return game.getRanking();
     }
-
+    /**
+     * Checks if the game has ended.
+     * @return true if the game state is END, false otherwise.
+     */
     public boolean isEndGame() {
-        return false;
+        GameState state = game.getState();
+        return state == GameState.END;
     }
 
+    /**
+     * Returns the name of the first player in the lobby.
+     * @return The name of the first player.
+     */
     public String getFirstPlayer() {
-        //TODO
-        return null;
+        return lobby.getPlayers()[0].getName();
     }
 
+    /**
+     * Checks if the lobby is locked.
+     * @return true if the lobby is locked, false otherwise.
+     */
     public boolean isLobbyLocked(){
         return lobby.getLock();
     }
+
+
+    public Integer getResourceCards(int position) {
+        return game.getResourceCard(position).getId();
+    }
+
+    public Integer getGoldCard(int position) {
+        return game.getGoldCard(position).getId();
+    }
+
 }
 

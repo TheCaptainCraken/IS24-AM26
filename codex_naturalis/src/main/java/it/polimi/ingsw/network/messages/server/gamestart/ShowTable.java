@@ -48,6 +48,6 @@ public class ShowTable extends ServerMessage {
 
     @Override
     public void callController(Controller controller) {
-        controller.sendInfoOnTable(); //metodo ha probabilmente una signature incompleta
+        //controller.sendInfoOnTable(resourceCards, goldCard, resourceCardOnDeck, goldCardOnDeck); //TODO
     }
 }
