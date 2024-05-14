@@ -1,8 +1,12 @@
 package it.polimi.ingsw.network.messages.server.gamestart;
 
 import it.polimi.ingsw.controller.client.Controller;
+import it.polimi.ingsw.model.GoldCard;
 import it.polimi.ingsw.model.Kingdom;
+import it.polimi.ingsw.model.ResourceCard;
 import it.polimi.ingsw.network.messages.server.ServerMessage;
+
+import java.lang.reflect.Array;
 
 public class ShowTable extends ServerMessage {
     private final int resourceCard_0;
@@ -48,6 +52,13 @@ public class ShowTable extends ServerMessage {
 
     @Override
     public void callController(Controller controller) {
-        //controller.sendInfoOnTable(resourceCards, goldCard, resourceCardOnDeck, goldCardOnDeck); //TODO
+        Integer[] resourceCards = new Integer[2];
+        Integer[] goldCards = new Integer[2];
+        resourceCards[0] = resourceCard_0;
+        resourceCards[1] = resourceCard_1;
+        goldCards[0] = goldCard_0;
+        goldCards[1] = goldCard_1;
+
+        controller.sendInfoOnTable(resourceCards, goldCards, resourceDeck, goldDeck); //TODO
     }
 }
