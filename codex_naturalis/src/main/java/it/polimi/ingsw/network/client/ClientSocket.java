@@ -82,7 +82,7 @@ public class ClientSocket extends NetworkClient implements Runnable{
         sendMessage(message);
     }
     @Override
-    public void chooseSideStartingCard(boolean side) {
+    public void chooseSideStartingCard(boolean side){
         ClientMessage message = new ChosenStartingCardSide(side);
         sendMessage(message);
     }
@@ -114,7 +114,7 @@ public class ClientSocket extends NetworkClient implements Runnable{
             ServerMessage serverMessage = receiveMessage();
             handleResponse(serverMessage);
         }
-    }
+    } //assolutamente non sicuro dell'implementazione
     public void handleResponse(ServerMessage message){
         message.callController(controller); //metodo che ogni sottoclasse di ServerMessage Overrida per chiamare il metodo del controller
         //soluzione usata per snellire codice,

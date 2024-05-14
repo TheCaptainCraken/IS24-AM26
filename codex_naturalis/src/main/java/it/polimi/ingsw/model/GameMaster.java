@@ -152,7 +152,7 @@ public class GameMaster {
      * Player
      *
      * @param namePlayer  Player who sent the request
-     * @param cardToPlace Which card wants to place
+     * @param index Which card wants to place
      * @param position    In which position of the table the player wants to be
      *                    place the card
      * @param side        To which side wants the player to place the card
