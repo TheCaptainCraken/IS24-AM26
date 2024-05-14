@@ -3,6 +3,11 @@ package it.polimi.ingsw.network.server.socket;
 import java.net.*;
 
 import it.polimi.ingsw.controller.server.Controller;
+import it.polimi.ingsw.model.exception.ClosingLobbyException;
+import it.polimi.ingsw.model.exception.ColorAlreadyTakenException;
+import it.polimi.ingsw.model.exception.LobbyCompleteException;
+import it.polimi.ingsw.model.exception.NoNameException;
+import it.polimi.ingsw.model.exception.SameNameException;
 import it.polimi.ingsw.network.messages.ErrorType;
 import it.polimi.ingsw.network.messages.client.ClientMessage;
 import it.polimi.ingsw.network.messages.client.gameflow.CardToBeDrawn;
@@ -13,6 +18,8 @@ import it.polimi.ingsw.network.messages.client.login.ColorChosen;
 import it.polimi.ingsw.network.messages.client.login.LoginMessage;
 import it.polimi.ingsw.network.messages.client.login.NumberOfPlayersMessage;
 import it.polimi.ingsw.network.messages.server.ErrorMessage;
+import it.polimi.ingsw.network.messages.server.ServerMessage;
+import it.polimi.ingsw.network.messages.server.login.StatusLogin;
 
 import java.io.*;
 
@@ -53,7 +60,7 @@ public class NetworkServerSocket {
                         message = (ClientMessage) in.readObject();
                         handleMessage(message);
                     } catch (ClassNotFoundException e) {
-                        out.writeObject(new ErrorMessage(ErrorType.INVALID_MESSAGE));
+                        sendErrorMessage(ErrorType.INVALID_MESSAGE);
                     }
                 }
             } catch (IOException e) {
@@ -62,13 +69,46 @@ public class NetworkServerSocket {
         }
 
         // manca la parte di fine della partita.
+        // appena finito, refactoring perché è troppo lungo.
         private void handleMessage(ClientMessage message) throws ClassNotFoundException {
             if (message instanceof LoginMessage) {
-                // login
+                LoginMessage parsedMessage = (LoginMessage) message;
+                // handle login
+                try {
+                    controller.addPlayer(parsedMessage.getNickname());
+                    // Salvo connessione
+                    // Condivido con altri giocatori
+                    sendMessage((new StatusLogin(controller.getIsFirst(parsedMessage.getNickname()))));
+                } catch (SameNameException e) {
+                    sendErrorMessage(ErrorType.NAME_ALREADY_USED);
+                } catch (LobbyCompleteException e) {
+                    sendErrorMessage(ErrorType.LOBBY_ALREADY_FULL);
+                    hastaLaVistaBaby(); // as per diagram
+                }
             } else if (message instanceof NumberOfPlayersMessage) {
-                // set number of players
+                NumberOfPlayersMessage parsedMessage = (NumberOfPlayersMessage) message;
+                try {
+                    controller.initializeLobby(parsedMessage.getNumber());
+                    // wait stuff for players to join
+                } catch (ClosingLobbyException e) {
+                    sendErrorMessage(ErrorType.LOBBY_IS_CLOSED);
+                    hastaLaVistaBaby(); // as per diagram
+                }
             } else if (message instanceof ColorChosen) {
-                // set color
+                ColorChosen parsedMessage = (ColorChosen) message;
+                try {
+                    boolean isLobbyReadyToStart = controller.setColour(parsedMessage.getNickname(),
+                            parsedMessage.getColor());
+                    // Ok (number of players in the lobby, name)
+                    if (isLobbyReadyToStart) {
+                        controller.start();
+                        // GameStart()
+                    }
+                } catch (NoNameException e) {
+                    sendErrorMessage(ErrorType.NAME_UNKNOWN);
+                } catch (ColorAlreadyTakenException e) {
+                    sendErrorMessage(ErrorType.COLOR_UNAVAILABLE);
+                }
             } else if (message instanceof ChosenStartingCardSide) {
                 // set starting card
             } else if (message instanceof ChosenObjectiveCard) {
@@ -78,14 +118,30 @@ public class NetworkServerSocket {
             } else if (message instanceof CardToBeDrawn) {
                 // draw card
             } else {
-                throw new ClassNotFoundException("Message not recognized");
+                throw new ClassNotFoundException();
             }
         }
 
-        private void closeConnection() throws IOException {
-            in.close();
-            out.close();
-            clientSocket.close();
+        private void hastaLaVistaBaby() {
+            try {
+                in.close();
+                out.close();
+                clientSocket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        private void sendErrorMessage(ErrorType errorType) {
+            sendMessage(new ErrorMessage(errorType));
+        }
+
+        private void sendMessage(ServerMessage message) {
+            try {
+                out.writeObject(message);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
     }
