@@ -17,6 +17,7 @@ public class LobbyIsReady extends ServerMessage {
     @Override
     public void callController(Controller controller) {
         if(isReady) {
+            //TODO è sempre true quando mandi questo messaggio in realtà
             controller.stopWaiting();
         } else{
             controller.waitLobby();

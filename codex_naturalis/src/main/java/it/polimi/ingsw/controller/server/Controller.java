@@ -229,7 +229,7 @@ public class Controller {
      * Places a new card on the table.
      * @param gold Whether the card is gold or not.
      * @param onTableOrDeck The index of the card on the table or deck.
-     * @return The id of the new card on the table, or -1 if the index is -1.
+     * @return The id of the new card on the table, or -1 if is the deck
      */
     public int newCardOnTable(boolean gold, int onTableOrDeck) {
         if(onTableOrDeck == -1) {

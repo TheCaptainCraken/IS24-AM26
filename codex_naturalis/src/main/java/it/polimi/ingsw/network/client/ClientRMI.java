@@ -35,7 +35,6 @@ public class ClientRMI extends NetworkClient implements RMIClientInterface {
 
         boolean isFirst = stub.isFirst(this, nickname);
         if (isFirst) {
-            //This should be changed
             controller.askNumberOfPlayer();
         }else{
             if(stub.lobbyIsReady()){
@@ -57,7 +56,6 @@ public class ClientRMI extends NetworkClient implements RMIClientInterface {
         stub.chooseColor(controller.getNickname(), color);
     }
 
-
     public void chooseSideStartingCard(boolean side) throws WrongGamePhaseException, NoTurnException, NoNameException {
         stub.chooseSideStartingCard(controller.getNickname(), side);
     }
@@ -68,7 +66,8 @@ public class ClientRMI extends NetworkClient implements RMIClientInterface {
         controller.showSecretObjectiveCard(indexCard);
     }
 
-    public void playCard(int indexHand, Point position, boolean side) throws WrongGamePhaseException, NoTurnException, NoNameException,  NotEnoughResourcesException, NoNameException, CardPositionException {
+    public void playCard(int indexHand, Point position, boolean side) throws WrongGamePhaseException,
+            NoTurnException,  NotEnoughResourcesException, NoNameException, CardPositionException {
         stub.placeCard(controller.getNickname(), indexHand, position, side);
     }
 
@@ -93,7 +92,7 @@ public class ClientRMI extends NetworkClient implements RMIClientInterface {
 
     @Override
     public void sendInfoOnTable(Integer[] resourceCards, Integer[] goldCard, Kingdom resourceCardOnDeck, Kingdom goldCardOnDeck){
-        controller.sendInfoOnTable(resourceCards, goldCard, resourceCardOnDeck, goldCardOnDeck);
+        controller.cardsOnTable(resourceCards, goldCard, resourceCardOnDeck, goldCardOnDeck);
     }
 
     @Override
@@ -123,7 +122,7 @@ public class ClientRMI extends NetworkClient implements RMIClientInterface {
 
     @Override
     public void refreshTurnInfo(String currentPlayer, GameState gameState){
-        controller.refreshTurnInfo(currentPlayer, gameState);
+        controller.turnInfo(currentPlayer, gameState);
     }
 
     @Override
@@ -145,6 +144,6 @@ public class ClientRMI extends NetworkClient implements RMIClientInterface {
 
     @Override
     public void getIsFirst(String firstPlayer) {
-        controller.getIsFirst(firstPlayer);
+        controller.showIsFirst(firstPlayer);
     }
 }

@@ -20,10 +20,10 @@ public class PlayersAndColorPins extends ServerMessage {
 
     @Override
     public void callController(Controller controller) {
-        HashMap<String,Color> newmap = new HashMap<>(); //copio hashmap evitare conflitti e incongruenze con lavoro lato server e lato controller
+        HashMap<String,Color> newMap = new HashMap<>();
         for(Player p: map.keySet()){
-            newmap.put(p.getName(), map.get(p));
+            newMap.put(p.getName(), map.get(p));
         }
-        controller.refreshUsers(newmap);
+        controller.refreshUsers(newMap);
     }
 }

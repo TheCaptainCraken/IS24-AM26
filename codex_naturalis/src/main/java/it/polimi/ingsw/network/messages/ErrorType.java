@@ -4,7 +4,7 @@ public enum ErrorType {
     CARD_POSITION,
     LOBBY_IS_CLOSED,
     COLOR_UNAVAILABLE,
-    FULL_LOBBY, // FullLobbyException
+    FULL_LOBBY, // LobbyFullException
     LOBBY_ALREADY_FULL, // LobbyCompleteException
     NAME_UNKNOWN,
     NOT_ENOUGH_RESOURCES,

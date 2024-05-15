@@ -551,10 +551,9 @@ public class Tui {
      * Shows the hidden hand of a player.
      * @param nickname The nickname of the player.
      */
-    //TODO metodo lato controller
     public void showHiddenHand(String nickname) {
         //TODO per tutti in un colpo solo
-        Pair<Kingdom, Boolean> hand = model.getPlayerCard(nickname);
+        Pair<Kingdom, Boolean> [] hand = model.getHiddenHand(nickname);
         ArrayList<String[]> cards = new ArrayList<>();
 
         //TODO logica
@@ -572,9 +571,8 @@ public class Tui {
     /**
      * Shows the hand of the client.
      */
-    //TODO metodo lato controller
     public void showHand() {
-        Integer[] myCards = model.getMyCards();
+        Integer[] myCards = model.getHand();
         ArrayList<String[]> cards = new ArrayList<>();
 
         for(Integer cardId: myCards){
@@ -596,8 +594,7 @@ public class Tui {
      * Shows the resources of the client.
      * @param name The name of client.
      */
-    //TODO metodo lato controller
-    private void showResourcesPlayer(String name) {
+    public void showResourcesPlayer(String name) {
         HashMap<String, HashMap<Sign, Integer>> resources = model.getResources();
 
         System.out.println("You have the following resources:");
@@ -606,12 +603,10 @@ public class Tui {
         }
     }
 
-
     /**
      * Shows the resources of all players.
      */
-    //TODO metodo lato controller
-    public void showResourcesAllPlayer() {
+    public void showResourcesAllPlayers() {
         HashMap<String, HashMap<Sign, Integer>> resources = model.getResources();
         for(String player: resources.keySet()){
             System.out.println(player + " has:");
@@ -712,6 +707,17 @@ public class Tui {
     }
 
 
+    public void showTableOfPlayer(Object tableOfPlayer) {
+        //TODO
+    }
+
+    public void showPoints(HashMap<String, Integer> points) {
+        System.out.println("The points of the players are:");
+        for(String player: points.keySet()){
+            System.out.println(player + " has " + points.get(player));
+        }
+        System.out.println();
+    }
 }
 
 

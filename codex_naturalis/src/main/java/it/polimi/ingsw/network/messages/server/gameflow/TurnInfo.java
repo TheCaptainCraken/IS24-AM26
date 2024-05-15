@@ -23,6 +23,6 @@ public class TurnInfo extends ServerMessage {
 
     @Override
     public void callController(Controller controller) {
-        controller.refreshTurnInfo(currentPlayer,state);
+        controller.turnInfo(currentPlayer,state);
     }
 }

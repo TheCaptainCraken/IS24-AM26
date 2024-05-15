@@ -18,6 +18,11 @@ public class GiveSecretObjectiveCards extends ServerMessage {
 
     @Override
     public void callController(Controller controller) {
-        //TODO metodo che implementa il mostrare scelta objectivecards
+        Integer[] choicesArray = new Integer[choices.size()];
+        for(int i = 0; i < choices.size(); i++) {
+            choicesArray[i] = choices.get(i);
+        }
+
+        controller.showSecretObjectiveCardsToChoose(choicesArray);
     }
 }

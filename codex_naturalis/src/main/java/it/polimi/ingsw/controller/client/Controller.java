@@ -115,8 +115,8 @@ public class Controller {
         view.disconnect();
     }
 
-    public void sendInfoOnTable(Integer[] resourceCards, Integer[] goldCard, Kingdom resourceCardOnDeck, Kingdom goldCardOnDeck) {
-        view.showCommonTable(resourceCards, goldCard, resourceCardOnDeck, goldCardOnDeck);
+    public void cardsOnTable(Integer[] resourceCards, Integer[] goldCard, Kingdom resourceCardOnDeck, Kingdom goldCardOnDeck) {
+        model.updateCommonTable(resourceCards, goldCard, resourceCardOnDeck, goldCardOnDeck);
     }
     /**
      * Triggers the view to display the starting card to the user.
@@ -163,7 +163,7 @@ public class Controller {
      * @param currentPlayer The nickname of the current player.
      * @param gameState The current state of the game.
      */
-    public void refreshTurnInfo(String currentPlayer, GameState gameState) {
+    public void turnInfo(String currentPlayer, GameState gameState) {
         view.showTurnInfo(currentPlayer, gameState);
         //TODO capire chiamate con Daniel
     }
@@ -190,6 +190,10 @@ public class Controller {
      */
     public void showRanking(ArrayList ranking) {
         view.showRanking(ranking);
+    }
+
+    public void showSecretObjectiveCardsToChoose(Integer[] objectiveCardIds) {
+        view.showSecretObjectiveCardsToChoose(objectiveCardIds);
     }
 
     public void updatePlaceCard(String nickname, int id, Point position, boolean side) {
@@ -222,7 +226,7 @@ public class Controller {
     public void updateHiddenHand(String nickname, Pair<Kingdom, Boolean>[] hand) {
         model.updateHiddenHand(nickname, hand);
     }
-    public void getIsFirst(String firstPlayer) {
+    public void showIsFirst(String firstPlayer) {
         //TODO cosa facciamo qua?
     }
 
@@ -397,7 +401,27 @@ public class Controller {
         }
     }
 
-    public void showSecretObjectiveCardsToChoose(Integer[] objectiveCardIds) {
-        view.showSecretObjectiveCardsToChoose(objectiveCardIds);
+    public void showTableOfPlayer(String name){
+        view.showTableOfPlayer(model.getTableOfPlayer(name));
+    }
+
+    public void showPoints(){
+        view.showPoints(model.getPoints());
+    }
+
+    public void showResources(){
+        view.showResourcesPlayer(getNickname());
+    }
+
+    public void showResourcesAllPlayers(){
+        view.showResourcesAllPlayers();
+    }
+
+    public void showHand(){
+        view.showHand();
+    }
+
+    public void showHiddenHand(String name){
+        view.showHiddenHand(name);
     }
 }

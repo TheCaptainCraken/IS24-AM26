@@ -16,6 +16,6 @@ public class FirstPlayer extends ServerMessage {
 
     @Override
     public void callController(Controller controller) {
-        controller.getIsFirst(nickname);
+        controller.showIsFirst(nickname);
     }
 }

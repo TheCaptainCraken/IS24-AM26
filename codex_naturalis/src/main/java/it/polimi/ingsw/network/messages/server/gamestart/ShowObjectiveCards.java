@@ -19,7 +19,7 @@ public class ShowObjectiveCards extends ServerMessage {
 
     @Override
     public void callController(Controller controller) {
-        Integer[] common = cards.toArray(new Integer[0]); //guarda PlayersAndPins
+        Integer[] common = cards.toArray(new Integer[0]);
         controller.showObjectiveCards(common);
     }
 }
