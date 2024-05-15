@@ -1,4 +1,4 @@
-package it.polimi.ingsw;
+package it.polimi.ingsw.modelTest;
 
 import it.polimi.ingsw.model.*;
 import it.polimi.ingsw.model.Color;
@@ -39,7 +39,7 @@ public class GameMasterTest {
 
         game = new GameMaster(lobby,
                 basePath + "resourceCardsDeck.json",
-                basePath + "goldCardsDeck.json",
+                "src/main/java/it/polimi/ingsw/model/decks/goldCardsDeck.json",
                 basePath + "objectiveCardsDeck.json",
                 basePath + "startingCardsDeck.json");
     }

@@ -1,4 +1,4 @@
-package it.polimi.ingsw;
+package it.polimi.ingsw.modelTest;
 
 import it.polimi.ingsw.model.Kingdom;
 import it.polimi.ingsw.model.ObjectiveType;

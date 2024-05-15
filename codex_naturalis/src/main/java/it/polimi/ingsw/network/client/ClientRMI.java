@@ -56,23 +56,23 @@ public class ClientRMI extends NetworkClient implements RMIClientInterface {
         stub.chooseColor(controller.getNickname(), color);
     }
 
-    public void chooseSideStartingCard(boolean side) throws WrongGamePhaseException, NoTurnException, NoNameException {
+    public void chooseSideStartingCard(boolean side) throws RemoteException, WrongGamePhaseException, NoTurnException, NoNameException {
         stub.chooseSideStartingCard(controller.getNickname(), side);
     }
 
     public void chooseSecretObjectiveCard(int indexCard)
-            throws WrongGamePhaseException, NoTurnException,  NoNameException {
+            throws RemoteException, WrongGamePhaseException, NoTurnException,  NoNameException {
         stub.chooseSecretObjectiveCard(controller.getNickname(), indexCard);
         controller.showSecretObjectiveCard(indexCard);
     }
 
-    public void playCard(int indexHand, Point position, boolean side) throws WrongGamePhaseException,
+    public void playCard(int indexHand, Point position, boolean side) throws RemoteException, WrongGamePhaseException,
             NoTurnException,  NotEnoughResourcesException, NoNameException, CardPositionException {
         stub.placeCard(controller.getNickname(), indexHand, position, side);
     }
 
     public void drawCard(String nickname, boolean gold, int onTableOrDeck)
-            throws WrongGamePhaseException, NoTurnException, NoNameException {
+            throws RemoteException, WrongGamePhaseException, NoTurnException, NoNameException {
         int cardId = stub.drawCard(nickname, gold, onTableOrDeck);
         controller.updateDrawCard(nickname, cardId);
     }

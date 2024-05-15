@@ -1,12 +1,13 @@
 package it.polimi.ingsw.view;
 
+import it.polimi.ingsw.controller.client.Controller;
 import it.polimi.ingsw.model.*;
+import it.polimi.ingsw.model.Color;
 import javafx.util.Pair;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.awt.*;
+import java.util.*;
 import java.util.List;
-import java.util.Objects;
 
 
 /**
@@ -14,16 +15,16 @@ import java.util.Objects;
  * It is responsible for displaying game information to the player and receiving player input.
  */
 public class Tui {
-    private LittleModel model; //TODO
+    private final Controller controller;
+    private final LittleModel model;
 
     /**
      * Constructor for the TUI.
      * Initializes the TUI with default values.
      */
-    public Tui(){
-        //TODO colori
-        //TODO vari deck
-        //TODO puntatore a littleModel
+    public Tui(LittleModel model, Controller controller){
+        this.model = model;
+        this.controller = controller;
     }
 
     /**
@@ -32,6 +33,10 @@ public class Tui {
     public void showInsertNumberOfPlayer() {
         System.out.println("You are the first player. Please enter the number of players)");
         System.out.println("The number of players must be between 2 and 4");
+
+        Scanner scanner = new Scanner(System.in);
+        int numberOfPlayers = scanner.nextInt();
+        controller.insertNumberOfPlayers(numberOfPlayers);
     }
     /**
      * Informs the player that they are connected to the server and waiting for the first player to choose the number of players.
@@ -45,6 +50,33 @@ public class Tui {
      */
     public void stopWaiting() {
         System.out.println("The game is starting");
+        askColor();
+    }
+
+    private void askColor() {
+        System.out.println("Choose your color");
+        System.out.println("1 - Blue\n" +
+                "2 - Yellow\n" +
+                "3 - Green\n" +
+                "4 - Red\n");
+        Scanner scanner = new Scanner(System.in);
+        int color = scanner.nextInt();
+        switch (color){
+            case 1:
+                controller.chooseColor(Color.BLUE);
+                break;
+            case 2:
+                controller.chooseColor(Color.YELLOW);
+                break;
+            case 3:
+                controller.chooseColor(Color.GREEN);
+                break;
+            case 4:
+                controller.chooseColor(Color.RED);
+                break;
+            default:
+                System.out.println("Invalid input");
+        }
     }
 
 
@@ -154,6 +186,7 @@ public class Tui {
                 System.out.print(row[i]);
                 System.out.print("    ");
             }
+            System.out.println();
         }
         System.out.println();
     }
@@ -192,11 +225,13 @@ public class Tui {
         int i;
 
         System.out.println("These are the secret objective cards you can choose. Please choose one");
+        //TODO numbers.
         for(i = 0; i < size; i++) {
             for(String[] row : cards) {
                 System.out.print(row[i]);
                 System.out.print("    ");
             }
+            System.out.println();
         }
         System.out.println();
     }
@@ -288,20 +323,16 @@ public class Tui {
                     };
                 }
                 break;
-            default: //TODO come vogliamo stamoare
+            default:
         }
-
-        //TODO sistemare layout provandolo. Da fare per ogni carta
-        //TODO carta troppo grande, sistemare
-
         return new String[]{
                 "┌---------------------------┐",
-                "|             "+card.getMultiplier()+"              |",
-                "|             "+card.getKingdom()+"                  |",
+                "|            "+card.getMultiplier()+"              |",
+                "|          "+card.getKingdom()+"            |",
                 "|                           |",
-                "|             "+objective[0]+"              |",
-                "|             "+objective[1]+"              |",
-                "|             "+objective[2]+"              |",
+                "|          "+objective[0]+"            |",
+                "|          "+objective[1]+"            |",
+                "|          "+objective[2]+"            |",
                 "|                           |",
                 "└---------------------------┘",
         };
@@ -359,13 +390,13 @@ public class Tui {
             }
         }
         return new String[]{
-                "┌-----┐---------------┌-----┐",
-                "|  "+corner.get(Corner.TOP_LEFT)+"  |               |  "+corner.get(Corner.TOP_RIGHT)+"  |",
-                "└-----┘               └-----┘",
+                "┌--------┐---------------┌--------┐",
+                "|  "+corner.get(Corner.TOP_LEFT)+" |               |  "+corner.get(Corner.TOP_RIGHT)+" |",
+                "└--------┘               └--------┘",
                 "|           "+midSignsString+"          |",
-                "┌-----┐               ┌-----┐",
-                "|  "+corner.get(Corner.BOTTOM_LEFT)+"  |               |  "+corner.get(Corner.BOTTOM_RIGHT)+"  |",
-                "└-----┘---------------└-----┘",
+                "┌--------┐               ┌--------┐",
+                "|  "+corner.get(Corner.BOTTOM_LEFT)+" |               |  "+corner.get(Corner.BOTTOM_RIGHT)+" |",
+                "└--------┘---------------└--------┘",
         };
     }
 
@@ -544,7 +575,26 @@ public class Tui {
      * Prints the default menu, with all the options to choose from.
      */
     public void defaultMenu(){
-        //TODO prints the default menu
+        System.out.println("please insert a number for choosing the option");
+        System.out.println("" +
+                "1 - place a card\n" +
+                "2 - draw a card\n" +
+                "3 - show the table of a player\n" +
+                "4 - show my resources\n" +
+                "5 - show all players resources\n" +
+                "6 - show the points of the players\n" +
+                "7 - show my hand\n" +
+                "8 - show the hidden hand of a player\n" );
+    }
+
+    public void startPhase(){
+        System.out.println("please insert a number for choosing the option");
+        System.out.println("" +
+                "9 - login\n" +
+                "10 - chooseColor\n" +
+                "11 - choose Side StartingCard \n" +
+                "12 - choose Objective Card\n");
+
     }
 
     /**
@@ -552,13 +602,16 @@ public class Tui {
      * @param nickname The nickname of the player.
      */
     public void showHiddenHand(String nickname) {
-        //TODO per tutti in un colpo solo
-        Pair<Kingdom, Boolean> [] hand = model.getHiddenHand(nickname);
+        Pair<Kingdom, Boolean>[] hand = model.getHiddenHand(nickname);
         ArrayList<String[]> cards = new ArrayList<>();
-
-        //TODO logica
         int i;
+
+        for(i = 0; i < hand.length; i++){
+            cards.add(null); //TODO LOGICA
+        }
+
         int size = cards.get(0).length;
+        System.out.println("These are the hidden cards of " + nickname + ":");
         for(i = 0; i < size; i++) {
             for (String[] card : cards) {
                 System.out.print(card[i]);
@@ -616,6 +669,15 @@ public class Tui {
         }
     }
 
+
+    public void showPoints(HashMap<String, Integer> points) {
+        System.out.println("The points of the players are:");
+        for(String player: points.keySet()){
+            System.out.println(player + " has " + points.get(player));
+        }
+        System.out.println();
+    }
+
     /**
      * Informs the player that the chosen color is already taken.
      */
@@ -650,7 +712,7 @@ public class Tui {
      * Informs the player that they are not connected to the server.
      */
     public void noConnection() {
-        System.out.println("You are not connected to the server. Please retry");
+        System.out.println("You are not connected to the server. Please retry\n");
     }
 
     /**
@@ -711,14 +773,81 @@ public class Tui {
         //TODO
     }
 
-    public void showPoints(HashMap<String, Integer> points) {
-        System.out.println("The points of the players are:");
-        for(String player: points.keySet()){
-            System.out.println(player + " has " + points.get(player));
+    public void printCard(int id) {
+        String[] card = createCardToPrint(model.getCard(id));
+        for(String row: card){
+            System.out.println(row);
         }
-        System.out.println();
+
+    }
+
+    public void askInput() {
+            while(true){
+                defaultMenu();
+                startPhase();
+                Scanner scanner = new Scanner(System.in);
+                Integer input = scanner.nextInt();
+                switch (input){
+                    case 1:
+                        Integer indexHand = scanner.nextInt();
+                        Point position = new Point();
+                        position.x = scanner.nextInt();
+                        position.y = scanner.nextInt();
+                        boolean isFacingUp = scanner.nextBoolean();
+                        controller.playCard(indexHand, position, isFacingUp);
+                        break;
+                    case 2:
+                        boolean gold = scanner.nextBoolean();
+                        int onTableOrDeck = scanner.nextInt();
+                        controller.drawCard(gold, onTableOrDeck);
+                        break;
+                    case 3:
+                        controller.showTableOfPlayer(scanner.nextLine());
+                        break;
+                    case 4:
+                        controller.showResources();
+                        break;
+                    case 5:
+                        controller.showResourcesAllPlayers();
+                        break;
+                    case 6:
+                        controller.showPoints();
+                        break;
+                    case 7:
+                        controller.showHand();
+                        break;
+                    case 8:
+                        controller.showHiddenHand(scanner.nextLine());
+                        break;
+                    case 9:
+                        System.out.println("Please enter your nickname");
+                        String name = scanner.nextLine();
+                        controller.login(name);
+                        break;
+                    case 10:
+                        controller.chooseColor(Color.valueOf(scanner.nextLine()));
+                    case 11:
+                        controller.chooseSideStartingCard(scanner.nextBoolean());
+                        break;
+                    case 12:
+                        controller.chooseSecretObjectiveCard(scanner.nextInt());
+                        break;
+                    default:
+                        System.out.println("Invalid input");
+                }
+            }
+
+        }
+
+    public void start() {
+        askInput();
+    }
+
+    public void showIsFirst(String firstPlayer) {
+        System.out.println("The fist player is" + firstPlayer +  ". Please enter the number of players" );
     }
 }
+
 
 
 

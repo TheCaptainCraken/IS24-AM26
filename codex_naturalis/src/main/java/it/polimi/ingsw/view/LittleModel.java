@@ -28,8 +28,8 @@ public class LittleModel {
     private Kingdom headDeckResource;
 
     private Deck startingCards;
-    private Deck ObjectiveCards;
-    private Deck ResourceCards;
+    private Deck objectiveCards;
+    private Deck tableCards;
 
     public LittleModel(){
         points = new HashMap<>();
@@ -40,9 +40,10 @@ public class LittleModel {
         cardsNumber = new HashMap<>(); //TODO azzerare a zero
 
         try{
-            startingCards = new Deck(basePath + "startingCardsDeck.json", true);
-            ObjectiveCards = new Deck(basePath + "objectiveCardsDeck.json", true);
-            ResourceCards = new Deck(basePath + "resourceCardsDeck.json", true);
+            //TODO due mazzi diversi
+            startingCards = new Deck("codex_naturalis/src/main/java/it/polimi/ingsw/model/decks/startingCardsDeck.json", true);
+            objectiveCards = new Deck("codex_naturalis/src/main/java/it/polimi/ingsw/model/decks/objectiveCardsDeck.json", true);
+            tableCards = new Deck("codex_naturalis/src/main/java/it/polimi/ingsw/model/decks/resourceCardsDeck.json", true);
         } catch (IOException e) {
            System.out.println("file for TUI not found");
         } catch (ParseException e) {
@@ -173,7 +174,7 @@ public class LittleModel {
 
     public ObjectiveCard getObjectiveCard(int id){
         id = id - 1;
-        return (ObjectiveCard) ObjectiveCards.getCard(id);
+        return (ObjectiveCard) objectiveCards.getCard(id);
     }
 
     public PlayedCard getStartingCard(int id){
@@ -186,10 +187,16 @@ public class LittleModel {
 
     public PlayedCard getCard(int id){
         id = id - 17;
-        PlayedCard card = new PlayedCard((PlayableCard) ResourceCards.getCard(id),
-                null, false, 0, new Point(0, 0));
+        HashMap<Corner, PlayedCard> cardsToAttach = new HashMap<>();
+        cardsToAttach.put(Corner.TOP_LEFT, null);
+        cardsToAttach.put(Corner.TOP_RIGHT, null);
+        cardsToAttach.put(Corner.BOTTOM_LEFT, null);
+        cardsToAttach.put(Corner.BOTTOM_RIGHT, null);
+
+        PlayedCard card = new PlayedCard((PlayableCard) tableCards.getCard(id),
+                cardsToAttach, false, 0, new Point(0, 0));
         //TODO
-        return null;
+        return card;
     }
 
     public PlayedCard getCardFromKingdom(){

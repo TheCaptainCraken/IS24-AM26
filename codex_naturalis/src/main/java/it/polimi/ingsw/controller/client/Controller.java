@@ -17,6 +17,7 @@ import java.awt.*;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Scanner;
 
 public class Controller {
     private String nickname;
@@ -25,12 +26,14 @@ public class Controller {
     private LittleModel model;
 
     public Controller(){
-        //TODO
+        model = new LittleModel();
     }
 
     public void setView(String typeOfView) {
+        model = new LittleModel();
         if(typeOfView.equals("TUI")){
-            view = new Tui();
+            this.view = new Tui(model, this);
+            view.start();
         }else if(typeOfView.equals("GUI")){
             //TODO
             //view = new GUI();
@@ -227,7 +230,7 @@ public class Controller {
         model.updateHiddenHand(nickname, hand);
     }
     public void showIsFirst(String firstPlayer) {
-        //TODO cosa facciamo qua?
+        view.showIsFirst(firstPlayer);
     }
 
     /**
@@ -302,9 +305,13 @@ public class Controller {
      * @param side The side chosen by the player.
      */
     public void chooseSideStartingCard(boolean side) {
-        try{
+        try {
             connection.chooseSideStartingCard(side);
-        } catch (WrongGamePhaseException e) {
+        }
+        catch (RemoteException e) {
+            view.noConnection();
+        }
+        catch (WrongGamePhaseException e) {
             view.wrongGamePhase();
         } catch (NoTurnException e) {
             view.noTurn();
@@ -331,6 +338,8 @@ public class Controller {
         }
         catch (NoNameException e) {
             view.noPlayer();
+        } catch (RemoteException e) {
+           view.noConnection();
         }
     }
 
@@ -357,39 +366,21 @@ public class Controller {
             view.noPlayer();
         } catch (CardPositionException e) {
             view.cardPositionError();
+        } catch (RemoteException e) {
+            view.noConnection();
         }
     }
-    /**
-     * Sets the secret objective card for the player in the game.
-     *
-     * This method is used to set the secret objective card for the player in the game.
-     * The actual setting of the card is handled by the connection object.
-     *
-     * @param indexCard The index of the secret objective card.
-     */
-    public void setSecretObjectiveCard(int indexCard) {
-        try {
-            connection.chooseSecretObjectiveCard(indexCard);
-        } catch (WrongGamePhaseException e) {
-            view.wrongGamePhase();
-        } catch (NoTurnException e) {
-            view.noTurn();
-        } catch (NoNameException e) {
-            view.noPlayer();
-        }
 
-    }
     /**
      * Draws a card in the game.
      *
      * This method is used to draw a card in the game.
      * The actual drawing of the card is handled by the connection object.
      *
-     * @param nickname The nickname of the player.
      * @param gold The gold status of the card.
      * @param onTableOrDeck The location from where the card is drawn.
      */
-    public void drawCard(String nickname, boolean gold, int onTableOrDeck) {
+    public void drawCard(boolean gold, int onTableOrDeck) {
         try{
             connection.drawCard(nickname, gold, onTableOrDeck);
         } catch (WrongGamePhaseException e) {
@@ -398,6 +389,8 @@ public class Controller {
             view.noTurn();
         } catch (NoNameException e) {
             view.noPlayer();
+        } catch (RemoteException e) {
+            view.noConnection();
         }
     }
 
@@ -424,4 +417,5 @@ public class Controller {
     public void showHiddenHand(String name){
         view.showHiddenHand(name);
     }
+
 }

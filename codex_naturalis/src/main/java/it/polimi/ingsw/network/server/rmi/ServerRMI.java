@@ -92,6 +92,7 @@ public class ServerRMI extends NetworkPlug implements LoggableServer {
 
     @Override
     protected void finalizingNumberOfPlayers() throws NoNameException, SameNameException, LobbyCompleteException {
+
     }
 
     @Override

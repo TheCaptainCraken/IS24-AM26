@@ -1,5 +1,7 @@
 package it.polimi.ingsw;
 
+import it.polimi.ingsw.controller.client.Controller;
+import it.polimi.ingsw.network.server.NetworkHandler;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -7,6 +9,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.Scanner;
 
 /**
  * JavaFX App
@@ -32,7 +35,26 @@ public class App extends Application {
     }
 
     public static void main(String[] args) {
-        launch();
+        Controller controller = null;
+        Scanner myObj = new Scanner(System.in);
+        System.out.println("Do you want to be client or server?\n"
+                + "Type 'client' to be a client or 'server' to be a server.");
+
+        String choice = myObj.nextLine();  // Read user input
+        if (choice.equals("client")) {
+            controller = new Controller();
+        } else if (choice.equals("server")) {
+           new NetworkHandler();
+        } else {
+            System.out.println("Invalid choice. Please type 'client' or 'server'.");
+        }
+
+        System.out.println("Choice your type of connection: RMI or Socket");
+        choice = myObj.nextLine();
+        controller.createInstanceOfConnection(choice);
+
+        System.out.println("Choice your type of view: TUI or GUI");
+        controller.setView(myObj.nextLine());
     }
 
 }

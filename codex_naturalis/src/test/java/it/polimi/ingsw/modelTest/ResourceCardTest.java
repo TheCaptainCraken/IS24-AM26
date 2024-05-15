@@ -1,4 +1,4 @@
-package it.polimi.ingsw;
+package it.polimi.ingsw.modelTest;
 
 import it.polimi.ingsw.model.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -8,10 +8,9 @@ import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class GoldCardTest {
-    GoldCard g1;
+public class ResourceCardTest {
+    ResourceCard r1,r2;
     HashMap<Corner, Sign> map;
-    HashMap<Sign,Integer> map1;
 
 
     @BeforeEach
@@ -21,16 +20,15 @@ public class GoldCardTest {
         map.put(Corner.TOP_RIGHT,Sign.LEAF);
         map.put(Corner.BOTTOM_LEFT,Sign.WOLF);
         map.put(Corner.BOTTOM_RIGHT,Sign.MUSHROOM);
-        map1 = new HashMap<>();
-        map1.put(Sign.BUTTERFLY,2);
-        map1.put(Sign.LEAF,1);
-
     }
+
     @Test
-    void NormalTest(){
-        g1 = new GoldCard(2, Kingdom.FUNGI,map,0,map1);
-        assertEquals(g1.getRequirements(),map1);
-
+    public void NormalTest(){
+        r1 = new ResourceCard(1, Kingdom.ANIMAL,map,1);
+        assertEquals(r1.getId(),1);
+        assertEquals(r1.getKingdom(),Kingdom.ANIMAL);
+        assertEquals(r1.getCorners(),map);
+        assertEquals(r1.getId(),1);
+        assertEquals(r1.getPoints(),1);
     }
-
 }
