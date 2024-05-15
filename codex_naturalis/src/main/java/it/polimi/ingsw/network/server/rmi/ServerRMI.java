@@ -4,7 +4,7 @@ import it.polimi.ingsw.controller.server.Controller;
 import it.polimi.ingsw.model.Color;
 import it.polimi.ingsw.model.Kingdom;
 import it.polimi.ingsw.model.exception.*;
-import it.polimi.ingsw.network.client.ClientRMI;
+import it.polimi.ingsw.network.client.RMIClientInterface;
 import it.polimi.ingsw.network.server.NetworkHandler;
 import it.polimi.ingsw.network.server.NetworkPlug;
 
@@ -17,48 +17,59 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
 
 public class ServerRMI extends NetworkPlug implements LoggableServer {
-    static int PORT = 1234; //TODO porta dinamica
+    static int PORT = 1099; //TODO porta dinamica
     int numberOfPlayers = 0;//TODO I can do a method to get it
-    HashMap<String, ClientRMI> connections = new HashMap<>();
+    HashMap<String, RMIClientInterface> connections = new HashMap<>();
     //TODO call broadcast methods
 
     public static void main(String[] args) throws RemoteException {
+        ServerRMI obj = new ServerRMI();
     }
 
     public ServerRMI() throws RemoteException {
-        super();
-
         NetworkHandler.getInstance().addNetworkPlug("RMI", this);
-
-        System.out.println("Hello, World!");
         LoggableServer serverSkeleton = null;//https://www.baeldung.com/java-rmi
-        ServerRMI obj = new ServerRMI();
+        Registry registry = null;
 
-        try{
-            serverSkeleton = (LoggableServer) UnicastRemoteObject.exportObject(obj, PORT);
-        }catch (RemoteException e){
+        try {
+            serverSkeleton = (LoggableServer) UnicastRemoteObject.exportObject(this, PORT);
+            System.out.println("Server skeleton created");
+        } catch (RemoteException e) {
+            System.out.println("Server skeleton not created");
             System.out.println("Server exception: " + e.toString());
             e.printStackTrace();
         }
 
-        Registry registry = null;
-        try{
+        try {
             registry = LocateRegistry.createRegistry(PORT);
-        }catch(RemoteException e){
+            System.out.println("Registry created");
+        } catch (RemoteException e) {
+            System.out.println("Registry not created");
             System.out.println("Registry exception: " + e.toString());
             e.printStackTrace();
         }
 
-        try{
-            registry.bind("Loggable", serverSkeleton);
-        }catch (RemoteException e) {
-            System.out.println("Rebind exception: " + e.toString());
-            e.printStackTrace();
-        }catch (AlreadyBoundException e) {
-            System.out.println("Already bound exception: " + e.toString());
-            e.printStackTrace();
+        if (registry != null && serverSkeleton != null) {
+            try {
+                registry.bind("Loggable", serverSkeleton);
+                System.out.println("Server bound");
+                System.out.println("Server ready");
+            } catch (RemoteException e) {
+                System.out.println("Rebind exception: " + e.toString());
+                e.printStackTrace();
+            } catch (AlreadyBoundException e) {
+                System.out.println("Already bound exception: " + e.toString());
+                e.printStackTrace();
+            }
+        } else {
+            if (registry == null) {
+                System.out.println("Registry is null, cannot bind the object.");
+            }
+            if (serverSkeleton == null) {
+                System.out.println("serverSkeleton is null, cannot bind the object.");
+            }
         }
-        System.out.println("Server ready");
+
     }
 
     //Only because we have all client on the same machine
@@ -66,7 +77,7 @@ public class ServerRMI extends NetworkPlug implements LoggableServer {
     int portAvailable = 41999;
 
     @Override
-    public boolean isFirst(ClientRMI clientRMI, String nickname) throws RemoteException, SameNameException, LobbyCompleteException {
+    public boolean loginAndIsFirst(RMIClientInterface clientRMI, String nickname) throws RemoteException, SameNameException, LobbyCompleteException {
         Controller.getInstance().addPlayer(nickname);
         connections.put(nickname, clientRMI);
         refreshUsers();
@@ -126,7 +137,7 @@ public class ServerRMI extends NetworkPlug implements LoggableServer {
     @Override
     protected void refreshUsers(){
         HashMap<String, Color> playersAndPins = Controller.getInstance().getPlayersAndPins();
-        for (ClientRMI connection : connections.values()){
+        for (RMIClientInterface connection : connections.values()){
             connection.refreshUsers(playersAndPins);
         }
     }

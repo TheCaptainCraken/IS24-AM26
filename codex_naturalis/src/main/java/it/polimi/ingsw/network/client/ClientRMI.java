@@ -8,6 +8,7 @@ import it.polimi.ingsw.network.server.rmi.LoggableServer;
 import javafx.util.Pair;
 
 import java.awt.*;
+import java.rmi.AccessException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -16,24 +17,41 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class ClientRMI extends NetworkClient implements RMIClientInterface {
-    int PORT = 1234;
+    static int PORT = 1099;
     Controller controller;
     LoggableServer stub = null;
     Registry registry = null;
 
-    //TODO costruttore
-
-    public void login(String nickname) throws RemoteException, SameNameException, LobbyCompleteException {
+    public ClientRMI(Controller controller) {
+        this.controller = controller;
         try {
             registry = LocateRegistry.getRegistry("127.0.0.1", PORT);
             stub = (LoggableServer) registry.lookup("Loggable");
         }
+
         catch (NotBoundException e) {
             System.out.println("Client exception: " + e.toString());
             throw new RuntimeException(e);
+        } catch (AccessException e) {
+            throw new RuntimeException(e);
+        } catch (RemoteException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void login(String nickname) throws RemoteException, SameNameException, LobbyCompleteException {
+        boolean isFirst = false;
+
+        try{
+            isFirst = stub.loginAndIsFirst((RMIClientInterface) this, nickname);
+        }catch(RemoteException e){
+            //TODO
+        }catch (LobbyCompleteException e){
+            //TODO
+        }catch (SameNameException e){
+            //TODO
         }
 
-        boolean isFirst = stub.isFirst(this, nickname);
         if (isFirst) {
             controller.askNumberOfPlayer();
         }else{

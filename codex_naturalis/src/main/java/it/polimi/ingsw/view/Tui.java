@@ -782,7 +782,7 @@ public class Tui {
     }
 
     public void askInput() {
-            while(true){
+            {
                 defaultMenu();
                 startPhase();
                 Scanner scanner = new Scanner(System.in);

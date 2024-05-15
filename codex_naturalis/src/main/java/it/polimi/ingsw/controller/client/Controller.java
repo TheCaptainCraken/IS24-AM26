@@ -42,7 +42,7 @@ public class Controller {
 
     public void createInstanceOfConnection(String typeOfConnection){
         if(typeOfConnection.equals("RMI")){
-            connection = new ClientRMI();
+            connection = new ClientRMI(this);
         }else if(typeOfConnection.equals("Socket")){
             connection = new ClientSocket("placeholder",69);
             //TODO vanno aggiunti address e port al costruttore,
