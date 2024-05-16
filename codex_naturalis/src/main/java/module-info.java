@@ -11,5 +11,8 @@ module it.polimi.ingsw {
 
     exports it.polimi.ingsw;
     exports it.polimi.ingsw.network.server;
-    exports it.polimi.ingsw.network.server.rmi;
+    exports it.polimi.ingsw.network.client;
+    exports it.polimi.ingsw.network.rmi;
+    exports it.polimi.ingsw.model.exception;
+    exports it.polimi.ingsw.model;
 }

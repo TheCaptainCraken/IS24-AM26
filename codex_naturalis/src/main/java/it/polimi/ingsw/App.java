@@ -36,25 +36,27 @@ public class App extends Application {
 
     public static void main(String[] args) {
         Controller controller = null;
-        Scanner myObj = new Scanner(System.in);
-        System.out.println("Do you want to be client or server?\n"
-                + "Type 'client' to be a client or 'server' to be a server.");
+       Scanner myObj = new Scanner(System.in);
+       System.out.println("Do you want to be client or server?\n"
+               + "Type 'client' to be a client or 'server' to be a server.");
 
-        String choice = myObj.nextLine();  // Read user input
-        if (choice.equals("client")) {
+       String choice = myObj.nextLine();  // Read user input
+         if (choice.equals("client")) {
             controller = new Controller();
-        } else if (choice.equals("server")) {
+       } else if (choice.equals("server")) {
            new NetworkHandler();
-        } else {
+         } else {
             System.out.println("Invalid choice. Please type 'client' or 'server'.");
-        }
+       }
 
-        System.out.println("Choice your type of connection: RMI or Socket");
-        choice = myObj.nextLine();
+       System.out.println("Choice your type of connection: RMI or Socket");
+         choice = myObj.nextLine();
         controller.createInstanceOfConnection(choice);
 
-        System.out.println("Choice your type of view: TUI or GUI");
-        controller.setView(myObj.nextLine());
-    }
+       System.out.println("Choice your type of view: TUI or GUI");
+       choice = myObj.nextLine();
+       controller.setView(choice);
 
+    }
 }
+

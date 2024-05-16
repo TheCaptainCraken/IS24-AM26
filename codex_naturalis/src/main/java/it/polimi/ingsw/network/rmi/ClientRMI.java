@@ -1,64 +1,68 @@
-package it.polimi.ingsw.network.client;
+package it.polimi.ingsw.network.rmi;
 
 import it.polimi.ingsw.controller.client.Controller;
 import it.polimi.ingsw.model.*;
 import it.polimi.ingsw.model.Color;
 import it.polimi.ingsw.model.exception.*;
-import it.polimi.ingsw.network.server.rmi.LoggableServer;
+import it.polimi.ingsw.network.client.NetworkClient;
 import javafx.util.Pair;
 
 import java.awt.*;
+import java.io.Serializable;
 import java.rmi.AccessException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class ClientRMI extends NetworkClient implements RMIClientInterface {
+
+public class ClientRMI extends NetworkClient implements RMIClientInterface, Serializable {
     static int PORT = 1099;
     Controller controller;
     LoggableServer stub = null;
     Registry registry = null;
 
-    public ClientRMI(Controller controller) {
+    public ClientRMI(Controller controller) throws RemoteException, SameNameException, LobbyCompleteException, NotBoundException {
         this.controller = controller;
-        try {
-            registry = LocateRegistry.getRegistry("127.0.0.1", PORT);
-            stub = (LoggableServer) registry.lookup("Loggable");
+
+        // Esportazione dell'oggetto ClientRMI come oggetto remoto
+        RMIClientInterface exportedClient = (RMIClientInterface) UnicastRemoteObject.exportObject(this, 0);
+
+        // Cerca il registro RMI
+        registry = LocateRegistry.getRegistry("127.0.0.1", PORT);
+
+        // Cerca l'oggetto remoto del server
+        stub = (LoggableServer) registry.lookup("Loggable");
+
+        // Registra il client presso il server
+        if(stub.loginAndIsFirst(exportedClient, controller.getNickname())){
+            System.out.println("Eureka!!!");
         }
 
-        catch (NotBoundException e) {
-            System.out.println("Client exception: " + e.toString());
-            throw new RuntimeException(e);
-        } catch (AccessException e) {
-            throw new RuntimeException(e);
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public void login(String nickname) throws RemoteException, SameNameException, LobbyCompleteException {
         boolean isFirst = false;
-
         try{
-            isFirst = stub.loginAndIsFirst((RMIClientInterface) this, nickname);
+            isFirst = stub.loginAndIsFirst( Controller.getClientRMI(), nickname);
         }catch(RemoteException e){
-            //TODO
+            System.out.println("no connection");
         }catch (LobbyCompleteException e){
-            //TODO
+            System.out.println("no connection");
         }catch (SameNameException e){
-            //TODO
+            System.out.println("no connection");
         }
 
         if (isFirst) {
             controller.askNumberOfPlayer();
         }else{
             if(stub.lobbyIsReady()){
-                controller.waitLobby();
-            }else{
                 controller.stopWaiting();
+            }else{
+                controller.waitLobby();
             }
         }
     }
