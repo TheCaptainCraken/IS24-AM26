@@ -15,7 +15,7 @@ public interface LoggableServer extends Remote {
 
     boolean lobbyIsReady() throws RemoteException;
 
-    void insertNumberOfPlayers(int numberOfPlayers) throws RemoteException, ClosingLobbyException, SameNameException, LobbyCompleteException, NoNameException;
+    boolean insertNumberOfPlayers(int numberOfPlayers) throws RemoteException, ClosingLobbyException, SameNameException, LobbyCompleteException, NoNameException;
 
     void chooseColor(String nickname, Color color) throws RemoteException, ColorAlreadyTakenException, NoNameException;
 

@@ -21,16 +21,16 @@ import java.io.*;
 import java.net.*;
 
 public class ClientSocket extends NetworkClient implements Runnable{
-//interface client ha una struttura adatta per utilizzo RMI, fare l'override con socket, è praticamente impossibile e poco sensato
-    private final Controller controller = new Controller();
-    private Socket socket;
-    private InputStream inputStream;
+    private final Controller controller;
+    private final Socket socket;
+    private final InputStream inputStream;
     private final ObjectInputStream objInputStream;
-    private OutputStream outputStream;
+    private final OutputStream outputStream;
     private final ObjectOutputStream objOutputStream;
-    public ClientSocket(String address, int port) {
+
+    public ClientSocket(Controller controller, String address, int port) {
         try{
-            socket = new Socket(address,port);
+            socket = new Socket(address, port);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -58,6 +58,8 @@ public class ClientSocket extends NetworkClient implements Runnable{
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        this.controller = controller;
     }
 
 
@@ -99,14 +101,14 @@ public class ClientSocket extends NetworkClient implements Runnable{
 
     @Override
     public void drawCard(String nickname, boolean gold, int onTableOrDeck) {
-        ClientMessage message = new CardToBeDrawn(nickname,gold,onTableOrDeck); //il nickname lo devo prendere dal controller o no?
+        ClientMessage message = new CardToBeDrawn(nickname,gold,onTableOrDeck);
+        //il nickname lo devo prendere dal controller o no?
         sendMessage(message);
     }
 
     //metodi che riguardano il gestire aggiornamenti view/ricezione info dal server, dovrebbero essere chiamati dai metodi qui sopra
     //una volta che hanno finito la loro logica, questi metodi sono unici per Socket
     //TODO metodo che ascolta e riceve aggiornamenti da server
-
 
     @Override
     public void run() {
@@ -115,8 +117,10 @@ public class ClientSocket extends NetworkClient implements Runnable{
             handleResponse(serverMessage);
         }
     } //assolutamente non sicuro dell'implementazione
+
     public void handleResponse(ServerMessage message){
-        message.callController(controller); //metodo che ogni sottoclasse di ServerMessage Overrida per chiamare il metodo del controller
+        message.callController(controller);
+        //metodo che ogni sottoclasse di ServerMessage Overrida per chiamare il metodo del controller
         //soluzione usata per snellire codice,
     }
 

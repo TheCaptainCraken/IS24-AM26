@@ -6,27 +6,37 @@ import it.polimi.ingsw.model.Kingdom;
 import it.polimi.ingsw.model.Sign;
 import it.polimi.ingsw.model.exception.*;
 
-import it.polimi.ingsw.network.client.ClientRMI;
+import it.polimi.ingsw.network.rmi.ClientRMI;
 import it.polimi.ingsw.network.client.ClientSocket;
 import it.polimi.ingsw.network.client.NetworkClient;
+import it.polimi.ingsw.network.rmi.RMIClientInterface;
 import it.polimi.ingsw.view.LittleModel;
+import it.polimi.ingsw.view.Phase;
 import it.polimi.ingsw.view.Tui;
 import javafx.util.Pair;
 
 import java.awt.*;
+import java.io.Serializable;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Scanner;
 
 public class Controller {
-    private String nickname;
+    private static String nickname;
+    public static Phase phase;
+    private static RMIClientInterface clientRMI;
     private NetworkClient connection;
     private Tui view;
     private LittleModel model;
 
     public Controller(){
         model = new LittleModel();
+        phase = Phase.LOGIN;
+    }
+
+    public static Phase getPhase() {
+        return Controller.phase;
     }
 
     public void setView(String typeOfView) {
@@ -42,20 +52,35 @@ public class Controller {
 
     public void createInstanceOfConnection(String typeOfConnection){
         if(typeOfConnection.equals("RMI")){
-            connection = new ClientRMI(this);
+            try {
+                clientRMI = new ClientRMI(this);
+            } catch (RemoteException e) {
+                throw new RuntimeException(e);
+            } catch (SameNameException e) {
+                throw new RuntimeException(e);
+            } catch (LobbyCompleteException e) {
+                throw new RuntimeException(e);
+            } catch (NotBoundException e) {
+                throw new RuntimeException(e);
+            }
+            connection = (NetworkClient) clientRMI;
         }else if(typeOfConnection.equals("Socket")){
-            connection = new ClientSocket("placeholder",69);
+            connection = new ClientSocket(this, "placeholder",0);
             //TODO vanno aggiunti address e port al costruttore,
             // il primo sarà una costante salvata nel codice l'altro sarà generato automaticamente
         }
+    }
+
+    public static RMIClientInterface getClientRMI() {
+        return clientRMI;
     }
 
     /**
      * Sets the nickname of the player.
      * @param nickname
      */
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
+    public static void setNickname(String nickname) {
+        Controller.nickname = nickname;
     }
 
     /**
@@ -106,6 +131,12 @@ public class Controller {
      * @param playersAndPins A HashMap where the keys are the nicknames of the players and the values are their associated colors.
      */
     public void refreshUsers(HashMap<String, Color> playersAndPins) {
+        if(playersAndPins.containsKey(nickname) && playersAndPins.get(nickname) == null){
+            Controller.phase = Phase.COLOR;
+        }else if(playersAndPins.containsKey(nickname) && playersAndPins.get(nickname) != null){
+            Controller.phase = Phase.GAMEFLOW;
+        }
+
         view.refreshUsers(playersAndPins);
     }
 
@@ -231,6 +262,7 @@ public class Controller {
     }
     public void showIsFirst(String firstPlayer) {
         view.showIsFirst(firstPlayer);
+        Controller.phase = Phase.COLOR;
     }
 
     /**
@@ -418,4 +450,12 @@ public class Controller {
         view.showHiddenHand(name);
     }
 
+    public void correctNumberOfPlayers(int numberOfPlayers) {
+        view.correctNumberOfPlayers(numberOfPlayers);
+    }
+
+    public void updateAndShowStartingCard(int startingCardId) {
+
+        view.showStartingCard(startingCardId);
+    }
 }

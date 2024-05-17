@@ -256,7 +256,7 @@ public class GameMaster {
                     && getOrderPlayer(currentPlayer.getName()) + 1 == lobby.getPlayers().length) {
                 // if it is the last player in last turn cycle, go to end mode
                 gameState = GameState.END;
-                endGame(); //game transitions into the the calculating phase
+                endGame(); //game transitions into the  calculating phase
             }
         } else {
             gameState = GameState.DRAWING_PHASE;
@@ -335,7 +335,7 @@ public class GameMaster {
                 && getOrderPlayer(currentPlayer.getName()) + 1 == lobby.getPlayers().length) {
             // if it is the last player in last turn cycle, go to end mode
             gameState = GameState.END;
-            endGame();//game transitions into the the calculating phase
+            endGame();//game transitions into the  calculating phase
         } else if (currentPlayer.getPoints() >= 20 || areTheCardFinished()) {
             // if a player reached 20 points set this turn cycle as the second-last
             if (getOrderPlayer(currentPlayer.getName()) + 1 == lobby.getPlayers().length) {
@@ -657,7 +657,7 @@ public class GameMaster {
      *
      * @param type       type of the objective card.
      * @param multiplier multiplier of the objective card.
-     * @param player     player who who is getting targeted.
+     * @param player     player who  is getting targeted.
      * @param kingdom    kingdom of the objective card.
      * @return number of points to add to the player points
      */
@@ -1081,6 +1081,10 @@ public class GameMaster {
 
     public Card getGoldCard(int position) {
         return onTableGoldCards[position];
+    }
+
+    public StartingCard getStartingCardToPosition(String nickname) throws NoNameException {
+        return startingCardToPosition[getOrderPlayer(nickname)];
     }
 }
 

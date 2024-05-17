@@ -35,6 +35,7 @@ public class NetworkHandler {
 
     public void finalizingNumberOfPlayersBroadcast(int numberOfPlayers) throws SameNameException, LobbyCompleteException, NoNameException {
         //TODO do a method that choose from lists of connections in each NetworkPlug`s HashMap
+        //TODO capire come eliminare i giocatori in più
 
 //        HashMap<String, Color> playersInLobby = null;
 //        for(String nickname : connections.keySet()){

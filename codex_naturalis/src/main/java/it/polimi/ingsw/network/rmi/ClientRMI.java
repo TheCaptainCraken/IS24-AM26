@@ -8,8 +8,6 @@ import it.polimi.ingsw.network.client.NetworkClient;
 import javafx.util.Pair;
 
 import java.awt.*;
-import java.io.Serializable;
-import java.rmi.AccessException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -19,9 +17,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 
-public class ClientRMI extends NetworkClient implements RMIClientInterface, Serializable {
+public class ClientRMI extends NetworkClient implements RMIClientInterface {
     static int PORT = 1099;
     Controller controller;
+    RMIClientInterface exportedClient = null;
     LoggableServer stub = null;
     Registry registry = null;
 
@@ -29,7 +28,7 @@ public class ClientRMI extends NetworkClient implements RMIClientInterface, Seri
         this.controller = controller;
 
         // Esportazione dell'oggetto ClientRMI come oggetto remoto
-        RMIClientInterface exportedClient = (RMIClientInterface) UnicastRemoteObject.exportObject(this, 0);
+         exportedClient = (RMIClientInterface) UnicastRemoteObject.exportObject(this, 0);
 
         // Cerca il registro RMI
         registry = LocateRegistry.getRegistry("127.0.0.1", PORT);
@@ -37,23 +36,18 @@ public class ClientRMI extends NetworkClient implements RMIClientInterface, Seri
         // Cerca l'oggetto remoto del server
         stub = (LoggableServer) registry.lookup("Loggable");
 
-        // Registra il client presso il server
-        if(stub.loginAndIsFirst(exportedClient, controller.getNickname())){
-            System.out.println("Eureka!!!");
-        }
-
     }
 
     public void login(String nickname) throws RemoteException, SameNameException, LobbyCompleteException {
         boolean isFirst = false;
         try{
-            isFirst = stub.loginAndIsFirst( Controller.getClientRMI(), nickname);
+            isFirst = stub.loginAndIsFirst(exportedClient, nickname);
         }catch(RemoteException e){
-            System.out.println("no connection");
+            //TODO
         }catch (LobbyCompleteException e){
-            System.out.println("no connection");
+            //TODO
         }catch (SameNameException e){
-            System.out.println("no connection");
+            //TODO
         }
 
         if (isFirst) {
@@ -69,11 +63,14 @@ public class ClientRMI extends NetworkClient implements RMIClientInterface, Seri
 
     public void insertNumberOfPlayers(int numberOfPlayers) throws RemoteException,
             SameNameException, LobbyCompleteException, NoNameException, ClosingLobbyException {
-        stub.insertNumberOfPlayers(numberOfPlayers);
+        boolean operazione = stub.insertNumberOfPlayers(numberOfPlayers);
+        if(operazione){
+            controller.correctNumberOfPlayers(numberOfPlayers);
+        }
     }
 
 
-    public void chooseColor(Color color) throws RemoteException,  ColorAlreadyTakenException, NoNameException {
+    public void chooseColor(Color color) throws RemoteException, ColorAlreadyTakenException, NoNameException {
         //TODO call controller ok client
         stub.chooseColor(controller.getNickname(), color);
     }
@@ -119,7 +116,7 @@ public class ClientRMI extends NetworkClient implements RMIClientInterface, Seri
 
     @Override
     public void showStartingCard(int startingCardId){
-        controller.showStartingCard(startingCardId);
+        controller.updateAndShowStartingCard(startingCardId);
     }
 
     @Override
@@ -167,5 +164,10 @@ public class ClientRMI extends NetworkClient implements RMIClientInterface, Seri
     @Override
     public void getIsFirst(String firstPlayer) {
         controller.showIsFirst(firstPlayer);
+    }
+
+    @Override
+    public void nicknameCorrect(String nickname) throws RemoteException {
+        Controller.setNickname(nickname);
     }
 }

@@ -1,6 +1,11 @@
 package it.polimi.ingsw;
 
 import it.polimi.ingsw.controller.client.Controller;
+import it.polimi.ingsw.model.exception.LobbyCompleteException;
+import it.polimi.ingsw.model.exception.SameNameException;
+import it.polimi.ingsw.network.rmi.ClientRMI;
+import it.polimi.ingsw.network.rmi.LoggableServer;
+import it.polimi.ingsw.network.rmi.RMIClientInterface;
 import it.polimi.ingsw.network.server.NetworkHandler;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -9,6 +14,11 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.rmi.AccessException;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.util.Scanner;
 
 /**
@@ -50,13 +60,12 @@ public class App extends Application {
        }
 
        System.out.println("Choice your type of connection: RMI or Socket");
-         choice = myObj.nextLine();
+        choice = myObj.nextLine();
         controller.createInstanceOfConnection(choice);
 
        System.out.println("Choice your type of view: TUI or GUI");
        choice = myObj.nextLine();
        controller.setView(choice);
-
     }
 }
 

@@ -37,4 +37,6 @@ public interface RMIClientInterface extends Remote {
     void showEndGame(HashMap<String, Integer> extraPoints, ArrayList<Player> ranking) throws RemoteException;
 
     void getIsFirst(String firstPlayer) throws RemoteException;
+
+    void nicknameCorrect(String nickname) throws RemoteException;
 }

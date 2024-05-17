@@ -6,10 +6,11 @@ import it.polimi.ingsw.model.exception.NoNameException;
 import it.polimi.ingsw.model.exception.SameNameException;
 
 import java.awt.*;
+import java.rmi.RemoteException;
 
 public abstract class NetworkPlug {
 
-    protected abstract void finalizingNumberOfPlayers() throws NoNameException, SameNameException, LobbyCompleteException;//TODO
+    protected abstract void finalizingNumberOfPlayers() throws NoNameException, SameNameException, LobbyCompleteException;
 
     protected abstract void gameIsStarting() throws NoNameException;
 

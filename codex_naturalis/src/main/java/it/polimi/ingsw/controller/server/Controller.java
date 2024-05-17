@@ -18,7 +18,7 @@ import java.util.HashMap;
  * It manages the game flow and interactions between server and the game model.
  */
 public class Controller {
-    static String basePath = "src/main/java/it/polimi/ingsw/model/decks/";
+    static String basePath = "codex_naturalis/src/main/java/it/polimi/ingsw/model/decks/";
     private static final Controller INSTANCE = new Controller();
 
     Lobby lobby;
@@ -168,7 +168,7 @@ public class Controller {
      * @return The id of the starting card.
      */
     public int getStartingCard(String nickname) throws NoNameException {
-        return lobby.getPlayerFromName(nickname).getRootCard().getCard().getId();
+        return game.getStartingCardToPosition(nickname).getId();
     }
     /**
      * Gets a player.
@@ -198,6 +198,10 @@ public class Controller {
         lobby.getPlayerFromName(name).setColour(colour);
 
         //Check if all players have chosen a color
+        if(!lobby.getLock()){
+            return false;
+        }
+
         for (Player player : lobby.getPlayers()) {
             if (player.getColor() == null) {
                 return false;
