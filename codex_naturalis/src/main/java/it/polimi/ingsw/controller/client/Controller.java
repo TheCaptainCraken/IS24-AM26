@@ -1,5 +1,6 @@
 package it.polimi.ingsw.controller.client;
 
+import it.polimi.ingsw.App;
 import it.polimi.ingsw.model.Color;
 import it.polimi.ingsw.model.GameState;
 import it.polimi.ingsw.model.Kingdom;
@@ -50,7 +51,7 @@ public class Controller {
             view.start();
         }else if(typeOfView.equals("GUI")){
             //TODO
-            //view = new GUI();
+            App.launch();
         }
     }
 
