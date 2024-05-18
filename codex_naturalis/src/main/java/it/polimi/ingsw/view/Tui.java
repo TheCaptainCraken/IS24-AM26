@@ -8,6 +8,7 @@ import javafx.util.Pair;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 /**
@@ -50,7 +51,6 @@ public class Tui {
      */
     public void stopWaiting() {
         System.out.println("The game is starting");
-        askColor();
     }
 
     private void askColor() {
@@ -62,6 +62,7 @@ public class Tui {
         Scanner scanner = new Scanner(System.in);
         int color;
         do{
+            //TODO se inserisce stringa non funziona
             color = scanner.nextInt();
             switch (color) {
                 case 1:
@@ -114,8 +115,8 @@ public class Tui {
         int i;
 
         //Convert the PlayedCard into a string to print it
-        cards.add(createCardToPrint(card));
-        cards.add(createCardToPrint(cardBack));
+        cards.add(createStartingCardToPrint(card));
+        cards.add(createStartingCardToPrint(cardBack));
 
 
         System.out.println("Choose the side of the starting Card. The one on the left is the top, the one on the right is the back");
@@ -123,7 +124,8 @@ public class Tui {
         for(i = 0; i < size; i++) {
             for(String[] cardsToPrint : cards) {
                 System.out.print(cardsToPrint[i]);
-                System.out.print("    ");
+                System.out.print("   ");
+                //TODO shift di uno non so perchè
             }
             System.out.println();
         }
@@ -141,12 +143,12 @@ public class Tui {
         ArrayList<String[]> goldCardsToPrint = new ArrayList<>();
 
         for(Integer cardId: resourceCards){
-            resourceCardsToPrint.add(createCardToPrint(model.getCard(cardId)));
+            resourceCardsToPrint.add(createCardToPrint(model.getCard(cardId, true)));
         }
         resourceCardsToPrint.add(createCardToPrint(model.getCardFromKingdom()));
 
         for(Integer cardId: goldCard){
-            goldCardsToPrint.add(createCardToPrint(model.getCard(cardId)));
+            goldCardsToPrint.add(createCardToPrint(model.getCard(cardId, true)));
         }
         goldCardsToPrint.add(createCardToPrint(model.getCardFromKingdom()));
 
@@ -230,7 +232,6 @@ public class Tui {
         int i;
 
         System.out.println("These are the secret objective cards you can choose. Please choose one");
-        //TODO numbers.
         for(i = 0; i < size; i++) {
             for(String[] row : cards) {
                 System.out.print(row[i]);
@@ -252,14 +253,13 @@ public class Tui {
         ObjectiveCard card = model.getObjectiveCard(indexCard);
         String[] objective = null;
 
-        //TODO ricontrolla con agnoli
         switch(card.getType()){
             case STAIR:
                 if(card.getKingdom() == Kingdom.FUNGI || card.getKingdom() == Kingdom.ANIMAL) {
                     objective = new String[]{
                             "      ***",
-                            "   ***",
-                            "***"
+                            "   ***   ",
+                            "***      "
                     };
 
                 }else {
@@ -273,73 +273,108 @@ public class Tui {
             case L_FORMATION:
                 if(card.getKingdom() == Kingdom.FUNGI) {
                     objective = new String[]{
-                            "F",
-                            "F",
-                            "   P"
+                            "    F    ",
+                            "    F    ",
+                            "       P "
                     };
                 }else if(card.getKingdom() == Kingdom.ANIMAL) {
                     objective = new String[]{
-                            "   F",
-                            "A",
-                            "A"
+                            "       F ",
+                            "    A    ",
+                            "    A    "
                     };
                 }else if(card.getKingdom() == Kingdom.INSECT) {
                     objective = new String[]{
-                            "A",
-                            "  I",
-                            "  I"
+                            "    A    ",
+                            "      I  ",
+                            "      I  "
                     };
                 }else {
                     objective = new String[]{
-                            "  P",
-                            "  P",
-                            "I"
+                            "     P   ",
+                            "     P   ",
+                            "   I     "
                     };
                 }
                 break;
             case FREE_RESOURCES:
-                //TODO cosa si intende
+                objective = new String[]{
+                        "  SCROLL ",
+                        "  INKS   ",
+                        "  QUILLS "
+                };
                 break;
             case TRIS:
                 if(card.getKingdom() == Kingdom.FUNGI) {
                     objective = new String[]{
-                            "  F  ",
-                            "F   F",
-                            "     "
+                            "      F  ",
+                            "    F   F",
+                            "         "
                     };
                 }else if(card.getKingdom() == Kingdom.ANIMAL) {
                     objective = new String[]{
-                            "  A  ",
-                            "A   A",
-                            "     "
+                            "      A  ",
+                            "    A   A",
+                            "         "
                     };
 
                 } else if (card.getKingdom() == Kingdom.PLANT) {
                     objective = new String[]{
-                            "  P  ",
-                            "P   P",
-                            "     "
+                            "     P   ",
+                            "   P   P ",
+                            "         "
                     };
                 } else if (card.getKingdom() == Kingdom.INSECT) {
                     objective = new String[]{
-                            "  I  ",
-                            "I   I",
-                            "     "
+                            "      I  ",
+                            "    I   I",
+                            "         "
                     };
                 }
                 break;
+            case TWO_INKS:
+                objective = new String[]{
+                        "  INKS   ",
+                        "  INKS   ",
+                        "         "
+                };
+                break;
+            case TWO_SCROLLS:
+                objective = new String[]{
+                        "  SCROLL ",
+                        "  SCROLL ",
+                        "         "
+                };
+                break;
+            case TWO_QUILLS:
+                objective = new String[]{
+                        "  QUILLS ",
+                        "  QUILLS ",
+                        "         "
+                };
+                break;
             default:
+                objective = new String[]{
+                        "   ",
+                        "   ",
+                        "   "
+                };
+
         }
+        String multiplier = Integer.toString(card.getMultiplier());
+        String kingdom = Optional.ofNullable(card.getKingdom())
+                .map(Kingdom::toString)
+                .orElse("");
+        kingdom = centerStringMidSign(kingdom);
         return new String[]{
-                "┌---------------------------┐",
-                "|            "+card.getMultiplier()+"              |",
-                "|          "+card.getKingdom()+"            |",
-                "|                           |",
-                "|          "+objective[0]+"            |",
-                "|          "+objective[1]+"            |",
-                "|          "+objective[2]+"            |",
-                "|                           |",
-                "└---------------------------┘",
+                "┌-------------------------------------┐",
+                "|                "+multiplier+"                    |",
+                ""+kingdom+"",
+                "|                                     |",
+                "|            "+objective[0]+"                |",
+                "|            "+objective[1]+"                |",
+                "|            "+objective[2]+"                |",
+                "└-------------------------------------┘",
         };
     }
 
@@ -407,62 +442,128 @@ public class Tui {
     public String[] createCardToPrint(PlayedCard card) {
         HashMap<Corner, String> corner = new HashMap<>();
         String midSignsString;
+        String points = "0";
 
         ArrayList<Sign> midSigns = new ArrayList<>();
-        if (card.getCard() instanceof StartingCard) {
-            if(!card.isFacingUp()) {
-                for (Corner c : Corner.values()) {
-                    corner.put(c, Optional.ofNullable(((StartingCard) card.getCard()).getBacksideCorners().get(c))
-                            .map(Object::toString)
-                            .orElse(Sign.EMPTY.toString()));
-                }
-                for (Sign s : ((StartingCard) card.getCard()).getBonusResources()) {
-                    midSigns.add(s);
-                }
-            }else {
-                for (Corner c : Corner.values()) {
-                    corner.put(c, card.getCard().getCorners().get(c).toString());
-                }
-            }
-        }
-        else if (card.isFacingUp()) {
+        if (card.isFacingUp()) {
             for (Corner c : Corner.values()) {
                 corner.put(c, Optional.ofNullable((card.getCard()).getCorners().get(c))
                         .map(Object::toString)
-                        .orElse(Sign.EMPTY.toString()));
+                        .orElse(Sign.NULL.toString()));
             }
             midSigns.add(fromKingdomToSign(card.getCard().getKingdom()));
-            //TODO oro o no. aggiungi punti o no.
+            if(card.getCard() instanceof ResourceCard){
+                points = Integer.toString(((ResourceCard) card.getCard()).getPoints());
+            }
         } else {
             for (Corner c : Corner.values()) {
-                corner.put(c, Sign.EMPTY.toString());
+                corner.put(c, Sign.NULL.toString());
             }
             midSigns.add(fromKingdomToSign(card.getCard().getKingdom()));
+        }
+
+
+        midSignsString = "  " + midSigns.get(0) + "  ";
+
+        String a = centerString(corner.get(Corner.TOP_LEFT));
+        String b = centerString(corner.get(Corner.TOP_RIGHT));
+        String c = centerString(corner.get(Corner.BOTTOM_LEFT));
+        String d = centerString(corner.get(Corner.BOTTOM_RIGHT));
+        String e = centerStringMidSign(midSignsString);
+
+
+        return new String[]{
+            "┌----------┐---------------┌----------┐",
+            ""+a+"       "+points+"       "+b+" ",
+            "└----------┘               └----------┘",
+                ""+e+"       ",
+            "┌----------┐               ┌----------┐",
+            ""+c+"               "+d+" ",
+            "└----------┘---------------└----------┘",
+    };
+    }
+
+    private String centerStringMidSign(String word) {
+        int length = 37;
+        int wordLength = word.length();
+        int startSpaces = (length - wordLength) / 2;
+        int endSpaces = length - startSpaces - wordLength;
+        return "|" + " ".repeat(startSpaces) + word + " ".repeat(endSpaces) + "|";
+    }
+
+    private String centerStartingCard(String word) {
+        int length = 38;
+        int wordLength = word.length();
+        int startSpaces = (length - wordLength) / 2;
+        int endSpaces = length - startSpaces - wordLength;
+        return "" + " ".repeat(startSpaces) + word + " ".repeat(endSpaces) + "";
+    }
+
+    public String centerString(String word) {
+        int length = 10;
+        int wordLength = word.length();
+        int startSpaces = (length - wordLength) / 2;
+        int endSpaces = length - startSpaces - wordLength;
+        return "|" + " ".repeat(startSpaces) + word + " ".repeat(endSpaces) + "|";
+    }
+
+    public String[] createStartingCardToPrint(PlayedCard card) {
+        HashMap<Corner, String> corner = new HashMap<>();
+        ArrayList<Sign> midSigns = new ArrayList<>();
+        if(!card.isFacingUp()) {
+            for (Corner c : Corner.values()) {
+                corner.put(c, Optional.ofNullable(((StartingCard) card.getCard()).getBacksideCorners().get(c))
+                            .map(Object::toString)
+                            .orElse(Sign.NULL.toString()));
+            }
+            for (Sign s : ((StartingCard) card.getCard()).getBonusResources()) {
+                midSigns.add(s);
+            }
+        }else {
+            for (Corner c : Corner.values()) {
+                corner.put(c, card.getCard().getCorners().get(c).toString());
+            }
         }
         switch (midSigns.size()) {
             case 1:
-                midSignsString = "  " + midSigns.get(0) + "  ";
+                midSigns.add(Sign.NULL);
+                midSigns.add(Sign.NULL);
                 break;
             case 2:
-                midSignsString = " " + midSigns.get(0) + " " + midSigns.get(1) + " ";
+                midSigns.add(Sign.NULL);
                 break;
             case 3:
-                midSignsString = midSigns.get(0) + " " + midSigns.get(1) + " " + midSigns.get(2);
                 break;
             default:
-                midSignsString = "     ";
+                midSigns.add(Sign.NULL);
+                midSigns.add(Sign.NULL);
+                midSigns.add(Sign.NULL);
                 break;
         }
 
-    return new String[]{
-            "┌--------┐---------------┌--------┐",
-            "|  "+corner.get(Corner.TOP_LEFT)+" |               |  "+corner.get(Corner.TOP_RIGHT)+" |",
-            "└--------┘               └--------┘",
-            "|           "+midSignsString+"          |",
-            "┌--------┐               ┌--------┐",
-            "|  "+corner.get(Corner.BOTTOM_LEFT)+" |               |  "+corner.get(Corner.BOTTOM_RIGHT)+" |",
-            "└--------┘---------------└--------┘",
-    };
+        String a = centerString(corner.get(Corner.TOP_LEFT));
+        String b = centerString(corner.get(Corner.TOP_RIGHT));
+        String c = centerString(corner.get(Corner.BOTTOM_LEFT));
+        String d = centerString(corner.get(Corner.BOTTOM_RIGHT));
+
+        String midSignsString = midSigns.stream()
+                .map(sign -> sign == Sign.NULL ? " " : sign.toString())
+                .collect(Collectors.joining(" "));
+
+        midSignsString = centerStartingCard(midSignsString);
+
+        // Ensure the final bar is always at the same position
+//        midSignsString = insertBarAtPosition(midSignsString, 30);
+
+        return new String[]{
+                " ┌----------┐---------------┌----------┐",
+                " "+a+"               "+b+"",
+                " └----------┘               └----------┘",
+                "  "+midSignsString +"  ",
+                " ┌----------┐               ┌----------┐",
+                " "+c+"               "+d+" ",
+                " └----------┘---------------└----------┘",
+        };
     }
 
     /**
@@ -650,11 +751,104 @@ public class Tui {
                 "6 - show the points of the players\n" +
                 "7 - show my hand\n" +
                 "8 - show the hidden hand of a player\n" );
+        int choice = 0;
+        Scanner scanner = new Scanner(System.in);
+        boolean validInput = false;
+        while (!validInput) {
+            try {
+                choice = scanner.nextInt();
+                validInput = true;
+            } catch (InputMismatchException e) {
+                System.out.println("Input not valid. Please insert a number.");
+                scanner.next(); // Consuma l'input non valido
+            }
+        }
+        switch (choice){
+            case 1:
+                placeCard();
+                break;
+            case 2:
+                drawCard();
+                break;
+            case 3:
+                System.out.println("Insert the nickname of the player");
+                String nickname = scanner.nextLine();
+                //TODO
+                controller.showTableOfPlayer(nickname);
+                break;
+            case 4:
+                showResourcesPlayer("me");
+                break;
+            case 5:
+                showResourcesAllPlayers();
+                break;
+            case 6:
+                showPoints(new HashMap<>());
+                break;
+            case 7:
+                showHand();
+                break;
+            case 8:
+                showHiddenHand("me");
+                break;
+            default:
+                System.out.println("Invalid input. Please retry");
+                defaultMenu();
+        }
+
+    }
+
+    private void drawCard() {
+        Scanner scanner = new Scanner(System.in);
+        boolean gold;
+        int onTableOrDeck;
+        boolean validInput = false;
+
+        while (!validInput) {
+            try {
+                System.out.println("Enter true if the card is gold, false otherwise:");
+                gold = scanner.nextBoolean();
+                System.out.println("Enter 1 if the card is on table, 0 if it's on deck:");
+                onTableOrDeck = scanner.nextInt();
+                controller.drawCard(gold, onTableOrDeck);
+                validInput = true;
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid input. Please enter the correct values.");
+                scanner.next(); // Consumes the invalid input
+            }
+        }
+    }
+    private void placeCard() {
+        Scanner scanner = new Scanner(System.in);
+        Integer indexHand;
+        Point position = new Point();
+        boolean isFacingUp;
+        boolean validInput = false;
+
+        while (!validInput) {
+            try {
+                System.out.println("Enter index of the card in hand:");
+                indexHand = scanner.nextInt();
+                System.out.println("Enter position x:");
+                position.x = scanner.nextInt();
+                System.out.println("Enter position y:");
+                position.y = scanner.nextInt();
+                System.out.println("Enter true if the card is facing up, false otherwise:");
+                isFacingUp = scanner.nextBoolean();
+                controller.playCard(indexHand, position, isFacingUp);
+                validInput = true;
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid input. Please enter the correct values.");
+                scanner.next(); // Consumes the invalid input
+            }
+        }
     }
 
     public void startPhase(){
-        System.out.println("insert your nickname\n " +
-                "1 - your nickname\n");
+        System.out.println("Please enter your nickname");
+        Scanner scanner = new Scanner(System.in);
+        String name = scanner.nextLine();
+        controller.login(name);
     }
 
     /**
@@ -689,7 +883,7 @@ public class Tui {
         ArrayList<String[]> cards = new ArrayList<>();
 
         for(Integer cardId: myCards){
-            cards.add(createCardToPrint(model.getCard(cardId)));
+            cards.add(createCardToPrint(model.getCard(cardId, true)));
         }
 
         System.out.println("These are your cards:");
@@ -833,8 +1027,8 @@ public class Tui {
         //TODO
     }
 
-    public void printCard(int id) {
-        String[] card = createCardToPrint(model.getCard(id));
+    public void printCard(int id, boolean side) {
+        String[] card = createCardToPrint(model.getCard(id, side));
         for(String row: card){
             System.out.println(row);
         }
@@ -842,70 +1036,6 @@ public class Tui {
     }
 
     public void start() {
-//            {
-//                defaultMenu();
-//                startPhase();
-//                int input = 0;
-//                Scanner scanner = new Scanner(System.in);
-//                try {
-//                    input = scanner.nextInt();
-//                    scanner.nextLine();
-//                } catch (InputMismatchException e) {
-//                    System.out.println("Per favore inserisci un numero intero.");
-//                } catch (NoSuchElementException e) {
-//                    System.out.println("Per favore inserisci un input.");
-//                } catch (IllegalStateException e) {
-//                    System.out.println("Lo scanner è chiuso.");
-//                }
-//                switch (input){
-//                    case 1:
-//                        Integer indexHand = scanner.nextInt();
-//                        Point position = new Point();
-//                        position.x = scanner.nextInt();
-//                        position.y = scanner.nextInt();
-//                        boolean isFacingUp = scanner.nextBoolean();
-//                        controller.playCard(indexHand, position, isFacingUp);
-//                        break;
-//                    case 2:
-//                        boolean gold = scanner.nextBoolean();
-//                        int onTableOrDeck = scanner.nextInt();
-//                        controller.drawCard(gold, onTableOrDeck);
-//                        break;
-//                    case 3:
-//                        controller.showTableOfPlayer(scanner.nextLine());
-//                        break;
-//                    case 4:
-//                        controller.showResources();
-//                        break;
-//                    case 5:
-//                        controller.showResourcesAllPlayers();
-//                        break;
-//                    case 6:
-//                        controller.showPoints();
-//                        break;
-//                    case 7:
-//                        controller.showHand();
-//                        break;
-//                    case 8:
-//                        controller.showHiddenHand(scanner.nextLine());
-//                        break;
-//                    case 9:
-//                        System.out.println("Please enter your nickname");
-//                        String name = scanner.nextLine();
-//                        controller.login(name);
-//                        break;
-//                    case 10:
-//                        controller.chooseColor(Color.valueOf(scanner.nextLine()));
-//                    case 11:
-//                        controller.chooseSideStartingCard(scanner.nextBoolean());
-//                        break;
-//                    case 12:
-//                        controller.chooseSecretObjectiveCard(scanner.nextInt());
-//                        break;
-//                    default:
-//                        System.out.println("Invalid input");
-//                }
-//            }
         while(true){
             switch(Controller.getPhase()){
                 case LOGIN:
@@ -914,60 +1044,74 @@ public class Tui {
                 case COLOR:
                     askColor();
                     break;
+                case CHOOSE_SIDE_STARTING_CARD:
+                    //la rete invia le carte e il giocatore sceglie
+                    chooseStartingCard();
+                    break;
+                case CHOOSE_SECRET_OBJECTIVE_CARD:
+                //la rete invia le carte obiettivo e il giocatore sceglie
+                    chooseSecretObjectiveCard();
+                    break;
+                case WAIT:
+                    //la rete invia il giocatore che inizia
+                    //TODO
+                    break;
                 case GAMEFLOW:
                     defaultMenu();
                     break;
             }
+        }
 
-            Scanner scanner = new Scanner(System.in);
-            int input = 0;
-            input = scanner.nextInt();
-            switch(input){
-                case(1):
-                    System.out.println("Please enter your nickname");
-                    String name = scanner.nextLine();
-                    controller.login(name);
-                   break;
-                case(2):
-                    askColor();
-                case(3):
-                    boolean side = scanner.nextBoolean();
-                    controller.chooseSideStartingCard(side);
-                    break;
-                case(4):
-                    int indexCard = scanner.nextInt();
+    }
+
+    private void chooseSecretObjectiveCard() {
+        Scanner scanner = new Scanner(System.in);
+        int indexCard = 0;
+        boolean validInput = false;
+
+        while (!validInput) {
+            try {
+                System.out.println("Enter 0 or 1:");
+                indexCard = scanner.nextInt();
+                if (indexCard == 0 || indexCard == 1) {
                     controller.chooseSecretObjectiveCard(indexCard);
-                    break;
-                case(5):
-                    int indexHand = scanner.nextInt();
-                    Point position = new Point();
-                    position.x = scanner.nextInt();
-                    position.y = scanner.nextInt();
-                    boolean isFacingUp = scanner.nextBoolean();
-                    controller.playCard(indexHand, position, isFacingUp);
-                    break;
-                case(6):
-                    boolean gold = scanner.nextBoolean();
-                    int onTableOrDeck = scanner.nextInt();
-                    controller.drawCard(gold, onTableOrDeck);
-                    break;
-                case(7):
-                    //TODO
-                default:
-                    System.out.println("Invalid input");
+                    validInput = true;
+                } else {
+                    System.out.println("Invalid input. Please enter 0 or 1.");
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid input. Please enter 0 or 1.");
+                scanner.next(); // Consumes the invalid input
             }
         }
-
-        }
+    }
 
     public void showIsFirst(String firstPlayer) {
-        System.out.println("The first player is" + firstPlayer +  ". The game is about to start");
-        Controller.phase = Phase.COLOR;
+        System.out.println("The first player is " + firstPlayer +  ". The game is about to start");
     }
 
     public void correctNumberOfPlayers(int numberOfPlayers) {
         System.out.println("You have correctly set the number of players");
         System.out.println("The number of players are " + numberOfPlayers);
+    }
+
+    public void chooseStartingCard() {
+        Scanner scanner = new Scanner(System.in);
+        boolean isFacingUp = false;
+
+        String side;
+        do {
+            side = scanner.nextLine();
+            if (side.equals("true"))
+                isFacingUp = true;
+            else if (side.equals("false"))
+                isFacingUp = false;
+            else
+                System.out.println("Invalid input");
+        } while (!side.equals("true") && !side.equals("false"));
+
+        controller.chooseSideStartingCard(isFacingUp);
+
     }
 }
 

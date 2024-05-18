@@ -1,4 +1,4 @@
 package it.polimi.ingsw.model.exception;
-
-public class WrongGamePhaseException extends Exception{
+import java.io.IOException;
+public class WrongGamePhaseException extends IOException{
 }

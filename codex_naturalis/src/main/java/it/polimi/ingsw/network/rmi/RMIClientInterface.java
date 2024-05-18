@@ -20,9 +20,9 @@ public interface RMIClientInterface extends Remote {
 
     void showStartingCard(int startingCardId) throws RemoteException;
 
-    void showObjectiveCards(Integer[] objectiveCardIds) throws RemoteException;
+    void sendCommonObjectiveCards(Integer[] objectiveCardIds) throws RemoteException;
 
-    void showSecretObjectiveCards(Integer[] objectiveCardIds) throws RemoteException;
+    void sendSecretObjectiveCardsToChoose(Integer[] objectiveCardIds) throws RemoteException;
 
     void showHand(String nickname, Integer[] hand) throws RemoteException;
 
@@ -36,7 +36,8 @@ public interface RMIClientInterface extends Remote {
 
     void showEndGame(HashMap<String, Integer> extraPoints, ArrayList<Player> ranking) throws RemoteException;
 
-    void getIsFirst(String firstPlayer) throws RemoteException;
+    void getIsFirstAndStartGame(String firstPlayer) throws RemoteException;
 
-    void nicknameCorrect(String nickname) throws RemoteException;
+
+    void stopWaiting() throws RemoteException;
 }

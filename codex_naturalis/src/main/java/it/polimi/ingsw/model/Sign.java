@@ -9,4 +9,5 @@ public enum Sign {
     SCROLL,
     INKWELL,
     EMPTY,
+    NULL,
 }
