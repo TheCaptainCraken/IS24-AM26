@@ -8,21 +8,21 @@ import it.polimi.ingsw.model.exception.SameNameException;
 import java.awt.*;
 import java.rmi.RemoteException;
 
-public abstract class NetworkPlug {
+public interface  NetworkPlug {
 
-    protected abstract void finalizingNumberOfPlayers() throws NoNameException, SameNameException, LobbyCompleteException;
+      void finalizingNumberOfPlayers() throws NoNameException, SameNameException, LobbyCompleteException;
 
-    protected abstract void gameIsStarting() throws NoNameException;
+      void gameIsStarting() throws NoNameException;
 
-    protected abstract void refreshUsers();
+      void refreshUsers();
 
-    protected abstract void sendingPlacedRootCardAndWhenCompleteObjectiveCards(String nickname, boolean side, int cardId, boolean allWithRootCardPlaced) throws NoNameException;//TODO discuss if we have to modify
+      void sendingPlacedRootCardAndWhenCompleteObjectiveCards(String nickname, boolean side, int cardId, boolean allWithRootCardPlaced) throws NoNameException;//TODO discuss if we have to modify
 
-    protected abstract void sendingHandsAndWhenSecretObjectiveCardsCompleteStartGameFlow(String nickname, boolean allWithSecretObjectiveCardChosen) throws NoNameException;//TODO discuss if we have to modify
+      void sendingHandsAndWhenSecretObjectiveCardsCompleteStartGameFlow(String nickname, boolean allWithSecretObjectiveCardChosen) throws NoNameException;//TODO discuss if we have to modify
 
-    protected abstract void sendPlacedCard(String nickname, int cardId, Point position, boolean side) throws NoNameException;
+      void sendPlacedCard(String nickname, int cardId, Point position, boolean side) throws NoNameException;
 
-    protected abstract void sendDrawnCard(String nickname, int newCardId, Kingdom headDeck, boolean gold, int onTableOrDeck) throws NoNameException;
+      void sendDrawnCard(String nickname, int newCardId, Kingdom headDeck, boolean gold, int onTableOrDeck) throws NoNameException;
 
-    protected abstract void sendEndGame();
+      void sendEndGame();
 }

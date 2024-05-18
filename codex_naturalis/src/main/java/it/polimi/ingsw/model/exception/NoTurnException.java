@@ -1,4 +1,4 @@
 package it.polimi.ingsw.model.exception;
-
-public class NoTurnException extends Exception{
+import java.io.IOException;
+public class NoTurnException extends IOException{
 }

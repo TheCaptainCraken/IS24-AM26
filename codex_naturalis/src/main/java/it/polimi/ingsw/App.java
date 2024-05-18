@@ -44,28 +44,38 @@ public class App extends Application {
         return fxmlLoader.load();
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         Controller controller = null;
-       Scanner myObj = new Scanner(System.in);
-       System.out.println("Do you want to be client or server?\n"
-               + "Type 'client' to be a client or 'server' to be a server.");
+        Scanner myObj = new Scanner(System.in);
 
-       String choice = myObj.nextLine();  // Read user input
-         if (choice.equals("client")) {
-            controller = new Controller();
-       } else if (choice.equals("server")) {
-           new NetworkHandler();
-         } else {
-            System.out.println("Invalid choice. Please type 'client' or 'server'.");
-       }
+        String choice;
+        controller = new Controller();
+        System.out.println("Choice your type of connection: RMI or Socket");
 
-       System.out.println("Choice your type of connection: RMI or Socket");
-        choice = myObj.nextLine();
-        controller.createInstanceOfConnection(choice);
+      do{
+          choice = myObj.nextLine();
+          switch(choice){
+              case "RMI":
+              case "Socket":
+                  controller.createInstanceOfConnection(choice);
+                  break;
+              default:
+                  System.out.println("Invalid choice, please insert RMI or Socket");
+          }
+      }while(!choice.equals("RMI") && !choice.equals("Socket"));
 
        System.out.println("Choice your type of view: TUI or GUI");
-       choice = myObj.nextLine();
-       controller.setView(choice);
+       do{
+           choice = myObj.nextLine();
+           switch(choice){
+               case "TUI":
+               case "GUI":
+                   controller.setView(choice);
+                   break;
+               default:
+                   System.out.println("Invalid choice, please insert TUI or GUI");
+           }
+       }while(!choice.equals("TUI") && !choice.equals("GUI"));
     }
 }
 

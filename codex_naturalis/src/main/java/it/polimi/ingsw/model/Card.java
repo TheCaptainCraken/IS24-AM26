@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model;
 
+
 /**
  * This class represents a generic card.
  */

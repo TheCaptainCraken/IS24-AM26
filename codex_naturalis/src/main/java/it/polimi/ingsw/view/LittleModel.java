@@ -7,10 +7,11 @@ import org.json.simple.parser.ParseException;
 
 import java.awt.*;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.*;
 
 
-public class LittleModel {
+public class LittleModel implements Serializable {
     static String basePath = "src/main/java/it/polimi/ingsw/model/decks/";
 
     private HashMap <String, Integer> points;
@@ -27,11 +28,16 @@ public class LittleModel {
     private Kingdom headDeckGold;
     private Kingdom headDeckResource;
 
-    private Deck startingCards;
-    private Deck objectiveCards;
-    private Deck tableCards;
+    private Integer[] secretObjectiveCardsToChoose;
+    private Integer[] commonObjectiveCards;
+    private Integer secretObjectiveCard;
 
-    public LittleModel(){
+    private Deck startingCardsDeck;
+    private Deck objectiveCardsDeck;
+    private Deck resourceCardsDeck;
+    private Deck goldCardsDeck;
+
+    public LittleModel() {
         points = new HashMap<>();
         resources = new HashMap<>();
         myCards = new Integer[3];
@@ -41,9 +47,10 @@ public class LittleModel {
 
         try{
             //TODO due mazzi diversi
-            startingCards = new Deck("codex_naturalis/src/main/java/it/polimi/ingsw/model/decks/startingCardsDeck.json", true);
-            objectiveCards = new Deck("codex_naturalis/src/main/java/it/polimi/ingsw/model/decks/objectiveCardsDeck.json", true);
-            tableCards = new Deck("codex_naturalis/src/main/java/it/polimi/ingsw/model/decks/resourceCardsDeck.json", true);
+            startingCardsDeck = new Deck("codex_naturalis/src/main/java/it/polimi/ingsw/model/decks/startingCardsDeck.json", true);
+            objectiveCardsDeck = new Deck("codex_naturalis/src/main/java/it/polimi/ingsw/model/decks/objectiveCardsDeck.json", true);
+            resourceCardsDeck = new Deck("codex_naturalis/src/main/java/it/polimi/ingsw/model/decks/resourceCardsDeck.json", true);
+            goldCardsDeck = new Deck("codex_naturalis/src/main/java/it/polimi/ingsw/model/decks/goldCardsDeck.json", true);
         } catch (IOException e) {
            System.out.println("file for TUI not found");
         } catch (ParseException e) {
@@ -103,6 +110,7 @@ public class LittleModel {
            table.put(nickname, new CardClient(id, side, position, 0, new HashMap<>()));
        }else{
            CardClient newCard = new CardClient(id, side, position, cardsNumber.put(nickname, cardsNumber.get(nickname) + 1), new HashMap<>());
+            //TODO sistemare perchè è null
 
            int xPlaceToCheck = 0;
            int yPlaceToCheck = 0;
@@ -174,29 +182,37 @@ public class LittleModel {
 
     public ObjectiveCard getObjectiveCard(int id){
         id = id - 1;
-        return (ObjectiveCard) objectiveCards.getCard(id);
+        return (ObjectiveCard) objectiveCardsDeck.getCard(id);
     }
 
-    public PlayedCard getStartingCard(int id){
+    public PlayedCard getStartingCard(int id, boolean side){
         id = id - 97;
-        PlayedCard card = new PlayedCard((PlayableCard) startingCards.getCard(id),
-                null, false, 0, new Point(0, 0));
-        //TODO
-        return null;
+        HashMap<Corner, PlayedCard> cardsToAttach = new HashMap<>();
+        for(Corner corner: Corner.values()){
+            cardsToAttach.put(corner, null);
+        }
+        PlayedCard card = new PlayedCard((PlayableCard) startingCardsDeck.getCard(id),
+                cardsToAttach, side, 0, new Point(0, 0));
+
+        return card;
     }
 
-    public PlayedCard getCard(int id){
-        id = id - 17;
+    public PlayedCard getCard(int id, boolean side){
+        PlayableCard card;
+        if(id < 57){
+           card = (PlayableCard) resourceCardsDeck.getCard(id - 17);
+        }else {
+            card = (PlayableCard) goldCardsDeck.getCard(id - 57);
+        }
+
         HashMap<Corner, PlayedCard> cardsToAttach = new HashMap<>();
         cardsToAttach.put(Corner.TOP_LEFT, null);
         cardsToAttach.put(Corner.TOP_RIGHT, null);
         cardsToAttach.put(Corner.BOTTOM_LEFT, null);
         cardsToAttach.put(Corner.BOTTOM_RIGHT, null);
 
-        PlayedCard card = new PlayedCard((PlayableCard) tableCards.getCard(id),
-                cardsToAttach, false, 0, new Point(0, 0));
-        //TODO
-        return card;
+        return new PlayedCard(card,
+                cardsToAttach, side, 0, new Point(0, 0));
     }
 
     public PlayedCard getCardFromKingdom(){
@@ -238,6 +254,30 @@ public class LittleModel {
             }
         }
         return null;
+    }
+
+    public void updateSecretObjectiveCard(int indexCard) {
+        secretObjectiveCard = secretObjectiveCardsToChoose[indexCard];
+    }
+
+    public void updateSecretObjectiveCardsToChoose(Integer[] secretObjectiveCardsToChoose) {
+        this.secretObjectiveCardsToChoose = secretObjectiveCardsToChoose;
+    }
+
+    public Integer[] getSecretObjectiveCardsToChoose() {
+        return secretObjectiveCardsToChoose;
+    }
+
+    public Integer[] getCommonObjectiveCards() {
+        return commonObjectiveCards;
+    }
+
+    public Integer getSecretObjectiveCard() {
+        return secretObjectiveCard;
+    }
+
+    public void updateCommonObjectiveCards(Integer[] commonObjectiveCards) {
+        this.commonObjectiveCards = commonObjectiveCards;
     }
 }
 

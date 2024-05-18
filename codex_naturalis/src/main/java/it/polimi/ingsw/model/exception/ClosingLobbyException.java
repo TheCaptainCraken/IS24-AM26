@@ -1,4 +1,4 @@
 package it.polimi.ingsw.model.exception;
-
-public class ClosingLobbyException extends Throwable {
+import java.io.IOException;
+public class ClosingLobbyException extends IOException {
 }

@@ -1,4 +1,4 @@
 package it.polimi.ingsw.model.exception;
-
-public class NotEnoughResourcesException extends Exception{
+import java.io.IOException;
+public class NotEnoughResourcesException extends IOException{
 }

@@ -1,4 +1,4 @@
 package it.polimi.ingsw.model.exception;
-
-public class NoNameException extends Exception{
+import java.io.IOException;
+public class NoNameException extends IOException{
 }

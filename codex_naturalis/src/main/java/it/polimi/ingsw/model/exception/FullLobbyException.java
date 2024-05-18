@@ -1,4 +1,4 @@
 package it.polimi.ingsw.model.exception;
-
-public class FullLobbyException extends Exception{
+import java.io.IOException;
+public class FullLobbyException extends IOException{
 }

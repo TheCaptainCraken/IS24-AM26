@@ -35,11 +35,15 @@ public class Controller {
         phase = Phase.LOGIN;
     }
 
-    public static Phase getPhase() {
+    public static synchronized Phase getPhase() {
         return Controller.phase;
     }
 
-    public void setView(String typeOfView) {
+    public static synchronized void setPhase(Phase phase) {
+        Controller.phase = phase;
+    }
+
+    public void setView(String typeOfView) throws InterruptedException {
         model = new LittleModel();
         if(typeOfView.equals("TUI")){
             this.view = new Tui(model, this);
@@ -131,11 +135,11 @@ public class Controller {
      * @param playersAndPins A HashMap where the keys are the nicknames of the players and the values are their associated colors.
      */
     public void refreshUsers(HashMap<String, Color> playersAndPins) {
-        if(playersAndPins.containsKey(nickname) && playersAndPins.get(nickname) == null){
-            Controller.phase = Phase.COLOR;
-        }else if(playersAndPins.containsKey(nickname) && playersAndPins.get(nickname) != null){
-            Controller.phase = Phase.GAMEFLOW;
-        }
+//        if(playersAndPins.containsKey(nickname) && playersAndPins.get(nickname) == null){
+//            Controller.phase = Phase.COLOR;
+//        }else if(playersAndPins.containsKey(nickname) && playersAndPins.get(nickname) != null){
+//            Controller.phase = Phase.GAMEFLOW;
+//        }
 
         view.refreshUsers(playersAndPins);
     }
@@ -184,7 +188,7 @@ public class Controller {
      * @param indexCard The index of the secret objective card.
      */
     public void showSecretObjectiveCard(int indexCard) {
-        view.showSecretObjectiveCard(indexCard);
+        view.showSecretObjectiveCard(model.getSecretObjectiveCardsToChoose()[indexCard]);
     }
 
 
@@ -227,6 +231,8 @@ public class Controller {
     }
 
     public void showSecretObjectiveCardsToChoose(Integer[] objectiveCardIds) {
+        Controller.setPhase(Phase.CHOOSE_SECRET_OBJECTIVE_CARD);
+        updateSecretObjectiveCardsToChoose(objectiveCardIds);
         view.showSecretObjectiveCardsToChoose(objectiveCardIds);
     }
 
@@ -261,8 +267,8 @@ public class Controller {
         model.updateHiddenHand(nickname, hand);
     }
     public void showIsFirst(String firstPlayer) {
+        Controller.phase = Phase.GAMEFLOW;
         view.showIsFirst(firstPlayer);
-        Controller.phase = Phase.COLOR;
     }
 
     /**
@@ -361,18 +367,7 @@ public class Controller {
      * @param indexCard The index of the secret objective card chosen by the player.
      */
     public void chooseSecretObjectiveCard(int indexCard) {
-        try{
-            connection.chooseSecretObjectiveCard(indexCard);
-        } catch (WrongGamePhaseException e) {
-            view.wrongGamePhase();
-        } catch (NoTurnException e) {
-            view.noTurn();
-        }
-        catch (NoNameException e) {
-            view.noPlayer();
-        } catch (RemoteException e) {
-           view.noConnection();
-        }
+        connection.chooseSecretObjectiveCard(indexCard);
     }
 
     /**
@@ -455,7 +450,55 @@ public class Controller {
     }
 
     public void updateAndShowStartingCard(int startingCardId) {
-
+        Controller.setPhase(Phase.CHOOSE_SIDE_STARTING_CARD);
         view.showStartingCard(startingCardId);
+    }
+
+    public void noConnection() {
+        view.noConnection();
+    }
+
+    public void wrongPhase() {
+        view.wrongGamePhase();
+    }
+
+    public void noTurn() {
+        view.noTurn();
+    }
+
+    public void noName() {
+        view.noPlayer();
+    }
+
+    public void notEnoughResources() {
+        view.notEnoughResources(nickname);
+    }
+
+    public void NoName() {
+        //TODO
+    }
+
+    public void cardPosition() {
+        view.cardPositionError();
+    }
+
+    public void sameName() {
+        view.sameName(nickname);
+    }
+
+    public void colorAlreadyTaken() {
+        view.colorAlreadyTaken();
+    }
+
+    public void updateSecretObjectiveCard(int indexCard) {
+        model.updateSecretObjectiveCard(indexCard);
+    }
+
+    public void updateSecretObjectiveCardsToChoose(Integer[] secretObjectiveCardsToChoose) {
+        model.updateSecretObjectiveCardsToChoose(secretObjectiveCardsToChoose);
+    }
+
+    public void updateCommonObjectiveCards(Integer[] commonObjectiveCards) {
+        model.updateCommonObjectiveCards(commonObjectiveCards);
     }
 }

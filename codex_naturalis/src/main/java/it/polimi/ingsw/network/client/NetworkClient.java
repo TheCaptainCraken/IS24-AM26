@@ -19,7 +19,7 @@ public abstract class NetworkClient {
     public void chooseSideStartingCard(boolean side) throws RemoteException, WrongGamePhaseException, NoTurnException,  NoNameException {
     }
 
-    public void chooseSecretObjectiveCard(int indexCard) throws RemoteException, WrongGamePhaseException, NoTurnException,  NoNameException {
+    public void chooseSecretObjectiveCard(int indexCard){
     }
 
     public void playCard(int indexHand, Point position, boolean side) throws RemoteException, WrongGamePhaseException, NoTurnException,  NotEnoughResourcesException, NoNameException, CardPositionException {

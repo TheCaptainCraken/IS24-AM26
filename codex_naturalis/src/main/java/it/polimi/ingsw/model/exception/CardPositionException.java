@@ -1,4 +1,4 @@
 package it.polimi.ingsw.model.exception;
-
-public class CardPositionException extends Throwable {
+import java.io.IOException;
+public class CardPositionException extends IOException{
 }
