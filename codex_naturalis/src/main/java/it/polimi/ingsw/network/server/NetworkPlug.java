@@ -8,7 +8,7 @@ import it.polimi.ingsw.model.exception.SameNameException;
 import java.awt.*;
 import java.rmi.RemoteException;
 
-public interface  NetworkPlug {
+public interface NetworkPlug {
 
       void finalizingNumberOfPlayers() throws NoNameException, SameNameException, LobbyCompleteException;
 

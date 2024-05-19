@@ -2,6 +2,7 @@ package it.polimi.ingsw.network.messages.server.gamestart;
 
 import it.polimi.ingsw.controller.client.Controller;
 import it.polimi.ingsw.network.messages.server.ServerMessage;
+import it.polimi.ingsw.view.Phase;
 
 import java.util.ArrayList;
 
@@ -22,7 +23,7 @@ public class GiveSecretObjectiveCards extends ServerMessage {
         for(int i = 0; i < choices.size(); i++) {
             choicesArray[i] = choices.get(i);
         }
-
+        Controller.setPhase(Phase.CHOOSE_SECRET_OBJECTIVE_CARD);
         controller.showSecretObjectiveCardsToChoose(choicesArray);
     }
 }

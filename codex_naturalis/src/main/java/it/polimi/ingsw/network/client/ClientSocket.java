@@ -13,7 +13,7 @@ import it.polimi.ingsw.network.messages.client.login.ColorChosen;
 import it.polimi.ingsw.network.messages.client.login.LoginMessage;
 import it.polimi.ingsw.network.messages.client.login.NumberOfPlayersMessage;
 import it.polimi.ingsw.network.messages.server.ServerMessage;
-
+import it.polimi.ingsw.view.Phase;
 
 
 import java.awt.*;
@@ -69,27 +69,36 @@ public class ClientSocket extends NetworkClient implements Runnable{
     public void login(String nickname) throws SameNameException, LobbyCompleteException{
         //client crea messaggio e lo invia usando objOutputStream
         ClientMessage message = new LoginMessage(nickname);
+        //TODO come stampo il nickname
         sendMessage(message);
-
     }
     @Override
     public void insertNumberOfPlayers(int numberOfPlayers){
+        //qui sempre corretto, da input è fatta questa cosa
         ClientMessage message = new NumberOfPlayersMessage(numberOfPlayers);
         sendMessage(message);
     }
 
     @Override
     public void chooseColor(Color color) {
-        ClientMessage  message = new ColorChosen(controller.getNickname(),color); //il nickname non è ancora stato fissato in controller vero?
+        //possibile errore, controllato con macchina a stati
+        Controller.setPhase(Phase.WAIT_ALL_CHOOSEN_COLOR);
+        ClientMessage message = new ColorChosen(controller.getNickname(),color);
         sendMessage(message);
     }
     @Override
     public void chooseSideStartingCard(boolean side){
+        //controllo da input, unici errori possibili sono il turno.
+        Controller.setPhase(Phase.WAIT_ALL_CHOSEN_STARTING_CARD);
+        //TODO aggiungere due fasi di wait una per sidestartingCard, l'altra per objectiveCard
         ClientMessage message = new ChosenStartingCardSide(side);
         sendMessage(message);
     }
     @Override
     public void chooseSecretObjectiveCard(int indexCard) {
+        //controllo da input. Unico errore possibile sono il turno.
+        Controller.setPhase(Phase.WAIT_ALL_CHOSEN_SECRET_CARD);
+        //TODO aggiungere due fasi di wait una per sidestartingCard, l'altra per objectiveCard
         ClientMessage message = new ChosenObjectiveCard(indexCard);
         sendMessage(message);
     }

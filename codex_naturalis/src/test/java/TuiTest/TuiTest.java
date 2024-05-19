@@ -13,23 +13,22 @@ import java.util.HashMap;
 public class TuiTest {
     public static Tui tui;
 
-public static void main(String[] args) {
-//        LittleModel model = new LittleModel();
-//        Controller controller = new Controller();
-//        Tui tui = new Tui(model, controller);
+    public static void main(String[] args) {
+        LittleModel model = new LittleModel();
+        Controller controller = new Controller();
+        Tui tui = new Tui(model, controller);
 
 //        for(int i = 97; i < 103; i++){
 //            System.out.println("Card " + i);
-//            String[] card = tui.createStartingCardToPrint(i);
+//            String[] card = tui.createCardToPrint(model.getStartingCard(i, true));
 //            for(int j = 0; j < 7; j++)
 //                System.out.println(card[j]);
 //        }
 //
-//        for(int i = 17; i < 97; i++){
-//            tui.printCard(i, false);
+//        for (int i = 17; i < 97; i++) {
+//            tui.printCard(i, true);
 //        }
-//
-//        for(int i = 17; i < 97; i++){
+        //        for(int i = 17; i < 97; i++){
 //            System.out.println("Card " + i);
 //            tui.printCard(i, true);
 //        }
@@ -47,15 +46,18 @@ public static void main(String[] args) {
 //
 //        tui.printCard(17, true);
 
-    LittleModel model = new LittleModel();
-    Controller controller = new Controller();
-    TuiTest.tui = new Tui(model, controller);
+//    LittleModel model = new LittleModel();
+//    Controller controller = new Controller();
+//    TuiTest.tui = new Tui(model, controller);
+//
+//    for(int i = 97; i < 103; i++)
+//        tui.showStartingCard(i);
+//    }
 
-    for(int i = 97; i < 103; i++)
-        tui.showStartingCard(i);
     }
-
-
 }
+
+
+
 
 

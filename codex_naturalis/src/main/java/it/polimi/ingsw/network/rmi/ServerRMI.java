@@ -91,22 +91,11 @@ public class ServerRMI implements LoggableServer, NetworkPlug {
             RemoteException, ClosingLobbyException, SameNameException, LobbyCompleteException, NoNameException {
 
         Controller.getInstance().initializeLobby(numberOfPlayers);
-        //TODO remove all players before
+        //TODO remove all players before, quando viene chiusa la lobby
         //Deletes all other connections that are not in the lobby
 
         NetworkHandler.getInstance().finalizingNumberOfPlayersBroadcast(numberOfPlayers);
         //NetworkHandler.getInstance().refreshUsersBroadcast();
-    }
-
-    @Override
-    public void finalizingNumberOfPlayers() {
-        for(String nickname : connections.keySet()){
-            try {
-                connections.get(nickname).stopWaiting();
-            } catch (RemoteException e) {
-                //TODO
-            }
-        }
     }
 
     @Override
@@ -158,6 +147,18 @@ public class ServerRMI implements LoggableServer, NetworkPlug {
     }
 
     //GAME START
+    @Override
+    public void finalizingNumberOfPlayers() {
+        for(String nickname : connections.keySet()){
+            new Thread(() -> {
+                try {
+                    connections.get(nickname).stopWaiting();
+                } catch (RemoteException e) {
+                    //TODO
+                }
+            }).start();
+        }
+    }
 
     //We could optimize and use a unique function without any
     @Override
@@ -203,6 +204,35 @@ public class ServerRMI implements LoggableServer, NetworkPlug {
     }
 
     @Override
+    public void placeCard(String nickname, int indexHand, Point position, boolean side)
+            throws WrongGamePhaseException, NoTurnException,
+            NotEnoughResourcesException, NoNameException, CardPositionException {
+
+        int cardId = Controller.getInstance().placeCard(nickname, indexHand, position, side);
+        NetworkHandler.getInstance().sendPlacedCardBroadcast(nickname, cardId, position, side);
+
+        if(Controller.getInstance().isEndGame()){
+            NetworkHandler.getInstance().sendEndGameBroadcast();
+        }
+    }
+
+
+    @Override
+    public int drawCard(String nickname, boolean gold, int onTableOrDeck)
+            throws WrongGamePhaseException, NoTurnException, NoNameException {
+        int cardId = Controller.getInstance().drawCard(nickname, gold, onTableOrDeck);
+        int newCardId = Controller.getInstance().newCardOnTable(gold, onTableOrDeck);
+        Kingdom headDeck = Controller.getInstance().getHeadDeck(gold);
+
+        NetworkHandler.getInstance().sendDrawnCardBroadcast(nickname, newCardId, headDeck, gold, onTableOrDeck);
+
+        if(Controller.getInstance().isEndGame()){
+            NetworkHandler.getInstance().sendEndGameBroadcast();
+        }
+        return cardId;
+    }
+
+    @Override
     public void sendingHandsAndWhenSecretObjectiveCardsCompleteStartGameFlow(String nickname, boolean allWithSecretObjectiveCardChosen) throws NoNameException {
         for(String nicknameRefresh : connections.keySet()){
             if(nickname.equals(nicknameRefresh)){
@@ -226,51 +256,6 @@ public class ServerRMI implements LoggableServer, NetworkPlug {
                 }
             }
         }
-    }
-
-    @Override
-    public void placeCard(String nickname, int indexHand, Point position, boolean side)
-            throws WrongGamePhaseException, NoTurnException,
-            NotEnoughResourcesException, NoNameException, CardPositionException {
-
-        int cardId = Controller.getInstance().placeCard(nickname, indexHand, position, side);
-        NetworkHandler.getInstance().sendPlacedCardBroadcast(nickname, cardId, position, side);
-
-        if(Controller.getInstance().isEndGame()){
-            NetworkHandler.getInstance().sendEndGameBroadcast();
-        }
-    }
-
-    @Override
-    public void sendPlacedCard(String nickname, int cardId, Point position, boolean side) throws NoNameException {
-        for(String nicknameRefresh : connections.keySet()){
-            try {
-                connections.get(nicknameRefresh).placeCard(nickname, cardId, position, side, Controller.getInstance().getPlayerResources(nickname), Controller.getInstance().getPlayerPoints(nickname));
-            } catch (RemoteException e) {
-                //TODO
-            }
-            try {
-                connections.get(nicknameRefresh).
-                        refreshTurnInfo(Controller.getInstance().getCurrentPlayer(), Controller.getInstance().getGameState());
-            } catch (RemoteException e) {
-                //TODO;
-            }
-        }
-    }
-
-    @Override
-    public int drawCard(String nickname, boolean gold, int onTableOrDeck)
-            throws WrongGamePhaseException, NoTurnException, NoNameException {
-        int cardId = Controller.getInstance().drawCard(nickname, gold, onTableOrDeck);
-        int newCardId = Controller.getInstance().newCardOnTable(gold, onTableOrDeck);
-        Kingdom headDeck = Controller.getInstance().getHeadDeck(gold);
-
-        NetworkHandler.getInstance().sendDrawnCardBroadcast(nickname, newCardId, headDeck, gold, onTableOrDeck);
-
-        if(Controller.getInstance().isEndGame()){
-            NetworkHandler.getInstance().sendEndGameBroadcast();
-        }
-        return cardId;
     }
 
     @Override
@@ -298,6 +283,24 @@ public class ServerRMI implements LoggableServer, NetworkPlug {
     }
 
     @Override
+    public void sendPlacedCard(String nickname, int cardId, Point position, boolean side) throws NoNameException {
+        for(String nicknameRefresh : connections.keySet()){
+            try {
+                connections.get(nicknameRefresh).placeCard(nickname, cardId, position, side, Controller.getInstance().getPlayerResources(nickname), Controller.getInstance().getPlayerPoints(nickname));
+            } catch (RemoteException e) {
+                //TODO
+            }
+            try {
+                connections.get(nicknameRefresh).
+                        refreshTurnInfo(Controller.getInstance().getCurrentPlayer(), Controller.getInstance().getGameState());
+            } catch (RemoteException e) {
+                //TODO;
+            }
+        }
+    }
+
+
+    @Override
     public void sendEndGame(){
         for(String nicknameRefresh : connections.keySet()){
             try {
@@ -308,4 +311,6 @@ public class ServerRMI implements LoggableServer, NetworkPlug {
             }
         }
     }
+
+
 }

@@ -39,17 +39,18 @@ public class ClientRMI extends NetworkClient implements RMIClientInterface {
 
     }
 
-    public void login(String nickname) throws RemoteException, SameNameException, LobbyCompleteException {
+    public void login(String name) throws RemoteException, SameNameException, LobbyCompleteException {
         boolean isFirst = false;
         try{
-            isFirst = stub.loginAndIsFirst(exportedClient, nickname);
-            Controller.setNickname(nickname);
+            isFirst = stub.loginAndIsFirst(exportedClient, name);
+            Controller.setNickname(name);
         }catch(RemoteException e){
             controller.noConnection();
         }catch (LobbyCompleteException e){
             //TODO
         }catch (SameNameException e){
-            controller.sameName();
+            Controller.phase = Phase.LOGIN;
+            controller.sameName(name);
         }
         if (isFirst) {
             Controller.setPhase(Phase.NUMBER_OF_PLAYERS);
@@ -58,7 +59,7 @@ public class ClientRMI extends NetworkClient implements RMIClientInterface {
             if(stub.lobbyIsReady()){
                 Controller.setPhase(Phase.COLOR);
             }else{
-                //TODO
+                Controller.setPhase(Phase.WAIT_NUMBER_OF_PLAYERS);
                 controller.waitLobby();
             }
         }
@@ -66,6 +67,7 @@ public class ClientRMI extends NetworkClient implements RMIClientInterface {
 
     public void insertNumberOfPlayers(int numberOfPlayers) {
         try {
+            Controller.phase = Phase.WAIT;
             stub.insertNumberOfPlayers(numberOfPlayers);
             controller.correctNumberOfPlayers(numberOfPlayers);
         } catch (RemoteException e) {
@@ -73,7 +75,7 @@ public class ClientRMI extends NetworkClient implements RMIClientInterface {
         } catch (ClosingLobbyException e) {
             //TODO
         } catch (SameNameException e) {
-            controller.sameName();
+            controller.sameName(controller.getNickname());
         } catch (LobbyCompleteException e) {
             //TODO
         } catch (NoNameException e) {
@@ -84,16 +86,14 @@ public class ClientRMI extends NetworkClient implements RMIClientInterface {
 
     public void chooseColor(Color color)  {
         try{
+            Controller.phase = Phase.WAIT;
             stub.chooseColor(controller.getNickname(), color);
-            if(Controller.getPhase() == Phase.COLOR) {
-                Controller.setPhase(Phase.WAIT);
-            }else{
-                Controller.setPhase(Phase.CHOOSE_SIDE_STARTING_CARD);
-            }
+            System.out.println(Controller.getPhase());
         }
         catch (RemoteException e){
             controller.noConnection();
         } catch (ColorAlreadyTakenException e) {
+            Controller.phase = Phase.COLOR;
             controller.colorAlreadyTaken();
         } catch (NoNameException e) {
            controller.noName();
@@ -102,18 +102,16 @@ public class ClientRMI extends NetworkClient implements RMIClientInterface {
 
     public void chooseSideStartingCard(boolean side){
         try {
+            Controller.phase = Phase.WAIT;
             stub.chooseSideStartingCard(controller.getNickname(), side);
-            if(Controller.getPhase() == Phase.CHOOSE_SIDE_STARTING_CARD) {
-                Controller.setPhase(Phase.WAIT);
-            }else{
-                Controller.setPhase(Phase.CHOOSE_SECRET_OBJECTIVE_CARD);
-            }
-
         } catch (RemoteException e) {
+            Controller.phase = Phase.CHOOSE_SIDE_STARTING_CARD; //TODO
             controller.noConnection();
         } catch (WrongGamePhaseException e) {
+            Controller.phase = Phase.CHOOSE_SIDE_STARTING_CARD;
             controller.wrongPhase();
         } catch (NoTurnException e) {
+            Controller.phase = Phase.CHOOSE_SIDE_STARTING_CARD;
             controller.noTurn();
         } catch (NoNameException e) {
             controller.noName();
@@ -123,22 +121,20 @@ public class ClientRMI extends NetworkClient implements RMIClientInterface {
     public void chooseSecretObjectiveCard(int indexCard)
     {
         try {
+            Controller.phase = Phase.WAIT;
             stub.chooseSecretObjectiveCard(controller.getNickname(), indexCard);
-            if(Controller.getPhase() == Phase.CHOOSE_SECRET_OBJECTIVE_CARD) {
-                Controller.setPhase(Phase.WAIT);
-            }else {
-                Controller.setPhase(Phase.GAMEFLOW);
-            }
-            controller.updateSecretObjectiveCard(indexCard);
-            controller.showSecretObjectiveCard(indexCard);
+            controller.updateAndShowSecretObjectiveCard(indexCard);
         } catch (RemoteException e) {
+            Controller.phase = Phase.CHOOSE_SECRET_OBJECTIVE_CARD;
             controller.noConnection();
         } catch (WrongGamePhaseException e) {
+            Controller.phase = Phase.CHOOSE_SECRET_OBJECTIVE_CARD;
            controller.wrongPhase();
         } catch (NoTurnException e) {
-           controller.noTurn();
+            Controller.phase = Phase.CHOOSE_SECRET_OBJECTIVE_CARD;
+            controller.noTurn();
         } catch (NoNameException e) {
-            controller.noName();
+            controller.noName(); //TODO
         }
     }
 

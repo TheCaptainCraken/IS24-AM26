@@ -4,6 +4,7 @@ import it.polimi.ingsw.controller.client.Controller;
 import it.polimi.ingsw.model.*;
 import it.polimi.ingsw.model.Color;
 import javafx.util.Pair;
+import it.polimi.ingsw.view.CardClient;
 
 import java.awt.*;
 import java.util.*;
@@ -23,7 +24,7 @@ public class Tui {
      * Constructor for the TUI.
      * Initializes the TUI with default values.
      */
-    public Tui(LittleModel model, Controller controller){
+    public Tui(LittleModel model, Controller controller) {
         this.model = model;
         this.controller = controller;
     }
@@ -32,13 +33,30 @@ public class Tui {
      * Displays to show the first player to enter the number of players.
      */
     public void showInsertNumberOfPlayer() {
-        System.out.println("You are the first player. Please enter the number of players");
-        System.out.println("The number of players must be between 2 and 4");
+            System.out.println("You are the first player. Please enter the number of players");
+            System.out.println("The number of players must be between 2 and 4");
 
-        Scanner scanner = new Scanner(System.in);
-        int numberOfPlayers = scanner.nextInt();
-        controller.insertNumberOfPlayers(numberOfPlayers);
+            Scanner scanner = new Scanner(System.in);
+            int numberOfPlayers = 0;
+            boolean validInput = false;
+
+            while (!validInput) {
+                try {
+                    numberOfPlayers = scanner.nextInt();
+                    if (numberOfPlayers >= 2 && numberOfPlayers <= 4) {
+                        validInput = true;
+                    } else {
+                        System.out.println("Invalid input. Please enter a number between 2 and 4.");
+                    }
+                } catch (InputMismatchException e) {
+                    System.out.println("Invalid input. Please enter a number between 2 and 4.");
+                    scanner.next(); // discard the invalid input
+                }
+            }
+            controller.insertNumberOfPlayers(numberOfPlayers);
+        //TODO dividere fasi
     }
+
     /**
      * Informs the player that they are connected to the server and waiting for the first player to choose the number of players.
      */
@@ -54,6 +72,7 @@ public class Tui {
     }
 
     private void askColor() {
+        System.out.println(Controller.getPhase());
         System.out.println("Choose your color");
         System.out.println("1 - Blue\n" +
                 "2 - Yellow\n" +
@@ -61,28 +80,36 @@ public class Tui {
                 "4 - Red\n");
         Scanner scanner = new Scanner(System.in);
         int color;
-        do{
-            //TODO se inserisce stringa non funziona
-            color = scanner.nextInt();
-            switch (color) {
-                case 1:
-                    controller.chooseColor(Color.BLUE);
-                    break;
-                case 2:
-                    controller.chooseColor(Color.YELLOW);
-                    break;
-                case 3:
-                    controller.chooseColor(Color.GREEN);
-                    break;
-                case 4:
-                    controller.chooseColor(Color.RED);
-                    break;
-                default:
-                    System.out.println("Invalid input");
+        boolean validInput = false;
+        do {
+            try {
+                color = scanner.nextInt();
+                switch (color) {
+                    case 1:
+                        controller.chooseColor(Color.BLUE);
+                        validInput = true;
+                        break;
+                    case 2:
+                        controller.chooseColor(Color.YELLOW);
+                        validInput = true;
+                        break;
+                    case 3:
+                        controller.chooseColor(Color.GREEN);
+                        validInput = true;
+                        break;
+                    case 4:
+                        controller.chooseColor(Color.RED);
+                        validInput = true;
+                        break;
+                    default:
+                        System.out.println("Invalid input");
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid input. Please enter a number between 1 and 4.");
+                scanner.next(); // discard the invalid input
             }
-        }while(color < 1 || color > 4);
+        } while (!validInput);
     }
-
 
     /**
      * Informs the player that the lobby has been filled with the number of players chosen by the first player.
@@ -93,6 +120,7 @@ public class Tui {
 
     /**
      * Displays the players in the lobby and their associated colors.
+     *
      * @param playersAndPins A HashMap containing the player nicknames as keys and their associated colors as values.
      */
     public void refreshUsers(HashMap<String, Color> playersAndPins) {
@@ -101,86 +129,43 @@ public class Tui {
             Color color = playersAndPins.get(nickname);
             System.out.println(nickname + " - " + Objects.requireNonNullElse(color, "no color"));
         }
-        //TODO ask daniel, per salvataggio dei nomi
     }
 
     /**
      * Displays the starting card to the player.
+     *
      * @param startingCardId The ID of the starting card.
      */
-    public void showStartingCard(int startingCardId) {
+    public synchronized void showStartingCard(int startingCardId) {
         PlayedCard card = model.getStartingCard(startingCardId, true);
         PlayedCard cardBack = model.getStartingCard(startingCardId, false);
         ArrayList<String[]> cards = new ArrayList<>();
         int i;
 
         //Convert the PlayedCard into a string to print it
-        cards.add(createStartingCardToPrint(card));
-        cards.add(createStartingCardToPrint(cardBack));
-
+        cards.add(createCardToPrint(card));
+        cards.add(createCardToPrint(cardBack));
 
         System.out.println("Choose the side of the starting Card. The one on the left is the top, the one on the right is the back");
         int size = cards.get(0).length;
-        for(i = 0; i < size; i++) {
-            for(String[] cardsToPrint : cards) {
+        for (i = 0; i < size; i++) {
+            for (String[] cardsToPrint : cards) {
                 System.out.print(cardsToPrint[i]);
                 System.out.print("   ");
-                //TODO shift di uno non so perchè
             }
             System.out.println();
         }
     }
 
     /**
-     * Displays the common table to the player.
-     * @param resourceCards The resource cards on the table.
-     * @param goldCard The gold cards on the table.
-     * @param resourceCardOnDeck The resource card on deck.
-     * @param goldCardOnDeck The gold card on deck.
-     */
-    public void showCommonTable(Integer[] resourceCards, Integer[] goldCard, Kingdom resourceCardOnDeck, Kingdom goldCardOnDeck) {
-        ArrayList<String[]> resourceCardsToPrint = new ArrayList<>();
-        ArrayList<String[]> goldCardsToPrint = new ArrayList<>();
-
-        for(Integer cardId: resourceCards){
-            resourceCardsToPrint.add(createCardToPrint(model.getCard(cardId, true)));
-        }
-        resourceCardsToPrint.add(createCardToPrint(model.getCardFromKingdom()));
-
-        for(Integer cardId: goldCard){
-            goldCardsToPrint.add(createCardToPrint(model.getCard(cardId, true)));
-        }
-        goldCardsToPrint.add(createCardToPrint(model.getCardFromKingdom()));
-
-        int i;
-        int size = resourceCardsToPrint.get(0).length;
-
-        System.out.println("These are the resource cards deck:");
-        for(i = 0; i < size; i++) {
-            for(String[] card: resourceCardsToPrint) {
-                System.out.print(card[i]);
-                System.out.print("    ");
-            }
-        }
-        System.out.println();
-        System.out.println("The gold card deck is:");
-        for(i = 0; i < size; i++) {
-            for(String[] card: goldCardsToPrint) {
-                System.out.print(card[i]);
-                System.out.print("    ");
-            }
-        }
-        System.out.println();
-    }
-
-    /**
      * Displays the common objective cards to the player.
+     *
      * @param objectiveCardIds The IDs of the objective cards.
      */
-    public void showCommonObjectives(Integer[] objectiveCardIds) {
+    public synchronized void showCommonObjectives(Integer[] objectiveCardIds) {
         List<String[]> cards = new ArrayList<>();
 
-        for(Integer cardId: objectiveCardIds){
+        for (Integer cardId : objectiveCardIds) {
             cards.add(createObjectiveCardToPrint(cardId));
         }
 
@@ -188,8 +173,8 @@ public class Tui {
         int i;
 
         System.out.println("These are the common objective cards:");
-        for(i = 0; i < size; i++) {
-            for(String[] row : cards) {
+        for (i = 0; i < size; i++) {
+            for (String[] row : cards) {
                 System.out.print(row[i]);
                 System.out.print("    ");
             }
@@ -206,10 +191,10 @@ public class Tui {
      *
      * @param indexCard The index of the secret objective card to print.
      */
-    public void showSecretObjectiveCard(int indexCard) {
+    public synchronized void showSecretObjectiveCard(int indexCard) {
         System.out.println("This is your secret objective card: ");
         String[] secretObjective = createObjectiveCardToPrint(indexCard);
-        for(String row: secretObjective){
+        for (String row : secretObjective) {
             System.out.println(row);
         }
     }
@@ -221,10 +206,10 @@ public class Tui {
      *
      * @param objectiveCardIds An array of IDs of the secret objective cards that the player can choose from.
      */
-    public void showSecretObjectiveCardsToChoose(Integer[] objectiveCardIds) {
+    public synchronized void showSecretObjectiveCardsToChoose(Integer[] objectiveCardIds) {
         List<String[]> cards = new ArrayList<>();
 
-        for(Integer cardId: objectiveCardIds){
+        for (Integer cardId : objectiveCardIds) {
             cards.add(createObjectiveCardToPrint(cardId));
         }
 
@@ -232,8 +217,8 @@ public class Tui {
         int i;
 
         System.out.println("These are the secret objective cards you can choose. Please choose one");
-        for(i = 0; i < size; i++) {
-            for(String[] row : cards) {
+        for (i = 0; i < size; i++) {
+            for (String[] row : cards) {
                 System.out.print(row[i]);
                 System.out.print("    ");
             }
@@ -241,6 +226,7 @@ public class Tui {
         }
         System.out.println();
     }
+
     /**
      * Created the objective card of the player.
      * This method takes an index of a card as input, retrieves the corresponding card
@@ -253,43 +239,43 @@ public class Tui {
         ObjectiveCard card = model.getObjectiveCard(indexCard);
         String[] objective = null;
 
-        switch(card.getType()){
+        switch (card.getType()) {
             case STAIR:
-                if(card.getKingdom() == Kingdom.FUNGI || card.getKingdom() == Kingdom.ANIMAL) {
+                if (card.getKingdom() == Kingdom.FUNGI || card.getKingdom() == Kingdom.ANIMAL) {
                     objective = new String[]{
                             "      ***",
                             "   ***   ",
                             "***      "
                     };
 
-                }else {
+                } else {
                     objective = new String[]{
                             "***      ",
                             "   ***   ",
                             "      ***"
                     };
                 }
-                    break;
+                break;
             case L_FORMATION:
-                if(card.getKingdom() == Kingdom.FUNGI) {
+                if (card.getKingdom() == Kingdom.FUNGI) {
                     objective = new String[]{
                             "    F    ",
                             "    F    ",
                             "       P "
                     };
-                }else if(card.getKingdom() == Kingdom.ANIMAL) {
+                } else if (card.getKingdom() == Kingdom.ANIMAL) {
                     objective = new String[]{
                             "       F ",
                             "    A    ",
                             "    A    "
                     };
-                }else if(card.getKingdom() == Kingdom.INSECT) {
+                } else if (card.getKingdom() == Kingdom.INSECT) {
                     objective = new String[]{
                             "    A    ",
                             "      I  ",
                             "      I  "
                     };
-                }else {
+                } else {
                     objective = new String[]{
                             "     P   ",
                             "     P   ",
@@ -305,13 +291,13 @@ public class Tui {
                 };
                 break;
             case TRIS:
-                if(card.getKingdom() == Kingdom.FUNGI) {
+                if (card.getKingdom() == Kingdom.FUNGI) {
                     objective = new String[]{
                             "      F  ",
                             "    F   F",
                             "         "
                     };
-                }else if(card.getKingdom() == Kingdom.ANIMAL) {
+                } else if (card.getKingdom() == Kingdom.ANIMAL) {
                     objective = new String[]{
                             "      A  ",
                             "    A   A",
@@ -368,12 +354,12 @@ public class Tui {
         kingdom = centerStringMidSign(kingdom);
         return new String[]{
                 "┌-------------------------------------┐",
-                "|                "+multiplier+"                    |",
-                ""+kingdom+"",
+                "|                " + multiplier + "                    |",
+                "" + kingdom + "",
                 "|                                     |",
-                "|            "+objective[0]+"                |",
-                "|            "+objective[1]+"                |",
-                "|            "+objective[2]+"                |",
+                "|            " + objective[0] + "                |",
+                "|            " + objective[1] + "                |",
+                "|            " + objective[2] + "                |",
                 "└-------------------------------------┘",
         };
     }
@@ -386,101 +372,137 @@ public class Tui {
      *
      * @param card The playedCardToPrint of the card to print.
      */
-//    public String[] createCardToPrint(PlayedCard card) {
-//        HashMap<Corner, String> corner = new HashMap<>();
-//        String midSignsString;
-//        if(card == null){
-//            midSignsString = "empty";
-//        }else{
-//            ArrayList<Sign> midSigns = new ArrayList<>();
-//            if (card.isFacingUp()) {
-//                for (Corner c : Corner.values()) {
-//                    corner.put(c, card.getCard().getCorners().get(c).toString());
-//                }
-//                midSigns.add(fromKingdomToSign(card.getCard().getKingdom()));
-//            } else {
-//                if (card.getCard() instanceof StartingCard) {
-//                    for (Corner c : Corner.values()) {
-//                        corner.put(c, ((StartingCard) card.getCard()).getBacksideCorners().get(c).toString());
-//                    }
-//                    for (Sign s : ((StartingCard) card.getCard()).getBonusResources()) {
-//                        midSigns.add(s);
-//                    }
-//                } else {
-//                    for (Corner c : Corner.values()) {
-//                        corner.put(c, Sign.EMPTY.toString());
-//                    }
-//                    midSigns.add(fromKingdomToSign(card.getCard().getKingdom()));
-//                }
-//            }
-//            switch (midSigns.size()) {
-//                case 1:
-//                    midSignsString = "  " + midSigns.get(0) + "  ";
-//                    break;
-//                case 2:
-//                    midSignsString = " " + midSigns.get(0) + " " + midSigns.get(1) + " ";
-//                    break;
-//                case 3:
-//                    midSignsString = midSigns.get(0) + " " + midSigns.get(1) + " " + midSigns.get(2);
-//                    break;
-//                default:
-//                    midSignsString = "     ";
-//                    break;
-//            }
-//        }
-//        return new String[]{
-//                "┌--------┐---------------┌--------┐",
-//                "|  "+corner.get(Corner.TOP_LEFT)+" |               |  "+corner.get(Corner.TOP_RIGHT)+" |",
-//                "└--------┘               └--------┘",
-//                "|           "+midSignsString+"          |",
-//                "┌--------┐               ┌--------┐",
-//                "|  "+corner.get(Corner.BOTTOM_LEFT)+" |               |  "+corner.get(Corner.BOTTOM_RIGHT)+" |",
-//                "└--------┘---------------└--------┘",
-//        };
-//    }
-
     public String[] createCardToPrint(PlayedCard card) {
         HashMap<Corner, String> corner = new HashMap<>();
-        String midSignsString;
-        String points = "0";
-
-        ArrayList<Sign> midSigns = new ArrayList<>();
-        if (card.isFacingUp()) {
+        String p = " ";
+        ArrayList<String> midSigns = new ArrayList<>();
+        if (card.isFacingUp() && card.getCard() instanceof StartingCard) {
             for (Corner c : Corner.values()) {
                 corner.put(c, Optional.ofNullable((card.getCard()).getCorners().get(c))
                         .map(Object::toString)
                         .orElse(Sign.NULL.toString()));
             }
-            midSigns.add(fromKingdomToSign(card.getCard().getKingdom()));
-            if(card.getCard() instanceof ResourceCard){
-                points = Integer.toString(((ResourceCard) card.getCard()).getPoints());
+            for (Sign s : ((StartingCard) card.getCard()).getBonusResources()) {
+                midSigns.add(s.toString());
             }
+        }else if(card.isFacingUp()){
+            for (Corner c : Corner.values()) {
+                corner.put(c, Optional.ofNullable((card.getCard()).getCorners().get(c))
+                        .map(Object::toString)
+                        .orElse(Sign.NULL.toString()));
+            }
+
+            if (card.getCard() instanceof ResourceCard) {
+                p = Integer.toString(((ResourceCard) card.getCard()).getPoints());
+            }
+            //Non ha kingdom se è carta alta.
+            midSigns.add("");
         } else {
             for (Corner c : Corner.values()) {
                 corner.put(c, Sign.NULL.toString());
             }
-            midSigns.add(fromKingdomToSign(card.getCard().getKingdom()));
+            midSigns.add(Optional.ofNullable(card.getCard().getKingdom())
+                    .map(Enum::name)
+                    .orElse(Sign.NULL.name()));
+        }
+        switch (midSigns.size()) {
+            case 1:
+                midSigns.add(Sign.NULL.toString());
+                midSigns.add(Sign.NULL.toString());
+                break;
+            case 2:
+                midSigns.add(Sign.NULL.toString());
+                break;
+            case 3:
+                break;
+            default:
+                break;
         }
 
-
-        midSignsString = "  " + midSigns.get(0) + "  ";
-
-        String a = centerString(corner.get(Corner.TOP_LEFT));
-        String b = centerString(corner.get(Corner.TOP_RIGHT));
-        String c = centerString(corner.get(Corner.BOTTOM_LEFT));
-        String d = centerString(corner.get(Corner.BOTTOM_RIGHT));
-        String e = centerStringMidSign(midSignsString);
-
+        String a = signToEmoji(corner.get(Corner.TOP_LEFT));
+        String b = signToEmoji(corner.get(Corner.TOP_RIGHT));
+        String c = signToEmoji(corner.get(Corner.BOTTOM_LEFT));
+        String d = signToEmoji(corner.get(Corner.BOTTOM_RIGHT));
+        String e = signToEmojiForStartingCard(midSigns.get(0));
+        String g = signToEmojiForStartingCard(midSigns.get(1));
+        String h = signToEmojiForStartingCard(midSigns.get(2));
 
         return new String[]{
-            "┌----------┐---------------┌----------┐",
-            ""+a+"       "+points+"       "+b+" ",
-            "└----------┘               └----------┘",
-                ""+e+"       ",
-            "┌----------┐               ┌----------┐",
-            ""+c+"               "+d+" ",
-            "└----------┘---------------└----------┘",
-    };
+                "┌--------┐--------------┌--------┐",
+                "    "+a+"           "+p+"          "+b+"    ",
+                "└--------┘              └--------┘",
+                "|     "+g+"         " + e + "         "+h+"   |",
+                "┌--------┐              ┌--------┐",
+                "    "+c+"                      "+d+ "    ",
+                "└--------┘--------------└--------┘",
+        };
+
+    }
+
+    public String signToEmoji(String sign) {
+        switch (sign) {
+            case "MUSHROOM":
+                return "\uD83C\uDF44"; // Fungus emoji
+            case "WOLF":
+                return "\uD83D\uDC36"; // Dog emoji
+            case "BUTTERFLY":
+                return "\uD83D\uDC1B"; // Bug emoji
+            case "LEAF":
+                return "\uD83C\uDF31"; // Herb emoji
+            case "SCROLL":
+                return "\uD83D\uDCC2"; // Scroll emoji
+            case "INKWELL":
+                return "\u2712"; // Black Nib emoji
+            case "QUILL":
+                return "\uD83D\uDCD1"; // Notebook With Decorative Cover emoji
+            case "NULL":
+                return "\uD83D\uDFE5"; // Question mark emoji
+            default:
+                return "  "; // Restituisci una stringa vuota o un'altra emoji di default se il Sign non è gestito
+        }
+    }
+
+    public String signToEmojiForStartingCard(String sign) {
+        switch (sign) {
+            case "MUSHROOM":
+            case "FUNGI":
+                return "\uD83C\uDF44"; // Fungus emoji
+            case "WOLF":
+            case "ANIMAL":
+                return "\uD83D\uDC36"; // Dog emoji
+            case "BUTTERFLY":
+            case "INSECT":
+                return "\uD83D\uDC1B"; // Bug emoji
+            case "LEAF":
+            case "PLANT":
+                return "\uD83C\uDF31"; // Herb emoji
+            case "SCROLL":
+                return "\uD83D\uDCC2"; // Scroll emoji
+            case "INKWELL":
+                return "\u2712"; // Black Nib emoji
+            case "QUILL":
+                return "\uD83D\uDCD1"; // Notebook With Decorative Cover emoji
+            case "NULL":
+                return "  "; // Question mark emoji
+            default:
+                return "  "; // Restituisci una stringa vuota o un'altra emoji di default se il Sign non è gestito
+        }
+    }
+
+
+    public String kingdomToEmoji(String kingdom) {
+        switch (kingdom) {
+            case "PLANT":
+                return "\uD83C\uDF31"; // Herb emoji
+            case "ANIMAL":
+                return "\uD83D\uDC36"; // Dog emoji
+            case "FUNGI":
+                return "\uD83C\uDF44"; // Fungus emoji
+            case "INSECT":
+                return "\uD83D\uDC1B"; // Bug emoji
+            default:
+                return "  "; // Restituisci una stringa vuota o un'altra emoji di default se il Kingdom non è gestito
+        }
     }
 
     private String centerStringMidSign(String word) {
@@ -491,119 +513,47 @@ public class Tui {
         return "|" + " ".repeat(startSpaces) + word + " ".repeat(endSpaces) + "|";
     }
 
-    private String centerStartingCard(String word) {
-        int length = 38;
-        int wordLength = word.length();
-        int startSpaces = (length - wordLength) / 2;
-        int endSpaces = length - startSpaces - wordLength;
-        return "" + " ".repeat(startSpaces) + word + " ".repeat(endSpaces) + "";
-    }
-
-    public String centerString(String word) {
-        int length = 10;
-        int wordLength = word.length();
-        int startSpaces = (length - wordLength) / 2;
-        int endSpaces = length - startSpaces - wordLength;
-        return "|" + " ".repeat(startSpaces) + word + " ".repeat(endSpaces) + "|";
-    }
-
-    public String[] createStartingCardToPrint(PlayedCard card) {
-        HashMap<Corner, String> corner = new HashMap<>();
-        ArrayList<Sign> midSigns = new ArrayList<>();
-        if(!card.isFacingUp()) {
-            for (Corner c : Corner.values()) {
-                corner.put(c, Optional.ofNullable(((StartingCard) card.getCard()).getBacksideCorners().get(c))
-                            .map(Object::toString)
-                            .orElse(Sign.NULL.toString()));
-            }
-            for (Sign s : ((StartingCard) card.getCard()).getBonusResources()) {
-                midSigns.add(s);
-            }
-        }else {
-            for (Corner c : Corner.values()) {
-                corner.put(c, card.getCard().getCorners().get(c).toString());
-            }
-        }
-        switch (midSigns.size()) {
-            case 1:
-                midSigns.add(Sign.NULL);
-                midSigns.add(Sign.NULL);
-                break;
-            case 2:
-                midSigns.add(Sign.NULL);
-                break;
-            case 3:
-                break;
-            default:
-                midSigns.add(Sign.NULL);
-                midSigns.add(Sign.NULL);
-                midSigns.add(Sign.NULL);
-                break;
-        }
-
-        String a = centerString(corner.get(Corner.TOP_LEFT));
-        String b = centerString(corner.get(Corner.TOP_RIGHT));
-        String c = centerString(corner.get(Corner.BOTTOM_LEFT));
-        String d = centerString(corner.get(Corner.BOTTOM_RIGHT));
-
-        String midSignsString = midSigns.stream()
-                .map(sign -> sign == Sign.NULL ? " " : sign.toString())
-                .collect(Collectors.joining(" "));
-
-        midSignsString = centerStartingCard(midSignsString);
-
-        // Ensure the final bar is always at the same position
-//        midSignsString = insertBarAtPosition(midSignsString, 30);
-
-        return new String[]{
-                " ┌----------┐---------------┌----------┐",
-                " "+a+"               "+b+"",
-                " └----------┘               └----------┘",
-                "  "+midSignsString +"  ",
-                " ┌----------┐               ┌----------┐",
-                " "+c+"               "+d+" ",
-                " └----------┘---------------└----------┘",
-        };
-    }
-
     /**
      * Displays the turn information to the player.
+     *
      * @param currentPlayer The current player.
-     * @param gameState The current game state.
+     * @param gameState     The current game state.
      */
-    public void showTurnInfo(String currentPlayer, GameState gameState) {
+    public synchronized void showTurnInfo(String currentPlayer, GameState gameState) {
         System.out.println("It's " + currentPlayer + "'s turn");
         System.out.println("The game phase is: " + gameState);
     }
 
     /**
      * Displays the extra points to the player.
+     *
      * @param extraPoints The extra points of the players.
      */
-    public void showExtraPoints(HashMap<String, Integer> extraPoints) {
+    public synchronized void showExtraPoints(HashMap<String, Integer> extraPoints) {
         System.out.println("The points made by ObjectiveCards are:");
-        for(String player: extraPoints.keySet()) {
+        for (String player : extraPoints.keySet()) {
             System.out.println(player + " - " + extraPoints.get(player));
         }
     }
 
     /**
      * Displays the ranking to the player.
+     *
      * @param ranking The ranking of the players.
      */
-    public void showRanking(ArrayList<Player> ranking) {
+    public synchronized void showRanking(ArrayList<Player> ranking) {
         System.out.println("The ranking is:");
-        for(Player player: ranking) {
+        for (Player player : ranking) {
             System.out.println(player);
         }
     }
 
-    public void printTableAreaOfPlayer(String nickname){
-        printTableArea(getTable(nickname));
-    }
+//    public void printTableAreaOfPlayer(String nickname) {
+//        printTableArea(getTable(nickname));
+//    }
 
-    private void printTableArea(PlayedCard card){
-        if(card == null){
+    private void printTableArea(PlayedCard card) {
+        if (card == null) {
             System.out.println("There is no card in this place");
             defaultMenu();
             return;
@@ -615,7 +565,7 @@ public class Tui {
                 "             s (quit)  \n" +
                 "(bot left) z   c (bot right)\n");
         char option = 's';//TODO Scanf con prossima opzione
-        switch(option){
+        switch (option) {
             case 'q':
                 printTableArea(card.getAttachmentCorners().get(Corner.TOP_LEFT));
                 break;
@@ -637,43 +587,43 @@ public class Tui {
         String toPrint = "";
         HashMap<Corner, PlayedCard> attachments = focusedCard.getAttachmentCorners();
         HashMap<Corner, String[]> attachmentsStrings = new HashMap<>();
-        for(Corner c : attachments.keySet()){
+        for (Corner c : attachments.keySet()) {
             attachmentsStrings.put(c, createCardToPrint(attachments.get(c)));
         }
         HashMap<Corner, String[]> arrows = createArrows(attachments, focusedCard);
 
-        for(int i = 0; i < 7; i++){
-            toPrint += attachmentsStrings.get(Corner.TOP_LEFT)[i]+"                             "+attachmentsStrings.get(Corner.TOP_RIGHT)[i]+"\n";
+        for (int i = 0; i < 7; i++) {
+            toPrint += attachmentsStrings.get(Corner.TOP_LEFT)[i] + "                             " + attachmentsStrings.get(Corner.TOP_RIGHT)[i] + "\n";
         }
-        toPrint += "                             "+arrows.get(Corner.TOP_LEFT)[0]+"                             "+arrows.get(Corner.TOP_RIGHT)[0]+"                             "+"\n";
-        toPrint += "                             "+arrows.get(Corner.TOP_LEFT)[1]+"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"+arrows.get(Corner.TOP_RIGHT)[1]+"                             "+"\n";
-        toPrint += "                             "+arrows.get(Corner.TOP_LEFT)[2]+"                             "+arrows.get(Corner.TOP_RIGHT)[2]+"                             "+"\n";
+        toPrint += "                             " + arrows.get(Corner.TOP_LEFT)[0] + "                             " + arrows.get(Corner.TOP_RIGHT)[0] + "                             " + "\n";
+        toPrint += "                             " + arrows.get(Corner.TOP_LEFT)[1] + "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + arrows.get(Corner.TOP_RIGHT)[1] + "                             " + "\n";
+        toPrint += "                             " + arrows.get(Corner.TOP_LEFT)[2] + "                             " + arrows.get(Corner.TOP_RIGHT)[2] + "                             " + "\n";
 
-        for(int i = 0; i < 7; i++){
-            toPrint += "                             "+" ~ "+attachmentsStrings.get(Corner.TOP_LEFT)[i]+" ~ "+"                             "+"\n";
+        for (int i = 0; i < 7; i++) {
+            toPrint += "                             " + " ~ " + attachmentsStrings.get(Corner.TOP_LEFT)[i] + " ~ " + "                             " + "\n";
         }
-        toPrint += "                             "+arrows.get(Corner.BOTTOM_LEFT)[0]+"                             "+arrows.get(Corner.BOTTOM_RIGHT)[0]+"                             "+"\n";
-        toPrint += "                             "+arrows.get(Corner.BOTTOM_LEFT)[1]+"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"+arrows.get(Corner.BOTTOM_RIGHT)[1]+"                             "+"\n";
-        toPrint += "                             "+arrows.get(Corner.BOTTOM_LEFT)[2]+"                             "+arrows.get(Corner.BOTTOM_RIGHT)[2]+"                             "+"\n";
-        for(int i=0; i<7; i++){
-            toPrint += attachmentsStrings.get(Corner.BOTTOM_LEFT)[i]+"                             "+attachmentsStrings.get(Corner.BOTTOM_RIGHT)[i]+"\n";
+        toPrint += "                             " + arrows.get(Corner.BOTTOM_LEFT)[0] + "                             " + arrows.get(Corner.BOTTOM_RIGHT)[0] + "                             " + "\n";
+        toPrint += "                             " + arrows.get(Corner.BOTTOM_LEFT)[1] + "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + arrows.get(Corner.BOTTOM_RIGHT)[1] + "                             " + "\n";
+        toPrint += "                             " + arrows.get(Corner.BOTTOM_LEFT)[2] + "                             " + arrows.get(Corner.BOTTOM_RIGHT)[2] + "                             " + "\n";
+        for (int i = 0; i < 7; i++) {
+            toPrint += attachmentsStrings.get(Corner.BOTTOM_LEFT)[i] + "                             " + attachmentsStrings.get(Corner.BOTTOM_RIGHT)[i] + "\n";
         }
         return toPrint;
     }
 
 
-    public HashMap<Corner, String[]> createArrows(HashMap<Corner, PlayedCard> attachments, PlayedCard focusedCard){
+    public HashMap<Corner, String[]> createArrows(HashMap<Corner, PlayedCard> attachments, PlayedCard focusedCard) {
         HashMap<Corner, String[]> arrows = new HashMap<>();
-        for(Corner corner: Corner.values()){
-            switch (corner){
-                case TOP_LEFT:{
-                    if (attachments.get(Corner.TOP_RIGHT).getTurnOfPositioning()>focusedCard.getTurnOfPositioning()){
+        for (Corner corner : Corner.values()) {
+            switch (corner) {
+                case TOP_LEFT: {
+                    if (attachments.get(Corner.TOP_RIGHT).getTurnOfPositioning() > focusedCard.getTurnOfPositioning()) {
                         arrows.put(Corner.TOP_RIGHT, new String[]{
                                 " ",
                                 " \\ ",
                                 " -┘"
                         });
-                    }else{
+                    } else {
                         arrows.put(Corner.TOP_RIGHT, new String[]{
                                 "┌- ",
                                 "\\ ",
@@ -681,14 +631,14 @@ public class Tui {
                         });
                     }
                 }
-                case TOP_RIGHT:{
-                    if (attachments.get(Corner.TOP_RIGHT).getTurnOfPositioning()>focusedCard.getTurnOfPositioning()){
+                case TOP_RIGHT: {
+                    if (attachments.get(Corner.TOP_RIGHT).getTurnOfPositioning() > focusedCard.getTurnOfPositioning()) {
                         arrows.put(Corner.TOP_RIGHT, new String[]{
                                 "   ",
                                 " / ",
                                 "└- "
                         });
-                    }else{
+                    } else {
                         arrows.put(Corner.TOP_RIGHT, new String[]{
                                 " -┐",
                                 " / ",
@@ -696,14 +646,14 @@ public class Tui {
                         });
                     }
                 }
-                case BOTTOM_LEFT:{
-                    if (attachments.get(Corner.BOTTOM_LEFT).getTurnOfPositioning()>focusedCard.getTurnOfPositioning()){
+                case BOTTOM_LEFT: {
+                    if (attachments.get(Corner.BOTTOM_LEFT).getTurnOfPositioning() > focusedCard.getTurnOfPositioning()) {
                         arrows.put(Corner.BOTTOM_LEFT, new String[]{
                                 " -┐",
                                 " / ",
                                 "   "
                         });
-                    }else{
+                    } else {
                         arrows.put(Corner.BOTTOM_LEFT, new String[]{
                                 "   ",
                                 " / ",
@@ -711,14 +661,14 @@ public class Tui {
                         });
                     }
                 }
-                case BOTTOM_RIGHT:{
-                    if (attachments.get(Corner.TOP_RIGHT).getTurnOfPositioning()>focusedCard.getTurnOfPositioning()){
+                case BOTTOM_RIGHT: {
+                    if (attachments.get(Corner.TOP_RIGHT).getTurnOfPositioning() > focusedCard.getTurnOfPositioning()) {
                         arrows.put(Corner.TOP_RIGHT, new String[]{
                                 "┌- ",
                                 "\\ ",
                                 "   "
                         });
-                    }else{
+                    } else {
                         arrows.put(Corner.TOP_RIGHT, new String[]{
                                 " ",
                                 " \\ ",
@@ -740,7 +690,7 @@ public class Tui {
     /**
      * Prints the default menu, with all the options to choose from.
      */
-    public void defaultMenu(){
+    public void defaultMenu() {
         System.out.println("please insert a number for choosing the option");
         System.out.println("" +
                 "1 - place a card\n" +
@@ -750,7 +700,7 @@ public class Tui {
                 "5 - show all players resources\n" +
                 "6 - show the points of the players\n" +
                 "7 - show my hand\n" +
-                "8 - show the hidden hand of a player\n" );
+                "8 - show the hidden hand of a player\n");
         int choice = 0;
         Scanner scanner = new Scanner(System.in);
         boolean validInput = false;
@@ -763,33 +713,31 @@ public class Tui {
                 scanner.next(); // Consuma l'input non valido
             }
         }
-        switch (choice){
+        switch (choice) {
             case 1:
+                printTableAreaOfPlayer(controller.getNickname());
                 placeCard();
                 break;
             case 2:
                 drawCard();
                 break;
             case 3:
-                System.out.println("Insert the nickname of the player");
-                String nickname = scanner.nextLine();
-                //TODO
-                controller.showTableOfPlayer(nickname);
+                showTableOfPlayerChecked();
                 break;
             case 4:
-                showResourcesPlayer("me");
+                showResourcesPlayer(controller.getNickname());
                 break;
             case 5:
                 showResourcesAllPlayers();
                 break;
             case 6:
-                showPoints(new HashMap<>());
+                showPoints(model.getPoints());
                 break;
             case 7:
                 showHand();
                 break;
             case 8:
-                showHiddenHand("me");
+                showHiddenHand();
                 break;
             default:
                 System.out.println("Invalid input. Please retry");
@@ -798,26 +746,40 @@ public class Tui {
 
     }
 
+    private void showTableOfPlayerChecked() {
+        Scanner scanner = new Scanner(System.in);
+        String nickname;
+        System.out.println("Please insert the nickname of the player you want to see the table of");
+        nickname = scanner.nextLine();
+        //TODO check if the nickname is valid and call proper function
+    }
+
     private void drawCard() {
         Scanner scanner = new Scanner(System.in);
-        boolean gold;
-        int onTableOrDeck;
-        boolean validInput = false;
+            boolean gold;
+            int onTableOrDeck;
+            boolean validInput = false;
 
-        while (!validInput) {
-            try {
-                System.out.println("Enter true if the card is gold, false otherwise:");
-                gold = scanner.nextBoolean();
-                System.out.println("Enter 1 if the card is on table, 0 if it's on deck:");
-                onTableOrDeck = scanner.nextInt();
-                controller.drawCard(gold, onTableOrDeck);
-                validInput = true;
-            } catch (InputMismatchException e) {
-                System.out.println("Invalid input. Please enter the correct values.");
-                scanner.next(); // Consumes the invalid input
+            printCommonTable();
+            while (!validInput) {
+                try {
+                    System.out.println("Enter true if the card is gold, false otherwise:");
+                    gold = scanner.nextBoolean();
+                    System.out.println("Enter -1, 0 or 1 if the card is on table, if it's on deck:");
+                    onTableOrDeck = scanner.nextInt();
+                    if (onTableOrDeck != -1 && onTableOrDeck != 0 && onTableOrDeck != 1) {
+                        System.out.println("Invalid input. Value must be -1, 0 or 1.");
+                        continue;
+                    }
+                    controller.drawCard(gold, onTableOrDeck);
+                    validInput = true;
+                } catch (InputMismatchException e) {
+                    System.out.println("Invalid input. Please enter the correct values.");
+                    scanner.next(); // Consumes the invalid input
+                }
             }
-        }
     }
+
     private void placeCard() {
         Scanner scanner = new Scanner(System.in);
         Integer indexHand;
@@ -825,10 +787,16 @@ public class Tui {
         boolean isFacingUp;
         boolean validInput = false;
 
+        showHand();
         while (!validInput) {
             try {
-                System.out.println("Enter index of the card in hand:");
+                System.out.println("Enter index of the card in hand (0-2):");
                 indexHand = scanner.nextInt();
+                //TODO mettere da 1 a 3, facendo più uno
+                if (indexHand < 0 || indexHand > 2) {
+                    System.out.println("Invalid input. Index must be between 0 and 2.");
+                    continue;
+                }
                 System.out.println("Enter position x:");
                 position.x = scanner.nextInt();
                 System.out.println("Enter position y:");
@@ -844,45 +812,57 @@ public class Tui {
         }
     }
 
-    public void startPhase(){
-        System.out.println("Please enter your nickname");
+    public void startPhase() {
         Scanner scanner = new Scanner(System.in);
-        String name = scanner.nextLine();
+        String name;
+
+        do {
+            System.out.println("Please enter your nickname (without spaces):");
+            name = scanner.nextLine();
+        } while (name.contains(" "));
+
         controller.login(name);
     }
 
     /**
      * Shows the hidden hand of a player.
-     * @param nickname The nickname of the player.
+     *
      */
-    public void showHiddenHand(String nickname) {
-        Pair<Kingdom, Boolean>[] hand = model.getHiddenHand(nickname);
-        ArrayList<String[]> cards = new ArrayList<>();
-        int i;
+    public synchronized void showHiddenHand() {
+        Set<String> players = model.getOtherPlayersCards().keySet();
 
-        for(i = 0; i < hand.length; i++){
-            cards.add(null); //TODO LOGICA
-        }
+        // Iterate over all players
+        for (String player : players) {
+            Pair<Kingdom, Boolean>[] hand = model.getHiddenHand(player);
+            ArrayList<String[]> cards = new ArrayList<>();
+            int i;
 
-        int size = cards.get(0).length;
-        System.out.println("These are the hidden cards of " + nickname + ":");
-        for(i = 0; i < size; i++) {
-            for (String[] card : cards) {
-                System.out.print(card[i]);
-                System.out.print("   ");
+            // Create a printable representation for each card in the hand
+            for (i = 0; i < hand.length; i++) {
+                cards.add(createCardToPrint(fromKingdomToId(hand[i].getKey())));
             }
+
+            int size = cards.get(0).length;
+            System.out.println("These are the hidden cards of " + player + ":");
+            for (i = 0; i < size; i++) {
+                for (String[] card : cards) {
+                    System.out.print(card[i]);
+                    System.out.print("   ");
+                }
+                System.out.println();
+            }
+            System.out.println();
         }
-        System.out.println();
     }
 
     /**
      * Shows the hand of the client.
      */
-    public void showHand() {
+    public synchronized void showHand() {
         Integer[] myCards = model.getHand();
         ArrayList<String[]> cards = new ArrayList<>();
 
-        for(Integer cardId: myCards){
+        for (Integer cardId : myCards) {
             cards.add(createCardToPrint(model.getCard(cardId, true)));
         }
 
@@ -893,40 +873,47 @@ public class Tui {
                 System.out.print(carte[i]);
                 System.out.print("   ");
             }
+            System.out.println();
         }
         System.out.println();
     }
 
     /**
      * Shows the resources of the client.
+     *
      * @param name The name of client.
      */
-    public void showResourcesPlayer(String name) {
+    public synchronized void showResourcesPlayer(String name) {
         HashMap<String, HashMap<Sign, Integer>> resources = model.getResources();
 
         System.out.println("You have the following resources:");
-        for(Sign sign: resources.get(name).keySet()){
-            System.out.println(sign + " - " + resources.get(name).get(sign));
+        for (Sign sign : resources.get(name).keySet()) {
+            if(sign != Sign.NULL && sign != Sign.EMPTY) {
+                System.out.println(sign + " - " + resources.get(name).get(sign));
+            }
         }
     }
 
     /**
      * Shows the resources of all players.
      */
-    public void showResourcesAllPlayers() {
+    public synchronized void showResourcesAllPlayers() {
         HashMap<String, HashMap<Sign, Integer>> resources = model.getResources();
-        for(String player: resources.keySet()){
+        for (String player : resources.keySet()) {
+            System.out.println();
             System.out.println(player + " has:");
-            for(Sign sign: resources.get(player).keySet()){
-                System.out.println(sign + " - " + resources.get(player).get(sign));
+            for (Sign sign : resources.get(player).keySet()) {
+                if(sign != Sign.NULL && sign != Sign.EMPTY) {
+                    System.out.println(sign + " - " + resources.get(player).get(sign));
+                }
             }
         }
     }
 
 
-    public void showPoints(HashMap<String, Integer> points) {
+    public synchronized void showPoints(HashMap<String, Integer> points) {
         System.out.println("The points of the players are:");
-        for(String player: points.keySet()){
+        for (String player : points.keySet()) {
             System.out.println(player + " has " + points.get(player));
         }
         System.out.println();
@@ -935,81 +922,85 @@ public class Tui {
     /**
      * Informs the player that the chosen color is already taken.
      */
-    public void colorAlreadyTaken() {
+    public synchronized void colorAlreadyTaken() {
         System.out.println("The color you chose is already taken. Please choose another one");
     }
 
     /**
      * Informs the player that the chosen nickname is already taken.
+     *
      * @param nickname The chosen nickname.
      */
-    public void sameName(String nickname) {
+    public synchronized void sameName(String nickname) {
         System.out.println("The nickname " + nickname + " is already taken. Please choose another one");
     }
 
     /**
      * Informs the player that it's not their turn.
      */
-    public void noTurn() {
+    public synchronized void noTurn() {
         System.out.println("It's not your turn. You can't perform this action");
     }
 
     /**
      * Informs the player that they don't have enough resources.
+     *
      * @param name The name of the player.
      */
-    public void notEnoughResources(String name) {
+    public synchronized void notEnoughResources(String name) {
         System.out.println("You don't have enough resources to perform this action");
     }
 
     /**
      * Informs the player that they are not connected to the server.
      */
-    public void noConnection() {
+    public synchronized void noConnection() {
         System.out.println("You are not connected to the server. Please retry\n");
     }
 
     /**
      * Informs the player that they can't position the card there.
      */
-    public void cardPositionError() {
+    public synchronized void cardPositionError() {
         System.out.println("You can't position the card there. Please try another position");
     }
 
     /**
      * Informs the player that the lobby is full.
      */
-    public void lobbyComplete() {
+    public synchronized void lobbyComplete() {
         System.out.println("The lobby is full. No other players can join");
     }
 
     /**
      * Informs the player that he can't perform the action in this game phase.
      */
-    public void wrongGamePhase() {
+    public synchronized void wrongGamePhase() {
         System.out.println("You can't perform this action in this game phase");
     }
+
     /**
      * Informs the client that the name given doesn't exist.
      */
-    public void noPlayer() {
+    public synchronized void noPlayer() {
         System.out.println("The player doesn't exist");
     }
 
     /**
      * Informs the player that the lobby is closed. A game already started.
      */
-    public void closingLobbyError() {
+    public synchronized void closingLobbyError() {
         System.out.println("The input is not correct. Please retry");
     }
 
     /**
      * Converts Kingdom enum to Sign enum
+     *
      * @param kingdom Kingdom to convert
      * @return Sign in which the Kingdom has been converted
      */
     private Sign fromKingdomToSign(Kingdom kingdom) throws IllegalArgumentException {
-        switch (kingdom){
+        switch (kingdom) {
             case PLANT:
                 return Sign.LEAF;
             case ANIMAL:
@@ -1027,17 +1018,19 @@ public class Tui {
         //TODO
     }
 
-    public void printCard(int id, boolean side) {
+    public synchronized void printCard(int id, boolean side) {
         String[] card = createCardToPrint(model.getCard(id, side));
-        for(String row: card){
+        for (String row : card) {
             System.out.println(row);
         }
 
     }
 
     public void start() {
-        while(true){
-            switch(Controller.getPhase()){
+        while (true) {
+            if(Controller.getPhase() != Phase.WAIT)
+                System.out.println("Current phase: " + Controller.getPhase());
+            switch (Controller.getPhase()) {
                 case LOGIN:
                     startPhase();
                     break;
@@ -1049,11 +1042,15 @@ public class Tui {
                     chooseStartingCard();
                     break;
                 case CHOOSE_SECRET_OBJECTIVE_CARD:
-                //la rete invia le carte obiettivo e il giocatore sceglie
+                    //la rete invia le carte obiettivo e il giocatore sceglie
                     chooseSecretObjectiveCard();
                     break;
                 case WAIT:
                     //la rete invia il giocatore che inizia
+                    //TODO
+                    break;
+                case WAIT_NUMBER_OF_PLAYERS:
+                    //la rete invia il numero di giocatori
                     //TODO
                     break;
                 case GAMEFLOW:
@@ -1086,11 +1083,11 @@ public class Tui {
         }
     }
 
-    public void showIsFirst(String firstPlayer) {
-        System.out.println("The first player is " + firstPlayer +  ". The game is about to start");
+    public synchronized void showIsFirst(String firstPlayer) {
+        System.out.println("The first player is " + firstPlayer + ". The game is about to start");
     }
 
-    public void correctNumberOfPlayers(int numberOfPlayers) {
+    public synchronized void correctNumberOfPlayers(int numberOfPlayers) {
         System.out.println("You have correctly set the number of players");
         System.out.println("The number of players are " + numberOfPlayers);
     }
@@ -1112,6 +1109,110 @@ public class Tui {
 
         controller.chooseSideStartingCard(isFacingUp);
 
+    }
+
+    public synchronized void printCommonTable() {
+        Integer[] resourceCards = model.getResourceCards();
+        Integer[] goldCard = model.getGoldCards();
+
+        Kingdom resourceCardOnDeck = model.getHeadDeckResource();
+        Kingdom goldCardOnDeck = model.getHeadDeckGold();
+
+        ArrayList<String[]> cardsToPrint = new ArrayList<>();
+        for (Integer cardId : resourceCards) {
+            cardsToPrint.add(createCardToPrint(model.getCard(cardId, true)));
+        }
+        cardsToPrint.add(createCardToPrint(fromKingdomToId(resourceCardOnDeck)));
+
+        ArrayList<String[]> goldCardsToPrint = new ArrayList<>();
+        for (Integer cardId : goldCard) {
+            goldCardsToPrint.add(createCardToPrint(model.getCard(cardId, true)));
+        }
+        goldCardsToPrint.add(createCardToPrint(fromKingdomToId(goldCardOnDeck)));
+
+        System.out.println("This is the resource card deck:\n");
+        printCardArray(cardsToPrint);
+        System.out.println("This is the gold card deck:\n");
+        printCardArray(goldCardsToPrint);
+
+    }
+
+    private void printCardArray(ArrayList<String[]> cardsToPrint) {
+        int size = cardsToPrint.get(0).length;
+        int i;
+        for (i = 0; i < size; i++) {
+            for (String[] card : cardsToPrint) {
+                System.out.print(card[i]);
+                System.out.print("   ");
+            }
+            System.out.println();
+        }
+    }
+
+    public PlayedCard fromKingdomToId(Kingdom kingdom) {
+        switch (kingdom) {
+            case PLANT:
+                return model.getCard(74, false);
+            case ANIMAL:
+                return model.getCard(85, false);
+            case FUNGI:
+                return model.getCard(63, false);
+            case INSECT:
+                return model.getCard(92, false);
+        }
+        return null;
+    }
+
+    public synchronized void printTableAreaOfPlayer(String nickname) {
+        ArrayList<CardClient> cards = model.getListOfCardForTui(nickname);
+        ArrayList<String[]> cardsToPrint = new ArrayList<>();
+
+        Collections.sort(cards, Comparator.comparing((CardClient card) -> card.getPosition().x + card.getPosition().y, Comparator.reverseOrder())
+                .thenComparing(card -> card.getPosition().x));
+
+        int level = cards.get(0).getPosition().x + cards.get(0).getPosition().y;
+        int min = cards.stream().mapToInt(card -> card.getPosition().x).min().orElse(0);
+        int inizialier = min;
+
+        for(CardClient card: cards){
+            if(level == card.getPosition().x + card.getPosition().y){
+                while(min != card.getPosition().x){
+                    min++;
+                    cardsToPrint.add(new String[]{
+                            "┌--------┐--------------┌--------┐",
+                            "|        |              |        |",
+                            "└--------┘              └--------┘",
+                            "|        |              |        |",
+                            "┌--------┐              ┌--------┐",
+                            "|        |              |        |",
+                            "└--------┘--------------└--------┘",
+                    });
+                }
+                cardsToPrint.add(createCardToPrint(model.getCard(card.getId(), card.getSide())));
+            }else{
+                min = inizialier;
+                printCardArray(cardsToPrint);
+                level = card.getPosition().x + card.getPosition().y;
+                cardsToPrint = new ArrayList<>();
+
+                while(min != card.getPosition().x){
+                    min++;
+                    cardsToPrint.add(new String[]{
+                            "┌--------┐--------------┌--------┐",
+                            "|        |              |        |",
+                            "└--------┘              └--------┘",
+                            "|        |              |        |",
+                            "┌--------┐              ┌--------┐",
+                            "|        |              |        |",
+                            "└--------┘--------------└--------┘",
+
+                    });
+                }
+                cardsToPrint.add(createCardToPrint(model.getCard(card.getId(), card.getSide())));
+            }
+        }
+        //solo per ultima lista di carte
+        printCardArray(cardsToPrint);
     }
 }
 

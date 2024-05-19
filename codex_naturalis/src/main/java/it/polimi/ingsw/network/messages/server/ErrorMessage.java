@@ -3,6 +3,7 @@ package it.polimi.ingsw.network.messages.server;
 import it.polimi.ingsw.controller.client.Controller;
 import it.polimi.ingsw.network.messages.ErrorType;
 import it.polimi.ingsw.network.messages.server.ServerMessage;
+import it.polimi.ingsw.view.Phase;
 
 public class ErrorMessage extends ServerMessage {
     private final ErrorType type;
@@ -18,17 +19,45 @@ public class ErrorMessage extends ServerMessage {
     @Override
     public void callController(Controller controller) {
         switch(type){
-            case NO_TURN: //TODO VIEW
-            case FULL_LOBBY: //TODO VIEW
-            case WRONG_PHASE: //TODO VIEW
-            case NAME_UNKNOWN: //TODO VIEW
-            case CARD_POSITION: //TODO VIEW
-            case LOBBY_IS_CLOSED: //TODO VIEW
-            case COLOR_UNAVAILABLE: //TODO VIEW
-            case NAME_ALREADY_USED: //TODO VIEW
-            case LOBBY_ALREADY_FULL: //TODO VIEW
-            case NOT_ENOUGH_RESOURCES: //TODO VIEW
-            case PLAYER_DOES_NOT_EXIST: //TODO VIEW
+            case NO_TURN:
+                if(Controller.getPhase() == Phase.WAIT_ALL_CHOSEN_STARTING_CARD){
+                    Controller.setPhase(Phase.CHOOSE_SIDE_STARTING_CARD);
+                }else if(Controller.getPhase() == Phase.WAIT_ALL_CHOSEN_SECRET_CARD){
+                    Controller.setPhase(Phase.CHOOSE_SECRET_OBJECTIVE_CARD);
+                }else{
+                    Controller.setPhase(Phase.GAMEFLOW);
+                }
+                controller.noTurn();
+            case FULL_LOBBY:
+                //TODO
+            case WRONG_PHASE:
+                if(Controller.getPhase() == Phase.WAIT_ALL_CHOSEN_STARTING_CARD){
+                    Controller.setPhase(Phase.CHOOSE_SIDE_STARTING_CARD);
+                }else if(Controller.getPhase() == Phase.WAIT_ALL_CHOSEN_SECRET_CARD){
+                    Controller.setPhase(Phase.CHOOSE_SECRET_OBJECTIVE_CARD);
+                }else{
+                    Controller.setPhase(Phase.GAMEFLOW);
+                }
+                //TODO messaggio errore
+            case NAME_UNKNOWN:
+                //TODO no succede mai
+            case CARD_POSITION:
+               //TODO
+            case LOBBY_IS_CLOSED:
+                //TODO VIEW
+            case COLOR_UNAVAILABLE:
+                Controller.setPhase(Phase.COLOR);
+                controller.colorAlreadyTaken();
+            case NAME_ALREADY_USED:
+                Controller.setPhase(Phase.LOGIN);
+                //TODO stampare nome non disponibile, senti Pietro
+            case LOBBY_ALREADY_FULL:
+                //TODO VIEW
+            case NOT_ENOUGH_RESOURCES:
+                controller.notEnoughResources();
+            case PLAYER_DOES_NOT_EXIST:
+                //TODO VIEW, non accade mai mandare questo messaggio
+                //TODO aggiungere due fasi di wait una per sidestartingCard, l'altra per objectiveCard
         }
     }
 }

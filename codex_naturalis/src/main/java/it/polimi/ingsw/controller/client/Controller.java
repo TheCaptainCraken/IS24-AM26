@@ -52,6 +52,12 @@ public class Controller {
             //TODO
             //view = new GUI();
         }
+
+        //for socket
+//        new Thread({
+//                this.view = new Tui(model, this);
+//                view.start();
+//        });
     }
 
     public void createInstanceOfConnection(String typeOfConnection){
@@ -59,7 +65,7 @@ public class Controller {
             try {
                 clientRMI = new ClientRMI(this);
             } catch (RemoteException e) {
-                throw new RuntimeException(e);
+                //TODO
             } catch (SameNameException e) {
                 throw new RuntimeException(e);
             } catch (LobbyCompleteException e) {
@@ -69,8 +75,10 @@ public class Controller {
             }
             connection = (NetworkClient) clientRMI;
         }else if(typeOfConnection.equals("Socket")){
-            connection = new ClientSocket(this, "placeholder",0);
-            //TODO vanno aggiunti address e port al costruttore,
+            ClientSocket socket = new ClientSocket(this, "placeholder", 0);
+            connection = (NetworkClient) socket;
+            socket.run();
+            //TODO vanno aggiunti address e port ,
             // il primo sarà una costante salvata nel codice l'altro sarà generato automaticamente
         }
     }
@@ -135,12 +143,7 @@ public class Controller {
      * @param playersAndPins A HashMap where the keys are the nicknames of the players and the values are their associated colors.
      */
     public void refreshUsers(HashMap<String, Color> playersAndPins) {
-//        if(playersAndPins.containsKey(nickname) && playersAndPins.get(nickname) == null){
-//            Controller.phase = Phase.COLOR;
-//        }else if(playersAndPins.containsKey(nickname) && playersAndPins.get(nickname) != null){
-//            Controller.phase = Phase.GAMEFLOW;
-//        }
-
+        model.updateUsers(playersAndPins);
         view.refreshUsers(playersAndPins);
     }
 
@@ -155,6 +158,7 @@ public class Controller {
 
     public void cardsOnTable(Integer[] resourceCards, Integer[] goldCard, Kingdom resourceCardOnDeck, Kingdom goldCardOnDeck) {
         model.updateCommonTable(resourceCards, goldCard, resourceCardOnDeck, goldCardOnDeck);
+        view.printCommonTable();
     }
     /**
      * Triggers the view to display the starting card to the user.
@@ -203,7 +207,6 @@ public class Controller {
      */
     public void turnInfo(String currentPlayer, GameState gameState) {
         view.showTurnInfo(currentPlayer, gameState);
-        //TODO capire chiamate con Daniel
     }
 
     /**
@@ -231,9 +234,9 @@ public class Controller {
     }
 
     public void showSecretObjectiveCardsToChoose(Integer[] objectiveCardIds) {
-        Controller.setPhase(Phase.CHOOSE_SECRET_OBJECTIVE_CARD);
-        updateSecretObjectiveCardsToChoose(objectiveCardIds);
+        model.updateSecretObjectiveCardsToChoose(objectiveCardIds);
         view.showSecretObjectiveCardsToChoose(objectiveCardIds);
+        Controller.setPhase(Phase.CHOOSE_SECRET_OBJECTIVE_CARD); //TODO prova a vedere se con socket è correto
     }
 
     public void updatePlaceCard(String nickname, int id, Point position, boolean side) {
@@ -281,6 +284,7 @@ public class Controller {
      */
     public void login(String nickname) {
         try{
+            Controller.phase = Phase.WAIT;
             connection.login(nickname);
         } catch (SameNameException e) {
             view.sameName(nickname);
@@ -301,6 +305,7 @@ public class Controller {
      */
     public void insertNumberOfPlayers(int numberOfPlayers) {
         try{
+            Controller.phase = Phase.WAIT;
             connection.insertNumberOfPlayers(numberOfPlayers);
         } catch (RemoteException e) {
             view.noConnection();
@@ -325,6 +330,7 @@ public class Controller {
      */
     public void chooseColor(Color color) {
         try{
+            Controller.phase = Phase.WAIT;
             connection.chooseColor(color);
         } catch (RemoteException e) {
             view.noConnection();
@@ -421,29 +427,6 @@ public class Controller {
         }
     }
 
-    public void showTableOfPlayer(String name){
-        view.showTableOfPlayer(model.getTableOfPlayer(name));
-    }
-
-    public void showPoints(){
-        view.showPoints(model.getPoints());
-    }
-
-    public void showResources(){
-        view.showResourcesPlayer(getNickname());
-    }
-
-    public void showResourcesAllPlayers(){
-        view.showResourcesAllPlayers();
-    }
-
-    public void showHand(){
-        view.showHand();
-    }
-
-    public void showHiddenHand(String name){
-        view.showHiddenHand(name);
-    }
 
     public void correctNumberOfPlayers(int numberOfPlayers) {
         view.correctNumberOfPlayers(numberOfPlayers);
@@ -451,6 +434,7 @@ public class Controller {
 
     public void updateAndShowStartingCard(int startingCardId) {
         Controller.setPhase(Phase.CHOOSE_SIDE_STARTING_CARD);
+        System.out.println("Starting card id: " + startingCardId);
         view.showStartingCard(startingCardId);
     }
 
@@ -482,23 +466,48 @@ public class Controller {
         view.cardPositionError();
     }
 
-    public void sameName() {
-        view.sameName(nickname);
+    public void sameName(String name) {
+        view.sameName(name);
     }
 
     public void colorAlreadyTaken() {
         view.colorAlreadyTaken();
     }
 
+    public void updateAndShowSecretObjectiveCard(int indexCard) {
+        model.updateSecretObjectiveCard(indexCard);
+        view.showSecretObjectiveCard(model.getSecretObjectiveCard());
+    }
+
+    //TODO capire se serve veramente questa cosa qui.
     public void updateSecretObjectiveCard(int indexCard) {
         model.updateSecretObjectiveCard(indexCard);
     }
 
-    public void updateSecretObjectiveCardsToChoose(Integer[] secretObjectiveCardsToChoose) {
-        model.updateSecretObjectiveCardsToChoose(secretObjectiveCardsToChoose);
-    }
-
     public void updateCommonObjectiveCards(Integer[] commonObjectiveCards) {
         model.updateCommonObjectiveCards(commonObjectiveCards);
+    }
+    public void showTableOfPlayer(String name){
+        view.showTableOfPlayer(model.getTableOfPlayer(name));
+    }
+
+    public void showPoints(){
+        view.showPoints(model.getPoints());
+    }
+
+    public void showResources(){
+        view.showResourcesPlayer(getNickname());
+    }
+
+    public void showResourcesAllPlayers(){
+        view.showResourcesAllPlayers();
+    }
+
+    public void showHand(){
+        view.showHand();
+    }
+
+    public void showHiddenHand(String name){
+        view.showHiddenHand();
     }
 }

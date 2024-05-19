@@ -76,6 +76,17 @@ public class App extends Application {
                    System.out.println("Invalid choice, please insert TUI or GUI");
            }
        }while(!choice.equals("TUI") && !choice.equals("GUI"));
+       
+//            // Emoji in formato Unicode
+//            String emoji = "\u2764\uFE0F"; // Unicode per ❤️
+//
+//            // Creiamo una stringa che contiene l'emoji
+//            String message = "Ti mando un cuore: " + emoji;
+//
+//            // Stampiamo la stringa
+//            System.out.println(message);
+//
+
     }
 }
 

@@ -24,7 +24,7 @@ public class CardClient {
         return id;
     }
 
-    public boolean isSide() {
+    public boolean getSide() {
         return side;
     }
 
@@ -43,4 +43,5 @@ public class CardClient {
     public void setAttached(Corner corner, CardClient newCard) {
         attachmentCorners.put(corner, newCard);
     }
+
 }
