@@ -62,7 +62,6 @@ public class ClientSocket extends NetworkClient implements Runnable{
         this.controller = controller;
     }
 
-
     //metodi che corrispondo alle azioni che un giocatore fa durante tutta la vita della connessione
     //hanno una corrispondeza 1:1 con metodi usati per RMI
     @Override
@@ -83,7 +82,7 @@ public class ClientSocket extends NetworkClient implements Runnable{
     public void chooseColor(Color color) {
         //possibile errore, controllato con macchina a stati
         Controller.setPhase(Phase.WAIT_ALL_CHOOSEN_COLOR);
-        ClientMessage message = new ColorChosen(controller.getNickname(),color);
+        ClientMessage message = new ColorChosen(controller.getNickname(), color);
         sendMessage(message);
     }
     @Override
@@ -91,7 +90,7 @@ public class ClientSocket extends NetworkClient implements Runnable{
         //controllo da input, unici errori possibili sono il turno.
         Controller.setPhase(Phase.WAIT_ALL_CHOSEN_STARTING_CARD);
         //TODO aggiungere due fasi di wait una per sidestartingCard, l'altra per objectiveCard
-        ClientMessage message = new ChosenStartingCardSide(side);
+        ClientMessage message = new ChosenStartingCardSide(controller.getNickname(), side);
         sendMessage(message);
     }
     @Override
@@ -99,18 +98,18 @@ public class ClientSocket extends NetworkClient implements Runnable{
         //controllo da input. Unico errore possibile sono il turno.
         Controller.setPhase(Phase.WAIT_ALL_CHOSEN_SECRET_CARD);
         //TODO aggiungere due fasi di wait una per sidestartingCard, l'altra per objectiveCard
-        ClientMessage message = new ChosenObjectiveCard(indexCard);
+        ClientMessage message = new ChosenObjectiveCard(controller.getNickname(), indexCard);
         sendMessage(message);
     }
     @Override
     public void playCard(int indexHand, Point position, boolean side) {
-        ClientMessage message = new CardToBePositioned(indexHand,position,side);
+        ClientMessage message = new CardToBePositioned(controller.getNickname(), indexHand, position, side);
         sendMessage(message);
     }
 
     @Override
     public void drawCard(String nickname, boolean gold, int onTableOrDeck) {
-        ClientMessage message = new CardToBeDrawn(nickname,gold,onTableOrDeck);
+        ClientMessage message = new CardToBeDrawn(nickname, gold, onTableOrDeck);
         //il nickname lo devo prendere dal controller o no?
         sendMessage(message);
     }

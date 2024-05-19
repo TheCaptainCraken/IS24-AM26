@@ -4,8 +4,10 @@ import it.polimi.ingsw.network.messages.client.ClientMessage;
 
 public class ChosenObjectiveCard extends ClientMessage {
     private final int indexCard;
+    private final String nickname;
 
-    public ChosenObjectiveCard(int indexCard) {
+    public ChosenObjectiveCard(String nickname, int indexCard) {
+        this.nickname = nickname;
         this.indexCard = indexCard;
     }
 
