@@ -63,7 +63,7 @@ public class ClientSocket extends NetworkClient implements Runnable{
     }
 
     //metodi che corrispondo alle azioni che un giocatore fa durante tutta la vita della connessione
-    //hanno una corrispondeza 1:1 con metodi usati per RMI
+    //hanno una corrispondenza 1:1 con metodi usati per RMI
     @Override
     public void login(String nickname) throws SameNameException, LobbyCompleteException{
         //client crea messaggio e lo invia usando objOutputStream
