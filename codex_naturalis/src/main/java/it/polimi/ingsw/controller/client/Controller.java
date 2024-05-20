@@ -274,7 +274,6 @@ public class Controller {
 
     /**
      * Logs in the player to the game.
-     *
      * This method is used to log in the player to the game by using the connection object.
      * The actual login is handled by the connection object.
      *
