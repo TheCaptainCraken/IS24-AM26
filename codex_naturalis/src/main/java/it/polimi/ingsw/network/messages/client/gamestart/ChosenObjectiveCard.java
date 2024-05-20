@@ -14,4 +14,8 @@ public class ChosenObjectiveCard extends ClientMessage {
     public int getIndexCard() {
         return indexCard;
     }
+
+    public String getNickname() {
+        return nickname;
+    }
 }

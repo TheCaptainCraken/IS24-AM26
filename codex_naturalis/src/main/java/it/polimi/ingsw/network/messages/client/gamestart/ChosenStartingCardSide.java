@@ -14,4 +14,8 @@ public class ChosenStartingCardSide extends ClientMessage {
     public boolean isSide() {
         return side;
     }
+
+    public String getNickname() {
+        return nickname;
+    }
 }
