@@ -5,15 +5,13 @@ import it.polimi.ingsw.model.exception.*;
 
 import java.awt.*;
 import java.rmi.RemoteException;
-import java.rmi.server.RemoteRef;
 
 public abstract class NetworkClient {
 
-    //metodi che il client chiama il server.
     public void insertNumberOfPlayers(int numberOfPlayers) throws RemoteException, ClosingLobbyException, SameNameException, LobbyCompleteException, NoNameException {
     }
 
-    public void chooseColor(Color color) throws RemoteException, ColorAlreadyTakenException, RemoteException,  NoNameException {
+    public void chooseColor(Color color) throws  ColorAlreadyTakenException, RemoteException,  NoNameException {
     }
 
     public void chooseSideStartingCard(boolean side) throws RemoteException, WrongGamePhaseException, NoTurnException,  NoNameException {

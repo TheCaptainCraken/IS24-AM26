@@ -22,7 +22,7 @@ public class ClientRMI extends NetworkClient implements RMIClientInterface {
     static int PORT = 1099;
     Controller controller;
     RMIClientInterface exportedClient = null;
-    LoggableServer stub = null;
+    RMIServerInterface stub = null;
     Registry registry = null;
 
     public ClientRMI(Controller controller) throws RemoteException, SameNameException, LobbyCompleteException, NotBoundException {
@@ -35,15 +35,17 @@ public class ClientRMI extends NetworkClient implements RMIClientInterface {
         registry = LocateRegistry.getRegistry("127.0.0.1", PORT);
 
         // Cerca l'oggetto remoto del server
-        stub = (LoggableServer) registry.lookup("Loggable");
+        stub = (RMIServerInterface) registry.lookup("Loggable");
 
     }
 
     public void login(String name) throws RemoteException, SameNameException, LobbyCompleteException {
         boolean isFirst = false;
+        boolean login = false;
         try{
             isFirst = stub.loginAndIsFirst(exportedClient, name);
             Controller.setNickname(name);
+            login = true;
         }catch(RemoteException e){
             controller.noConnection();
         }catch (LobbyCompleteException e){
@@ -52,15 +54,18 @@ public class ClientRMI extends NetworkClient implements RMIClientInterface {
             Controller.phase = Phase.LOGIN;
             controller.sameName(name);
         }
-        if (isFirst) {
-            Controller.setPhase(Phase.NUMBER_OF_PLAYERS);
-            controller.askNumberOfPlayer();
-        }else{
-            if(stub.lobbyIsReady()){
-                Controller.setPhase(Phase.COLOR);
-            }else{
-                Controller.setPhase(Phase.WAIT_NUMBER_OF_PLAYERS);
-                controller.waitLobby();
+
+        if(login) {
+            if (isFirst) {
+                Controller.setPhase(Phase.NUMBER_OF_PLAYERS);
+                controller.askNumberOfPlayer();
+            } else {
+                if (stub.lobbyIsReady()) {
+                    Controller.setPhase(Phase.COLOR);
+                } else {
+                    Controller.setPhase(Phase.WAIT_NUMBER_OF_PLAYERS);
+                    controller.waitLobby();
+                }
             }
         }
     }
