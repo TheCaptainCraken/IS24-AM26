@@ -15,7 +15,7 @@ import java.rmi.RemoteException;
  */
 public interface RMIServerInterface extends Remote {
     /**
-     * This method is used to login a client and check if it is the first player to login.
+     * This method is used to log in a client and check if it is the first player to login.
      * @param clientRMI The client that is logging in.
      * @param nickname The nickname of the client that is logging in.
      * @return True if the client is the first to login, false otherwise.

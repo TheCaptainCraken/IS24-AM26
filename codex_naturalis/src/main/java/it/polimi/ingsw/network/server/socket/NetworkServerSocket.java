@@ -77,11 +77,11 @@ public class NetworkServerSocket implements NetworkPlug {
 
     // TODO: I have no idea what I should do here.
     @Override
-    public void finalizingNumberOfPlayers() throws NoNameException, SameNameException, LobbyCompleteException {
+    public void finalizingNumberOfPlayers() {
     }
 
     @Override
-    public void gameIsStarting() throws NoNameException {
+    public void gameIsStarting()  {
         int resourceCard0 = controller.getResourceCards(0);
         int resourceCard1 = controller.getResourceCards(1);
 
@@ -96,7 +96,11 @@ public class NetworkServerSocket implements NetworkPlug {
 
         ArrayList<String> players = new ArrayList<String>();
         for (String player : players) {
-            sendBroadCastMessage(new ShowStartingCard(controller.getStartingCard(player)));
+            try {
+                sendBroadCastMessage(new ShowStartingCard(controller.getStartingCard(player)));
+            } catch (NoNameException e) {
+                //TODO
+            }
         }
     }
 
@@ -120,7 +124,7 @@ public class NetworkServerSocket implements NetworkPlug {
 
     @Override
     public void sendingPlacedRootCardAndWhenCompleteObjectiveCards(String nickname, boolean side, int cardId,
-            boolean allWithRootCardPlaced) throws NoNameException {
+            boolean allWithRootCardPlaced) {
         sendBroadCastMessage(new CardIsPositioned(nickname, cardId, new Point(0, 0), side));
         if (allWithRootCardPlaced) {
             sendBroadCastMessage(
@@ -132,18 +136,18 @@ public class NetworkServerSocket implements NetworkPlug {
 
     @Override
     public void sendingHandsAndWhenSecretObjectiveCardsCompleteStartGameFlow(String nickname,
-            boolean allWithSecretObjectiveCardChosen) throws NoNameException {
+            boolean allWithSecretObjectiveCardChosen) {
     }// TODO discuss if we have to modify
 
     @Override
-    public void sendPlacedCard(String nickname, int cardId, Point position, boolean side) throws NoNameException {
+    public void sendPlacedCard(String nickname, int cardId, Point position, boolean side)  {
         sendBroadCastMessage(new CardIsPositioned(nickname, cardId, position, side));
         sendBroadCastMessage(new TurnInfo(nickname, controller.getGameState()));
     }
 
     @Override
     public void sendDrawnCard(String nickname, int newCardId, Kingdom headDeck, boolean gold, int onTableOrDeck)
-            throws NoNameException {
+             {
     }
 
     @Override
@@ -228,13 +232,7 @@ public class NetworkServerSocket implements NetworkPlug {
                     if (isLobbyReadyToStart) {
                         controller.start();
                         networkHandler.refreshUsersBroadcast();
-                        try {
-                            networkHandler.gameIsStartingBroadcast();
-                        } catch (NoNameException e) {
-                            sendErrorMessage(ErrorType.NAME_UNKNOWN);
-                        } catch (RemoteException e) {
-                            // why the fuck do I have to catch this??
-                        }
+                        networkHandler.gameIsStartingBroadcast();
                         // GameStart() 
                     }
                 } catch (NoNameException e) {

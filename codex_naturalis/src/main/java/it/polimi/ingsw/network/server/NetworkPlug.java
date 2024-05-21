@@ -47,7 +47,7 @@ public interface NetworkPlug {
      * @throws SameNameException      If two players have the same nickname.
      * @throws LobbyCompleteException If the lobby is already full.
      */
-    void finalizingNumberOfPlayers() throws NoNameException, SameNameException, LobbyCompleteException;
+    void finalizingNumberOfPlayers() ;
 
     /**
      * Communicates to the clients that the game is starting. The message should be
@@ -56,7 +56,7 @@ public interface NetworkPlug {
      * gold card on deck, 1 resource card on deck).
      * It should notify the personal starting card for each player.
      */
-    void gameIsStarting() throws NoNameException;
+    void gameIsStarting() ;
 
     /**
      * Refreshes the list of users.
@@ -79,7 +79,7 @@ public interface NetworkPlug {
      * @throws NoNameException If a player with the given nickname does not exist.
      */
     void sendingPlacedRootCardAndWhenCompleteObjectiveCards(String nickname, boolean side, int cardId,
-            boolean allWithRootCardPlaced) throws NoNameException;// TODO discuss if we have to modify
+            boolean allWithRootCardPlaced) ;// TODO discuss if we have to modify
 
     /**
      * Sends the hands and secret objective cards.
@@ -93,7 +93,7 @@ public interface NetworkPlug {
     // TODO chiedere a danil se logica è corretta, sembra che a ogni scelta di carta
     // segreta si invia a tutti i giocatori la mano dei giocatori
     void sendingHandsAndWhenSecretObjectiveCardsCompleteStartGameFlow(String nickname,
-            boolean allWithSecretObjectiveCardChosen) throws NoNameException;// TODO discuss if we have to modify
+            boolean allWithSecretObjectiveCardChosen) ;// TODO discuss if we have to modify
 
     /**
      * Sends the placed card. Broadcast to all clients.
@@ -108,7 +108,7 @@ public interface NetworkPlug {
      * @param side     The side of the card.
      * @throws NoNameException If a player with the given nickname does not exist.
      */
-    void sendPlacedCard(String nickname, int cardId, Point position, boolean side) throws NoNameException;
+    void sendPlacedCard(String nickname, int cardId, Point position, boolean side) ;
 
     /**
      * Sends the drawn card. Broadcast to all clients.
@@ -127,7 +127,7 @@ public interface NetworkPlug {
     // TODO sistemare cosa invia, a volte inviamo meno uno per dire qualcosa,
     // scriverlo
     void sendDrawnCard(String nickname, int newCardId, Kingdom headDeck, boolean gold, int onTableOrDeck)
-            throws NoNameException;
+            ;
 
     /**
      * Sends the end game signal. Broadcast to all clients.

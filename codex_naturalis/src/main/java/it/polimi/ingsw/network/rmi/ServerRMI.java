@@ -391,25 +391,39 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
      */
     @Override
     public void sendingHandsAndWhenSecretObjectiveCardsCompleteStartGameFlow(String nickname, boolean allWithSecretObjectiveCardChosen)
-            throws NoNameException {
+             {
         //Get the player's hand from nickname. It sends
-        Integer[] hand = Controller.getInstance().getHand(nickname);
-        Pair<Kingdom, Boolean>[]  HiddenHand = Controller.getInstance().getHiddenHand(nickname);
+                 try {
+                     Integer[] hand = Controller.getInstance().getHand(nickname);
+                 } catch (NoNameException e) {
+                     throw new RuntimeException(e);
+                 }
+                 try {
+                     Pair<Kingdom, Boolean>[]  HiddenHand = Controller.getInstance().getHiddenHand(nickname);
+                 } catch (NoNameException e) {
+                     throw new RuntimeException(e);
+                 }
 
-        for(String nicknameRefresh : connections.keySet()){
+                 for(String nicknameRefresh : connections.keySet()){
             if(nickname.equals(nicknameRefresh)){
                 try {
                     // Send the player's hand to the client. It is unicast call, only the player can see their hand.
                     connections.get(nicknameRefresh).showHand(nickname, Controller.getInstance().getHand(nickname));
                 } catch (RemoteException e) {
                     //TODO
+                } catch (NoNameException e) {
+                    throw new RuntimeException(e);
                 }
             }else{
                 //TODO THREAD
                 try {
                     // Send the hidden hand of the player to all other clients.
                     // It is a broadcast call, all other players can see the hidden hand of the player.
-                    connections.get(nicknameRefresh).showHiddenHand(nicknameRefresh, Controller.getInstance().getHiddenHand(nickname));
+                    try {
+                        connections.get(nicknameRefresh).showHiddenHand(nicknameRefresh, Controller.getInstance().getHiddenHand(nickname));
+                    } catch (NoNameException e) {
+                        throw new RuntimeException(e);
+                    }
                 } catch (RemoteException e) {
                     //TODO
                 }
@@ -441,11 +455,19 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
      * @throws NoNameException If a player with the given nickname does not exist.
      */
     @Override
-    public void sendingPlacedRootCardAndWhenCompleteObjectiveCards(String nickname, boolean side, int cardId, boolean allWithRootCardPlaced) throws NoNameException {
+    public void sendingPlacedRootCardAndWhenCompleteObjectiveCards(String nickname, boolean side, int cardId, boolean allWithRootCardPlaced) {
         //Get the player's resources and points from nickname, so it is the same information for all players.
-        HashMap<Sign, Integer> playerResources = Controller.getInstance().getPlayerResources(nickname);
+        try {
+            HashMap<Sign, Integer> playerResources = Controller.getInstance().getPlayerResources(nickname);
+        } catch (NoNameException e) {
+            throw new RuntimeException(e);
+        }
         //get the player's points from nickname, so it is the same information for all players.
-        int playerPoints = Controller.getInstance().getPlayerPoints(nickname);
+        try {
+            int playerPoints = Controller.getInstance().getPlayerPoints(nickname);
+        } catch (NoNameException e) {
+            throw new RuntimeException(e);
+        }
         //TODO sistemare controller.
         for(String nicknameRefresh : connections.keySet()){
             new Thread(() -> {
@@ -472,8 +494,12 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
                 }
                 try {
                     //Broadcast the secret objective cards to choose to the player
-                    connections.get(nicknameRefresh).
-                            sendSecretObjectiveCardsToChoose(Controller.getInstance().getSecretObjectiveCardsToChoose(nicknameRefresh));
+                    try {
+                        connections.get(nicknameRefresh).
+                                sendSecretObjectiveCardsToChoose(Controller.getInstance().getSecretObjectiveCardsToChoose(nicknameRefresh));
+                    } catch (NoNameException e) {
+                        throw new RuntimeException(e);
+                    }
                 } catch (RemoteException e) {
                     //TODO
                 }
@@ -498,12 +524,16 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
      */
     //TODO thread
     @Override
-    public void sendDrawnCard(String nickname, int newCardId, Kingdom headDeck, boolean gold, int onTableOrDeck) throws NoNameException {
+    public void sendDrawnCard(String nickname, int newCardId, Kingdom headDeck, boolean gold, int onTableOrDeck) {
         for(String nicknameRefresh : connections.keySet()){
             //if is not the player who has drawn the card, send the hidden hand of the player.
             if(!nickname.equals(nicknameRefresh)){
                 try {
-                    connections.get(nicknameRefresh).showHiddenHand(nicknameRefresh, Controller.getInstance().getHiddenHand(nickname));
+                    try {
+                        connections.get(nicknameRefresh).showHiddenHand(nicknameRefresh, Controller.getInstance().getHiddenHand(nickname));
+                    } catch (NoNameException e) {
+                        throw new RuntimeException(e);
+                    }
                 } catch (RemoteException e) {
                     //TODO
                 }
@@ -541,11 +571,15 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
      */
     //TODO thread
     @Override
-    public void sendPlacedCard(String nickname, int cardId, Point position, boolean side) throws NoNameException {
+    public void sendPlacedCard(String nickname, int cardId, Point position, boolean side) {
         for(String nicknameRefresh : connections.keySet()){
             try {
                 // Broadcast the placed card information, the player's resources and points
-                connections.get(nicknameRefresh).placeCard(nickname, cardId, position, side, Controller.getInstance().getPlayerResources(nickname), Controller.getInstance().getPlayerPoints(nickname));
+                try {
+                    connections.get(nicknameRefresh).placeCard(nickname, cardId, position, side, Controller.getInstance().getPlayerResources(nickname), Controller.getInstance().getPlayerPoints(nickname));
+                } catch (NoNameException e) {
+                    throw new RuntimeException(e);
+                }
             } catch (RemoteException e) {
                 //TODO
             }
