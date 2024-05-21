@@ -1175,6 +1175,7 @@ public class Tui {
         int inizialier = min;
 
         for(CardClient card: cards){
+            //TODO sistemare fai shift delle carte
             if(level == card.getPosition().x + card.getPosition().y){
                 while(min != card.getPosition().x){
                     min++;

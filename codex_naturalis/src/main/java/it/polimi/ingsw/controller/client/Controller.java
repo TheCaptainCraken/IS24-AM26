@@ -283,16 +283,8 @@ public class Controller {
      * @param nickname The nickname of the player.
      */
     public void login(String nickname) {
-        try{
-            Controller.phase = Phase.WAIT;
-            connection.login(nickname);
-        } catch (SameNameException e) {
-            view.sameName(nickname);
-        } catch (LobbyCompleteException e){
-            view.lobbyComplete();
-        } catch (RemoteException e) {
-            view.noConnection();
-        }
+        Controller.phase = Phase.WAIT;
+        connection.login(nickname);
     }
 
     /**
@@ -304,20 +296,8 @@ public class Controller {
      * @param numberOfPlayers The number of players.
      */
     public void insertNumberOfPlayers(int numberOfPlayers) {
-        try{
-            Controller.phase = Phase.WAIT;
-            connection.insertNumberOfPlayers(numberOfPlayers);
-        } catch (RemoteException e) {
-            view.noConnection();
-        } catch (ClosingLobbyException e) {
-            view.closingLobbyError();
-        } catch (SameNameException e) {
-            view.sameName(nickname);
-        } catch (LobbyCompleteException e) {
-            view.lobbyComplete();
-        } catch (NoNameException e) {
-            view.noPlayer();
-        }
+        Controller.phase = Phase.WAIT;
+        connection.insertNumberOfPlayers(numberOfPlayers);
     }
 
     /**
@@ -329,16 +309,8 @@ public class Controller {
      * @param color The color chosen by the player.
      */
     public void chooseColor(Color color) {
-        try{
-            Controller.phase = Phase.WAIT;
-            connection.chooseColor(color);
-        } catch (RemoteException e) {
-            view.noConnection();
-        } catch (ColorAlreadyTakenException e) {
-            view.colorAlreadyTaken();
-        } catch (NoNameException e) {
-            view.noPlayer();
-        }
+        Controller.phase = Phase.WAIT;
+        connection.chooseColor(color);
     }
     /**
      * Sets the side of the starting card for the player in the game.
@@ -349,19 +321,7 @@ public class Controller {
      * @param side The side chosen by the player.
      */
     public void chooseSideStartingCard(boolean side) {
-        try {
-            connection.chooseSideStartingCard(side);
-        }
-        catch (RemoteException e) {
-            view.noConnection();
-        }
-        catch (WrongGamePhaseException e) {
-            view.wrongGamePhase();
-        } catch (NoTurnException e) {
-            view.noTurn();
-        } catch (NoNameException e) {
-            view.noPlayer();
-        }
+        connection.chooseSideStartingCard(side);
     }
 
     /**
@@ -387,21 +347,7 @@ public class Controller {
      * @param side The side of the card.
      */
     public void playCard(int indexHand, Point position, boolean side) {
-        try{
-            connection.playCard(indexHand, position, side);
-        } catch (WrongGamePhaseException e) {
-            view.wrongGamePhase();
-        } catch (NoTurnException e) {
-            view.noTurn();
-        } catch (NotEnoughResourcesException e) {
-            view.notEnoughResources(nickname);
-        } catch (NoNameException e) {
-            view.noPlayer();
-        } catch (CardPositionException e) {
-            view.cardPositionError();
-        } catch (RemoteException e) {
-            view.noConnection();
-        }
+        connection.playCard(indexHand, position, side);
     }
 
     /**
@@ -414,17 +360,7 @@ public class Controller {
      * @param onTableOrDeck The location from where the card is drawn.
      */
     public void drawCard(boolean gold, int onTableOrDeck) {
-        try{
-            connection.drawCard(nickname, gold, onTableOrDeck);
-        } catch (WrongGamePhaseException e) {
-            view.wrongGamePhase();
-        } catch (NoTurnException e) {
-            view.noTurn();
-        } catch (NoNameException e) {
-            view.noPlayer();
-        } catch (RemoteException e) {
-            view.noConnection();
-        }
+        connection.drawCard(nickname, gold, onTableOrDeck);
     }
 
 

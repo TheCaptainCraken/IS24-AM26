@@ -86,7 +86,7 @@ public class NetworkHandler {
      * @throws RemoteException
      * @throws NoNameException
      */
-    public void gameIsStartingBroadcast() throws RemoteException, NoNameException {
+    public void gameIsStartingBroadcast() {
         for (NetworkPlug networkPlug : networkInterfacesAndConnections.values()) {
             networkPlug.gameIsStarting();
         }

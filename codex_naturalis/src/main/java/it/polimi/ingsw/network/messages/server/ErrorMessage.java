@@ -57,7 +57,6 @@ public class ErrorMessage extends ServerMessage {
                 controller.notEnoughResources();
             case PLAYER_DOES_NOT_EXIST:
                 //TODO VIEW, non accade mai mandare questo messaggio
-                //TODO aggiungere due fasi di wait una per sidestartingCard, l'altra per objectiveCard
         }
     }
 }
