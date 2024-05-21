@@ -71,6 +71,9 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
         }catch (SameNameException e){
             Controller.phase = Phase.LOGIN;
             controller.sameName(name);
+        }catch (NoNameException e){
+            Controller.phase = Phase.LOGIN;
+            controller.noName();
         }
 
         if(login) {
@@ -122,6 +125,7 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
            controller.noName();
         }
     }
+
     /**
      * NetworkClient interface methods
      *
@@ -269,19 +273,26 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
         }
     }
 
-    public void disconnect() {
-        controller.disconnect();
-    }
-
     //RMIClientInterface methods. These methods are called by the server to update the client's view.
     /**
      * Stops the waiting phase for the client.
      * This method is used to transition the client from a waiting phase to the color selection phase.
      */
     @Override
-    public void stopWaiting() {
-        Controller.setPhase(Phase.COLOR);
+    public void lobbyReadyReachedMaxSize(boolean lobbyIsReady) {
+        if(lobbyIsReady){
+            Controller.setPhase(Phase.COLOR);
+        }else{
+            Controller.setPhase(Phase.WAIT_NUMBER_OF_PLAYERS);
+            //TODO We are waiting other players to connect to the lobby
+        }
     }
+
+    @Override
+    public void disconnect() {
+        controller.disconnect();
+    }
+
     /**
      * Refreshes the list of users in the game.
      * This method is used to update the list of players and their corresponding colors.
@@ -291,7 +302,6 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
     @Override
     public void refreshUsers(HashMap<String, Color> playersAndPins) {
         controller.refreshUsers(playersAndPins);
-        //TODO logica opposta
     }
     /**
      * Sends information about the cards on the table to the client.

@@ -108,13 +108,13 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
      * @throws LobbyCompleteException If the lobby is already complete and no more players can join.
      */
     @Override
-    public boolean loginAndIsFirst(RMIClientInterface clientRMI, String nickname) throws RemoteException, SameNameException, LobbyCompleteException {
+    public boolean loginAndIsFirst(RMIClientInterface clientRMI, String nickname) throws RemoteException, SameNameException, LobbyCompleteException, NoNameException {
         //Add player to the starting lobby, throws exception if the lobby is already complete or the nickname is already taken
         Controller.getInstance().addPlayer(nickname);
         //Add the player to the connections map
         connections.put(nickname, clientRMI);
-        //Refresh the users list for all clients
-        NetworkHandler.getInstance().refreshUsersBroadcast();
+        //We told players if all joined in
+        NetworkHandler.getInstance().finalizingNumberOfPlayersBroadcast();
         //Return whether the player is the first one to log in
         return Controller.getInstance().getIsFirst(nickname);
     }
@@ -140,7 +140,7 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
         //TODO remove all players before, quando viene chiusa la lobby
         //Deletes all other connections that are not in the lobby
 
-        NetworkHandler.getInstance().finalizingNumberOfPlayersBroadcast(numberOfPlayers);
+        NetworkHandler.getInstance().finalizingNumberOfPlayersBroadcast();
         //NetworkHandler.getInstance().refreshUsersBroadcast();
     }
     /**
@@ -311,7 +311,7 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
             //send the updated user list to the client
             try  {
                 connection.refreshUsers(playersAndPins);
-                } catch (RemoteException e) {
+            } catch (RemoteException e) {
                     //TODO
             }
         }
@@ -365,13 +365,21 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
     //TODO javadoc and comment
 
     @Override
-    public void finalizingNumberOfPlayers() {
+    public void finalizingNumberOfPlayers(boolean lobbyIsReady) {
         for(String nickname : connections.keySet()){
             new Thread(() -> {
-                try {
-                    connections.get(nickname).stopWaiting();
-                } catch (RemoteException e) {
-                    //TODO
+                if(Controller.getInstance().isAdmitted(nickname)){
+                    try {
+                        connections.get(nickname).lobbyReadyReachedMaxSize(lobbyIsReady);
+                    } catch (RemoteException e) {
+                        //TODO
+                    }
+                }else{
+                    try {
+                        connections.get(nickname).disconnect();
+                    } catch (RemoteException e) {
+                        //TODO
+                    }
                 }
             }).start();
         }

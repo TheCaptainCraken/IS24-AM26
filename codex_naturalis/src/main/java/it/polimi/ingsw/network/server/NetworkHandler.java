@@ -1,5 +1,6 @@
 package it.polimi.ingsw.network.server;
 
+import it.polimi.ingsw.controller.server.Controller;
 import it.polimi.ingsw.model.Kingdom;
 import it.polimi.ingsw.model.exception.LobbyCompleteException;
 import it.polimi.ingsw.model.exception.NoNameException;
@@ -60,7 +61,7 @@ public class NetworkHandler {
         networkInterfacesAndConnections.put(nameNetworkPlug, networkPlug);
     }
 
-    public void finalizingNumberOfPlayersBroadcast(int numberOfPlayers) throws SameNameException, LobbyCompleteException, NoNameException {
+    public void finalizingNumberOfPlayersBroadcast() throws SameNameException, LobbyCompleteException, NoNameException {
         //TODO do a method that choose from lists of connections in each NetworkPlug`s HashMap
         //TODO capire come eliminare i giocatori in più
 
@@ -74,8 +75,10 @@ public class NetworkHandler {
 //                connections.get(nickname).stopWaiting(nickname);
 //            }
 //        }
+        //Scrematura giocatori se lobby.size() > maxSize
+        boolean lobbyIsReady = Controller.getInstance().lobbyIsReady();
         for (NetworkPlug networkPlug : networkInterfacesAndConnections.values()) {
-            networkPlug.finalizingNumberOfPlayers();
+            networkPlug.finalizingNumberOfPlayers(lobbyIsReady);
         }
         lobbyIsReady = true;
     }

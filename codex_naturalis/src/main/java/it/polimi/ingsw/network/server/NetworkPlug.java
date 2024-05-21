@@ -47,7 +47,7 @@ public interface NetworkPlug {
      * @throws SameNameException      If two players have the same nickname.
      * @throws LobbyCompleteException If the lobby is already full.
      */
-    void finalizingNumberOfPlayers() ;
+    void finalizingNumberOfPlayers(boolean lobbyIsReady) ;
 
     /**
      * Communicates to the clients that the game is starting. The message should be

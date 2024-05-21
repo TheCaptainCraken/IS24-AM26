@@ -23,7 +23,7 @@ public interface RMIServerInterface extends Remote {
      * @throws SameNameException throws a SameNameException if the nickname is already taken.
      * @throws LobbyCompleteException throws a LobbyCompleteException if the lobby is already full or the game has already started.
      */
-    boolean loginAndIsFirst(RMIClientInterface clientRMI, String nickname) throws RemoteException, SameNameException, LobbyCompleteException;
+    boolean loginAndIsFirst(RMIClientInterface clientRMI, String nickname) throws RemoteException, SameNameException, LobbyCompleteException, NoNameException;
 
     /**
      * This method is used to check if the lobby is ready to start the game.

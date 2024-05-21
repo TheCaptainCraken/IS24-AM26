@@ -440,4 +440,11 @@ public class Controller {
         return game.getGoldCard(position).getId();
     }
 
+    public boolean isAdmitted(String nickname) {
+        return lobby.isAdmitted(nickname);
+    }
+
+    public boolean lobbyIsReady(){
+        return lobby.isReady();
+    }
 }

@@ -40,7 +40,7 @@ public class Lobby {
         Player newPlayer = new Player(nickname);
         players.add(newPlayer);
 
-        if(players.size() == maxSize){
+        if(players.size() == maxSize && maxSize!=0){
             setLock();
         }
 
@@ -87,6 +87,13 @@ public class Lobby {
             throw new ClosingLobbyException();
         }
         this.maxSize = maxSize;
+        if(maxSize<players.size()){
+            for(Player player : players){
+                if(players.indexOf(player) >= maxSize){
+                    players.remove(player);
+                }
+            }
+        }
     }
 
     /** It locks the lobby so nobody can join anymore, the lobby cannot be unlocked
@@ -107,5 +114,21 @@ public class Lobby {
         }
 
         return PlayerAndPin;
+    }
+
+    public boolean isAdmitted(String nickname) {
+        for(Player player : players){
+            if(player.getName().equals(nickname)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isReady() {
+        if(maxSize == players.size()){
+            Collections.shuffle(players);
+        }
+        return maxSize == players.size();
     }
 }
