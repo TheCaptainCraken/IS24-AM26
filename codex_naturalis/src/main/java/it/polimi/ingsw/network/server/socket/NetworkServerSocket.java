@@ -35,7 +35,9 @@ import it.polimi.ingsw.network.messages.server.gameflow.CardIsPositioned;
 import it.polimi.ingsw.network.messages.server.gameflow.ShowDrawnCard;
 import it.polimi.ingsw.network.messages.server.gameflow.ShowNewTableCard;
 import it.polimi.ingsw.network.messages.server.gameflow.TurnInfo;
+import it.polimi.ingsw.network.messages.server.gamestart.FirstPlayer;
 import it.polimi.ingsw.network.messages.server.gamestart.GiveSecretObjectiveCards;
+import it.polimi.ingsw.network.messages.server.gamestart.ShowHand;
 import it.polimi.ingsw.network.messages.server.gamestart.ShowHiddenHand;
 import it.polimi.ingsw.network.messages.server.gamestart.ShowObjectiveCards;
 import it.polimi.ingsw.network.messages.server.gamestart.ShowStartingCard;
@@ -51,17 +53,28 @@ import java.io.*;
 public class NetworkServerSocket implements NetworkPlug {
 
     private ServerSocket serverSocket;
+
     private Controller controller;
 
-    // ip : ClientHandler
     private HashMap<String, ClientHandler> connections;
 
+    /**
+     * This constructor is used to create a new NetworkServerSocket.
+     * 
+     * @param port The port of the server.
+     * @throws IOException
+     */
     public NetworkServerSocket(int port) throws IOException {
         serverSocket = new ServerSocket(port);
         NetworkHandler.getInstance().addNetworkPlug("socket", this);
         controller = Controller.getInstance();
     }
 
+    /**
+     * This method is used to start the server.
+     * 
+     * @throws IOException
+     */
     public void start() throws IOException {
         while (2 + 2 == 4) {
             Socket new_connection = serverSocket.accept();
@@ -71,16 +84,22 @@ public class NetworkServerSocket implements NetworkPlug {
         }
     }
 
+    /**
+     * This method is used to send a message to all the clients.
+     * 
+     * @param message The message to be sent.
+     */
     private void sendBroadCastMessage(ServerMessage message) {
         for (String client : connections.keySet()) {
             connections.get(client).sendMessage(message);
         }
     }
 
-    // TODO: I have no idea what I should do here.
     @Override
-    public void finalizingNumberOfPlayers() {
-        sendBroadCastMessage(new StopWaiting());
+    public void finalizingNumberOfPlayers(boolean lobbyIsReady) {
+        if (lobbyIsReady) {
+            sendBroadCastMessage(new StopWaiting());
+        }
     }
 
     @Override
@@ -131,7 +150,10 @@ public class NetworkServerSocket implements NetworkPlug {
     @Override
     public void sendingHandsAndWhenSecretObjectiveCardsCompleteStartGameFlow(String nickname,
             boolean allWithSecretObjectiveCardChosen) {
-    }// TODO discuss if we have to modify
+        for (String player : controller.getNicknames()) {
+            connections.get(player).sendHand(nickname, allWithSecretObjectiveCardChosen);
+        }
+    }
 
     @Override
     public void sendPlacedCard(String nickname, int cardId, Point position, boolean side) {
@@ -152,6 +174,9 @@ public class NetworkServerSocket implements NetworkPlug {
         sendBroadCastMessage(new ShowRanking(controller.getRanking()));
     }
 
+    /**
+     * This class is used to handle the connection with the client.
+     */
     private static class ClientHandler extends Thread {
         private Socket clientSocket;
         private ObjectOutputStream out;
@@ -166,6 +191,9 @@ public class NetworkServerSocket implements NetworkPlug {
             networkHandler = NetworkHandler.getInstance();
         }
 
+        /**
+         * This method is used to handle the messages received from the client.
+         */
         public void run() {
             try {
                 out = new ObjectOutputStream(clientSocket.getOutputStream());
@@ -184,8 +212,12 @@ public class NetworkServerSocket implements NetworkPlug {
             }
         }
 
-        // manca la parte di fine della partita.
-        // appena finito, refactoring perché è troppo lungo.
+        /**
+         * This method is used to handle the messages received from the client.
+         * 
+         * @param message The message received from the client.
+         * @throws ClassNotFoundException
+         */
         private void handleMessage(ClientMessage message) throws ClassNotFoundException {
             if (message instanceof LoginMessage) {
                 LoginMessage parsedMessage = (LoginMessage) message;
@@ -205,7 +237,7 @@ public class NetworkServerSocket implements NetworkPlug {
                 NumberOfPlayersMessage parsedMessage = (NumberOfPlayersMessage) message;
                 try {
                     controller.initializeLobby(parsedMessage.getNumber());
-                    networkHandler.finalizingNumberOfPlayersBroadcast(parsedMessage.getNumber());
+                    networkHandler.finalizingNumberOfPlayersBroadcast();
                 } catch (ClosingLobbyException e) {
                     sendErrorMessage(ErrorType.LOBBY_IS_CLOSED);
                     hastaLaVistaBaby(); // as per diagram
@@ -312,6 +344,9 @@ public class NetworkServerSocket implements NetworkPlug {
             }
         }
 
+        /**
+         * This method is used to close the connection with the client.
+         */
         private void hastaLaVistaBaby() {
             try {
                 in.close();
@@ -322,10 +357,20 @@ public class NetworkServerSocket implements NetworkPlug {
             }
         }
 
+        /**
+         * This method is used to send an error message to the client.
+         * 
+         * @param errorType The type of the error.
+         */
         public void sendErrorMessage(ErrorType errorType) {
             sendMessage(new ErrorMessage(errorType));
         }
 
+        /**
+         * This method is used to send a message to the client.
+         * 
+         * @param message The message to be sent.
+         */
         public void sendMessage(ServerMessage message) {
             try {
                 out.writeObject(message);
@@ -334,6 +379,13 @@ public class NetworkServerSocket implements NetworkPlug {
             }
         }
 
+        /**
+         * This method is used to send the common objective cards to the clients. It is
+         * a
+         * broadcast call.
+         * 
+         * @param objectiveCardIds The ids of the common objective cards.
+         */
         public void sendSecretObjectives() {
             try {
                 ArrayList<Integer> choices = new ArrayList<>(
@@ -344,6 +396,19 @@ public class NetworkServerSocket implements NetworkPlug {
             }
         }
 
+        /**
+         * This method is used to send the drawn card to the clients. It is a broadcast
+         * call.
+         * 
+         * @param nickname      The nickname of the player.
+         * @param newCardId     The id of the new card.
+         * @param headDeck      The head deck.
+         * @param gold          A boolean indicating whether the card is gold. To know
+         *                      which deck to update.
+         * @param onTableOrDeck An integer indicating whether the card is on the table
+         *                      or
+         *                      the deck.
+         */
         public void sendDrawnCardIfPlayer(String nickname, int newCardId, Kingdom headDeck, boolean gold,
                 int onTableOrDeck) {
             if (!this.nickname.equals(nickname)) {
@@ -352,6 +417,34 @@ public class NetworkServerSocket implements NetworkPlug {
 
             sendMessage(new ShowNewTableCard(newCardId, gold, onTableOrDeck));
             sendMessage(new TurnInfo(nickname, controller.getGameState()));
+        }
+
+        /**
+         * This method is used to send the hand of the player.
+         * 
+         * @param nickname                         The nickname of the player.
+         * @param allWithSecretObjectiveCardChosen A boolean indicating whether all the
+         *                                         players have chosen their secret
+         *                                         objective card.
+         */
+        public void sendHand(String nickname, boolean allWithSecretObjectiveCardChosen) {
+            if (this.nickname.equals(nickname)) {
+                try {
+                    sendMessage(new ShowHand(nickname, new ArrayList<>(Arrays.asList(controller.getHand(nickname)))));
+                } catch (NoNameException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                try {
+                    sendMessage(new ShowHiddenHand(nickname, controller.getHiddenHand(nickname)));
+                } catch (NoNameException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            if (allWithSecretObjectiveCardChosen) {
+                sendMessage(new FirstPlayer(controller.getFirstPlayer()));
+            }
         }
     }
 
