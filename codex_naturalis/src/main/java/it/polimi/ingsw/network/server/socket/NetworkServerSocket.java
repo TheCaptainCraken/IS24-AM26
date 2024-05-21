@@ -1,7 +1,6 @@
 package it.polimi.ingsw.network.server.socket;
 
 import java.net.*;
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -10,7 +9,6 @@ import java.awt.Point;
 import it.polimi.ingsw.controller.server.Controller;
 import it.polimi.ingsw.model.Color;
 import it.polimi.ingsw.model.Kingdom;
-import it.polimi.ingsw.model.Player;
 import it.polimi.ingsw.model.exception.CardPositionException;
 import it.polimi.ingsw.model.exception.ClosingLobbyException;
 import it.polimi.ingsw.model.exception.ColorAlreadyTakenException;
@@ -35,10 +33,14 @@ import it.polimi.ingsw.network.messages.server.endgame.ShowPointsFromObjectives;
 import it.polimi.ingsw.network.messages.server.endgame.ShowRanking;
 import it.polimi.ingsw.network.messages.server.gameflow.CardIsPositioned;
 import it.polimi.ingsw.network.messages.server.gameflow.ShowDrawnCard;
+import it.polimi.ingsw.network.messages.server.gameflow.ShowNewTableCard;
 import it.polimi.ingsw.network.messages.server.gameflow.TurnInfo;
+import it.polimi.ingsw.network.messages.server.gamestart.GiveSecretObjectiveCards;
+import it.polimi.ingsw.network.messages.server.gamestart.ShowHiddenHand;
 import it.polimi.ingsw.network.messages.server.gamestart.ShowObjectiveCards;
 import it.polimi.ingsw.network.messages.server.gamestart.ShowStartingCard;
 import it.polimi.ingsw.network.messages.server.gamestart.ShowTable;
+import it.polimi.ingsw.network.messages.server.gamestart.StopWaiting;
 import it.polimi.ingsw.network.messages.server.login.PlayersAndColorPins;
 import it.polimi.ingsw.network.messages.server.login.StatusLogin;
 import it.polimi.ingsw.network.server.NetworkHandler;
@@ -78,10 +80,11 @@ public class NetworkServerSocket implements NetworkPlug {
     // TODO: I have no idea what I should do here.
     @Override
     public void finalizingNumberOfPlayers() {
+        sendBroadCastMessage(new StopWaiting());
     }
 
     @Override
-    public void gameIsStarting()  {
+    public void gameIsStarting() {
         int resourceCard0 = controller.getResourceCards(0);
         int resourceCard1 = controller.getResourceCards(1);
 
@@ -94,12 +97,13 @@ public class NetworkServerSocket implements NetworkPlug {
         sendBroadCastMessage(
                 new ShowTable(resourceCard0, resourceCard1, goldCard0, goldCard1, resourceCardOnDeck, goldCardOnDeck));
 
-        ArrayList<String> players = new ArrayList<String>();
+        ArrayList<String> players = controller.getNicknames();
         for (String player : players) {
             try {
                 sendBroadCastMessage(new ShowStartingCard(controller.getStartingCard(player)));
             } catch (NoNameException e) {
-                //TODO
+                // This error should never occur
+                e.printStackTrace();
             }
         }
     }
@@ -107,19 +111,7 @@ public class NetworkServerSocket implements NetworkPlug {
     @Override
     public void refreshUsers() {
         HashMap<String, Color> playersAndPins = controller.getPlayersAndPins();
-
-        HashMap<Player, Color> playersAndPinsPlayer = new HashMap<>();
-
-        for (String player : playersAndPins.keySet()) {
-            try {
-                playersAndPinsPlayer.put(controller.getPlayer(player), playersAndPins.get(player));
-            } catch (NoNameException e) {
-                // either handle the exception or change the constructor of the message.
-            }
-        }
-
-        sendBroadCastMessage(new PlayersAndColorPins(playersAndPinsPlayer)); // change constructor of message or handle
-                                                                             // the exception
+        sendBroadCastMessage(new PlayersAndColorPins(playersAndPins));
     }
 
     @Override
@@ -130,7 +122,9 @@ public class NetworkServerSocket implements NetworkPlug {
             sendBroadCastMessage(
                     new ShowObjectiveCards(new ArrayList<>(Arrays.asList(controller.getCommonObjectiveCards()))));
 
-            // send message to single players with their unique cards objectives.
+            for (String player : controller.getNicknames()) {
+                connections.get(player).sendSecretObjectives();
+            }
         }
     }
 
@@ -140,14 +134,16 @@ public class NetworkServerSocket implements NetworkPlug {
     }// TODO discuss if we have to modify
 
     @Override
-    public void sendPlacedCard(String nickname, int cardId, Point position, boolean side)  {
+    public void sendPlacedCard(String nickname, int cardId, Point position, boolean side) {
         sendBroadCastMessage(new CardIsPositioned(nickname, cardId, position, side));
         sendBroadCastMessage(new TurnInfo(nickname, controller.getGameState()));
     }
 
     @Override
-    public void sendDrawnCard(String nickname, int newCardId, Kingdom headDeck, boolean gold, int onTableOrDeck)
-             {
+    public void sendDrawnCard(String nickname, int newCardId, Kingdom headDeck, boolean gold, int onTableOrDeck) {
+        for (String player : connections.keySet()) {
+            connections.get(player).sendDrawnCardIfPlayer(nickname, newCardId, headDeck, gold, onTableOrDeck);
+        }
     }
 
     @Override
@@ -162,6 +158,7 @@ public class NetworkServerSocket implements NetworkPlug {
         private ObjectInputStream in;
         private Controller controller;
         private NetworkHandler networkHandler;
+        private String nickname;
 
         public ClientHandler(Socket socket) {
             this.clientSocket = socket;
@@ -195,7 +192,7 @@ public class NetworkServerSocket implements NetworkPlug {
                 // handle login
                 try {
                     controller.addPlayer(parsedMessage.getNickname());
-                    // Salvo connessione
+                    nickname = parsedMessage.getNickname();
                     networkHandler.refreshUsersBroadcast();
                     sendMessage((new StatusLogin(controller.getIsFirst(parsedMessage.getNickname()))));
                 } catch (SameNameException e) {
@@ -209,7 +206,6 @@ public class NetworkServerSocket implements NetworkPlug {
                 try {
                     controller.initializeLobby(parsedMessage.getNumber());
                     networkHandler.finalizingNumberOfPlayersBroadcast(parsedMessage.getNumber());
-                    // wait stuff for players to join
                 } catch (ClosingLobbyException e) {
                     sendErrorMessage(ErrorType.LOBBY_IS_CLOSED);
                     hastaLaVistaBaby(); // as per diagram
@@ -228,12 +224,10 @@ public class NetworkServerSocket implements NetworkPlug {
                 try {
                     boolean isLobbyReadyToStart = controller.setColour(parsedMessage.getNickname(),
                             parsedMessage.getColor());
-                    // Ok (number of players in the lobby, name)
                     if (isLobbyReadyToStart) {
                         controller.start();
                         networkHandler.refreshUsersBroadcast();
                         networkHandler.gameIsStartingBroadcast();
-                        // GameStart() 
                     }
                 } catch (NoNameException e) {
                     sendErrorMessage(ErrorType.NAME_UNKNOWN);
@@ -245,8 +239,9 @@ public class NetworkServerSocket implements NetworkPlug {
                 try {
                     int cardId = controller.placeRootCard(parsedMessage.getNickname(), parsedMessage.isSide());
                     boolean allWithRootCardPlaced = controller.areAllRootCardPlaced();
-
-                    // send message to confirm
+                    networkHandler.sendingPlacedRootCardAndWhenCompleteObjectiveCardsBroadcast(
+                            parsedMessage.getNickname(),
+                            parsedMessage.isSide(), cardId, allWithRootCardPlaced);
                 } catch (WrongGamePhaseException e) {
                     sendErrorMessage(ErrorType.WRONG_PHASE);
                 } catch (NoTurnException e) {
@@ -261,7 +256,8 @@ public class NetworkServerSocket implements NetworkPlug {
                     controller.chooseObjectiveCard(parsedMessage.getNickname(), parsedMessage.getIndexCard());
                     boolean allWithSecretObjectiveCardChosen = controller.areAllSecretObjectiveCardChosen();
 
-                    // send message to confirm
+                    networkHandler.sendingHandsAndWhenSecretObjectiveCardsCompleteStartGameFlowBroadcast(
+                            parsedMessage.getNickname(), allWithSecretObjectiveCardChosen);
                 } catch (WrongGamePhaseException e) {
                     sendErrorMessage(ErrorType.WRONG_PHASE);
                 } catch (NoTurnException e) {
@@ -338,6 +334,25 @@ public class NetworkServerSocket implements NetworkPlug {
             }
         }
 
+        public void sendSecretObjectives() {
+            try {
+                ArrayList<Integer> choices = new ArrayList<>(
+                        Arrays.asList(controller.getSecretObjectiveCardsToChoose(nickname)));
+                sendMessage(new GiveSecretObjectiveCards(choices));
+            } catch (NoNameException e) {
+                e.printStackTrace();
+            }
+        }
+
+        public void sendDrawnCardIfPlayer(String nickname, int newCardId, Kingdom headDeck, boolean gold,
+                int onTableOrDeck) {
+            if (!this.nickname.equals(nickname)) {
+                sendMessage(new ShowDrawnCard(newCardId, nickname));
+            }
+
+            sendMessage(new ShowNewTableCard(newCardId, gold, onTableOrDeck));
+            sendMessage(new TurnInfo(nickname, controller.getGameState()));
+        }
     }
 
 }
