@@ -47,4 +47,9 @@ public class GUI extends Application {
          loginController.showInsertNumberOfPlayer();
     }
 
+    public void waitLobby(){
+        loginController.waitLobby();
+    }
+
+
 }
