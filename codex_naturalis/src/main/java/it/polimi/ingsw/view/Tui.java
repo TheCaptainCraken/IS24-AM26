@@ -4,19 +4,17 @@ import it.polimi.ingsw.controller.client.Controller;
 import it.polimi.ingsw.model.*;
 import it.polimi.ingsw.model.Color;
 import javafx.util.Pair;
-import it.polimi.ingsw.view.CardClient;
 
 import java.awt.*;
 import java.util.*;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 /**
  * This class represents the Text User Interface (TUI) of the game.
  * It is responsible for displaying game information to the player and receiving player input.
  */
-public class Tui {
+public class Tui implements InterfaceForView{
     private final Controller controller;
     private final LittleModel model;
 
@@ -32,7 +30,8 @@ public class Tui {
     /**
      * Displays to show the first player to enter the number of players.
      */
-    public void showInsertNumberOfPlayer() {
+    @Override
+    public void showInsertNumberOfPlayers() {
             System.out.println("You are the first player. Please enter the number of players");
             System.out.println("The number of players must be between 2 and 4");
 
@@ -60,6 +59,7 @@ public class Tui {
     /**
      * Informs the player that they are connected to the server and waiting for the first player to choose the number of players.
      */
+    @Override
     public void waitLobby() {
         System.out.println("You are connected to the server. Please wait for all players to join the game");
     }
@@ -67,6 +67,7 @@ public class Tui {
     /**
      * Informs the player that the game is starting.
      */
+    @Override
     public void stopWaiting() {
         System.out.println("The game is starting");
     }
@@ -114,6 +115,7 @@ public class Tui {
     /**
      * Informs the player that the lobby has been filled with the number of players chosen by the first player.
      */
+    @Override
     public void disconnect() {
         System.out.println("Lobby has been fulled with number of parameters chosen by the first player");
     }
@@ -123,6 +125,7 @@ public class Tui {
      *
      * @param playersAndPins A HashMap containing the player nicknames as keys and their associated colors as values.
      */
+    @Override
     public void refreshUsers(HashMap<String, Color> playersAndPins) {
         System.out.println("The players in the lobby are:");
         for (String nickname : playersAndPins.keySet()) {
@@ -136,6 +139,7 @@ public class Tui {
      *
      * @param startingCardId The ID of the starting card.
      */
+    @Override
     public synchronized void showStartingCard(int startingCardId) {
         PlayedCard card = model.getStartingCard(startingCardId, true);
         PlayedCard cardBack = model.getStartingCard(startingCardId, false);
@@ -162,6 +166,7 @@ public class Tui {
      *
      * @param objectiveCardIds The IDs of the objective cards.
      */
+    @Override
     public synchronized void showCommonObjectives(Integer[] objectiveCardIds) {
         List<String[]> cards = new ArrayList<>();
 
@@ -191,6 +196,7 @@ public class Tui {
      *
      * @param indexCard The index of the secret objective card to print.
      */
+    @Override
     public synchronized void showSecretObjectiveCard(int indexCard) {
         System.out.println("This is your secret objective card: ");
         String[] secretObjective = createObjectiveCardToPrint(indexCard);
@@ -206,6 +212,7 @@ public class Tui {
      *
      * @param objectiveCardIds An array of IDs of the secret objective cards that the player can choose from.
      */
+    @Override
     public synchronized void showSecretObjectiveCardsToChoose(Integer[] objectiveCardIds) {
         List<String[]> cards = new ArrayList<>();
 
@@ -235,7 +242,7 @@ public class Tui {
      *
      * @param indexCard The index of the objective card to print.
      */
-    public String[] createObjectiveCardToPrint(int indexCard) {
+    private String[] createObjectiveCardToPrint(int indexCard) {
         ObjectiveCard card = model.getObjectiveCard(indexCard);
         String[] objective = null;
 
@@ -372,7 +379,7 @@ public class Tui {
      *
      * @param card The playedCardToPrint of the card to print.
      */
-    public String[] createCardToPrint(PlayedCard card) {
+    private String[] createCardToPrint(PlayedCard card) {
         HashMap<Corner, String> corner = new HashMap<>();
         String p = " ";
         ArrayList<String> midSigns = new ArrayList<>();
@@ -439,7 +446,7 @@ public class Tui {
 
     }
 
-    public String signToEmoji(String sign) {
+    private String signToEmoji(String sign) {
         switch (sign) {
             case "MUSHROOM":
                 return "\uD83C\uDF44"; // Fungus emoji
@@ -462,7 +469,7 @@ public class Tui {
         }
     }
 
-    public String signToEmojiForStartingCard(String sign) {
+    private String signToEmojiForStartingCard(String sign) {
         switch (sign) {
             case "MUSHROOM":
             case "FUNGI":
@@ -489,22 +496,6 @@ public class Tui {
         }
     }
 
-
-    public String kingdomToEmoji(String kingdom) {
-        switch (kingdom) {
-            case "PLANT":
-                return "\uD83C\uDF31"; // Herb emoji
-            case "ANIMAL":
-                return "\uD83D\uDC36"; // Dog emoji
-            case "FUNGI":
-                return "\uD83C\uDF44"; // Fungus emoji
-            case "INSECT":
-                return "\uD83D\uDC1B"; // Bug emoji
-            default:
-                return "  "; // Restituisci una stringa vuota o un'altra emoji di default se il Kingdom non è gestito
-        }
-    }
-
     private String centerStringMidSign(String word) {
         int length = 37;
         int wordLength = word.length();
@@ -519,6 +510,7 @@ public class Tui {
      * @param currentPlayer The current player.
      * @param gameState     The current game state.
      */
+    @Override
     public synchronized void showTurnInfo(String currentPlayer, GameState gameState) {
         System.out.println("It's " + currentPlayer + "'s turn");
         System.out.println("The game phase is: " + gameState);
@@ -529,6 +521,7 @@ public class Tui {
      *
      * @param extraPoints The extra points of the players.
      */
+    @Override
     public synchronized void showExtraPoints(HashMap<String, Integer> extraPoints) {
         System.out.println("The points made by ObjectiveCards are:");
         for (String player : extraPoints.keySet()) {
@@ -541,11 +534,17 @@ public class Tui {
      *
      * @param ranking The ranking of the players.
      */
+    @Override
     public synchronized void showRanking(ArrayList<Player> ranking) {
         System.out.println("The ranking is:");
         for (Player player : ranking) {
             System.out.println(player);
         }
+    }
+
+    @Override
+    public void showHiddenHand(String nickname) {
+        //TODO
     }
 
 //    public void printTableAreaOfPlayer(String nickname) {
@@ -681,16 +680,10 @@ public class Tui {
         return arrows;
     }
 
-
-    public PlayedCard getTable(String nickname) {
-        //TODO get the table (RootCard) of the player with the given nickname
-        return null;
-    }
-
     /**
      * Prints the default menu, with all the options to choose from.
      */
-    public void defaultMenu() {
+    private void defaultMenu() {
         System.out.println("please insert a number for choosing the option");
         System.out.println("" +
                 "1 - place a card\n" +
@@ -760,7 +753,7 @@ public class Tui {
             int onTableOrDeck;
             boolean validInput = false;
 
-            printCommonTable();
+            showCommonTable();
             while (!validInput) {
                 try {
                     System.out.println("Enter true if the card is gold, false otherwise:");
@@ -812,7 +805,7 @@ public class Tui {
         }
     }
 
-    public void startPhase() {
+    private void startPhase() {
         Scanner scanner = new Scanner(System.in);
         String name;
 
@@ -828,6 +821,7 @@ public class Tui {
      * Shows the hidden hand of a player.
      *
      */
+    //TODO modifica uguale ad interfaccia
     public synchronized void showHiddenHand() {
         Set<String> players = model.getOtherPlayersCards().keySet();
 
@@ -858,6 +852,7 @@ public class Tui {
     /**
      * Shows the hand of the client.
      */
+    @Override
     public synchronized void showHand() {
         Integer[] myCards = model.getHand();
         ArrayList<String[]> cards = new ArrayList<>();
@@ -883,6 +878,7 @@ public class Tui {
      *
      * @param name The name of client.
      */
+    @Override
     public synchronized void showResourcesPlayer(String name) {
         HashMap<String, HashMap<Sign, Integer>> resources = model.getResources();
 
@@ -897,6 +893,7 @@ public class Tui {
     /**
      * Shows the resources of all players.
      */
+    @Override
     public synchronized void showResourcesAllPlayers() {
         HashMap<String, HashMap<Sign, Integer>> resources = model.getResources();
         for (String player : resources.keySet()) {
@@ -910,7 +907,7 @@ public class Tui {
         }
     }
 
-
+    @Override
     public synchronized void showPoints(HashMap<String, Integer> points) {
         System.out.println("The points of the players are:");
         for (String player : points.keySet()) {
@@ -922,6 +919,7 @@ public class Tui {
     /**
      * Informs the player that the chosen color is already taken.
      */
+    @Override
     public synchronized void colorAlreadyTaken() {
         System.out.println("The color you chose is already taken. Please choose another one");
     }
@@ -931,6 +929,7 @@ public class Tui {
      *
      * @param nickname The chosen nickname.
      */
+    @Override
     public synchronized void sameName(String nickname) {
         System.out.println("The nickname " + nickname + " is already taken. Please choose another one");
     }
@@ -938,6 +937,7 @@ public class Tui {
     /**
      * Informs the player that it's not their turn.
      */
+    @Override
     public synchronized void noTurn() {
         System.out.println("It's not your turn. You can't perform this action");
     }
@@ -945,15 +945,16 @@ public class Tui {
     /**
      * Informs the player that they don't have enough resources.
      *
-     * @param name The name of the player.
      */
-    public synchronized void notEnoughResources(String name) {
+    @Override
+    public synchronized void notEnoughResources() {
         System.out.println("You don't have enough resources to perform this action");
     }
 
     /**
      * Informs the player that they are not connected to the server.
      */
+    @Override
     public synchronized void noConnection() {
         System.out.println("You are not connected to the server. Please retry\n");
     }
@@ -961,6 +962,7 @@ public class Tui {
     /**
      * Informs the player that they can't position the card there.
      */
+    @Override
     public synchronized void cardPositionError() {
         System.out.println("You can't position the card there. Please try another position");
     }
@@ -968,6 +970,7 @@ public class Tui {
     /**
      * Informs the player that the lobby is full.
      */
+    @Override
     public synchronized void lobbyComplete() {
         System.out.println("The lobby is full. No other players can join");
     }
@@ -975,6 +978,7 @@ public class Tui {
     /**
      * Informs the player that he can't perform the action in this game phase.
      */
+    @Override
     public synchronized void wrongGamePhase() {
         System.out.println("You can't perform this action in this game phase");
     }
@@ -982,6 +986,7 @@ public class Tui {
     /**
      * Informs the client that the name given doesn't exist.
      */
+    @Override
     public synchronized void noPlayer() {
         System.out.println("The player doesn't exist");
     }
@@ -989,6 +994,7 @@ public class Tui {
     /**
      * Informs the player that the lobby is closed. A game already started.
      */
+    @Override
     public synchronized void closingLobbyError() {
         System.out.println("The input is not correct. Please retry");
     }
@@ -999,6 +1005,7 @@ public class Tui {
      * @param kingdom Kingdom to convert
      * @return Sign in which the Kingdom has been converted
      */
+    //TODO PERCHE NON è USATA?
     private Sign fromKingdomToSign(Kingdom kingdom) throws IllegalArgumentException {
         switch (kingdom) {
             case PLANT:
@@ -1026,6 +1033,7 @@ public class Tui {
 
     }
 
+    @Override
     public void start() {
         while (true) {
             if(Controller.getPhase() != Phase.WAIT)
@@ -1082,17 +1090,18 @@ public class Tui {
             }
         }
     }
-
+    @Override
     public synchronized void showIsFirst(String firstPlayer) {
         System.out.println("The first player is " + firstPlayer + ". The game is about to start");
     }
 
+    @Override
     public synchronized void correctNumberOfPlayers(int numberOfPlayers) {
         System.out.println("You have correctly set the number of players");
         System.out.println("The number of players are " + numberOfPlayers);
     }
 
-    public void chooseStartingCard() {
+    private void chooseStartingCard() {
         Scanner scanner = new Scanner(System.in);
         boolean isFacingUp = false;
 
@@ -1111,7 +1120,7 @@ public class Tui {
 
     }
 
-    public synchronized void printCommonTable() {
+    public synchronized void showCommonTable() {
         Integer[] resourceCards = model.getResourceCards();
         Integer[] goldCard = model.getGoldCards();
 
@@ -1163,7 +1172,7 @@ public class Tui {
         return null;
     }
 
-    public synchronized void printTableAreaOfPlayer(String nickname) {
+    private synchronized void printTableAreaOfPlayer(String nickname) {
         ArrayList<CardClient> cards = model.getListOfCardForTui(nickname);
         ArrayList<String[]> cardsToPrint = new ArrayList<>();
 

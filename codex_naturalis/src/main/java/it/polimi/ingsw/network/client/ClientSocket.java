@@ -65,30 +65,36 @@ public class ClientSocket implements Runnable, NetworkClient{
         try{
             socket = new Socket(address, port);
         } catch (IOException e) {
+            System.out.println("Server not reachable");
             throw new RuntimeException(e);
+            //TODO
         }
 
         try{
             inputStream = socket.getInputStream();
         } catch (IOException e) {
+            System.out.println("Error in input stream");
             throw new RuntimeException(e);
         }
 
         try{
             objInputStream = new ObjectInputStream(inputStream);
         } catch (IOException e) {
+            System.out.println("Error in object input stream");
             throw new RuntimeException(e);
         }
 
         try{
             outputStream = socket.getOutputStream();
         } catch (IOException e) {
+            System.out.println("Error in output stream");
             throw new RuntimeException(e);
         }
 
         try{
             objOutputStream = new ObjectOutputStream(outputStream);
         } catch (IOException e) {
+            System.out.println("Error in object output stream");
             throw new RuntimeException(e);
         }
 
@@ -184,6 +190,7 @@ public class ClientSocket implements Runnable, NetworkClient{
     public void chooseSecretObjectiveCard(int indexCard) {
         //input control by the client interface.
         //wait that all players have chosen the secret objective card.
+        controller.updateAndShowSecretObjectiveCard(indexCard);
         Controller.setPhase(Phase.WAIT_ALL_CHOSEN_SECRET_CARD);
         //send the message to the server.
         //possible errors can be:
@@ -265,8 +272,13 @@ public class ClientSocket implements Runnable, NetworkClient{
         ServerMessage answer;
         try {
             answer = (ServerMessage) objInputStream.readObject();
-        } catch (IOException | ClassNotFoundException e) {
+        } catch (IOException e) {
+            //TODO
             throw new RuntimeException(e);
+        }
+        catch (ClassNotFoundException e) {
+            System.out.println("This error should never happen. The server is sending a message that the client does not know how to handle.");
+            return null;
         }
         return answer;
     }
@@ -282,6 +294,7 @@ public class ClientSocket implements Runnable, NetworkClient{
         try{
             objOutputStream.writeObject(message);
         } catch (IOException e) {
+            //TODO
             throw new RuntimeException(e);
         }
     }

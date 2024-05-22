@@ -110,7 +110,7 @@ public class Controller {
      * The actual input is handled by the view (TUI or GUI).
      */
     public void askNumberOfPlayer() {
-        view.showInsertNumberOfPlayer();
+        view.showInsertNumberOfPlayers();
     }
     /**
      * Triggers the view to display a waiting message to the user.
@@ -157,7 +157,7 @@ public class Controller {
 
     public void cardsOnTable(Integer[] resourceCards, Integer[] goldCard, Kingdom resourceCardOnDeck, Kingdom goldCardOnDeck) {
         model.updateCommonTable(resourceCards, goldCard, resourceCardOnDeck, goldCardOnDeck);
-        view.printCommonTable();
+        view.showCommonTable();
     }
     /**
      * Triggers the view to display the starting card to the user.
@@ -391,7 +391,7 @@ public class Controller {
     }
 
     public void notEnoughResources() {
-        view.notEnoughResources(nickname);
+        view.notEnoughResources();
     }
 
     public void NoName() {
