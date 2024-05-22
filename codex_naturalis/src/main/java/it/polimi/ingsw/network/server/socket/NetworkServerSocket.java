@@ -32,6 +32,8 @@ import it.polimi.ingsw.network.messages.server.ServerMessage;
 import it.polimi.ingsw.network.messages.server.endgame.ShowPointsFromObjectives;
 import it.polimi.ingsw.network.messages.server.endgame.ShowRanking;
 import it.polimi.ingsw.network.messages.server.gameflow.CardIsPositioned;
+import it.polimi.ingsw.network.messages.server.gameflow.RefreshedPoints;
+import it.polimi.ingsw.network.messages.server.gameflow.RefreshedResources;
 import it.polimi.ingsw.network.messages.server.gameflow.ShowDrawnCard;
 import it.polimi.ingsw.network.messages.server.gameflow.ShowNewTableCard;
 import it.polimi.ingsw.network.messages.server.gameflow.TurnInfo;
@@ -43,6 +45,7 @@ import it.polimi.ingsw.network.messages.server.gamestart.ShowObjectiveCards;
 import it.polimi.ingsw.network.messages.server.gamestart.ShowStartingCard;
 import it.polimi.ingsw.network.messages.server.gamestart.ShowTable;
 import it.polimi.ingsw.network.messages.server.gamestart.StopWaiting;
+import it.polimi.ingsw.network.messages.server.login.LobbyIsReady;
 import it.polimi.ingsw.network.messages.server.login.PlayersAndColorPins;
 import it.polimi.ingsw.network.messages.server.login.StatusLogin;
 import it.polimi.ingsw.network.server.NetworkHandler;
@@ -96,7 +99,7 @@ public class NetworkServerSocket implements NetworkPlug {
     }
 
     @Override
-    //TODO
+    // TODO
     public void finalizingNumberOfPlayers(boolean lobbyIsReady) {
         if (lobbyIsReady) {
             sendBroadCastMessage(new StopWaiting());
@@ -117,16 +120,8 @@ public class NetworkServerSocket implements NetworkPlug {
         sendBroadCastMessage(
                 new ShowTable(resourceCard0, resourceCard1, goldCard0, goldCard1, resourceCardOnDeck, goldCardOnDeck));
 
-        ArrayList<String> players = controller.getNicknames();
-        //TODO cosi rimandi di nuovo a tutti. In più tue connessioni non quelle di tutti, potresti avere null
-        //starting card è un messaggio unicast a singolo player.
-        for (String player : players) {
-            try {
-                sendBroadCastMessage(new ShowStartingCard(controller.getStartingCard(player)));
-            } catch (NoNameException e) {
-                // This error should never occur
-                e.printStackTrace();
-            }
+        for (ClientHandler connection : connections.values()) {
+            connection.sendStartingCard();
         }
     }
 
@@ -141,13 +136,18 @@ public class NetworkServerSocket implements NetworkPlug {
             boolean allWithRootCardPlaced) {
 
         sendBroadCastMessage(new CardIsPositioned(nickname, cardId, new Point(0, 0), side));
-        //TODO punti e risorse
+        try {
+            sendBroadCastMessage(new RefreshedPoints(nickname, controller.getPlayerPoints(nickname)));
+            sendBroadCastMessage(new RefreshedResources(nickname, controller.getPlayerResources(nickname)));
+        } catch (NoNameException e) {
+            // This should never occur
+            e.printStackTrace();
+        }
         if (allWithRootCardPlaced) {
             sendBroadCastMessage(
                     new ShowObjectiveCards(new ArrayList<>(Arrays.asList(controller.getCommonObjectiveCards()))));
-            //TODO puoi avere null
-            for (String player : controller.getNicknames()) {
-                connections.get(player).sendSecretObjectives();
+            for (ClientHandler connection : connections.values()) {
+                connection.sendSecretObjectives();
             }
         }
     }
@@ -155,16 +155,15 @@ public class NetworkServerSocket implements NetworkPlug {
     @Override
     public void sendingHandsAndWhenSecretObjectiveCardsCompleteStartGameFlow(String nickname,
             boolean allWithSecretObjectiveCardChosen) {
-        //TODO puoi avere null
-        for (String player : controller.getNicknames()) {
-            connections.get(player).sendHand(nickname, allWithSecretObjectiveCardChosen);
+
+        for (ClientHandler connection : connections.values()) {
+            connection.sendHand(nickname, allWithSecretObjectiveCardChosen);
         }
     }
 
     @Override
     public void sendPlacedCard(String nickname, int cardId, Point position, boolean side) {
         sendBroadCastMessage(new CardIsPositioned(nickname, cardId, position, side));
-        //TODO non è il nickname, è il nuovo giocatore in gioco. Controller.getInstance().getCurrentPlayer()
         sendBroadCastMessage(new TurnInfo(controller.getCurrentPlayer(), controller.getGameState()));
     }
 
@@ -233,8 +232,8 @@ public class NetworkServerSocket implements NetworkPlug {
                     controller.addPlayer(parsedMessage.getNickname());
                     nickname = parsedMessage.getNickname();
                     networkHandler.refreshUsersBroadcast();
-                    sendMessage((new StatusLogin(controller.getIsFirst(parsedMessage.getNickname()))));
-                    //TODO lobbyIsReady
+                    sendMessage(new StatusLogin(controller.getIsFirst(parsedMessage.getNickname())));
+                    sendMessage(new LobbyIsReady(controller.lobbyIsReady()));
                 } catch (SameNameException e) {
                     sendErrorMessage(ErrorType.NAME_ALREADY_USED);
                 } catch (LobbyCompleteException e) {
@@ -264,11 +263,8 @@ public class NetworkServerSocket implements NetworkPlug {
                 try {
                     boolean isLobbyReadyToStart = controller.setColour(parsedMessage.getNickname(),
                             parsedMessage.getColor());
+                    networkHandler.refreshUsersBroadcast();
                     if (isLobbyReadyToStart) {
-                        //TODO non c'è questa parte la fa già networkHandler
-                        controller.start();
-                        //TODO non deve essere nell'if ma furoi. inviamo sempre il nuovo colore
-                        networkHandler.refreshUsersBroadcast();
                         networkHandler.gameIsStartingBroadcast();
                     }
                 } catch (NoNameException e) {
@@ -315,13 +311,9 @@ public class NetworkServerSocket implements NetworkPlug {
                             parsedMessage.getPosition(), parsedMessage.isSide());
                     networkHandler.sendPlacedCardBroadcast(parsedMessage.getNickname(), cardId,
                             parsedMessage.getPosition(), parsedMessage.isSide());
-
-                    //TODO manca parte if finale.
-                    // Check if the game has ended
-//                    if(Controller.getInstance().isEndGame()){
-//                        // Broadcast the end game information
-//                        NetworkHandler.getInstance().sendEndGameBroadcast();
-//                    }
+                    if (controller.isEndGame()) {
+                        networkHandler.sendEndGameBroadcast();
+                    }
                 } catch (WrongGamePhaseException e) {
                     sendErrorMessage(ErrorType.WRONG_PHASE);
                 } catch (NoTurnException e) {
@@ -339,12 +331,10 @@ public class NetworkServerSocket implements NetworkPlug {
                 try {
                     int CardId = controller.drawCard(parsedMessage.getNickname(), parsedMessage.isGold(),
                             parsedMessage.getOnTableOrOnDeck());
-                    //TODO perchè card id, è la nuova carta che c'è sul tavolo. devi mettere onTableOrOnDeck.
                     int newCardId = controller.newCardOnTable(parsedMessage.isGold(), CardId);
                     Kingdom headDeck = controller.getHeadDeck(parsedMessage.isGold());
-                    //TODO anche qua che senso ha? mandi due volte newCardId. Devi metter onTableOrDeck.
                     networkHandler.sendDrawnCardBroadcast(parsedMessage.getNickname(), newCardId, headDeck,
-                            parsedMessage.isGold(), newCardId);
+                            parsedMessage.isGold(), parsedMessage.getOnTableOrOnDeck());
 
                     if (controller.isEndGame()) {
                         networkHandler.sendEndGameBroadcast();
@@ -432,10 +422,8 @@ public class NetworkServerSocket implements NetworkPlug {
             if (!this.nickname.equals(nickname)) {
                 sendMessage(new ShowDrawnCard(newCardId, nickname));
             }
-            //TODO manca carta sul deck
-            sendMessage(new ShowNewTableCard(newCardId, gold, onTableOrDeck));
-            //TODO non è il nickname, è il nuovo giocatore in gioco. Controller.getInstance().getCurrentPlayer()
-            sendMessage(new TurnInfo(nickname, controller.getGameState()));
+            sendMessage(new ShowNewTableCard(newCardId, gold, onTableOrDeck, controller.getHeadDeck(gold)));
+            sendMessage(new TurnInfo(controller.getCurrentPlayer(), controller.getGameState()));
         }
 
         /**
@@ -462,8 +450,16 @@ public class NetworkServerSocket implements NetworkPlug {
             }
 
             if (allWithSecretObjectiveCardChosen) {
-                //TODO sistemare isFirstPlayer
+                // TODO sistemare isFirstPlayer
                 sendMessage(new FirstPlayer(controller.getFirstPlayer()));
+            }
+        }
+
+        public void sendStartingCard() {
+            try {
+                sendMessage(new ShowStartingCard(controller.getStartingCard(nickname)));
+            } catch (NoNameException e) {
+                sendErrorMessage(ErrorType.NAME_UNKNOWN);
             }
         }
     }
