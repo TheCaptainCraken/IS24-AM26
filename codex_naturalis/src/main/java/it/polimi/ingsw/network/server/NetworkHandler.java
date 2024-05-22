@@ -90,6 +90,7 @@ public class NetworkHandler {
      * @throws NoNameException
      */
     public void gameIsStartingBroadcast() {
+        //TODO conoreoller.start()
         for (NetworkPlug networkPlug : networkInterfacesAndConnections.values()) {
             networkPlug.gameIsStarting();
         }
