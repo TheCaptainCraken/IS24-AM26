@@ -114,6 +114,7 @@ public class ClientSocket implements Runnable, NetworkClient{
         //Possible errors can be:
         // - the nickname is already taken: NAME_ALREADY_TAKEN
         Controller.setPhase(Phase.WAIT);
+        Controller.setNickname(nickname);
         ClientMessage message = new LoginMessage(nickname);
         sendMessage(message);
     }
@@ -127,7 +128,9 @@ public class ClientSocket implements Runnable, NetworkClient{
      */
     @Override
     public void insertNumberOfPlayers(int numberOfPlayers){
-        //qui sempre corretto, da input è fatta questa cosa
+        //input always correct. The client interface will control the input.
+        //wait for message STOP_WAITING_OR_DISCONNECT true.
+        Controller.setPhase(Phase.WAIT);
         ClientMessage message = new NumberOfPlayersMessage(numberOfPlayers);
         sendMessage(message);
     }
@@ -182,7 +185,6 @@ public class ClientSocket implements Runnable, NetworkClient{
         //input control by the client interface.
         //wait that all players have chosen the secret objective card.
         Controller.setPhase(Phase.WAIT_ALL_CHOSEN_SECRET_CARD);
-        //TODO aggiungere due fasi di wait una per sidestartingCard, l'altra per objectiveCard
         //send the message to the server.
         //possible errors can be:
         // - the turn is not correct: NO_TURN

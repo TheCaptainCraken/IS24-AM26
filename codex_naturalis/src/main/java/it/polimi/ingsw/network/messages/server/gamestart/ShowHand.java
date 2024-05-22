@@ -7,9 +7,9 @@ import java.util.ArrayList;
 
 public class ShowHand extends ServerMessage {
     private final String nickname;
-    private final ArrayList<Integer> cardsInHand;
+    private final Integer[] cardsInHand;
 
-    public ShowHand(String nickname, ArrayList<Integer> cardsInHand) {
+    public ShowHand(String nickname, Integer[] cardsInHand) {
         this.nickname = nickname;
         this.cardsInHand = cardsInHand;
     }
@@ -18,13 +18,12 @@ public class ShowHand extends ServerMessage {
         return nickname;
     }
 
-    public ArrayList<Integer> getCardsInHand() {
+    public Integer[] getCardsInHand() {
         return cardsInHand;
     }
 
     @Override
     public void callController(Controller controller) {
-        Integer[] array = cardsInHand.toArray(new Integer[0]);
-        controller.updateHand(nickname,array);
+        controller.updateHand(nickname, cardsInHand);
     }
 }

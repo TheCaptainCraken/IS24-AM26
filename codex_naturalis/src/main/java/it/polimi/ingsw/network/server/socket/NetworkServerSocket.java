@@ -34,7 +34,6 @@ import it.polimi.ingsw.network.messages.server.endgame.ShowRanking;
 import it.polimi.ingsw.network.messages.server.gameflow.CardIsPositioned;
 import it.polimi.ingsw.network.messages.server.gameflow.RefreshedPoints;
 import it.polimi.ingsw.network.messages.server.gameflow.RefreshedResources;
-import it.polimi.ingsw.network.messages.server.gameflow.ShowDrawnCard;
 import it.polimi.ingsw.network.messages.server.gameflow.ShowNewTableCard;
 import it.polimi.ingsw.network.messages.server.gameflow.TurnInfo;
 import it.polimi.ingsw.network.messages.server.gamestart.FirstPlayer;
@@ -44,7 +43,7 @@ import it.polimi.ingsw.network.messages.server.gamestart.ShowHiddenHand;
 import it.polimi.ingsw.network.messages.server.gamestart.ShowObjectiveCards;
 import it.polimi.ingsw.network.messages.server.gamestart.ShowStartingCard;
 import it.polimi.ingsw.network.messages.server.gamestart.ShowTable;
-import it.polimi.ingsw.network.messages.server.gamestart.StopWaiting;
+import it.polimi.ingsw.network.messages.server.gamestart.StopWaitingOrDisconnect;
 import it.polimi.ingsw.network.messages.server.login.LobbyIsReady;
 import it.polimi.ingsw.network.messages.server.login.PlayersAndColorPins;
 import it.polimi.ingsw.network.messages.server.login.StatusLogin;
@@ -100,10 +99,16 @@ public class NetworkServerSocket implements NetworkPlug {
 
     @Override
     // TODO
-    public void finalizingNumberOfPlayers(boolean lobbyIsReady) {
-        if (lobbyIsReady) {
-            sendBroadCastMessage(new StopWaiting());
-        }
+    public void finalizingNumberOfPlayers() {
+       for(ClientHandler client : connections.values()){
+           if(controller.isAdmitted(client.getNickname())){
+               client.sendMessage(new StopWaitingOrDisconnect(true));
+           }else{
+               //disconnessione
+                client.sendMessage(new StopWaitingOrDisconnect(false));
+                client.hastaLaVistaBaby();
+           }
+       }
     }
 
     @Override
@@ -164,6 +169,14 @@ public class NetworkServerSocket implements NetworkPlug {
     @Override
     public void sendPlacedCard(String nickname, int cardId, Point position, boolean side) {
         sendBroadCastMessage(new CardIsPositioned(nickname, cardId, position, side));
+        //TODO fatto io
+        try {
+            sendBroadCastMessage(new RefreshedPoints(nickname, controller.getPlayerPoints(nickname)));
+            sendBroadCastMessage(new RefreshedResources(nickname, controller.getPlayerResources(nickname)));
+        } catch (NoNameException e) {
+            // This should never occur
+            e.printStackTrace();
+        }
         sendBroadCastMessage(new TurnInfo(controller.getCurrentPlayer(), controller.getGameState()));
     }
 
@@ -195,6 +208,10 @@ public class NetworkServerSocket implements NetworkPlug {
             this.clientSocket = socket;
             controller = Controller.getInstance();
             networkHandler = NetworkHandler.getInstance();
+        }
+
+        public String getNickname() {
+            return nickname;
         }
 
         /**
@@ -233,12 +250,18 @@ public class NetworkServerSocket implements NetworkPlug {
                     nickname = parsedMessage.getNickname();
                     networkHandler.refreshUsersBroadcast();
                     sendMessage(new StatusLogin(controller.getIsFirst(parsedMessage.getNickname())));
-                    sendMessage(new LobbyIsReady(controller.lobbyIsReady()));
+                    if(!controller.getIsFirst(parsedMessage.getNickname())){
+                        sendMessage(new LobbyIsReady(controller.lobbyIsReady()));
+                    }
+                    //TODO questo messaggio non ti serve in realtà
+                    networkHandler.finalizingNumberOfPlayersBroadcast();
                 } catch (SameNameException e) {
                     sendErrorMessage(ErrorType.NAME_ALREADY_USED);
                 } catch (LobbyCompleteException e) {
                     sendErrorMessage(ErrorType.LOBBY_ALREADY_FULL);
                     hastaLaVistaBaby(); // as per diagram
+                } catch (NoNameException e) {
+                    //TODO
                 }
             } else if (message instanceof NumberOfPlayersMessage) {
                 NumberOfPlayersMessage parsedMessage = (NumberOfPlayersMessage) message;
@@ -340,7 +363,7 @@ public class NetworkServerSocket implements NetworkPlug {
                         networkHandler.sendEndGameBroadcast();
                     }
 
-                    sendMessage(new ShowDrawnCard(newCardId, parsedMessage.getNickname()));
+                    sendMessage(new ShowHand(parsedMessage.getNickname(), controller.getHand(nickname)));
                 } catch (WrongGamePhaseException e) {
                     sendErrorMessage(ErrorType.WRONG_PHASE);
                 } catch (NoTurnException e) {
@@ -420,8 +443,14 @@ public class NetworkServerSocket implements NetworkPlug {
         public void sendDrawnCardIfPlayer(String nickname, int newCardId, Kingdom headDeck, boolean gold,
                 int onTableOrDeck) {
             if (!this.nickname.equals(nickname)) {
-                sendMessage(new ShowDrawnCard(newCardId, nickname));
+                //TODO sisteamre anche qua
+                try {
+                    sendMessage(new ShowHiddenHand(nickname, controller.getHiddenHand(nickname)));
+                } catch (NoNameException e) {
+                   //TODO
+                }
             }
+            //TODO aggiornamento carte girate
             sendMessage(new ShowNewTableCard(newCardId, gold, onTableOrDeck, controller.getHeadDeck(gold)));
             sendMessage(new TurnInfo(controller.getCurrentPlayer(), controller.getGameState()));
         }
@@ -437,7 +466,7 @@ public class NetworkServerSocket implements NetworkPlug {
         public void sendHand(String nickname, boolean allWithSecretObjectiveCardChosen) {
             if (this.nickname.equals(nickname)) {
                 try {
-                    sendMessage(new ShowHand(nickname, new ArrayList<>(Arrays.asList(controller.getHand(nickname)))));
+                    sendMessage(new ShowHand(nickname, controller.getHand(nickname)));
                 } catch (NoNameException e) {
                     e.printStackTrace();
                 }

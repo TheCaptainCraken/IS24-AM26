@@ -14,7 +14,7 @@ import java.util.HashMap;
 
 public class Lobby {
     private final ArrayList<Player> players;
-    private int index;//to letchooseFirstPlayer being reusable
+    private int index; //to letchooseFirstPlayer being reusable
     private int maxSize;
     boolean complete;
 
@@ -40,7 +40,9 @@ public class Lobby {
         Player newPlayer = new Player(nickname);
         players.add(newPlayer);
 
-        if(players.size() == maxSize && maxSize!=0){
+        //max size is always more than zero when we check here. The first player can choose the size of the lobby(2, 3, 4), so we set lock always when the lobby is full
+        //and the first player has chosen the number of players.
+        if(players.size() == maxSize){
             setLock();
         }
 
@@ -87,7 +89,8 @@ public class Lobby {
             throw new ClosingLobbyException();
         }
         this.maxSize = maxSize;
-        if(maxSize<players.size()){
+
+        if(maxSize < players.size()){
             for(Player player : players){
                 if(players.indexOf(player) >= maxSize){
                     players.remove(player);

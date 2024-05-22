@@ -8,6 +8,7 @@ import it.polimi.ingsw.model.Sign;
 import it.polimi.ingsw.model.exception.*;
 import it.polimi.ingsw.network.server.NetworkHandler;
 import it.polimi.ingsw.network.server.NetworkPlug;
+import it.polimi.ingsw.network.server.socket.NetworkServerSocket;
 import javafx.util.Pair;
 
 import java.awt.*;
@@ -38,8 +39,8 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
 
     public static void main(String[] args) throws IOException {
         ServerRMI obj = new ServerRMI();
-//        NetworkServerSocket networkServerSocket = new NetworkServerSocket(0);
-//        networkServerSocket.start();
+        NetworkServerSocket networkServerSocket = new NetworkServerSocket(0);
+        networkServerSocket.start();
     }
 
     /**
@@ -141,7 +142,7 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
         //Deletes all other connections that are not in the lobby
 
         NetworkHandler.getInstance().finalizingNumberOfPlayersBroadcast();
-        //NetworkHandler.getInstance().refreshUsersBroadcast();
+        NetworkHandler.getInstance().refreshUsersBroadcast();
     }
     /**
      * RMIServerInterface interface method
@@ -272,11 +273,12 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
      * @throws NoNameException If a player with the given nickname does not exist.
      */
     @Override
-    public int drawCard(String nickname, boolean gold, int onTableOrDeck)
+    public Integer[] drawCard(String nickname, boolean gold, int onTableOrDeck)
             throws WrongGamePhaseException, NoTurnException, NoNameException {
         // The player draws the card, returns the id of the drawn card. Throws an exception if the card cannot be drawn,
         // or if it's not the player's turn, or if the game is not in the correct phase.
-        int cardId = Controller.getInstance().drawCard(nickname, gold, onTableOrDeck);
+        //TODO
+        // int cardId = Controller.getInstance().drawCard(nickname, gold, onTableOrDeck);
         // Get the id of the new card on the table
         int newCardId = Controller.getInstance().newCardOnTable(gold, onTableOrDeck);
         // Get the head of the deck, the new card is drawn from. It is used to update the head of the deck on the client side.
@@ -291,8 +293,8 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
             NetworkHandler.getInstance().sendEndGameBroadcast();
         }
         // Return the id of the drawn card, used to update the client side.
-        // It is a unicast call. Other players are not able to see the drawn card.
-        return cardId;
+        // It is unicast call. Other players are not able to see the drawn card.
+        return Controller.getInstance().getHand(nickname);
     }
 
     /**
@@ -307,6 +309,7 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
     @Override
     public void refreshUsers(){
         HashMap<String, Color> playersAndPins = Controller.getInstance().getPlayersAndPins();
+        //TODO thread
         for (RMIClientInterface connection : connections.values()){
             //send the updated user list to the client
             try  {
@@ -352,7 +355,7 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
 
             new Thread(() -> {
                 try {
-                    //send the starting card to the client, based on the player's nickname. It is a unicast method call.
+                    //send the starting card to the client, based on the player's nickname. It is  unicast method call.
                     connections.get(nicknameRefresh).showStartingCard(Controller.getInstance().getStartingCard(nicknameRefresh));
                 } catch (RemoteException e) {
                     //TODO
@@ -365,21 +368,24 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
     //TODO javadoc and comment
 
     @Override
-    public void finalizingNumberOfPlayers(boolean lobbyIsReady) {
+    public void finalizingNumberOfPlayers() {
         for(String nickname : connections.keySet()){
             new Thread(() -> {
                 if(Controller.getInstance().isAdmitted(nickname)){
                     try {
-                        connections.get(nickname).lobbyReadyReachedMaxSize(lobbyIsReady);
+                        connections.get(nickname).stopWaiting();
                     } catch (RemoteException e) {
                         //TODO
                     }
                 }else{
+                    //TODO eliminare dalle disconnesioni tabella.
                     try {
                         connections.get(nickname).disconnect();
                     } catch (RemoteException e) {
+                        connections.remove(nickname);
                         //TODO
                     }
+                    connections.remove(nickname);
                 }
             }).start();
         }
@@ -413,6 +419,7 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
                  }
 
                  for(String nicknameRefresh : connections.keySet()){
+
             if(nickname.equals(nicknameRefresh)){
                 try {
                     // Send the player's hand to the client. It is unicast call, only the player can see their hand.

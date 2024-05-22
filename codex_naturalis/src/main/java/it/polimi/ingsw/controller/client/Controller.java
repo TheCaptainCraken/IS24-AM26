@@ -16,7 +16,6 @@ import it.polimi.ingsw.view.Tui;
 import javafx.util.Pair;
 
 import java.awt.*;
-import java.io.Serializable;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -247,8 +246,8 @@ public class Controller {
         model.updateResources(nickname, resources);
     }
 
-    public void updateDrawCard(String nickname, int cardId) {
-        model.updateDrawCard(nickname, cardId);
+    public void updateDrawCard(String nickname, Integer[] newHand) {
+        model.updatePrivateHand(newHand);
     }
 
     public void updateScore(String nickname, int points) {
@@ -263,7 +262,8 @@ public class Controller {
         model.updateCardOnTable(newCardId, gold, onTableOrDeck);
     }
     public void updateHand(String nickname, Integer[] hand) {
-        model.updateHand(nickname, hand);
+        view.showHand();
+        model.updatePrivateHand(hand);
     }
 
     public void updateHiddenHand(String nickname, Pair<Kingdom, Boolean>[] hand) {

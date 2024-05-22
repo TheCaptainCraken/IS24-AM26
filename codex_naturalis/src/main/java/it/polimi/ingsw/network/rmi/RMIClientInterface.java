@@ -114,7 +114,7 @@ public interface RMIClientInterface extends Remote {
      * This method sends to all the stopWaiting signal. When this call arrives, the client knows that it can be in CHOOSE COLOR PHASE.
      * @throws RemoteException throws a RemoteException if there is a problem with the connection.
      */
-    void lobbyReadyReachedMaxSize(boolean lobbyReady) throws RemoteException;
+    void stopWaiting() throws RemoteException;
 
     void disconnect() throws RemoteException;
 }

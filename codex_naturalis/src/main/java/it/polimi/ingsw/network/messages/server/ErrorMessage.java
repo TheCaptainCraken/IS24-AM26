@@ -49,6 +49,8 @@ public class ErrorMessage extends ServerMessage {
                 Controller.setPhase(Phase.COLOR);
                 controller.colorAlreadyTaken();
             case NAME_ALREADY_USED:
+                //TODO forse conviene messaggio di ritorno sul refreshUsers.
+                Controller.setNickname(null);
                 Controller.setPhase(Phase.LOGIN);
                 //TODO stampare nome non disponibile, senti Pietro
             case LOBBY_ALREADY_FULL:

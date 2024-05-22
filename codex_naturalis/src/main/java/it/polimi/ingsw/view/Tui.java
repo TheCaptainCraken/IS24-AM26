@@ -61,7 +61,7 @@ public class Tui {
      * Informs the player that they are connected to the server and waiting for the first player to choose the number of players.
      */
     public void waitLobby() {
-        System.out.println("You are connected to the server. Please wait for the first player to choose the number of players");
+        System.out.println("You are connected to the server. Please wait for all players to join the game");
     }
 
     /**

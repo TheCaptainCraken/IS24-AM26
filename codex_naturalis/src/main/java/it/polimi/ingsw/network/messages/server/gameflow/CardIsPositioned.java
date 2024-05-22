@@ -36,6 +36,7 @@ public class CardIsPositioned extends ServerMessage {
 
     @Override
     public void callController(Controller controller) {
+        //TODO punti e risorse nuovo giocatore
         controller.updatePlaceCard(nickname,cardId,position,side);
     }
 }

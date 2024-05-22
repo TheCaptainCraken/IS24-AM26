@@ -40,14 +40,9 @@ public interface NetworkPlug {
      * All players allowed to join the game receive a stopWaiting message,
      * the others not allowed to play should be cancelled from the connection list,
      * and this should be notified to the clients.
-     * .
-     * 
-     * @throws NoNameException        If a player with the given nickname does not
-     *                                exist.
-     * @throws SameNameException      If two players have the same nickname.
-     * @throws LobbyCompleteException If the lobby is already full.
+     *
      */
-    void finalizingNumberOfPlayers(boolean lobbyIsReady) ;
+    void finalizingNumberOfPlayers();
 
     /**
      * Communicates to the clients that the game is starting. The message should be
@@ -56,7 +51,7 @@ public interface NetworkPlug {
      * gold card on deck, 1 resource card on deck).
      * It should notify the personal starting card for each player.
      */
-    void gameIsStarting() ;
+    void gameIsStarting();
 
     /**
      * Refreshes the list of users.
@@ -68,7 +63,7 @@ public interface NetworkPlug {
      * Sends the placed root card broadcast to all client.
      * If all players have placed their root card, and thus @param
      * allWithRootCardPlaced is true, you notify the common Objectives cards.
-     * Also with a unicast message you notify the secret objective cards that the
+     * Also with unicast message you notify the secret objective cards that the
      * player can choose.
      *
      * @param nickname              The nickname of the player.
@@ -126,8 +121,7 @@ public interface NetworkPlug {
 
     // TODO sistemare cosa invia, a volte inviamo meno uno per dire qualcosa,
     // scriverlo
-    void sendDrawnCard(String nickname, int newCardId, Kingdom headDeck, boolean gold, int onTableOrDeck)
-            ;
+    void sendDrawnCard(String nickname, int newCardId, Kingdom headDeck, boolean gold, int onTableOrDeck);
 
     /**
      * Sends the end game signal. Broadcast to all clients.

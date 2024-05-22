@@ -77,10 +77,11 @@ public class NetworkHandler {
 //        }
         //Scrematura giocatori se lobby.size() > maxSize
         boolean lobbyIsReady = Controller.getInstance().lobbyIsReady();
-        for (NetworkPlug networkPlug : networkInterfacesAndConnections.values()) {
-            networkPlug.finalizingNumberOfPlayers(lobbyIsReady);
+        if(lobbyIsReady) {
+            for (NetworkPlug networkPlug : networkInterfacesAndConnections.values()) {
+                networkPlug.finalizingNumberOfPlayers();
+            }
         }
-        lobbyIsReady = true;
     }
 
     /**
@@ -90,7 +91,8 @@ public class NetworkHandler {
      * @throws NoNameException
      */
     public void gameIsStartingBroadcast() {
-        //TODO conoreoller.start()
+        //TODO
+        Controller.getInstance().start();
         for (NetworkPlug networkPlug : networkInterfacesAndConnections.values()) {
             networkPlug.gameIsStarting();
         }

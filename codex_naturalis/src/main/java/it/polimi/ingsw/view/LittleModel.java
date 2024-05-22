@@ -10,7 +10,6 @@ import java.awt.*;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
-import java.util.List;
 
 
 public class LittleModel implements Serializable {
@@ -60,7 +59,7 @@ public class LittleModel implements Serializable {
         }
     }
 
-    public void updateHand(String nickname, Integer[] hand){
+    public void updatePrivateHand(Integer[] hand){
         myCards = hand;
     }
 

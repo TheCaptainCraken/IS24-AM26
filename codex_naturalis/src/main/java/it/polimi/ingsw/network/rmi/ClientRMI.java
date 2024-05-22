@@ -60,7 +60,7 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
         boolean isFirst = false;
         boolean login = false;
         try{
-            //call remote method loginAndIsFirst
+            //call remote method loginAndIsFirst, return if is the first layer and have to choose the number of players.
             isFirst = stub.loginAndIsFirst(exportedClient, name);
             Controller.setNickname(name);
             login = true;
@@ -88,7 +88,7 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
                         Controller.setPhase(Phase.COLOR);
                     } else {
                         //if lobby is not ready, set FSM to WAIT_NUMBER_OF_PLAYERS and wait for lobby
-                        Controller.setPhase(Phase.WAIT_NUMBER_OF_PLAYERS);
+                        Controller.setPhase(Phase.WAIT);
                         controller.waitLobby();
                     }
                 } catch (RemoteException e) {
@@ -258,10 +258,10 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
      */
     public void drawCard(String nickname, boolean gold, int onTableOrDeck)
     {
-        int cardId; //TODO sistemare, diventa array di carteId.
+        Integer[] newHand; //TODO sistemare, diventa array di carteId.
         try {
-            cardId = stub.drawCard(nickname, gold, onTableOrDeck);
-            controller.updateDrawCard(nickname, cardId);
+            newHand = stub.drawCard(nickname, gold, onTableOrDeck);
+            controller.updateDrawCard(nickname, newHand);
         } catch (RemoteException e) {
             controller.noConnection();
         } catch (WrongGamePhaseException e) {
@@ -279,13 +279,8 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
      * This method is used to transition the client from a waiting phase to the color selection phase.
      */
     @Override
-    public void lobbyReadyReachedMaxSize(boolean lobbyIsReady) {
-        if(lobbyIsReady){
+    public void stopWaiting() {
             Controller.setPhase(Phase.COLOR);
-        }else{
-            Controller.setPhase(Phase.WAIT_NUMBER_OF_PLAYERS);
-            //TODO We are waiting other players to connect to the lobby
-        }
     }
 
     @Override

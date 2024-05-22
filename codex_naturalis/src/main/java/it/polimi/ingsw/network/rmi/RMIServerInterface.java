@@ -99,5 +99,5 @@ public interface RMIServerInterface extends Remote {
      * @throws NoTurnException throws a NoTurnException if the player is trying to draw a card when it is not his turn.
      * @throws NoNameException throws a NoNameException if a player with the given nickname does not exist.
      */
-    int drawCard(String nickname, boolean gold, int onTableOrDeck) throws RemoteException, WrongGamePhaseException, NoTurnException,  NoNameException;
+    Integer[] drawCard(String nickname, boolean gold, int onTableOrDeck) throws RemoteException, WrongGamePhaseException, NoTurnException,  NoNameException;
 }
