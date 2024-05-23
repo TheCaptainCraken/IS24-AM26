@@ -19,6 +19,7 @@ import java.util.HashMap;
 
 public class GUI extends Application implements InterfaceForView{
     private Controller controller;
+    private FXMLLoader fxmlLoader;
     public static LoginController loginController;
     private static Scene scene;
     private Parent root;
@@ -26,11 +27,12 @@ public class GUI extends Application implements InterfaceForView{
 
     @Override
     public void start(Stage stage) throws IOException {
-        loginController = new LoginController();
+        //loginController = new LoginController();
         root = loadFXML("gui");
-        scene = new Scene(root, 1920, 1080);
+        loginController =(LoginController) fxmlLoader.getController();
         loginController.setStage(stage);
         loginController.setController(controller);
+        scene = new Scene(root, 1920, 1080);
         stage.setScene(scene);
         stage.show();
     }
@@ -40,7 +42,7 @@ public class GUI extends Application implements InterfaceForView{
     }
 
     private  Parent loadFXML(String fxml) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(it.polimi.ingsw.App.class.getResource(fxml + ".fxml"));
+        fxmlLoader = new FXMLLoader(it.polimi.ingsw.App.class.getResource(fxml + ".fxml"));
         return fxmlLoader.load();
     }
 
@@ -48,28 +50,25 @@ public class GUI extends Application implements InterfaceForView{
         launch(args);
     }
 
-    public void showInsertNumberOfPlayer(){
-         loginController.showInsertNumberOfPlayer();
-    }
-
     @Override
-    public void start() {
-
+    public void showInsertNumberOfPlayers(){
+         loginController.showInsertNumberOfPlayers();
     }
+
 
     @Override
     public void stopWaiting() {
-
+        loginController.stopWaiting();
     }
 
     @Override
     public void disconnect() {
-
+        loginController.disconnect();
     }
 
     @Override
     public void refreshUsers(HashMap<String, Color> playersAndPins) {
-
+        loginController.refreshUsers(playersAndPins);
     }
 
     @Override
@@ -134,12 +133,12 @@ public class GUI extends Application implements InterfaceForView{
 
     @Override
     public void colorAlreadyTaken() {
-
+        loginController.colorAlreadyTaken();
     }
 
     @Override
     public void sameName(String nickname) {
-
+        loginController.sameName(nickname);
     }
 
     @Override
@@ -187,10 +186,6 @@ public class GUI extends Application implements InterfaceForView{
 
     }
 
-    @Override
-    public void showInsertNumberOfPlayers() {
-
-    }
 
     public void waitLobby(){
         loginController.waitLobby();
@@ -198,7 +193,7 @@ public class GUI extends Application implements InterfaceForView{
 
     @Override
     public void correctNumberOfPlayers(int numberOfPlayers) {
-
+        loginController.correctNumberOfPlayers(numberOfPlayers);
     }
 
 

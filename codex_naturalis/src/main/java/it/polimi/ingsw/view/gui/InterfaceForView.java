@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 public interface InterfaceForView {
     //create the GUI/UI. It is launched by controller
-    void start();
+    //void start();
     //message of stopWaiting. The next phase is chooseColor.
     void stopWaiting();
     //you have been disconnected since you have been inactive for too long, or the lobby is already full.

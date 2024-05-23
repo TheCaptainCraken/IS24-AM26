@@ -5,15 +5,15 @@ import it.polimi.ingsw.model.Color;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+
+import java.util.HashMap;
 
 public class LoginController {
     private GUI gui;
@@ -31,7 +31,8 @@ public class LoginController {
     @FXML
     Label label1,name1,name2,name3,name4;
     Dialog<String> dialog;
-
+    @FXML
+    HBox inputBox;
     @FXML
     TextField input;
     @FXML
@@ -40,58 +41,45 @@ public class LoginController {
     ImageView avatar1,avatar2,avatar3,avatar4,logo;
 
     public void handleSubmit(){
-        //controller.login(input.getText());
-        dialog = new Dialog<>();
-        dialog.setTitle("Login");
-        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
-        Label label = new Label("Please Insert A Username");
-        label.setFont(Font.font(22));
-        TextField input = new TextField();
-        Pane pane = new Pane();
-        VBox content = new VBox(label,pane,input);
-        content.setPrefSize(300,100);
-        content.setSpacing(15);
-        dialog.getDialogPane().setContent(content);
-
-        dialog.setResultConverter(dialogButton -> {
-            if (dialogButton == ButtonType.OK) {
-                button1.setVisible(false);
-                controller.login(input.getText());
-            }
-            return null;
-        });
-        dialog.showAndWait();
-
+        String name = input.getText();
+        if(name.isBlank()){
+            dialog = new Dialog<>();
+            dialog.setTitle("Format Error");
+            Label label = new Label("Username Can't be Empty!");
+            ImageView error = new ImageView("error_icon.png");
+            label.setFont(Font.font(22));
+            HBox box = new HBox(error,label);
+            dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK);
+            dialog.getDialogPane().setContent(box);
+            dialog.show();
+        } else {
+            controller.login(name);
+            input.setVisible(false);
+            button1.setVisible(false);
+            label1.setText("Please Wait...");
+        }
     }
 
     public void handleDebug(){
-        //showInsertNumberOfPlayer();
+        //showInsertNumberOfPlayers();
         //waitLobby();
         //showColorPrompt();
+        //stopWaiting();
+        //colorAlreadyTaken();
+        sameName("cock");
     }
 
-    public void showInsertNumberOfPlayer() {
+    public void showInsertNumberOfPlayers() {
 
-        dialog = new Dialog<>();
-        dialog.setTitle("NumberOfPlayers");
-        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
-        Label label = new Label("You are the first player. Please enter the number of players");
-        label.setFont(Font.font(20));
-        ChoiceBox<String> menu = new ChoiceBox<>();
-        menu.getItems().addAll("2","3","4");
-        menu.setValue("2");
+        label1.setText("You are the first player.\n Please enter the number of players");
+        button1.setText("Submit");
+        ChoiceBox <Integer> box = new ChoiceBox<>();
+        box.getItems().addAll(2,3,4);
+        box.setValue(2);
+        inputBox.getChildren().remove(input);
+        inputBox.getChildren().add(box);
+        button1.setOnMouseClicked(event -> controller.insertNumberOfPlayers(box.getValue()));
 
-        VBox content = new VBox(label,menu);
-        content.setAlignment(Pos.CENTER);
-        content.setSpacing(15);
-        dialog.getDialogPane().setContent(content);
-        dialog.setResultConverter(dialogButton -> {
-            if (dialogButton == ButtonType.OK) {
-                controller.insertNumberOfPlayers(Integer.parseInt(menu.getValue()));
-            }
-            return null;
-        });
-        dialog.showAndWait();
     }
 
     public void waitLobby(){
@@ -100,59 +88,124 @@ public class LoginController {
 
     }
 
-    public void stopWaiting(){
-        button1.setVisible(false);
-        label1.setText("The Game is Starting!");
+    public void disconnect(){
+        //TODO don't really know how to put it
     }
 
-    public void askColor(){
-        button1.setVisible(true);
-        button1.setOnMouseClicked(event -> {
-            showColorPrompt();
-        });
+    public void stopWaiting(){
+        label1.setText("Choose your Color!");
+        showColorPrompt();
     }
+
 
     public void showColorPrompt(){
+
+        button1.setVisible(false);
+        inputBox.getChildren().remove(input);
+        setupColors();
+
+    }
+
+    private void setupColors(){
+        Image yellow = new Image("TokenYellow.png");
+        ImageView y = new ImageView(yellow);
+        y.setFitWidth(75);
+        y.setFitHeight(75);
+        y.setPreserveRatio(true);
+        y.setSmooth(true);
+
+        Image green = new Image("TokenGreen.png");
+        ImageView g = new ImageView(green);
+        g.setFitWidth(75);
+        g.setFitHeight(75);
+
+        Image blue = new Image("TokenBlue.png");
+        ImageView b = new ImageView(blue);
+        b.setFitWidth(75);
+        b.setFitHeight(75);
+
+        Image red = new Image("TokenRed.png");
+        ImageView r = new ImageView(red);
+        r.setFitWidth(75);
+        r.setFitHeight(75);
+
+        Button rButton = new Button();
+        rButton.setGraphic(r);
+        Label l1 = new Label("RED");
+        rButton.setOnMouseClicked(event -> controller.chooseColor(Color.RED));
+
+        Button bButton = new Button();
+        bButton.setGraphic(b);
+        Label l2 = new Label("BLUE");
+        bButton.setOnMouseClicked(event -> controller.chooseColor(Color.BLUE));
+
+        Button gButton = new Button();
+        gButton.setGraphic(g);
+        gButton.setOnMouseClicked(event -> controller.chooseColor(Color.GREEN));
+        Label l3 = new Label("GREEN");
+
+        Button yButton = new Button();
+        yButton.setGraphic(y);
+        yButton.setOnMouseClicked(event -> controller.chooseColor(Color.YELLOW));
+        Label l4 = new Label("YELLOW");
+
+        VBox b1 = new VBox(rButton,l1);
+        b1.setAlignment(Pos.CENTER);
+        VBox b2 = new VBox(bButton,l2);
+        b2.setAlignment(Pos.CENTER);
+        VBox b3 = new VBox(gButton,l3);
+        b3.setAlignment(Pos.CENTER);
+        VBox b4 = new VBox(yButton,l4);
+        b4.setAlignment(Pos.CENTER);
+
+        inputBox.getChildren().addAll(b1,b2,b3,b4);
+        inputBox.setSpacing(10);
+
+    }
+
+    public void refreshUsers(HashMap<String,Color> map){
+
+    }
+
+    public void correctNumberOfPlayers(int number){
+        label1.setText("You have correctly set the number of players\nThe number of players is " + number);
+    }
+
+    //Exception Handling
+    public void colorAlreadyTaken(){
         dialog = new Dialog<>();
-        dialog.setTitle("chooseColor");
-        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
-        Label l = new Label("Please Choose a Color");
+        dialog.setTitle("Color Already Taken!");
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK);
+        Label l = new Label("The color you have selected\n has been chosen by another player.\n Please try again");
         l.setFont(Font.font(16));
-        ChoiceBox<String> colors = setupColors();
-        VBox content = new VBox(l,colors);
-        content.setAlignment(Pos.CENTER);
-        content.setSpacing(10);
-        dialog.getDialogPane().setContent(content);
-        dialog.setResultConverter(dialogButton -> {
-            if (dialogButton == ButtonType.OK) {
-                Color color = StringToColor(colors.getValue());
-                controller.chooseColor(color);
-            }
-            return null;
-        });
-        dialog.showAndWait();
+        ImageView error = new ImageView("error_icon.png");
+        HBox box = new HBox(error,l);
+        dialog.getDialogPane().setContent(box);
+        dialog.show();
 
     }
 
-    private ChoiceBox<String> setupColors(){
-        ChoiceBox<String> box = new ChoiceBox<>();
-        box.getItems().addAll("Yellow","Blue","Green","Red");
-        box.setValue("Yellow");
-        return box;
+    public void sameName(String nickname) {
+        dialog = new Dialog<>();
+        dialog.setTitle("Username Already Taken!");
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK);
+        Label l = new Label("The username "+"'"+ nickname +"'"+ "\n has already been selected by another player.\n Please try again");
+        l.setFont(Font.font(16));
+        ImageView error = new ImageView("error_icon.png");
+        HBox box = new HBox(error,l);
+        dialog.getDialogPane().setContent(box);
+        dialog.show();
+        button1.setVisible(true);
+    }
+    public void noConnection() {
 
     }
 
-    private Color StringToColor(String color){
-        Color c = Color.YELLOW;
-        switch(color){
-            case "Yellow": c = Color.YELLOW;
-            case "Blue":c = Color.BLUE;
-            case "Green": c = Color.GREEN;
-            case "Red": c = Color.RED;
-        }
-        return c;
+    public void lobbyComplete() {
+        input.setVisible(false);
+        button1.setVisible(false);
+        label1.setText("The lobby is full. No other players can join");
     }
-
 
 
 }
