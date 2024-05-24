@@ -10,9 +10,10 @@ import it.polimi.ingsw.network.rmi.ClientRMI;
 import it.polimi.ingsw.network.client.ClientSocket;
 import it.polimi.ingsw.network.client.NetworkClient;
 import it.polimi.ingsw.network.rmi.RMIClientInterface;
+import it.polimi.ingsw.view.ViewInterface;
 import it.polimi.ingsw.view.LittleModel;
 import it.polimi.ingsw.view.Phase;
-import it.polimi.ingsw.view.Tui;
+import it.polimi.ingsw.view.TUI;
 import javafx.util.Pair;
 
 import java.awt.*;
@@ -26,7 +27,7 @@ public class Controller {
     public static Phase phase;
     private static RMIClientInterface clientRMI;
     private NetworkClient connection;
-    private Tui view;
+    private ViewInterface view;
     private LittleModel model;
 
     public Controller(){
@@ -45,7 +46,7 @@ public class Controller {
     public void setView(String typeOfView) throws InterruptedException {
         model = new LittleModel();
         if(typeOfView.equals("TUI")){
-            this.view = new Tui(model, this);
+            this.view = new TUI(model, this);
             view.start();
         }else if(typeOfView.equals("GUI")){
             //TODO
@@ -110,7 +111,7 @@ public class Controller {
      * The actual input is handled by the view (TUI or GUI).
      */
     public void askNumberOfPlayer() {
-        view.showInsertNumberOfPlayers();
+        view.askNumberOfPlayers();
     }
     /**
      * Triggers the view to display a waiting message to the user.
@@ -423,16 +424,16 @@ public class Controller {
     public void updateCommonObjectiveCards(Integer[] commonObjectiveCards) {
         model.updateCommonObjectiveCards(commonObjectiveCards);
     }
-    public void showTableOfPlayer(String name){
-        view.showTableOfPlayer(model.getTableOfPlayer(name));
+    public void showTableOfPlayer(String nickname){
+        view.showTableOfPlayer(nickname);
     }
 
     public void showPoints(){
-        view.showPoints(model.getPoints());
+        view.showPoints();
     }
 
     public void showResources(){
-        view.showResourcesPlayer(getNickname());
+        view.showResourcesPlayer();
     }
 
     public void showResourcesAllPlayers(){
@@ -444,6 +445,6 @@ public class Controller {
     }
 
     public void showHiddenHand(String name){
-        view.showHiddenHand();
+        view.showHiddenHand(name);
     }
 }

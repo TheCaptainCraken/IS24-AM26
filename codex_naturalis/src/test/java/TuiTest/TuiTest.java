@@ -2,21 +2,15 @@ package TuiTest;
 
 import it.polimi.ingsw.controller.client.Controller;
 import it.polimi.ingsw.view.LittleModel;
-import it.polimi.ingsw.view.Tui;
-import it.polimi.ingsw.model.*;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.HashMap;
+import it.polimi.ingsw.view.TUI;
 
 public class TuiTest {
-    public static Tui tui;
+    public static TUI tui;
 
     public static void main(String[] args) {
         LittleModel model = new LittleModel();
         Controller controller = new Controller();
-        Tui tui = new Tui(model, controller);
+        TUI tui = new TUI(model, controller);
 
 //        for(int i = 97; i < 103; i++){
 //            System.out.println("Card " + i);

@@ -14,7 +14,7 @@ import java.util.List;
  * This class represents the Text User Interface (TUI) of the game.
  * It is responsible for displaying game information to the player and receiving player input.
  */
-public class Tui implements InterfaceForView{
+public class TUI implements ViewInterface {
     private final Controller controller;
     private final LittleModel model;
 
@@ -22,7 +22,7 @@ public class Tui implements InterfaceForView{
      * Constructor for the TUI.
      * Initializes the TUI with default values.
      */
-    public Tui(LittleModel model, Controller controller) {
+    public TUI(LittleModel model, Controller controller) {
         this.model = model;
         this.controller = controller;
     }
@@ -31,7 +31,7 @@ public class Tui implements InterfaceForView{
      * Displays to show the first player to enter the number of players.
      */
     @Override
-    public void showInsertNumberOfPlayers() {
+    public void askNumberOfPlayers() {
             System.out.println("You are the first player. Please enter the number of players");
             System.out.println("The number of players must be between 2 and 4");
 
@@ -52,7 +52,7 @@ public class Tui implements InterfaceForView{
                     scanner.next(); // discard the invalid input
                 }
             }
-            controller.insertNumberOfPlayers(numberOfPlayers);
+            ViewSubmissions.getInstance().chooseNumberOfPlayers(numberOfPlayers);
         //TODO dividere fasi
     }
 
@@ -72,7 +72,7 @@ public class Tui implements InterfaceForView{
         System.out.println("The game is starting");
     }
 
-    private void askColor() {
+    public void askChooseColor() {
         System.out.println(Controller.getPhase());
         System.out.println("Choose your color");
         System.out.println("1 - Blue\n" +
@@ -87,19 +87,19 @@ public class Tui implements InterfaceForView{
                 color = scanner.nextInt();
                 switch (color) {
                     case 1:
-                        controller.chooseColor(Color.BLUE);
+                        ViewSubmissions.getInstance().chooseColor(Color.BLUE);
                         validInput = true;
                         break;
                     case 2:
-                        controller.chooseColor(Color.YELLOW);
+                        ViewSubmissions.getInstance().chooseColor(Color.YELLOW);
                         validInput = true;
                         break;
                     case 3:
-                        controller.chooseColor(Color.GREEN);
+                        ViewSubmissions.getInstance().chooseColor(Color.GREEN);
                         validInput = true;
                         break;
                     case 4:
-                        controller.chooseColor(Color.RED);
+                        ViewSubmissions.getInstance().chooseColor(Color.RED);
                         validInput = true;
                         break;
                     default:
@@ -189,23 +189,6 @@ public class Tui implements InterfaceForView{
     }
 
     /**
-     * Prints the secret objective card of the player.
-     * This method takes an index of a card as input, retrieves the corresponding card
-     * and prints the representation of the card on the console. The representation of the card
-     * is an array of strings, with each string representing a row of the card.
-     *
-     * @param indexCard The index of the secret objective card to print.
-     */
-    @Override
-    public synchronized void showSecretObjectiveCard(int indexCard) {
-        System.out.println("This is your secret objective card: ");
-        String[] secretObjective = createObjectiveCardToPrint(indexCard);
-        for (String row : secretObjective) {
-            System.out.println(row);
-        }
-    }
-
-    /**
      * Displays the secret objective cards that the player can choose from.
      * This method retrieves the secret objective cards from the model, converts them into a printable format,
      * and then prints them to the console for the player to view and choose from.
@@ -232,6 +215,23 @@ public class Tui implements InterfaceForView{
             System.out.println();
         }
         System.out.println();
+    }
+
+    /**
+     * Prints the secret objective card of the player.
+     * This method takes an index of a card as input, retrieves the corresponding card
+     * and prints the representation of the card on the console. The representation of the card
+     * is an array of strings, with each string representing a row of the card.
+     *
+     * @param indexCard The index of the secret objective card to print.
+     */
+    @Override
+    public synchronized void showSecretObjectiveCard(int indexCard) {
+        System.out.println("This is your secret objective card: ");
+        String[] secretObjective = createObjectiveCardToPrint(indexCard);
+        for (String row : secretObjective) {
+            System.out.println(row);
+        }
     }
 
     /**
@@ -709,22 +709,22 @@ public class Tui implements InterfaceForView{
         switch (choice) {
             case 1:
                 printTableAreaOfPlayer(controller.getNickname());
-                placeCard();
+                askPlaceCard();
                 break;
             case 2:
-                drawCard();
+                askDrawCard();
                 break;
             case 3:
                 showTableOfPlayerChecked();
                 break;
             case 4:
-                showResourcesPlayer(controller.getNickname());
+                showResourcesPlayer();
                 break;
             case 5:
                 showResourcesAllPlayers();
                 break;
             case 6:
-                showPoints(model.getPoints());
+                showPoints();
                 break;
             case 7:
                 showHand();
@@ -747,7 +747,7 @@ public class Tui implements InterfaceForView{
         //TODO check if the nickname is valid and call proper function
     }
 
-    private void drawCard() {
+    private void askDrawCard() {
         Scanner scanner = new Scanner(System.in);
             boolean gold;
             int onTableOrDeck;
@@ -764,7 +764,7 @@ public class Tui implements InterfaceForView{
                         System.out.println("Invalid input. Value must be -1, 0 or 1.");
                         continue;
                     }
-                    controller.drawCard(gold, onTableOrDeck);
+                    ViewSubmissions.getInstance().drawCard(gold, onTableOrDeck);
                     validInput = true;
                 } catch (InputMismatchException e) {
                     System.out.println("Invalid input. Please enter the correct values.");
@@ -773,7 +773,7 @@ public class Tui implements InterfaceForView{
             }
     }
 
-    private void placeCard() {
+    private void askPlaceCard() {
         Scanner scanner = new Scanner(System.in);
         Integer indexHand;
         Point position = new Point();
@@ -796,7 +796,7 @@ public class Tui implements InterfaceForView{
                 position.y = scanner.nextInt();
                 System.out.println("Enter true if the card is facing up, false otherwise:");
                 isFacingUp = scanner.nextBoolean();
-                controller.playCard(indexHand, position, isFacingUp);
+                ViewSubmissions.getInstance().placeCard(indexHand, position, isFacingUp);
                 validInput = true;
             } catch (InputMismatchException e) {
                 System.out.println("Invalid input. Please enter the correct values.");
@@ -805,16 +805,15 @@ public class Tui implements InterfaceForView{
         }
     }
 
-    private void startPhase() {
+    private void askChooseNickname() {
         Scanner scanner = new Scanner(System.in);
-        String name;
+        String nickname;
 
         do {
             System.out.println("Please enter your nickname (without spaces):");
-            name = scanner.nextLine();
-        } while (name.contains(" "));
-
-        controller.login(name);
+            nickname = scanner.nextLine();
+        } while (nickname.contains(" "));
+        ViewSubmissions.getInstance().chooseNickname(nickname);
     }
 
     /**
@@ -876,10 +875,10 @@ public class Tui implements InterfaceForView{
     /**
      * Shows the resources of the client.
      *
-     * @param name The name of client.
      */
     @Override
-    public synchronized void showResourcesPlayer(String name) {
+    public synchronized void showResourcesPlayer() {
+        String name = controller.getNickname();
         HashMap<String, HashMap<Sign, Integer>> resources = model.getResources();
 
         System.out.println("You have the following resources:");
@@ -908,7 +907,8 @@ public class Tui implements InterfaceForView{
     }
 
     @Override
-    public synchronized void showPoints(HashMap<String, Integer> points) {
+    public synchronized void showPoints() {
+        HashMap<String, Integer> points = model.getPoints();
         System.out.println("The points of the players are:");
         for (String player : points.keySet()) {
             System.out.println(player + " has " + points.get(player));
@@ -1021,7 +1021,8 @@ public class Tui implements InterfaceForView{
     }
 
 
-    public void showTableOfPlayer(Object tableOfPlayer) {
+    public void showTableOfPlayer(String nickname) {
+        Object tableOfPlayer = model.getTableOfPlayer(nickname);
         //TODO
     }
 
@@ -1040,18 +1041,18 @@ public class Tui implements InterfaceForView{
                 System.out.println("Current phase: " + Controller.getPhase());
             switch (Controller.getPhase()) {
                 case LOGIN:
-                    startPhase();
+                    askChooseNickname();
                     break;
                 case COLOR:
-                    askColor();
+                    askChooseColor();
                     break;
                 case CHOOSE_SIDE_STARTING_CARD:
                     //la rete invia le carte e il giocatore sceglie
-                    chooseStartingCard();
+                    askChooseStartingCard();
                     break;
                 case CHOOSE_SECRET_OBJECTIVE_CARD:
                     //la rete invia le carte obiettivo e il giocatore sceglie
-                    chooseSecretObjectiveCard();
+                    askChooseSecretObjectiveCard();
                     break;
                 case WAIT:
                     //la rete invia il giocatore che inizia
@@ -1069,7 +1070,7 @@ public class Tui implements InterfaceForView{
 
     }
 
-    private void chooseSecretObjectiveCard() {
+    private void askChooseSecretObjectiveCard() {
         Scanner scanner = new Scanner(System.in);
         int indexCard = 0;
         boolean validInput = false;
@@ -1079,7 +1080,7 @@ public class Tui implements InterfaceForView{
                 System.out.println("Enter 0 or 1:");
                 indexCard = scanner.nextInt();
                 if (indexCard == 0 || indexCard == 1) {
-                    controller.chooseSecretObjectiveCard(indexCard);
+                    ViewSubmissions.getInstance().chooseSecretObjectiveCard(indexCard);
                     validInput = true;
                 } else {
                     System.out.println("Invalid input. Please enter 0 or 1.");
@@ -1090,6 +1091,7 @@ public class Tui implements InterfaceForView{
             }
         }
     }
+
     @Override
     public synchronized void showIsFirst(String firstPlayer) {
         System.out.println("The first player is " + firstPlayer + ". The game is about to start");
@@ -1101,7 +1103,7 @@ public class Tui implements InterfaceForView{
         System.out.println("The number of players are " + numberOfPlayers);
     }
 
-    private void chooseStartingCard() {
+    private void askChooseStartingCard() {
         Scanner scanner = new Scanner(System.in);
         boolean isFacingUp = false;
 
@@ -1115,11 +1117,10 @@ public class Tui implements InterfaceForView{
             else
                 System.out.println("Invalid input");
         } while (!side.equals("true") && !side.equals("false"));
-
-        controller.chooseSideStartingCard(isFacingUp);
-
+        ViewSubmissions.getInstance().chooseStartingCard(isFacingUp);
     }
 
+    @Override
     public synchronized void showCommonTable() {
         Integer[] resourceCards = model.getResourceCards();
         Integer[] goldCard = model.getGoldCards();
