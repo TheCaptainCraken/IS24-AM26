@@ -33,7 +33,7 @@ public interface InterfaceForView {
     void showRanking(ArrayList<Player> ranking);
     //TODO capire come fare differenziazione su controller.
     void showHiddenHand(String nickname);
-    //this is your private Hand. YOu can take this information from the model.
+    //this is your private Hand. You can take this information from the model.
     void showHand();
     //TODO capire come fare differenziazione su controller.
     void showResourcesPlayer(String name);
