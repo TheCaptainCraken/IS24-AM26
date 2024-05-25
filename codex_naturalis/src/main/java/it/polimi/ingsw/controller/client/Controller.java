@@ -46,7 +46,7 @@ public class Controller {
     public void setView(String typeOfView){
         model = new LittleModel();
         if(typeOfView.equals("TUI")){
-            this.view = new Tui(model, this);
+            this.view = new TUI(model, this);
             view.start();
         }else if(typeOfView.equals("GUI")){
             //TODO

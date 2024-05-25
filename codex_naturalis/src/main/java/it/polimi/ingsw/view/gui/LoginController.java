@@ -1,7 +1,7 @@
 package it.polimi.ingsw.view.gui;
 
-import it.polimi.ingsw.controller.client.Controller;
 import it.polimi.ingsw.model.Color;
+import it.polimi.ingsw.view.ViewSubmissions;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
@@ -20,7 +20,6 @@ import java.util.TimerTask;
 
 public class LoginController {
     private GUI gui;
-    private Controller controller;
     Group root;
     private Stage stage;
     private ArrayList<Label> names;
@@ -54,7 +53,7 @@ public class LoginController {
             dialog.getDialogPane().setContent(box);
             dialog.show();
         } else {
-            controller.login(name);
+            ViewSubmissions.getInstance().chooseNickname(name);
             input.setVisible(false);
             button1.setVisible(false);
             label1.setText("Please Wait...");
@@ -90,7 +89,7 @@ public class LoginController {
         box.setValue(2);
         inputBox.getChildren().remove(input);
         inputBox.getChildren().add(box);
-        button1.setOnMouseClicked(event -> controller.insertNumberOfPlayers(box.getValue()));
+        button1.setOnMouseClicked(event -> ViewSubmissions.getInstance().chooseNumberOfPlayers(box.getValue()));
 
     }
 
@@ -175,7 +174,7 @@ public class LoginController {
         rButton.setOnMouseClicked(event -> {
             label1.setText("Color Submitted!");
             inputBox.getChildren().clear();
-            controller.chooseColor(Color.RED);
+            ViewSubmissions.getInstance().chooseColor(Color.RED);
         });
 
         Button bButton = new Button();
@@ -184,7 +183,7 @@ public class LoginController {
         bButton.setOnMouseClicked(event -> {
                 label1.setText("Color Submitted!");
                 inputBox.getChildren().clear();
-                controller.chooseColor(Color.BLUE);
+                ViewSubmissions.getInstance().chooseColor(Color.BLUE);
         });
 
         Button gButton = new Button();
@@ -193,7 +192,7 @@ public class LoginController {
         gButton.setOnMouseClicked(event -> {
             label1.setText("Color Submitted!");
             inputBox.getChildren().clear();
-            controller.chooseColor(Color.GREEN);
+            ViewSubmissions.getInstance().chooseColor(Color.GREEN);
         });
 
         Button yButton = new Button();
@@ -202,7 +201,7 @@ public class LoginController {
         yButton.setOnMouseClicked(event -> {
             label1.setText("Color Submitted!");
             inputBox.getChildren().clear();
-            controller.chooseColor(Color.YELLOW);
+            ViewSubmissions.getInstance().chooseColor(Color.YELLOW);
         });
 
         VBox b1 = new VBox(rButton,l1);
@@ -302,7 +301,5 @@ public class LoginController {
     public void setStage(Stage stage) {
         this.stage = stage;
     }
-    public void setController(Controller controller) {
-        this.controller = controller;
-    }
+
 }

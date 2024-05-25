@@ -396,7 +396,7 @@
     "kingdom": "PLANT",
     "corners": {
       "TOP_LEFT": null,
-      "TOP_RIGHT": "SCROLL",
+      "TOP_RIGHT": "INKWELL",
       "BOTTOM_LEFT": null,
       "BOTTOM_RIGHT": "EMPTY"
     },
@@ -540,7 +540,7 @@
 },  {
   "id": 82,
   "prototype": "SPECIAL_GOLD",
-  "points": 1,
+  "points": 2,
   "kingdom": "ANIMAL",
   "thing-to-count": "CORNER",
   "corners": {
@@ -587,7 +587,7 @@
     "kingdom": "ANIMAL",
     "corners": {
       "TOP_LEFT": "EMPTY",
-      "TOP_RIGHT": "SCROLL",
+      "TOP_RIGHT": "INKWELL",
       "BOTTOM_LEFT": null,
       "BOTTOM_RIGHT": null
     },
@@ -648,10 +648,10 @@
     "prototype": "SPECIAL_GOLD",
     "points": 1,
     "kingdom": "INSECT",
-    "thing-to-count": "INKWELL",
+    "thing-to-count": "QUILL",
     "corners": {
       "TOP_LEFT": "EMPTY",
-      "TOP_RIGHT": "INKWELL",
+      "TOP_RIGHT": "QUILL",
       "BOTTOM_LEFT": null,
       "BOTTOM_RIGHT": "EMPTY"
     },
@@ -781,7 +781,7 @@
     "points": 3,
     "kingdom": "INSECT",
     "corners": {
-      "TOP_LEFT": "SCROLL",
+      "TOP_LEFT": "INKWELL",
       "TOP_RIGHT": null,
       "BOTTOM_LEFT": "EMPTY",
       "BOTTOM_RIGHT": null
@@ -825,7 +825,7 @@
     "corners": {
       "TOP_LEFT": null,
       "TOP_RIGHT": null,
-      "BOTTOM_LEFT": "INKWELL",
+      "BOTTOM_LEFT": "QUILL",
       "BOTTOM_RIGHT": "EMPTY"
     },
     "requirements": {

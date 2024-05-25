@@ -9,6 +9,7 @@ import java.util.HashMap;
 
 public interface ViewInterface {
     //create the GUI/UI. It is launched by controller
+    //non credo debba essere implementato da gui, esiste già un metodo start() ma è della Classe Astratta Application
     void start();
 
 

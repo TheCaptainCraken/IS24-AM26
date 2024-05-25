@@ -61,7 +61,7 @@
                 <directory>src/main/resources/cards/objective</directory>
             </resource>
             <resource>
-                <directory>src/main/resources/cards/resource</directory>
+                <directory>src/main/resources/cards/front</directory>
             </resource>
             <resource>
                 <directory>src/main/resources/cards/starting</directory>

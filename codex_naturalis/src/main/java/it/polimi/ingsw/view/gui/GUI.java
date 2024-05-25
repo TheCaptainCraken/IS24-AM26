@@ -6,6 +6,8 @@ import it.polimi.ingsw.model.GameState;
 import it.polimi.ingsw.model.Kingdom;
 import it.polimi.ingsw.model.Player;
 import it.polimi.ingsw.view.LittleModel;
+import it.polimi.ingsw.view.ViewInterface;
+import it.polimi.ingsw.view.ViewSubmissions;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Group;
@@ -17,9 +19,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class GUI extends Application implements InterfaceForView{
+public class GUI extends Application implements ViewInterface {
 
-    private  Controller controller; //TODO va final una volta finita implementazione (capire come usarlo come singleton)
+    private ViewSubmissions viewSubmissions; //TODO va final una volta finita implementazione
     private  LittleModel model; //TODO va final una volta finita implementazione
     private FXMLLoader fxmlLoader;
     public static LoginController loginController;
@@ -41,7 +43,6 @@ public class GUI extends Application implements InterfaceForView{
         loginController =(LoginController) fxmlLoader.getController();
         this.primaryStage = stage;
         loginController.setStage(stage);
-        loginController.setController(controller);
         scene = new Scene(root, 1920, 1080);
         loginController.setup();
         stage.setScene(scene);
@@ -62,10 +63,9 @@ public class GUI extends Application implements InterfaceForView{
     }
 
     @Override
-    public void showInsertNumberOfPlayers(){
-         loginController.showInsertNumberOfPlayers();
+    public void askNumberOfPlayers() {
+        loginController.showInsertNumberOfPlayers();
     }
-
 
     @Override
     public void stopWaiting() {
@@ -87,7 +87,6 @@ public class GUI extends Application implements InterfaceForView{
         try{
             setRoot("matchView");
             matchController = (MatchController) fxmlLoader.getController();
-            matchController.setController(controller);
             matchController.setStage(primaryStage);
             matchController.setModel(model);
             matchController.showCommonTable();
@@ -123,12 +122,22 @@ public class GUI extends Application implements InterfaceForView{
     }
 
     @Override
+    public void showResourcesPlayer() {
+
+    }
+
+    @Override
     public void showExtraPoints(HashMap<String, Integer> extraPoints) {
 
     }
 
     @Override
     public void showRanking(ArrayList<Player> ranking) {
+
+    }
+
+    @Override
+    public void showTableOfPlayer(String nickname) {
 
     }
 
@@ -143,19 +152,15 @@ public class GUI extends Application implements InterfaceForView{
     }
 
     @Override
-    public void showResourcesPlayer(String name) {
-
-    }
-
-    @Override
     public void showResourcesAllPlayers() {
 
     }
 
     @Override
-    public void showPoints(HashMap<String, Integer> points) {
+    public void showPoints() {
 
     }
+
 
     @Override
     public void colorAlreadyTaken() {
@@ -212,6 +217,11 @@ public class GUI extends Application implements InterfaceForView{
         loginController.showIsFirst(firstPlayer);
     }
 
+
+    @Override
+    public void start() {
+
+    }
 
     public void waitLobby(){
         loginController.waitLobby();
