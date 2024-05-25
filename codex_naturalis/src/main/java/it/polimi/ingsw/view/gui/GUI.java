@@ -9,8 +9,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.DialogPane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -33,6 +31,7 @@ public class GUI extends Application implements InterfaceForView{
         loginController.setStage(stage);
         loginController.setController(controller);
         scene = new Scene(root, 1920, 1080);
+        loginController.setup();
         stage.setScene(scene);
         stage.show();
     }

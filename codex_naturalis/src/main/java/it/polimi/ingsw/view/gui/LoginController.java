@@ -13,20 +13,20 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class LoginController {
     private GUI gui;
     private Controller controller;
     Group root;
     private Stage stage;
-    public void setStage(Stage stage) {
-        this.stage = stage;
-    }
-
-    public void setController(Controller controller) {
-        this.controller = controller;
-    }
+    private ArrayList<Label> names;
+    private ArrayList<ImageView> avatars;
+    private String DEFAULT_LABEL = "Awaiting Players...";
+    private String DEFAULT_COLOR = "TokenBlack.png";
 
     @FXML
     Label label1,name1,name2,name3,name4;
@@ -60,13 +60,24 @@ public class LoginController {
         }
     }
 
-    public void handleDebug(){
+    public void handleDebug() throws InterruptedException {
         //showInsertNumberOfPlayers();
         //waitLobby();
         //showColorPrompt();
         //stopWaiting();
         //colorAlreadyTaken();
-        sameName("cock");
+        //sameName("test");
+        HashMap <String,Color> map = new HashMap<>();
+        //map.put("Arturo",Color.BLUE);
+        map.put("Pietro",null);
+        //map.put("Daniel",Color.GREEN);
+        refreshUsers(map);
+        HashMap <String,Color> map1 = new HashMap<>();
+        //map1.put("Arturo",Color.BLUE);
+        map1.put("Pietro",Color.RED);
+        //map1.put("Daniel",Color.GREEN);
+        refreshUsers(map1);
+
     }
 
     public void showInsertNumberOfPlayers() {
@@ -106,6 +117,33 @@ public class LoginController {
 
     }
 
+    /**
+     * method used to setup the Login View with its images
+     */
+    public void setup(){
+
+        Image img = new Image("logo.png");
+        Image token = new Image(DEFAULT_COLOR);
+        names = new ArrayList<>();
+        avatars = new ArrayList<>();
+
+        logo.setImage(img);
+        names.add(name1);
+        names.add(name2);
+        names.add(name3);
+        names.add(name4);
+        avatars.add(avatar1);
+        avatars.add(avatar2);
+        avatars.add(avatar3);
+        avatars.add(avatar4);
+
+        for(Label l: names)
+            l.setText(DEFAULT_LABEL);
+
+        for(ImageView i: avatars)
+            i.setImage(token);
+
+    }
     private void setupColors(){
         Image yellow = new Image("TokenYellow.png");
         ImageView y = new ImageView(yellow);
@@ -162,9 +200,50 @@ public class LoginController {
         inputBox.setSpacing(10);
 
     }
+    private Image loadColor(Color c){
+        switch(c){
+            case GREEN:
+                return new Image("TokenGreen.png");
+            case RED:
+                return new Image("TokenRed.png");
+            case BLUE:
+                return new Image("TokenBlue.png");
+            case YELLOW:
+                return new Image("TokenGreen.png");
+        }
+        return null;
+    }
+    public void setStage(Stage stage) {
+        this.stage = stage;
+    }
+    public void setController(Controller controller) {
+        this.controller = controller;
+    }
 
     public void refreshUsers(HashMap<String,Color> map){
+        int i;
+        for(String s: map.keySet()){
+            i = 0;
+            for(Label l: names){
+                Color c = map.get(s);
+                if(l.getText().equals(s)){
+                    if(c != null && avatars.get(i).getImage().getUrl().equals(DEFAULT_COLOR)){
+                        Image img = loadColor(c);
+                        avatars.get(i).setImage(img);
+                    }
+                    break;
+                } else if(l.getText().equals(DEFAULT_LABEL)){
+                    l.setText(s);
+                    if(c != null){
+                        Image img = loadColor(c);
+                        avatars.get(i).setImage(img);
 
+                    }
+                    break;
+                }
+                i++;
+            }
+        }
     }
 
     public void correctNumberOfPlayers(int number){

@@ -75,7 +75,7 @@
             </HBox>
          </bottom>
          <top>
-            <ImageView fx:id="logo" fitHeight="225.0" fitWidth="235.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER" />
+            <ImageView fx:id="logo" fitHeight="223.0" fitWidth="400.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER" />
          </top>
          <left>
             <Pane prefHeight="622.0" prefWidth="600.0" BorderPane.alignment="CENTER">
