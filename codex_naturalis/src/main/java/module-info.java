@@ -17,4 +17,6 @@ module it.polimi.ingsw {
     exports it.polimi.ingsw.model.exception;
     exports it.polimi.ingsw.model;
     exports it.polimi.ingsw.view.gui;
+    exports it.polimi.ingsw.controller.client;
+    exports it.polimi.ingsw.view;
 }

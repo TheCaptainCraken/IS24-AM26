@@ -2,6 +2,7 @@ package it.polimi.ingsw.view.gui;
 
 import it.polimi.ingsw.model.Color;
 import it.polimi.ingsw.model.GameState;
+import it.polimi.ingsw.model.Kingdom;
 import it.polimi.ingsw.model.Player;
 
 import java.util.ArrayList;
@@ -17,6 +18,8 @@ public interface InterfaceForView {
     //refresh users. NOTE: color can be null if the player has not chosen a color yet.
     void refreshUsers(HashMap<String, Color> playersAndPins);
     //show the starting card to choose side. You should print both the side of the same starting card.
+    //prints the card on the table or the update
+    public void showCommonTable();
     void showStartingCard(int startingCardId);
     //print the common objectives card. They are fixed for all the game.
     void showCommonObjectives(Integer[] objectiveCardIds);

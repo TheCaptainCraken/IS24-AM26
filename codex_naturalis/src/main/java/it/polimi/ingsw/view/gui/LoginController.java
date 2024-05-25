@@ -25,8 +25,8 @@ public class LoginController {
     private Stage stage;
     private ArrayList<Label> names;
     private ArrayList<ImageView> avatars;
-    private String DEFAULT_LABEL = "Awaiting Players...";
-    private String DEFAULT_COLOR = "TokenBlack.png";
+    private final String DEFAULT_LABEL = "Awaiting Players...";
+    private final Image DEFAULT_TOKEN = new Image("TokenBlack.png");
 
     @FXML
     Label label1,name1,name2,name3,name4;
@@ -40,6 +40,7 @@ public class LoginController {
     @FXML
     ImageView avatar1,avatar2,avatar3,avatar4,logo;
 
+    //METHODS CALLED BY VIEW COMPONENTS
     public void handleSubmit(){
         String name = input.getText();
         if(name.isBlank()){
@@ -64,22 +65,22 @@ public class LoginController {
         //showInsertNumberOfPlayers();
         //waitLobby();
         //showColorPrompt();
-        //stopWaiting();
+        stopWaiting();
         //colorAlreadyTaken();
         //sameName("test");
-        HashMap <String,Color> map = new HashMap<>();
-        //map.put("Arturo",Color.BLUE);
+        /*HashMap <String,Color> map = new HashMap<>();
+        map.put("Arturo",Color.BLUE);
         map.put("Pietro",null);
-        //map.put("Daniel",Color.GREEN);
+        map.put("Daniel",Color.GREEN);
         refreshUsers(map);
         HashMap <String,Color> map1 = new HashMap<>();
-        //map1.put("Arturo",Color.BLUE);
+        map1.put("Arturo",Color.BLUE);
         map1.put("Pietro",Color.RED);
-        //map1.put("Daniel",Color.GREEN);
-        refreshUsers(map1);
+        map1.put("Daniel",Color.GREEN);
+        refreshUsers(map1);*/
 
     }
-
+    //METHODS CALLED BY GUI CLASS
     public void showInsertNumberOfPlayers() {
 
         label1.setText("You are the first player.\n Please enter the number of players");
@@ -110,20 +111,21 @@ public class LoginController {
 
 
     public void showColorPrompt(){
-
         button1.setVisible(false);
         inputBox.getChildren().remove(input);
         setupColors();
+    }
 
+    public void showIsFirst(String firstPlayer){
+        label1.setText("The first player is " + firstPlayer +".\nThe game is about to start!");
     }
 
     /**
-     * method used to setup the Login View with its images
+     * method used to Set Up the Login View with its images
      */
     public void setup(){
 
         Image img = new Image("logo.png");
-        Image token = new Image(DEFAULT_COLOR);
         names = new ArrayList<>();
         avatars = new ArrayList<>();
 
@@ -141,7 +143,7 @@ public class LoginController {
             l.setText(DEFAULT_LABEL);
 
         for(ImageView i: avatars)
-            i.setImage(token);
+            i.setImage(DEFAULT_TOKEN);
 
     }
     private void setupColors(){
@@ -170,22 +172,38 @@ public class LoginController {
         Button rButton = new Button();
         rButton.setGraphic(r);
         Label l1 = new Label("RED");
-        rButton.setOnMouseClicked(event -> controller.chooseColor(Color.RED));
+        rButton.setOnMouseClicked(event -> {
+            label1.setText("Color Submitted!");
+            inputBox.getChildren().clear();
+            controller.chooseColor(Color.RED);
+        });
 
         Button bButton = new Button();
         bButton.setGraphic(b);
         Label l2 = new Label("BLUE");
-        bButton.setOnMouseClicked(event -> controller.chooseColor(Color.BLUE));
+        bButton.setOnMouseClicked(event -> {
+                label1.setText("Color Submitted!");
+                inputBox.getChildren().clear();
+                controller.chooseColor(Color.BLUE);
+        });
 
         Button gButton = new Button();
         gButton.setGraphic(g);
-        gButton.setOnMouseClicked(event -> controller.chooseColor(Color.GREEN));
         Label l3 = new Label("GREEN");
+        gButton.setOnMouseClicked(event -> {
+            label1.setText("Color Submitted!");
+            inputBox.getChildren().clear();
+            controller.chooseColor(Color.GREEN);
+        });
 
         Button yButton = new Button();
         yButton.setGraphic(y);
-        yButton.setOnMouseClicked(event -> controller.chooseColor(Color.YELLOW));
         Label l4 = new Label("YELLOW");
+        yButton.setOnMouseClicked(event -> {
+            label1.setText("Color Submitted!");
+            inputBox.getChildren().clear();
+            controller.chooseColor(Color.YELLOW);
+        });
 
         VBox b1 = new VBox(rButton,l1);
         b1.setAlignment(Pos.CENTER);
@@ -209,15 +227,9 @@ public class LoginController {
             case BLUE:
                 return new Image("TokenBlue.png");
             case YELLOW:
-                return new Image("TokenGreen.png");
+                return new Image("TokenYellow.png");
         }
         return null;
-    }
-    public void setStage(Stage stage) {
-        this.stage = stage;
-    }
-    public void setController(Controller controller) {
-        this.controller = controller;
     }
 
     public void refreshUsers(HashMap<String,Color> map){
@@ -227,7 +239,7 @@ public class LoginController {
             for(Label l: names){
                 Color c = map.get(s);
                 if(l.getText().equals(s)){
-                    if(c != null && avatars.get(i).getImage().getUrl().equals(DEFAULT_COLOR)){
+                    if(c != null && avatars.get(i).getImage().equals(DEFAULT_TOKEN) ){
                         Image img = loadColor(c);
                         avatars.get(i).setImage(img);
                     }
@@ -250,6 +262,7 @@ public class LoginController {
         label1.setText("You have correctly set the number of players\nThe number of players is " + number);
     }
 
+
     //Exception Handling
     public void colorAlreadyTaken(){
         dialog = new Dialog<>();
@@ -261,7 +274,7 @@ public class LoginController {
         HBox box = new HBox(error,l);
         dialog.getDialogPane().setContent(box);
         dialog.show();
-
+        showColorPrompt();
     }
 
     public void sameName(String nickname) {
@@ -286,5 +299,10 @@ public class LoginController {
         label1.setText("The lobby is full. No other players can join");
     }
 
-
+    public void setStage(Stage stage) {
+        this.stage = stage;
+    }
+    public void setController(Controller controller) {
+        this.controller = controller;
+    }
 }

@@ -49,13 +49,22 @@
                 <directory>src/main/resources</directory>
             </resource>
             <resource>
-                <directory>src/main/resources/cards</directory>
-            </resource>
-            <resource>
                 <directory>src/main/resources/gui</directory>
             </resource>
             <resource>
                 <directory>src/main/resources/tokens</directory>
+            </resource>
+            <resource>
+                <directory>src/main/resources/cards/backs</directory>
+            </resource>
+            <resource>
+                <directory>src/main/resources/cards/objective</directory>
+            </resource>
+            <resource>
+                <directory>src/main/resources/cards/resource</directory>
+            </resource>
+            <resource>
+                <directory>src/main/resources/cards/starting</directory>
             </resource>
         </resources>
         <plugins>

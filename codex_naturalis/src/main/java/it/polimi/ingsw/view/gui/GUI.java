@@ -3,7 +3,9 @@ package it.polimi.ingsw.view.gui;
 import it.polimi.ingsw.controller.client.Controller;
 import it.polimi.ingsw.model.Color;
 import it.polimi.ingsw.model.GameState;
+import it.polimi.ingsw.model.Kingdom;
 import it.polimi.ingsw.model.Player;
+import it.polimi.ingsw.view.LittleModel;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Group;
@@ -16,18 +18,28 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class GUI extends Application implements InterfaceForView{
-    private Controller controller;
+
+    private  Controller controller; //TODO va final una volta finita implementazione (capire come usarlo come singleton)
+    private  LittleModel model; //TODO va final una volta finita implementazione
     private FXMLLoader fxmlLoader;
     public static LoginController loginController;
+    public static MatchController matchController;
     private static Scene scene;
+    private Stage primaryStage;
     private Parent root;
+
+    /*public GUI(Controller controller, LittleModel model) {
+        this.controller = controller;
+        this.model = model;
+    }*/ //TODO costruttore va usato, metodo launch sarà chiamato DOPO che controller ha creato oggetto GUI
 
 
     @Override
     public void start(Stage stage) throws IOException {
         //loginController = new LoginController();
-        root = loadFXML("gui");
+        root = loadFXML("loginView");
         loginController =(LoginController) fxmlLoader.getController();
+        this.primaryStage = stage;
         loginController.setStage(stage);
         loginController.setController(controller);
         scene = new Scene(root, 1920, 1080);
@@ -36,7 +48,7 @@ public class GUI extends Application implements InterfaceForView{
         stage.show();
     }
 
-    public  void setRoot(String fxml) throws IOException {
+    public void setRoot(String fxml) throws IOException {
         scene.setRoot(loadFXML(fxml));
     }
 
@@ -69,6 +81,21 @@ public class GUI extends Application implements InterfaceForView{
     public void refreshUsers(HashMap<String, Color> playersAndPins) {
         loginController.refreshUsers(playersAndPins);
     }
+
+    @Override
+    public void showCommonTable() {
+        try{
+            setRoot("matchView");
+            matchController = (MatchController) fxmlLoader.getController();
+            matchController.setController(controller);
+            matchController.setStage(primaryStage);
+            matchController.setModel(model);
+            matchController.showCommonTable();
+        } catch(IOException e){
+            System.out.println("Could not load fxml file");
+        }
+    }
+
 
     @Override
     public void showStartingCard(int startingCardId) {
@@ -182,7 +209,7 @@ public class GUI extends Application implements InterfaceForView{
 
     @Override
     public void showIsFirst(String firstPlayer) {
-
+        loginController.showIsFirst(firstPlayer);
     }
 
 
