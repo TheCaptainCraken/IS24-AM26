@@ -158,7 +158,7 @@ public class Controller {
      * @return The id of the drawn card.
      */
     public int drawCard(String player, boolean gold, int onTableOrDeck)
-            throws WrongGamePhaseException, NoTurnException, NoNameException {
+            throws WrongGamePhaseException, NoTurnException, NoNameException, CardPositionException {
         return game.drawCard(player, gold, onTableOrDeck);
     }
 

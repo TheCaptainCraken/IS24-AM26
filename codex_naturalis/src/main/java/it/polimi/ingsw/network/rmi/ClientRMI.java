@@ -32,7 +32,7 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
     RMIServerInterface stub = null;
     Registry registry = null;
 
-    public ClientRMI(Controller controller) throws RemoteException, SameNameException, LobbyCompleteException, NotBoundException {
+    public ClientRMI(Controller controller) throws RemoteException, NotBoundException {
         this.controller = controller;
 
         // Esportazione dell'oggetto ClientRMI come oggetto remoto
@@ -258,7 +258,7 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
      */
     public void drawCard(String nickname, boolean gold, int onTableOrDeck)
     {
-        Integer[] newHand; //TODO sistemare, diventa array di carteId.
+        Integer[] newHand;
         try {
             newHand = stub.drawCard(nickname, gold, onTableOrDeck);
             controller.updateDrawCard(nickname, newHand);
@@ -270,6 +270,8 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
             controller.noTurn();
         } catch (NoNameException e) {
             controller.noName();
+        } catch (CardPositionException e) {
+            controller.cardPosition();
         }
     }
 

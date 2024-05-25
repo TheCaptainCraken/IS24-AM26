@@ -21,8 +21,8 @@ public class Lobby {
         this.complete = false;
     }
 
-    /**If possible it adds a new player to the lobby with a unique nickname
-     * @param nickname nickname of the new Player
+    /** If possible it adds a new player to the lobby with a unique nickname
+     *  @param nickname nickname of the new Player
      */
     public void addPlayer(String nickname) throws LobbyCompleteException, SameNameException {
         if(complete){
@@ -37,7 +37,7 @@ public class Lobby {
         players.add(newPlayer);
 
         //max size is always more than zero when we check here.
-        // The first player can choose the size of the lobby(2, 3, 4), so we set lock always when the lobby is full
+        //The first player can choose the size of the lobby(2, 3, 4), so we set lock always when the lobby is full
         //and the first player has chosen the number of players.
         if(players.size() == maxSize){
             setLock();
@@ -65,6 +65,7 @@ public class Lobby {
     }
 
     public void setMaxSize(int maxSize) throws ClosingLobbyException {
+        //TODO questa eccezione è inutile, input gestito da client. complete okay ma già bloccante in AddPlayer.
         if(complete || maxSize > 4 || maxSize < 2){
             throw new ClosingLobbyException();
         }
@@ -75,6 +76,8 @@ public class Lobby {
             {
                 players.remove(i);
             }
+            //after that the lobby is locked, no one can join anymore.
+            setLock();
         }else if(maxSize == players.size()){
             setLock();
         }
@@ -110,8 +113,8 @@ public class Lobby {
     }
 
     public boolean isReady() {
+        //if ready to start, I shuffle the players.
         if(maxSize == players.size()){
-            //TODO modifica così lo fai ogni volta che uno chiede questa cosa.
             Collections.shuffle(players);
         }
         return maxSize == players.size();

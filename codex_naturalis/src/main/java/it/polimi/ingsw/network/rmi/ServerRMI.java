@@ -274,10 +274,9 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
      */
     @Override
     public Integer[] drawCard(String nickname, boolean gold, int onTableOrDeck)
-            throws WrongGamePhaseException, NoTurnException, NoNameException {
+            throws WrongGamePhaseException, NoTurnException, NoNameException, CardPositionException {
         // The player draws the card, returns the id of the drawn card. Throws an exception if the card cannot be drawn,
         // or if it's not the player's turn, or if the game is not in the correct phase.
-        //TODO
          Controller.getInstance().drawCard(nickname, gold, onTableOrDeck);
         // Get the id of the new card on the table
         int newCardId = Controller.getInstance().newCardOnTable(gold, onTableOrDeck);

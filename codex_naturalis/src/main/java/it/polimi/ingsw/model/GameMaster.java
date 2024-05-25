@@ -277,8 +277,7 @@ public class GameMaster {
      * @return
      */
     public int drawCard(String namePlayer, boolean Gold, int CardPosition)
-            throws WrongGamePhaseException, NoTurnException,
-             IndexOutOfBoundsException, NoNameException{
+            throws WrongGamePhaseException, NoTurnException, NoNameException, CardPositionException {
         // CardPosition has 0, 1 for position of array of cards on table and -1 for
         // drawing from deck
         Player currentPlayer = getCurrentPlayer();
@@ -297,7 +296,7 @@ public class GameMaster {
             } else {
                 cardDrawn = onTableGoldCards[CardPosition];
                 if (cardDrawn == null) {
-                    throw new IllegalArgumentException("There is no card in that spot on table");
+                    throw new CardPositionException();
                 }
                 currentPlayer.takeCard(cardDrawn);
                 try {
@@ -313,7 +312,7 @@ public class GameMaster {
             } else {
                 cardDrawn = onTableResourceCards[CardPosition];
                 if (cardDrawn == null) {
-                    throw new IllegalArgumentException("There is no card in that spot on table");
+                    throw new CardPositionException();
                 }
                 currentPlayer.takeCard(cardDrawn);
                 try {

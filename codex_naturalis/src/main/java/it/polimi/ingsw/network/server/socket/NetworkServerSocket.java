@@ -374,6 +374,8 @@ public class NetworkServerSocket implements NetworkPlug {
                     sendErrorMessage(ErrorType.NO_TURN);
                 } catch (NoNameException e) {
                     sendErrorMessage(ErrorType.NAME_UNKNOWN);
+                } catch (CardPositionException e) {
+                    sendErrorMessage(ErrorType.CARD_POSITION);
                 }
             } else {
                 throw new ClassNotFoundException();

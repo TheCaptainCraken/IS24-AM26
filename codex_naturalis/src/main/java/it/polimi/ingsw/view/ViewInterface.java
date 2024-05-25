@@ -57,7 +57,6 @@ public interface ViewInterface {
 
     //They are triggered by menus and listeners or they automatically appear on the screen if you are watching to them.
     //TODO Should be done also for the TUI
-
     //Show the cards placed of the player on the table.
     void showTableOfPlayer(String nickname);
     //show the new hand of another player

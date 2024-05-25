@@ -10,10 +10,7 @@ import it.polimi.ingsw.network.rmi.ClientRMI;
 import it.polimi.ingsw.network.client.ClientSocket;
 import it.polimi.ingsw.network.client.NetworkClient;
 import it.polimi.ingsw.network.rmi.RMIClientInterface;
-import it.polimi.ingsw.view.Tui;
-import it.polimi.ingsw.view.ViewInterface;
-import it.polimi.ingsw.view.LittleModel;
-import it.polimi.ingsw.view.Phase;
+import it.polimi.ingsw.view.*;
 import javafx.util.Pair;
 
 import java.awt.*;
@@ -34,6 +31,7 @@ public class Controller {
     public Controller(){
         model = new LittleModel();
         phase = Phase.LOGIN;
+        ViewSubmissions.getInstance().setController(this);
     }
 
     public static synchronized Phase getPhase() {
@@ -44,7 +42,7 @@ public class Controller {
         Controller.phase = phase;
     }
 
-    public void setView(String typeOfView) throws InterruptedException {
+    public void setView(String typeOfView){
         model = new LittleModel();
         if(typeOfView.equals("TUI")){
             this.view = new Tui(model, this);
@@ -62,13 +60,10 @@ public class Controller {
                 clientRMI = new ClientRMI(this);
             } catch (RemoteException e) {
                 //TODO
-            } catch (SameNameException e) {
-                throw new RuntimeException(e);
-            } catch (LobbyCompleteException e) {
-                throw new RuntimeException(e);
             } catch (NotBoundException e) {
-                throw new RuntimeException(e);
+                System.out.println("Not bound exception");
             }
+
             connection = (NetworkClient) clientRMI;
         }else if(typeOfConnection.equals("Socket")){
             ClientSocket socket = null;
@@ -80,10 +75,6 @@ public class Controller {
             connection = (NetworkClient) socket;
             new Thread(socket::run).start();
         }
-    }
-
-    public static RMIClientInterface getClientRMI() {
-        return clientRMI;
     }
 
     /**
@@ -101,7 +92,6 @@ public class Controller {
     public String getNickname() {
         return nickname;
     }
-
 
     /**
      * Triggers the view to ask the user for the number of players.
@@ -419,36 +409,10 @@ public class Controller {
         model.updateSecretObjectiveCard(indexCard);
     }
 
-    //TODO capire se serve veramente questa cosa qui.
-    public void updateCommonObjectiveCards(Integer[] commonObjectiveCards) {
-        model.updateCommonObjectiveCards(commonObjectiveCards);
-    }
-    public void showTableOfPlayer(String nickname){
-        view.showTableOfPlayer(nickname);
-    }
-
-    public void showPoints(){
-        view.showPoints();
-    }
-
-    public void showResources() {
-        view.showResourcesPlayer();
-    }
     public void cardPositionError() {
         view.cardPositionError();
     }
 
-    public void showResourcesAllPlayers(){
-        view.showResourcesAllPlayers();
-    }
-
-    public void showHand(){
-        view.showHand();
-    }
-
-    public void showHiddenHand(String name){
-        view.showHiddenHand(name);
-    }
     public void fullLobby() {
         view.closingLobbyError();
     }
