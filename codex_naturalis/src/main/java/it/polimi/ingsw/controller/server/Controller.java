@@ -224,7 +224,7 @@ public class Controller {
      * @throws ColorAlreadyTakenException If the color is already taken.
      * @return Whether all players have chosen a color.
      */
-    public boolean setColour(String name, Color colour) throws ColorAlreadyTakenException, NoNameException {
+    public boolean setColourAndLobbyisReadyToStart(String name, Color colour) throws ColorAlreadyTakenException, NoNameException {
         for (Player player : lobby.getPlayers()) {
             if (player.getColor() == colour) {
                 throw new ColorAlreadyTakenException();
@@ -232,11 +232,6 @@ public class Controller {
         }
 
         lobby.getPlayerFromName(name).setColour(colour);
-
-        // Check if all players have chosen a color
-        if (!lobby.getLock()) {
-            return false;
-        }
 
         for (Player player : lobby.getPlayers()) {
             if (player.getColor() == null) {
@@ -368,7 +363,7 @@ public class Controller {
         int i;
 
         for (i = 0; i < 3; i++) {
-            hiddenHand[i] = new Pair(player.getHand()[i].getKingdom(), (player.getHand()[i] instanceof GoldCard));
+            hiddenHand[i] = new Pair<>(player.getHand()[i].getKingdom(), (player.getHand()[i] instanceof GoldCard));
         }
         return hiddenHand;
     }

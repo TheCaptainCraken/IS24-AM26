@@ -2,26 +2,39 @@ package TuiTest;
 
 import it.polimi.ingsw.controller.client.Controller;
 import it.polimi.ingsw.view.LittleModel;
-import it.polimi.ingsw.view.TUI;
+import it.polimi.ingsw.view.Tui;
 
 public class TuiTest {
-    public static TUI tui;
+    public static Tui tui;
 
     public static void main(String[] args) {
         LittleModel model = new LittleModel();
         Controller controller = new Controller();
-        TUI tui = new TUI(model, controller);
+        Tui tui = new Tui(model, controller);
 
-//        for(int i = 97; i < 103; i++){
-//            System.out.println("Card " + i);
-//            String[] card = tui.createCardToPrint(model.getStartingCard(i, true));
-//            for(int j = 0; j < 7; j++)
-//                System.out.println(card[j]);
-//        }
+        System.out.println(tui.signToEmoji("INKWELL")); // This will print the mushroom emoji
 //
+        for(int i = 97; i < 103; i++){
+            System.out.println("Card " + i);
+            String[] card = tui.createCardToPrint(model.getStartingCard(i, true));
+            for(int j = 0; j < 7; j++)
+                System.out.println(card[j]);
+        }
+
 //        for (int i = 17; i < 97; i++) {
 //            tui.printCard(i, true);
 //        }
+
+        ArrayList<String[]> cards = new ArrayList<>();
+        for(int i = 17; i < 103; i++) {
+            cards.add(tui.createCardToPrint(model.getCard(i, true)));
+            tui.printCardArray(cards);
+        }
+
+    }
+}
+
+
         //        for(int i = 17; i < 97; i++){
 //            System.out.println("Card " + i);
 //            tui.printCard(i, true);
@@ -48,8 +61,7 @@ public class TuiTest {
 //        tui.showStartingCard(i);
 //    }
 
-    }
-}
+
 
 
 

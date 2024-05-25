@@ -61,42 +61,14 @@ public class ClientSocket implements Runnable, NetworkClient{
      * @param address The address of the server.
      * @param port The port of the server.
      */
-    public ClientSocket(Controller controller, String address, int port) {
-        try{
-            socket = new Socket(address, port);
-        } catch (IOException e) {
-            System.out.println("Server not reachable");
-            throw new RuntimeException(e);
-            //TODO
-        }
+    public ClientSocket(Controller controller, String address, int port) throws IOException {
+        socket = new Socket(address, port);
 
-        try{
-            inputStream = socket.getInputStream();
-        } catch (IOException e) {
-            System.out.println("Error in input stream");
-            throw new RuntimeException(e);
-        }
+        outputStream = socket.getOutputStream();
+        objOutputStream = new ObjectOutputStream(outputStream);
 
-        try{
-            objInputStream = new ObjectInputStream(inputStream);
-        } catch (IOException e) {
-            System.out.println("Error in object input stream");
-            throw new RuntimeException(e);
-        }
-
-        try{
-            outputStream = socket.getOutputStream();
-        } catch (IOException e) {
-            System.out.println("Error in output stream");
-            throw new RuntimeException(e);
-        }
-
-        try{
-            objOutputStream = new ObjectOutputStream(outputStream);
-        } catch (IOException e) {
-            System.out.println("Error in object output stream");
-            throw new RuntimeException(e);
-        }
+        inputStream = socket.getInputStream();
+        objInputStream = new ObjectInputStream(inputStream);
 
         this.controller = controller;
     }
@@ -190,7 +162,7 @@ public class ClientSocket implements Runnable, NetworkClient{
     public void chooseSecretObjectiveCard(int indexCard) {
         //input control by the client interface.
         //wait that all players have chosen the secret objective card.
-        controller.updateAndShowSecretObjectiveCard(indexCard);
+        controller.updateSecretObjectiveCard(indexCard);
         Controller.setPhase(Phase.WAIT_ALL_CHOSEN_SECRET_CARD);
         //send the message to the server.
         //possible errors can be:
@@ -273,14 +245,24 @@ public class ClientSocket implements Runnable, NetworkClient{
         try {
             answer = (ServerMessage) objInputStream.readObject();
         } catch (IOException e) {
-            //TODO
-            throw new RuntimeException(e);
+            throw new RuntimeException();
         }
         catch (ClassNotFoundException e) {
             System.out.println("This error should never happen. The server is sending a message that the client does not know how to handle.");
             return null;
         }
         return answer;
+    }
+
+    public void disconnect(){
+        //TODO disconnessioni
+        try {
+            inputStream.close();
+            objInputStream.close();
+            objOutputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
     /**
      * Sends a message to the server.

@@ -10,13 +10,14 @@ import it.polimi.ingsw.network.rmi.ClientRMI;
 import it.polimi.ingsw.network.client.ClientSocket;
 import it.polimi.ingsw.network.client.NetworkClient;
 import it.polimi.ingsw.network.rmi.RMIClientInterface;
+import it.polimi.ingsw.view.Tui;
 import it.polimi.ingsw.view.ViewInterface;
 import it.polimi.ingsw.view.LittleModel;
 import it.polimi.ingsw.view.Phase;
-import it.polimi.ingsw.view.TUI;
 import javafx.util.Pair;
 
 import java.awt.*;
+import java.io.IOException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -46,18 +47,13 @@ public class Controller {
     public void setView(String typeOfView) throws InterruptedException {
         model = new LittleModel();
         if(typeOfView.equals("TUI")){
-            this.view = new TUI(model, this);
+            this.view = new Tui(model, this);
             view.start();
         }else if(typeOfView.equals("GUI")){
             //TODO
             //view = new GUI();
         }
 
-        //for socket
-//        new Thread({
-//                this.view = new Tui(model, this);
-//                view.start();
-//        });
     }
 
     public void createInstanceOfConnection(String typeOfConnection){
@@ -75,11 +71,14 @@ public class Controller {
             }
             connection = (NetworkClient) clientRMI;
         }else if(typeOfConnection.equals("Socket")){
-            ClientSocket socket = new ClientSocket(this, "placeholder", 0);
+            ClientSocket socket = null;
+            try {
+                socket = new ClientSocket(this, "localhost", 4567);
+            } catch (IOException e) {
+                //TODO
+            }
             connection = (NetworkClient) socket;
-            socket.run();
-            //TODO vanno aggiunti address e port ,
-            // il primo sarà una costante salvata nel codice l'altro sarà generato automaticamente
+            new Thread(socket::run).start();
         }
     }
 
@@ -236,7 +235,7 @@ public class Controller {
     public void showSecretObjectiveCardsToChoose(Integer[] objectiveCardIds) {
         model.updateSecretObjectiveCardsToChoose(objectiveCardIds);
         view.showSecretObjectiveCardsToChoose(objectiveCardIds);
-        Controller.setPhase(Phase.CHOOSE_SECRET_OBJECTIVE_CARD); //TODO prova a vedere se con socket è correto
+        Controller.setPhase(Phase.CHOOSE_SECRET_OBJECTIVE_CARD);
     }
 
     public void updatePlaceCard(String nickname, int id, Point position, boolean side) {
@@ -263,8 +262,8 @@ public class Controller {
         model.updateCardOnTable(newCardId, gold, onTableOrDeck);
     }
     public void updateHand(String nickname, Integer[] hand) {
-        view.showHand();
         model.updatePrivateHand(hand);
+        view.showHand();
     }
 
     public void updateHiddenHand(String nickname, Pair<Kingdom, Boolean>[] hand) {
@@ -396,7 +395,7 @@ public class Controller {
     }
 
     public void NoName() {
-        //TODO
+        view.noPlayer();
     }
 
     public void cardPosition() {
@@ -416,11 +415,11 @@ public class Controller {
         view.showSecretObjectiveCard(model.getSecretObjectiveCard());
     }
 
-    //TODO capire se serve veramente questa cosa qui.
     public void updateSecretObjectiveCard(int indexCard) {
         model.updateSecretObjectiveCard(indexCard);
     }
 
+    //TODO capire se serve veramente questa cosa qui.
     public void updateCommonObjectiveCards(Integer[] commonObjectiveCards) {
         model.updateCommonObjectiveCards(commonObjectiveCards);
     }
@@ -432,8 +431,11 @@ public class Controller {
         view.showPoints();
     }
 
-    public void showResources(){
+    public void showResources() {
         view.showResourcesPlayer();
+    }
+    public void cardPositionError() {
+        view.cardPositionError();
     }
 
     public void showResourcesAllPlayers(){
@@ -447,4 +449,8 @@ public class Controller {
     public void showHiddenHand(String name){
         view.showHiddenHand(name);
     }
+    public void fullLobby() {
+        view.closingLobbyError();
+    }
 }
+

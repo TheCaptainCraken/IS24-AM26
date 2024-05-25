@@ -8,13 +8,10 @@ import org.json.simple.parser.ParseException;
 
 import java.awt.*;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.*;
 
 
-public class LittleModel implements Serializable {
-    static String basePath = "src/main/java/it/polimi/ingsw/model/decks/";
-
+public class LittleModel {
     private HashMap <String, Integer> points;
     private HashMap<String, HashMap<Sign, Integer>> resources;
 
@@ -76,7 +73,7 @@ public class LittleModel implements Serializable {
     }
 
     public void updateCardOnTable(int newCardId, boolean gold, int onTableOrDeck) {
-        if(newCardId != -1) {
+        if(onTableOrDeck != -1) {
             if (gold) {
                 goldCards[onTableOrDeck] = newCardId;
             } else {
@@ -103,6 +100,7 @@ public class LittleModel implements Serializable {
 
     public void updateDrawCard(String nickname, int cardId) {
         //TODO capire logica
+        //TODO modificare la logica -> aggiornare tutta la mano
     }
 
     public void updatePlaceCard(String nickname, int id, Point position, boolean side) {

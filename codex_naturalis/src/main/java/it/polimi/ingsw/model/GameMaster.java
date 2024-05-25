@@ -357,6 +357,7 @@ public class GameMaster {
      * Represents the last part of the game, in which the points gained
      * from fulfilling the objectives are calculated.
      */
+    //TODO verificare questo metodo.
     public void endGame() throws WrongGamePhaseException {
         if (gameState != GameState.END) {
             throw new WrongGamePhaseException();
@@ -372,13 +373,13 @@ public class GameMaster {
                 }
                 ranking.add(player);
             }
+
             Collections.sort(ranking, new Comparator<Player>() {
                 @Override
                 public int compare(Player p1, Player p2) {
                     int sum1 = p1.getPoints() + p1.getObjectivePoints();
                     int sum2 = p2.getPoints() + p2.getObjectivePoints();
                     if(sum1 == sum2) {
-
                         return Integer.compare(p1.getObjectivePoints(),p2.getObjectivePoints());
                     } else if(sum1 > sum2){
                         return 1;

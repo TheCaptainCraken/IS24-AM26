@@ -28,8 +28,10 @@ public class ErrorMessage extends ServerMessage {
                     Controller.setPhase(Phase.GAMEFLOW);
                 }
                 controller.noTurn();
+                break;
             case FULL_LOBBY:
-                //TODO
+                controller.fullLobby();
+                break;
             case WRONG_PHASE:
                 if(Controller.getPhase() == Phase.WAIT_ALL_CHOSEN_STARTING_CARD){
                     Controller.setPhase(Phase.CHOOSE_SIDE_STARTING_CARD);
@@ -38,27 +40,34 @@ public class ErrorMessage extends ServerMessage {
                 }else{
                     Controller.setPhase(Phase.GAMEFLOW);
                 }
-                //TODO messaggio errore
+                controller.wrongPhase();
+                break;
             case NAME_UNKNOWN:
-                //TODO no succede mai
+                System.out.println("Name not known. This error should never occur.");
+                break;
             case CARD_POSITION:
-               //TODO
+               controller.cardPositionError();
+                break;
             case LOBBY_IS_CLOSED:
                 //TODO VIEW
+                break;
             case COLOR_UNAVAILABLE:
                 Controller.setPhase(Phase.COLOR);
                 controller.colorAlreadyTaken();
+                break;
             case NAME_ALREADY_USED:
-                //TODO forse conviene messaggio di ritorno sul refreshUsers.
                 Controller.setNickname(null);
                 Controller.setPhase(Phase.LOGIN);
-                //TODO stampare nome non disponibile, senti Pietro
+                break;
             case LOBBY_ALREADY_FULL:
                 //TODO VIEW
+                break;
             case NOT_ENOUGH_RESOURCES:
                 controller.notEnoughResources();
+                break;
             case PLAYER_DOES_NOT_EXIST:
-                //TODO VIEW, non accade mai mandare questo messaggio
+                System.out.println("Player does not exist. This error should never occur.");
+                break;
         }
     }
 }

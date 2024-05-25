@@ -69,7 +69,9 @@ public class NetworkServerSocket implements NetworkPlug {
     public NetworkServerSocket(int port) throws IOException {
         serverSocket = new ServerSocket(port);
         NetworkHandler.getInstance().addNetworkPlug("socket", this);
+        connections = new HashMap<>();
         controller = Controller.getInstance();
+        //TODO cosi distruggi sincronizzazione
     }
 
     /**
@@ -82,7 +84,7 @@ public class NetworkServerSocket implements NetworkPlug {
             Socket new_connection = serverSocket.accept();
             ClientHandler connection = new ClientHandler(new_connection);
             connections.put(new_connection.getRemoteSocketAddress().toString(), connection);
-            connection.run();
+            connection.start();
         }
     }
 
@@ -169,7 +171,6 @@ public class NetworkServerSocket implements NetworkPlug {
     @Override
     public void sendPlacedCard(String nickname, int cardId, Point position, boolean side) {
         sendBroadCastMessage(new CardIsPositioned(nickname, cardId, position, side));
-        //TODO fatto io
         try {
             sendBroadCastMessage(new RefreshedPoints(nickname, controller.getPlayerPoints(nickname)));
             sendBroadCastMessage(new RefreshedResources(nickname, controller.getPlayerResources(nickname)));
@@ -217,6 +218,7 @@ public class NetworkServerSocket implements NetworkPlug {
         /**
          * This method is used to handle the messages received from the client.
          */
+        @Override
         public void run() {
             try {
                 out = new ObjectOutputStream(clientSocket.getOutputStream());
@@ -253,7 +255,6 @@ public class NetworkServerSocket implements NetworkPlug {
                     if(!controller.getIsFirst(parsedMessage.getNickname())){
                         sendMessage(new LobbyIsReady(controller.lobbyIsReady()));
                     }
-                    //TODO questo messaggio non ti serve in realtà
                     networkHandler.finalizingNumberOfPlayersBroadcast();
                 } catch (SameNameException e) {
                     sendErrorMessage(ErrorType.NAME_ALREADY_USED);
@@ -284,7 +285,7 @@ public class NetworkServerSocket implements NetworkPlug {
             } else if (message instanceof ColorChosen) {
                 ColorChosen parsedMessage = (ColorChosen) message;
                 try {
-                    boolean isLobbyReadyToStart = controller.setColour(parsedMessage.getNickname(),
+                    boolean isLobbyReadyToStart = controller.setColourAndLobbyisReadyToStart(parsedMessage.getNickname(),
                             parsedMessage.getColor());
                     networkHandler.refreshUsersBroadcast();
                     if (isLobbyReadyToStart) {
@@ -354,10 +355,13 @@ public class NetworkServerSocket implements NetworkPlug {
                 try {
                     int CardId = controller.drawCard(parsedMessage.getNickname(), parsedMessage.isGold(),
                             parsedMessage.getOnTableOrOnDeck());
-                    int newCardId = controller.newCardOnTable(parsedMessage.isGold(), CardId);
+
+                    int newCardId = controller.newCardOnTable(parsedMessage.isGold(), parsedMessage.getOnTableOrOnDeck());
+
                     Kingdom headDeck = controller.getHeadDeck(parsedMessage.isGold());
-                    networkHandler.sendDrawnCardBroadcast(parsedMessage.getNickname(), newCardId, headDeck,
-                            parsedMessage.isGold(), parsedMessage.getOnTableOrOnDeck());
+
+                    networkHandler.sendDrawnCardBroadcast(parsedMessage.getNickname(), CardId, headDeck,
+                            parsedMessage.isGold(), newCardId);
 
                     if (controller.isEndGame()) {
                         networkHandler.sendEndGameBroadcast();
@@ -415,7 +419,7 @@ public class NetworkServerSocket implements NetworkPlug {
          * This method is used to send the common objective cards to the clients. It is
          * a broadcast call.
          * 
-         * //@param objectiveCardIds The ids of the common objective cards. TODO
+         * //@param objectiveCardIds The ids of the common objective cards.
          */
         public void sendSecretObjectives() {
             try {
@@ -443,15 +447,13 @@ public class NetworkServerSocket implements NetworkPlug {
         public void sendDrawnCardIfPlayer(String nickname, int newCardId, Kingdom headDeck, boolean gold,
                 int onTableOrDeck) {
             if (!this.nickname.equals(nickname)) {
-                //TODO sisteamre anche qua
                 try {
                     sendMessage(new ShowHiddenHand(nickname, controller.getHiddenHand(nickname)));
                 } catch (NoNameException e) {
                    //TODO
                 }
             }
-            //TODO aggiornamento carte girate
-            sendMessage(new ShowNewTableCard(newCardId, gold, onTableOrDeck, controller.getHeadDeck(gold)));
+            sendMessage(new ShowNewTableCard(newCardId, gold, onTableOrDeck, headDeck));
             sendMessage(new TurnInfo(controller.getCurrentPlayer(), controller.getGameState()));
         }
 

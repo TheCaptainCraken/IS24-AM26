@@ -5,16 +5,12 @@ import it.polimi.ingsw.model.exception.LobbyCompleteException;
 import it.polimi.ingsw.model.exception.SameNameException;
 import it.polimi.ingsw.model.exception.NoNameException;
 
-import it.polimi.ingsw.model.exception.LobbyCompleteException;
-import it.polimi.ingsw.model.exception.SameNameException;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
 public class Lobby {
     private final ArrayList<Player> players;
-    private int index; //to letchooseFirstPlayer being reusable
     private int maxSize;
     boolean complete;
 
@@ -40,14 +36,12 @@ public class Lobby {
         Player newPlayer = new Player(nickname);
         players.add(newPlayer);
 
-        //max size is always more than zero when we check here. The first player can choose the size of the lobby(2, 3, 4), so we set lock always when the lobby is full
+        //max size is always more than zero when we check here.
+        // The first player can choose the size of the lobby(2, 3, 4), so we set lock always when the lobby is full
         //and the first player has chosen the number of players.
         if(players.size() == maxSize){
             setLock();
         }
-
-        //TODO bisognerebbe settare casualmente il giocatore iniziale.
-        // Non deve essere sempre il primo aggiunto, basta anche uno shuffle.
     }
 
     /**Get a fixed array of players
@@ -55,10 +49,6 @@ public class Lobby {
      */
     public Player[] getPlayers() {
         return players.toArray(new Player[players.size()]);
-    }
-
-    public int getSize(){
-        return players.size();
     }
 
     /**Given a  nickname it returns the player with that unique nickname
@@ -74,16 +64,6 @@ public class Lobby {
         throw new NoNameException();
     }
 
-    /**Set the first player
-     *
-     * @param i the index starting from 0 of the player that will be the first one to play
-     */
-    public void chooseFirstPlayer(int i){
-        Collections.rotate(players, index);
-        Collections.rotate(players, -i);
-        index = i;
-    }
-
     public void setMaxSize(int maxSize) throws ClosingLobbyException {
         if(complete || maxSize > 4 || maxSize < 2){
             throw new ClosingLobbyException();
@@ -91,11 +71,12 @@ public class Lobby {
         this.maxSize = maxSize;
 
         if(maxSize < players.size()){
-            for(Player player : players){
-                if(players.indexOf(player) >= maxSize){
-                    players.remove(player);
-                }
+            for(int i = players.size() - 1; i >= maxSize; i--)
+            {
+                players.remove(i);
             }
+        }else if(maxSize == players.size()){
+            setLock();
         }
     }
 
@@ -130,6 +111,7 @@ public class Lobby {
 
     public boolean isReady() {
         if(maxSize == players.size()){
+            //TODO modifica così lo fai ogni volta che uno chiede questa cosa.
             Collections.shuffle(players);
         }
         return maxSize == players.size();

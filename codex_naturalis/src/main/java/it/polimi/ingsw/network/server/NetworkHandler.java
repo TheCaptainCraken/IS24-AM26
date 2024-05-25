@@ -22,8 +22,6 @@ public class NetworkHandler {
      * The instance of the controller. It is used to access the controller from the other classes.
      */
     private static final NetworkHandler INSTANCE = new NetworkHandler();
-    //TODO a cosa serve?
-    boolean lobbyIsReady = false;
 
     /**
      * The HashMap is used to store the different protocols types.
@@ -36,7 +34,6 @@ public class NetworkHandler {
      * @return The instance of the controller.
      */
     public static NetworkHandler getInstance(){
-        //TODO mutex
         return INSTANCE;
     }
 
@@ -53,29 +50,14 @@ public class NetworkHandler {
      * @param nameNetworkPlug The name of the protocol.
      * @param networkPlug The protocol itself. ServerRMI, ServerSocket...
      *
-     *
-     * @param nameNetworkPlug
-     * @param networkPlug
      */
     public void addNetworkPlug(String nameNetworkPlug, NetworkPlug networkPlug) {
         networkInterfacesAndConnections.put(nameNetworkPlug, networkPlug);
     }
 
     public void finalizingNumberOfPlayersBroadcast() throws SameNameException, LobbyCompleteException, NoNameException {
-        //TODO do a method that choose from lists of connections in each NetworkPlug`s HashMap
-        //TODO capire come eliminare i giocatori in più
-
-//        HashMap<String, Color> playersInLobby = null;
-//        for(String nickname : connections.keySet()){
-//            if(Controller.getInstance().getPlayer(nickname) == null){
-//                connections.get(nickname).disconnect();
-//                connections.remove(nickname);
-//            }else{
-//                Controller.getInstance().addPlayer(nickname);
-//                connections.get(nickname).stopWaiting(nickname);
-//            }
-//        }
         //Scrematura giocatori se lobby.size() > maxSize
+        //TODO problemi di sincronizzazione?
         boolean lobbyIsReady = Controller.getInstance().lobbyIsReady();
         if(lobbyIsReady) {
             for (NetworkPlug networkPlug : networkInterfacesAndConnections.values()) {
@@ -91,8 +73,6 @@ public class NetworkHandler {
      * @throws NoNameException
      */
     public void gameIsStartingBroadcast() {
-        //TODO
-        Controller.getInstance().start();
         for (NetworkPlug networkPlug : networkInterfacesAndConnections.values()) {
             networkPlug.gameIsStarting();
         }
@@ -104,6 +84,7 @@ public class NetworkHandler {
      *
      */
     public void refreshUsersBroadcast() {
+        //TODO.
         for (NetworkPlug networkPlug : networkInterfacesAndConnections.values()) {
             networkPlug.refreshUsers();
         }
@@ -142,7 +123,7 @@ public class NetworkHandler {
     }
 
     /**
-     * Broadcasts the message of a player placing a card. It also send the new points and resources of the player. It uses controller methods to get these information.
+     * Broadcasts the message of a player placing a card. It also sends the new points and resources of the player. It uses controller methods to get these information.
      * The message is sent to all the different protocols.
      *
      * @param nickname The nickname of the player.

@@ -37,5 +37,7 @@ public class ShowNewTableCard extends ServerMessage {
     @Override
     public void callController(Controller controller) {
         controller.updateCardOnTable(idCard, gold, onTableOrDeck);
+        //TODO ricontrollare logica.
+        controller.updateHeadDeck(topCard, gold);
     }
 }

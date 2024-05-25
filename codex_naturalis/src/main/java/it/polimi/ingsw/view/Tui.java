@@ -13,16 +13,24 @@ import java.util.List;
 /**
  * This class represents the Text User Interface (TUI) of the game.
  * It is responsible for displaying game information to the player and receiving player input.
+ * The TUI communicates with the game's controller to send player actions and receive updates about the game state.
+ * It also uses the game's model to retrieve information about the game state for display.
+ * The TUI is designed to be used in a console environment.
+ *
+ * @author PietroBenecchi
  */
-public class TUI implements ViewInterface {
+public class Tui implements ViewInterface {
     private final Controller controller;
+    /**
+     * Model of the game. It is used to retrieve information about the game state
+     */
     private final LittleModel model;
 
     /**
      * Constructor for the TUI.
      * Initializes the TUI with default values.
      */
-    public TUI(LittleModel model, Controller controller) {
+    public Tui(LittleModel model, Controller controller) {
         this.model = model;
         this.controller = controller;
     }
@@ -112,6 +120,7 @@ public class TUI implements ViewInterface {
         } while (!validInput);
     }
 
+
     /**
      * Informs the player that the lobby has been filled with the number of players chosen by the first player.
      */
@@ -189,6 +198,24 @@ public class TUI implements ViewInterface {
     }
 
     /**
+     * Prints the secret objective card of the player.
+     * This method takes an index of a card as input, retrieves the corresponding card
+     * and prints the representation of the card on the console. The representation of the card
+     * is an array of strings, with each string representing a row of the card.
+     *
+     * @param indexCard The index of the secret objective card to print.
+     */
+    @Override
+    public synchronized void showSecretObjectiveCard(int indexCard) {
+        //TODO sistemare la sincronizzazione per socket.
+        System.out.println("This is your secret objective card: ");
+        String[] secretObjective = createObjectiveCardToPrint(indexCard);
+        for (String row : secretObjective) {
+            System.out.println(row);
+        }
+    }
+
+    /**
      * Displays the secret objective cards that the player can choose from.
      * This method retrieves the secret objective cards from the model, converts them into a printable format,
      * and then prints them to the console for the player to view and choose from.
@@ -215,23 +242,7 @@ public class TUI implements ViewInterface {
             System.out.println();
         }
         System.out.println();
-    }
-
-    /**
-     * Prints the secret objective card of the player.
-     * This method takes an index of a card as input, retrieves the corresponding card
-     * and prints the representation of the card on the console. The representation of the card
-     * is an array of strings, with each string representing a row of the card.
-     *
-     * @param indexCard The index of the secret objective card to print.
-     */
-    @Override
-    public synchronized void showSecretObjectiveCard(int indexCard) {
-        System.out.println("This is your secret objective card: ");
-        String[] secretObjective = createObjectiveCardToPrint(indexCard);
-        for (String row : secretObjective) {
-            System.out.println(row);
-        }
+        System.out.println("Enter 0 or 1:");
     }
 
     /**
@@ -403,10 +414,10 @@ public class TUI implements ViewInterface {
                 p = Integer.toString(((ResourceCard) card.getCard()).getPoints());
             }
             //Non ha kingdom se è carta alta.
-            midSigns.add("");
+            midSigns.add(" ");
         } else {
             for (Corner c : Corner.values()) {
-                corner.put(c, Sign.NULL.toString());
+                corner.put(c, Sign.EMPTY.toString());
             }
             midSigns.add(Optional.ofNullable(card.getCard().getKingdom())
                     .map(Enum::name)
@@ -430,38 +441,40 @@ public class TUI implements ViewInterface {
         String b = signToEmoji(corner.get(Corner.TOP_RIGHT));
         String c = signToEmoji(corner.get(Corner.BOTTOM_LEFT));
         String d = signToEmoji(corner.get(Corner.BOTTOM_RIGHT));
-        String e = signToEmojiForStartingCard(midSigns.get(0));
-        String g = signToEmojiForStartingCard(midSigns.get(1));
-        String h = signToEmojiForStartingCard(midSigns.get(2));
+        String e = middleSignEmoji(midSigns.get(0));
+        String g = middleSignEmoji(midSigns.get(1));
+        String h = middleSignEmoji(midSigns.get(2));
 
         return new String[]{
-                "┌--------┐--------------┌--------┐",
+                "┌––––––––┐––––––––––––––┌––––––––┐",
                 "    "+a+"           "+p+"          "+b+"    ",
-                "└--------┘              └--------┘",
+                "└––––––––┘              └––––––––┘",
                 "|     "+g+"         " + e + "         "+h+"   |",
-                "┌--------┐              ┌--------┐",
+                "┌––––––––┐              ┌––––––––┐",
                 "    "+c+"                      "+d+ "    ",
-                "└--------┘--------------└--------┘",
+                "└––––––––┘––––––––––––––└––––––––┘",
         };
 
     }
 
-    private String signToEmoji(String sign) {
+    public String signToEmoji(String sign) {
         switch (sign) {
             case "MUSHROOM":
                 return "\uD83C\uDF44"; // Fungus emoji
             case "WOLF":
-                return "\uD83D\uDC36"; // Dog emoji
+                return "\uD83D\uDC3A"; // WOLF emoji
             case "BUTTERFLY":
-                return "\uD83D\uDC1B"; // Bug emoji
+                return "\uD83E\uDD8B"; // Butterfly emoji
             case "LEAF":
-                return "\uD83C\uDF31"; // Herb emoji
+                return "\uD83C\uDF3F"; // Herb emoji
             case "SCROLL":
-                return "\uD83D\uDCC2"; // Scroll emoji
+                return "\uD83D\uDCDC"; // Scroll emoji
             case "INKWELL":
-                return "\u2712"; // Black Nib emoji
+                return "\uD83D\uDD8B"; // Black Nib emoji
             case "QUILL":
-                return "\uD83D\uDCD1"; // Notebook With Decorative Cover emoji
+                return "\uD83E\uDEB6"; // Notebook With Decorative Cover emoji
+            case "EMPTY":
+                return "  "; // Restituisci una stringa vuota o un'altra emoji di default se il Sign non è gestito
             case "NULL":
                 return "\uD83D\uDFE5"; // Question mark emoji
             default:
@@ -469,28 +482,28 @@ public class TUI implements ViewInterface {
         }
     }
 
-    private String signToEmojiForStartingCard(String sign) {
+    private String middleSignEmoji(String sign) {
         switch (sign) {
             case "MUSHROOM":
             case "FUNGI":
                 return "\uD83C\uDF44"; // Fungus emoji
             case "WOLF":
             case "ANIMAL":
-                return "\uD83D\uDC36"; // Dog emoji
+                return "\uD83D\uDC3A"; // WOLF emoji
             case "BUTTERFLY":
             case "INSECT":
-                return "\uD83D\uDC1B"; // Bug emoji
+                return "\uD83E\uDD8B"; // Butterfly emoji
             case "LEAF":
             case "PLANT":
-                return "\uD83C\uDF31"; // Herb emoji
+                return "\uD83C\uDF3F"; // Herb emoji
             case "SCROLL":
-                return "\uD83D\uDCC2"; // Scroll emoji
+                return "\uD83D\uDCDC"; // Scroll emoji
             case "INKWELL":
-                return "\u2712"; // Black Nib emoji
+                return "\uD83D\uDD8B"; // Black Nib emoji
             case "QUILL":
-                return "\uD83D\uDCD1"; // Notebook With Decorative Cover emoji
+                return "\uD83E\uDEB6"; // Notebook With Decorative Cover emoji
             case "NULL":
-                return "  "; // Question mark emoji
+                return "  ";
             default:
                 return "  "; // Restituisci una stringa vuota o un'altra emoji di default se il Sign non è gestito
         }
@@ -543,201 +556,15 @@ public class TUI implements ViewInterface {
     }
 
     @Override
+    public void showTableOfPlayer(String nickname) {
+        //TODO
+    }
+
+    @Override
     public void showHiddenHand(String nickname) {
         //TODO
     }
 
-//    public void printTableAreaOfPlayer(String nickname) {
-//        printTableArea(getTable(nickname));
-//    }
-
-    private void printTableArea(PlayedCard card) {
-        if (card == null) {
-            System.out.println("There is no card in this place");
-            defaultMenu();
-            return;
-        }
-        System.out.println("Arrows means that the first is on the other one, example: card1 -> card2, card1 is on card2 on the corner near the arrow");
-        System.out.println(focusOnCard(card));//Useless first time
-        System.out.println("Options: +\n" +
-                "(top left) q   e (top right)\n" +
-                "             s (quit)  \n" +
-                "(bot left) z   c (bot right)\n");
-        char option = 's';//TODO Scanf con prossima opzione
-        switch (option) {
-            case 'q':
-                printTableArea(card.getAttachmentCorners().get(Corner.TOP_LEFT));
-                break;
-            case 'e':
-                printTableArea(card.getAttachmentCorners().get(Corner.TOP_RIGHT));
-                break;
-            case 'z':
-                printTableArea(card.getAttachmentCorners().get(Corner.BOTTOM_LEFT));
-                break;
-            case 'c':
-                printTableArea(card.getAttachmentCorners().get(Corner.BOTTOM_RIGHT));
-                break;
-            default:
-                defaultMenu();
-        }
-    }
-
-    public String focusOnCard(PlayedCard focusedCard) {
-        String toPrint = "";
-        HashMap<Corner, PlayedCard> attachments = focusedCard.getAttachmentCorners();
-        HashMap<Corner, String[]> attachmentsStrings = new HashMap<>();
-        for (Corner c : attachments.keySet()) {
-            attachmentsStrings.put(c, createCardToPrint(attachments.get(c)));
-        }
-        HashMap<Corner, String[]> arrows = createArrows(attachments, focusedCard);
-
-        for (int i = 0; i < 7; i++) {
-            toPrint += attachmentsStrings.get(Corner.TOP_LEFT)[i] + "                             " + attachmentsStrings.get(Corner.TOP_RIGHT)[i] + "\n";
-        }
-        toPrint += "                             " + arrows.get(Corner.TOP_LEFT)[0] + "                             " + arrows.get(Corner.TOP_RIGHT)[0] + "                             " + "\n";
-        toPrint += "                             " + arrows.get(Corner.TOP_LEFT)[1] + "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + arrows.get(Corner.TOP_RIGHT)[1] + "                             " + "\n";
-        toPrint += "                             " + arrows.get(Corner.TOP_LEFT)[2] + "                             " + arrows.get(Corner.TOP_RIGHT)[2] + "                             " + "\n";
-
-        for (int i = 0; i < 7; i++) {
-            toPrint += "                             " + " ~ " + attachmentsStrings.get(Corner.TOP_LEFT)[i] + " ~ " + "                             " + "\n";
-        }
-        toPrint += "                             " + arrows.get(Corner.BOTTOM_LEFT)[0] + "                             " + arrows.get(Corner.BOTTOM_RIGHT)[0] + "                             " + "\n";
-        toPrint += "                             " + arrows.get(Corner.BOTTOM_LEFT)[1] + "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + arrows.get(Corner.BOTTOM_RIGHT)[1] + "                             " + "\n";
-        toPrint += "                             " + arrows.get(Corner.BOTTOM_LEFT)[2] + "                             " + arrows.get(Corner.BOTTOM_RIGHT)[2] + "                             " + "\n";
-        for (int i = 0; i < 7; i++) {
-            toPrint += attachmentsStrings.get(Corner.BOTTOM_LEFT)[i] + "                             " + attachmentsStrings.get(Corner.BOTTOM_RIGHT)[i] + "\n";
-        }
-        return toPrint;
-    }
-
-
-    public HashMap<Corner, String[]> createArrows(HashMap<Corner, PlayedCard> attachments, PlayedCard focusedCard) {
-        HashMap<Corner, String[]> arrows = new HashMap<>();
-        for (Corner corner : Corner.values()) {
-            switch (corner) {
-                case TOP_LEFT: {
-                    if (attachments.get(Corner.TOP_RIGHT).getTurnOfPositioning() > focusedCard.getTurnOfPositioning()) {
-                        arrows.put(Corner.TOP_RIGHT, new String[]{
-                                " ",
-                                " \\ ",
-                                " -┘"
-                        });
-                    } else {
-                        arrows.put(Corner.TOP_RIGHT, new String[]{
-                                "┌- ",
-                                "\\ ",
-                                "   "
-                        });
-                    }
-                }
-                case TOP_RIGHT: {
-                    if (attachments.get(Corner.TOP_RIGHT).getTurnOfPositioning() > focusedCard.getTurnOfPositioning()) {
-                        arrows.put(Corner.TOP_RIGHT, new String[]{
-                                "   ",
-                                " / ",
-                                "└- "
-                        });
-                    } else {
-                        arrows.put(Corner.TOP_RIGHT, new String[]{
-                                " -┐",
-                                " / ",
-                                "   "
-                        });
-                    }
-                }
-                case BOTTOM_LEFT: {
-                    if (attachments.get(Corner.BOTTOM_LEFT).getTurnOfPositioning() > focusedCard.getTurnOfPositioning()) {
-                        arrows.put(Corner.BOTTOM_LEFT, new String[]{
-                                " -┐",
-                                " / ",
-                                "   "
-                        });
-                    } else {
-                        arrows.put(Corner.BOTTOM_LEFT, new String[]{
-                                "   ",
-                                " / ",
-                                "└- "
-                        });
-                    }
-                }
-                case BOTTOM_RIGHT: {
-                    if (attachments.get(Corner.TOP_RIGHT).getTurnOfPositioning() > focusedCard.getTurnOfPositioning()) {
-                        arrows.put(Corner.TOP_RIGHT, new String[]{
-                                "┌- ",
-                                "\\ ",
-                                "   "
-                        });
-                    } else {
-                        arrows.put(Corner.TOP_RIGHT, new String[]{
-                                " ",
-                                " \\ ",
-                                " -┘"
-                        });
-                    }
-                }
-            }
-        }
-        return arrows;
-    }
-
-    /**
-     * Prints the default menu, with all the options to choose from.
-     */
-    private void defaultMenu() {
-        System.out.println("please insert a number for choosing the option");
-        System.out.println("" +
-                "1 - place a card\n" +
-                "2 - draw a card\n" +
-                "3 - show the table of a player\n" +
-                "4 - show my resources\n" +
-                "5 - show all players resources\n" +
-                "6 - show the points of the players\n" +
-                "7 - show my hand\n" +
-                "8 - show the hidden hand of a player\n");
-        int choice = 0;
-        Scanner scanner = new Scanner(System.in);
-        boolean validInput = false;
-        while (!validInput) {
-            try {
-                choice = scanner.nextInt();
-                validInput = true;
-            } catch (InputMismatchException e) {
-                System.out.println("Input not valid. Please insert a number.");
-                scanner.next(); // Consuma l'input non valido
-            }
-        }
-        switch (choice) {
-            case 1:
-                printTableAreaOfPlayer(controller.getNickname());
-                askPlaceCard();
-                break;
-            case 2:
-                askDrawCard();
-                break;
-            case 3:
-                showTableOfPlayerChecked();
-                break;
-            case 4:
-                showResourcesPlayer();
-                break;
-            case 5:
-                showResourcesAllPlayers();
-                break;
-            case 6:
-                showPoints();
-                break;
-            case 7:
-                showHand();
-                break;
-            case 8:
-                showHiddenHand();
-                break;
-            default:
-                System.out.println("Invalid input. Please retry");
-                defaultMenu();
-        }
-
-    }
 
     private void showTableOfPlayerChecked() {
         Scanner scanner = new Scanner(System.in);
@@ -783,11 +610,10 @@ public class TUI implements ViewInterface {
         showHand();
         while (!validInput) {
             try {
-                System.out.println("Enter index of the card in hand (0-2):");
+                System.out.println("Enter index of the card in hand (1-3):");
                 indexHand = scanner.nextInt();
-                //TODO mettere da 1 a 3, facendo più uno
-                if (indexHand < 0 || indexHand > 2) {
-                    System.out.println("Invalid input. Index must be between 0 and 2.");
+                if (indexHand < 1 || indexHand > 3) {
+                    System.out.println("Invalid input. Index must be between 1 and 3.");
                     continue;
                 }
                 System.out.println("Enter position x:");
@@ -797,6 +623,8 @@ public class TUI implements ViewInterface {
                 System.out.println("Enter true if the card is facing up, false otherwise:");
                 isFacingUp = scanner.nextBoolean();
                 ViewSubmissions.getInstance().placeCard(indexHand, position, isFacingUp);
+                //TODO
+                //controller.playCard(indexHand + 1, position, isFacingUp);
                 validInput = true;
             } catch (InputMismatchException e) {
                 System.out.println("Invalid input. Please enter the correct values.");
@@ -996,49 +824,13 @@ public class TUI implements ViewInterface {
      */
     @Override
     public synchronized void closingLobbyError() {
-        System.out.println("The input is not correct. Please retry");
-    }
-
-    /**
-     * Converts Kingdom enum to Sign enum
-     *
-     * @param kingdom Kingdom to convert
-     * @return Sign in which the Kingdom has been converted
-     */
-    //TODO PERCHE NON è USATA?
-    private Sign fromKingdomToSign(Kingdom kingdom) throws IllegalArgumentException {
-        switch (kingdom) {
-            case PLANT:
-                return Sign.LEAF;
-            case ANIMAL:
-                return Sign.WOLF;
-            case FUNGI:
-                return Sign.MUSHROOM;
-            case INSECT:
-                return Sign.BUTTERFLY;
-        }
-        throw new IllegalArgumentException("It's not a right Kingdom to convert");
-    }
-
-
-    public void showTableOfPlayer(String nickname) {
-        Object tableOfPlayer = model.getTableOfPlayer(nickname);
         //TODO
-    }
-
-    public synchronized void printCard(int id, boolean side) {
-        String[] card = createCardToPrint(model.getCard(id, side));
-        for (String row : card) {
-            System.out.println(row);
-        }
-
+        System.out.println("TODO closingLobbyError");
     }
 
     @Override
     public void start() {
         while (true) {
-            if(Controller.getPhase() != Phase.WAIT)
-                System.out.println("Current phase: " + Controller.getPhase());
             switch (Controller.getPhase()) {
                 case LOGIN:
                     askChooseNickname();
@@ -1147,13 +939,13 @@ public class TUI implements ViewInterface {
 
     }
 
-    private void printCardArray(ArrayList<String[]> cardsToPrint) {
+    public void printCardArray(ArrayList<String[]> cardsToPrint) {
         int size = cardsToPrint.get(0).length;
         int i;
         for (i = 0; i < size; i++) {
             for (String[] card : cardsToPrint) {
                 System.out.print(card[i]);
-                System.out.print("   ");
+                System.out.print(" ");
             }
             System.out.println();
         }
@@ -1184,6 +976,18 @@ public class TUI implements ViewInterface {
         int min = cards.stream().mapToInt(card -> card.getPosition().x).min().orElse(0);
         int inizialier = min;
 
+        if(level % 2 == 0){
+            //TODO poi togliere only for debuggng porpouse
+            cardsToPrint.add(new String[]{
+                    "┌--------┐--------------┌--------┐",
+                    "|        |              |        |",
+                    "└--------┘              └--------┘",
+                    "|        |              |        |",
+                    "┌--------┐              ┌--------┐",
+                    "|        |              |        |",
+                    "└--------┘--------------└--------┘",
+            });
+        }
         for(CardClient card: cards){
             //TODO sistemare fai shift delle carte
             if(level == card.getPosition().x + card.getPosition().y){
@@ -1206,6 +1010,17 @@ public class TUI implements ViewInterface {
                 level = card.getPosition().x + card.getPosition().y;
                 cardsToPrint = new ArrayList<>();
 
+                if(level % 2 == 0){
+                    cardsToPrint.add(new String[]{
+                            "┌--------┐--------------┌--------┐",
+                            "|        |              |        |",
+                            "└--------┘              └--------┘",
+                            "|        |              |        |",
+                            "┌--------┐              ┌--------┐",
+                            "|        |              |        |",
+                            "└--------┘--------------└--------┘",
+                    });
+                }
                 while(min != card.getPosition().x){
                     min++;
                     cardsToPrint.add(new String[]{
@@ -1225,6 +1040,184 @@ public class TUI implements ViewInterface {
         //solo per ultima lista di carte
         printCardArray(cardsToPrint);
     }
+
+
+    /**
+     * Displays to show the first player to enter the number of players.
+     */
+    public void showInsertNumberOfPlayers() {
+        System.out.println("You are the first player. Please enter the number of players");
+        System.out.println("The number of players must be between 2 and 4");
+
+        Scanner scanner = new Scanner(System.in);
+        int numberOfPlayers = 0;
+        boolean validInput = false;
+
+        while (!validInput) {
+            try {
+                numberOfPlayers = scanner.nextInt();
+                if (numberOfPlayers >= 2 && numberOfPlayers <= 4) {
+                    validInput = true;
+                } else {
+                    System.out.println("Invalid input. Please enter a number between 2 and 4.");
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid input. Please enter a number between 2 and 4.");
+                scanner.next(); // discard the invalid input
+            }
+        }
+        controller.insertNumberOfPlayers(numberOfPlayers);
+        //TODO dividere
+    }
+
+    /**
+     * Prompts the user to choose a color for their player.
+     * This method is used during the COLOR phase of the game, where each player chooses a unique color to represent them.
+     * The chosen color is then sent to the server to be registered.
+     * If the chosen color is already taken, the user will be prompted to choose again.
+     *
+     */
+    private void askColor() {
+        System.out.println(Controller.getPhase());
+        System.out.println("Choose your color");
+        System.out.println("1 - Blue\n" +
+                "2 - Yellow\n" +
+                "3 - Green\n" +
+                "4 - Red\n");
+        Scanner scanner = new Scanner(System.in);
+        int color;
+        boolean validInput = false;
+        do {
+            try {
+                color = scanner.nextInt();
+                switch (color) {
+                    case 1:
+                        controller.chooseColor(Color.BLUE);
+                        validInput = true;
+                        break;
+                    case 2:
+                        controller.chooseColor(Color.YELLOW);
+                        validInput = true;
+                        break;
+                    case 3:
+                        controller.chooseColor(Color.GREEN);
+                        validInput = true;
+                        break;
+                    case 4:
+                        controller.chooseColor(Color.RED);
+                        validInput = true;
+                        break;
+                    default:
+                        System.out.println("Invalid input");
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid input. Please enter a number between 1 and 4.");
+                scanner.next(); // discard the invalid input
+            }
+        } while (!validInput);
+    }
+
+    private void chooseSecretObjectiveCard() {
+        Scanner scanner = new Scanner(System.in);
+        int indexCard = 0;
+        boolean validInput = false;
+
+        while (!validInput) {
+            try {
+                indexCard = scanner.nextInt();
+                if (indexCard == 0 || indexCard == 1) {
+                    controller.chooseSecretObjectiveCard(indexCard);
+                    validInput = true;
+                } else {
+                    System.out.println("Invalid input. Please enter 0 or 1.");
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid input. Please enter 0 or 1.");
+                scanner.next(); // Consumes the invalid input
+            }
+        }
+    }
+
+
+    private void chooseStartingCard() {
+        Scanner scanner = new Scanner(System.in);
+        boolean isFacingUp = false;
+
+        String side;
+        do {
+            side = scanner.nextLine();
+            if (side.equals("true"))
+                isFacingUp = true;
+            else if (side.equals("false"))
+                isFacingUp = false;
+            else
+                System.out.println("Invalid input");
+        } while (!side.equals("true") && !side.equals("false"));
+
+        controller.chooseSideStartingCard(isFacingUp);
+
+    }
+
+
+    /**
+     * Prints the default menu, with all the options to choose from.
+     */
+    private void defaultMenu() {
+        System.out.println("please insert a number for choosing the option");
+        System.out.println("" +
+                "1 - place a card\n" +
+                "2 - draw a card\n" +
+                "3 - show the table of a player\n" +
+                "4 - show my resources\n" +
+                "5 - show all players resources\n" +
+                "6 - show the points of the players\n" +
+                "7 - show my hand\n" +
+                "8 - show the hidden hand of a player\n");
+        int choice = 0;
+        Scanner scanner = new Scanner(System.in);
+        boolean validInput = false;
+        while (!validInput) {
+            try {
+                choice = scanner.nextInt();
+                validInput = true;
+            } catch (InputMismatchException e) {
+                System.out.println("Input not valid. Please insert a number.");
+                scanner.next(); // Consuma l'input non valido
+            }
+        }
+        switch (choice) {
+            case 1:
+                printTableAreaOfPlayer(controller.getNickname());
+                askPlaceCard();
+                break;
+            case 2:
+                askDrawCard();
+                break;
+            case 3:
+                showTableOfPlayerChecked();
+                break;
+            case 4:
+                showResourcesPlayer();
+                break;
+            case 5:
+                showResourcesAllPlayers();
+                break;
+            case 6:
+                showPoints();
+                break;
+            case 7:
+                showHand();
+                break;
+            case 8:
+                showHiddenHand();
+                break;
+            default:
+                System.out.println("Invalid input. Please retry");
+                defaultMenu();
+        }
+
+    }
+
 }
 
 

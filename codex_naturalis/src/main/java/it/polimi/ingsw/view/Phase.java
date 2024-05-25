@@ -12,7 +12,7 @@ public enum Phase {
      * The CHOOSE_COLOR phase is used to set the color of the player in the game.
      * It is the second state of the game. It is set when:
      * - RMI: after stopWaitingMethod
-     * - Socket: after NAME_ACCEPTED //TODO
+     * - Socket: after NAME_ACCEPTED
      */
     COLOR,
     CHOOSE_SIDE_STARTING_CARD,
