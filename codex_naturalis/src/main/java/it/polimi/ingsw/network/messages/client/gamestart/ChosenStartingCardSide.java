@@ -4,12 +4,18 @@ import it.polimi.ingsw.network.messages.client.ClientMessage;
 
 public class ChosenStartingCardSide extends ClientMessage {
     private final boolean side;
+    private final String nickname;
 
-    public ChosenStartingCardSide(boolean side) {
+    public ChosenStartingCardSide(String nickname, boolean side) {
+        this.nickname = nickname;
         this.side = side;
     }
 
     public boolean isSide() {
         return side;
+    }
+
+    public String getNickname() {
+        return nickname;
     }
 }

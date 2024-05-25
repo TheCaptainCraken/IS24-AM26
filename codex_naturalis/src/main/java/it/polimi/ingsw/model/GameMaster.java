@@ -277,8 +277,7 @@ public class GameMaster {
      * @return
      */
     public int drawCard(String namePlayer, boolean Gold, int CardPosition)
-            throws WrongGamePhaseException, NoTurnException,
-             IndexOutOfBoundsException, NoNameException{
+            throws WrongGamePhaseException, NoTurnException, NoNameException, CardPositionException {
         // CardPosition has 0, 1 for position of array of cards on table and -1 for
         // drawing from deck
         Player currentPlayer = getCurrentPlayer();
@@ -297,7 +296,7 @@ public class GameMaster {
             } else {
                 cardDrawn = onTableGoldCards[CardPosition];
                 if (cardDrawn == null) {
-                    throw new IllegalArgumentException("There is no card in that spot on table");
+                    throw new CardPositionException();
                 }
                 currentPlayer.takeCard(cardDrawn);
                 try {
@@ -313,7 +312,7 @@ public class GameMaster {
             } else {
                 cardDrawn = onTableResourceCards[CardPosition];
                 if (cardDrawn == null) {
-                    throw new IllegalArgumentException("There is no card in that spot on table");
+                    throw new CardPositionException();
                 }
                 currentPlayer.takeCard(cardDrawn);
                 try {
@@ -357,6 +356,7 @@ public class GameMaster {
      * Represents the last part of the game, in which the points gained
      * from fulfilling the objectives are calculated.
      */
+    //TODO verificare questo metodo.
     public void endGame() throws WrongGamePhaseException {
         if (gameState != GameState.END) {
             throw new WrongGamePhaseException();
@@ -372,13 +372,13 @@ public class GameMaster {
                 }
                 ranking.add(player);
             }
+
             Collections.sort(ranking, new Comparator<Player>() {
                 @Override
                 public int compare(Player p1, Player p2) {
                     int sum1 = p1.getPoints() + p1.getObjectivePoints();
                     int sum2 = p2.getPoints() + p2.getObjectivePoints();
                     if(sum1 == sum2) {
-
                         return Integer.compare(p1.getObjectivePoints(),p2.getObjectivePoints());
                     } else if(sum1 > sum2){
                         return 1;

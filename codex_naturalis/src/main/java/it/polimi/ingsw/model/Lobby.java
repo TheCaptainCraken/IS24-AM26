@@ -5,16 +5,12 @@ import it.polimi.ingsw.model.exception.LobbyCompleteException;
 import it.polimi.ingsw.model.exception.SameNameException;
 import it.polimi.ingsw.model.exception.NoNameException;
 
-import it.polimi.ingsw.model.exception.LobbyCompleteException;
-import it.polimi.ingsw.model.exception.SameNameException;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
 public class Lobby {
     private final ArrayList<Player> players;
-    private int index;//to letchooseFirstPlayer being reusable
     private int maxSize;
     boolean complete;
 
@@ -25,8 +21,8 @@ public class Lobby {
         this.complete = false;
     }
 
-    /**If possible it adds a new player to the lobby with a unique nickname
-     * @param nickname nickname of the new Player
+    /** If possible it adds a new player to the lobby with a unique nickname
+     *  @param nickname nickname of the new Player
      */
     public void addPlayer(String nickname) throws LobbyCompleteException, SameNameException {
         if(complete){
@@ -40,12 +36,12 @@ public class Lobby {
         Player newPlayer = new Player(nickname);
         players.add(newPlayer);
 
+        //max size is always more than zero when we check here.
+        //The first player can choose the size of the lobby(2, 3, 4), so we set lock always when the lobby is full
+        //and the first player has chosen the number of players.
         if(players.size() == maxSize){
             setLock();
         }
-
-        //TODO bisognerebbe settare casualmente il giocatore iniziale.
-        // Non deve essere sempre il primo aggiunto, basta anche uno shuffle.
     }
 
     /**Get a fixed array of players
@@ -53,10 +49,6 @@ public class Lobby {
      */
     public Player[] getPlayers() {
         return players.toArray(new Player[players.size()]);
-    }
-
-    public int getSize(){
-        return players.size();
     }
 
     /**Given a  nickname it returns the player with that unique nickname
@@ -72,21 +64,23 @@ public class Lobby {
         throw new NoNameException();
     }
 
-    /**Set the first player
-     *
-     * @param i the index starting from 0 of the player that will be the first one to play
-     */
-    public void chooseFirstPlayer(int i){
-        Collections.rotate(players, index);
-        Collections.rotate(players, -i);
-        index = i;
-    }
-
     public void setMaxSize(int maxSize) throws ClosingLobbyException {
+        //TODO questa eccezione è inutile, input gestito da client. complete okay ma già bloccante in AddPlayer.
         if(complete || maxSize > 4 || maxSize < 2){
             throw new ClosingLobbyException();
         }
         this.maxSize = maxSize;
+
+        if(maxSize < players.size()){
+            for(int i = players.size() - 1; i >= maxSize; i--)
+            {
+                players.remove(i);
+            }
+            //after that the lobby is locked, no one can join anymore.
+            setLock();
+        }else if(maxSize == players.size()){
+            setLock();
+        }
     }
 
     /** It locks the lobby so nobody can join anymore, the lobby cannot be unlocked
@@ -107,5 +101,22 @@ public class Lobby {
         }
 
         return PlayerAndPin;
+    }
+
+    public boolean isAdmitted(String nickname) {
+        for(Player player : players){
+            if(player.getName().equals(nickname)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isReady() {
+        //if ready to start, I shuffle the players.
+        if(maxSize == players.size()){
+            Collections.shuffle(players);
+        }
+        return maxSize == players.size();
     }
 }

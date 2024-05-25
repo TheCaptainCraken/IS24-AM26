@@ -2,6 +2,7 @@ package it.polimi.ingsw.network.messages.server.login;
 
 import it.polimi.ingsw.controller.client.Controller;
 import it.polimi.ingsw.network.messages.server.ServerMessage;
+import it.polimi.ingsw.view.Phase;
 
 public class StatusLogin extends ServerMessage {
     private final boolean  isFirst;
@@ -17,8 +18,10 @@ public class StatusLogin extends ServerMessage {
     @Override
     public void callController(Controller controller){
         if(isFirst){
+            Controller.setPhase(Phase.NUMBER_OF_PLAYERS);
             controller.askNumberOfPlayer();
         } else {
+            Controller.setPhase(Phase.WAIT);
             controller.waitLobby();
         }
     }

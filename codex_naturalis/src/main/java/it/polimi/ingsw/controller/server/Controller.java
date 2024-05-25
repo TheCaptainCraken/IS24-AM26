@@ -1,6 +1,5 @@
 package it.polimi.ingsw.controller.server;
 
-
 import it.polimi.ingsw.model.*;
 import it.polimi.ingsw.model.Color;
 import it.polimi.ingsw.model.exception.*;
@@ -11,7 +10,6 @@ import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-
 
 /**
  * This class represents the main controller of the game.
@@ -26,10 +24,11 @@ public class Controller {
 
     /**
      * Gets the instance of the controller.
+     * 
      * @return The instance of the controller.
      */
-    public static Controller getInstance(){
-        //TODO mutex here
+    public static Controller getInstance() {
+        // TODO mutex here
         return INSTANCE;
     }
 
@@ -37,10 +36,13 @@ public class Controller {
      * Private constructor for the singleton pattern.
      * Initializes the lobby.
      */
-    private Controller() { lobby = new Lobby();
+    private Controller() {
+        lobby = new Lobby();
     }
+
     /**
      * Initializes the lobby with a maximum number of players.
+     * 
      * @param nPlayers The maximum number of players.
      * @throws ClosingLobbyException If the lobby is already closed.
      */
@@ -51,10 +53,12 @@ public class Controller {
     /**
      * Initializes the GameMaster object which manages the game flow.
      *
-     * This method is used to create a new GameMaster object with the lobby and the paths to the decks of cards.
-     * The actual initialization of the GameMaster is handled by the GameMaster's constructor.
+     * This method is used to create a new GameMaster object with the lobby and the
+     * paths to the decks of cards.
+     * The actual initialization of the GameMaster is handled by the GameMaster's
+     * constructor.
      *
-     * @throws IOException If the file is not found.
+     * @throws IOException    If the file is not found.
      * @throws ParseException If the file is not valid.
      */
     public void start() {
@@ -70,10 +74,13 @@ public class Controller {
             System.out.println("the file is not valid");
         }
     }
+
     /**
      * Adds a player to the lobby.
+     * 
      * @param nickname The nickname of the player.
-     * @throws SameNameException If a player with the same nickname already exists.
+     * @throws SameNameException      If a player with the same nickname already
+     *                                exists.
      * @throws LobbyCompleteException If the lobby is already full.
      */
     public void addPlayer(String nickname) throws SameNameException, LobbyCompleteException {
@@ -82,37 +89,57 @@ public class Controller {
 
     /**
      * Places the root card for a player.
+     * 
      * @param player The player's name.
-     * @param side The side of the card.
+     * @param side   The side of the card.
      * @throws WrongGamePhaseException If the game is not in the correct phase.
-     * @throws NoTurnException If it's not the player's turn.
+     * @throws NoTurnException         If it's not the player's turn.
      * @return The id of the placed card.
      */
-    public int placeRootCard(String player, boolean side) throws WrongGamePhaseException, NoTurnException, NoNameException {
+    public int placeRootCard(String player, boolean side)
+            throws WrongGamePhaseException, NoTurnException, NoNameException {
         return game.placeRootCard(player, side);
     }
 
     /**
+     * Gets the nicknames of the players in the lobby.
+     * 
+     * @return An ArrayList of the nicknames of the players.
+     */
+    public ArrayList<String> getNicknames() {
+        ArrayList<String> nicknames = new ArrayList<>();
+
+        for (Player player : lobby.getPlayers()) {
+            nicknames.add(player.getName());
+        }
+        return nicknames;
+    }
+
+    /**
      * Allows a player to choose an objective card.
-     * @param player The player's name.
+     * 
+     * @param player    The player's name.
      * @param whichCard The index of the card to choose.
      * @throws WrongGamePhaseException If the game is not in the correct phase.
-     * @throws NoTurnException If it's not the player's turn.
+     * @throws NoTurnException         If it's not the player's turn.
      */
-    public void chooseObjectiveCard(String player, int whichCard) throws WrongGamePhaseException, NoTurnException, NoNameException {
+    public void chooseObjectiveCard(String player, int whichCard)
+            throws WrongGamePhaseException, NoTurnException, NoNameException {
         game.chooseObjectiveCard(player, whichCard);
     }
 
     /**
      * Allows a player to place a card.
-     * @param player The player's name.
+     * 
+     * @param player    The player's name.
      * @param indexHand The index of the card in the player's hand.
-     * @param position The position to place the card.
-     * @param side The side of the card.
-     * @throws WrongGamePhaseException If the game is not in the correct phase.
-     * @throws NoTurnException If it's not the player's turn.
-     * @throws NotEnoughResourcesException If the player does not have enough resources.
-     * @throws NoNameException If the field does not exist.
+     * @param position  The position to place the card.
+     * @param side      The side of the card.
+     * @throws WrongGamePhaseException     If the game is not in the correct phase.
+     * @throws NoTurnException             If it's not the player's turn.
+     * @throws NotEnoughResourcesException If the player does not have enough
+     *                                     resources.
+     * @throws NoNameException             If the field does not exist.
      * @return The id of the placed card.
      */
     public int placeCard(String player, int indexHand, Point position, boolean side) throws WrongGamePhaseException,
@@ -122,19 +149,22 @@ public class Controller {
 
     /**
      * Allows a player to draw a card.
-     * @param player The player's name.
-     * @param gold Whether the card is gold or not.
+     * 
+     * @param player        The player's name.
+     * @param gold          Whether the card is gold or not.
      * @param onTableOrDeck The index of the card on the table or deck.
      * @throws WrongGamePhaseException If the game is not in the correct phase.
-     * @throws NoTurnException If it's not the player's turn.
+     * @throws NoTurnException         If it's not the player's turn.
      * @return The id of the drawn card.
      */
-    public int drawCard(String player, boolean gold, int onTableOrDeck) throws WrongGamePhaseException, NoTurnException, NoNameException {
+    public int drawCard(String player, boolean gold, int onTableOrDeck)
+            throws WrongGamePhaseException, NoTurnException, NoNameException, CardPositionException {
         return game.drawCard(player, gold, onTableOrDeck);
     }
 
     /**
      * Gets the points of a player.
+     * 
      * @param player The player's name.
      * @throws NoNameException If the field does not exist.
      * @return The player's points.
@@ -145,6 +175,7 @@ public class Controller {
 
     /**
      * Gets the resources of a player.
+     * 
      * @param player The player's name.
      * @throws NoNameException If the field does not exist.
      * @return A map of the player's resources.
@@ -155,6 +186,7 @@ public class Controller {
 
     /**
      * Gets the name of the current player.
+     * 
      * @return The name of the current player.
      */
     public String getCurrentPlayer() {
@@ -163,6 +195,7 @@ public class Controller {
 
     /**
      * Gets the id of the starting card of a player.
+     * 
      * @param nickname The player's nickname.
      * @throws NoNameException If the field does not exist.
      * @return The id of the starting card.
@@ -170,8 +203,10 @@ public class Controller {
     public int getStartingCard(String nickname) throws NoNameException {
         return game.getStartingCardToPosition(nickname).getId();
     }
+
     /**
      * Gets a player.
+     * 
      * @param nickname The player's nickname.
      * @throws NoNameException If the field does not exist.
      * @return The player.
@@ -182,25 +217,21 @@ public class Controller {
 
     /**
      * Sets the color for a player.
-     * @param name The player's name.
+     * 
+     * @param name   The player's name.
      * @param colour The color to set.
-     * @throws NoNameException If the field does not exist.
+     * @throws NoNameException            If the field does not exist.
      * @throws ColorAlreadyTakenException If the color is already taken.
      * @return Whether all players have chosen a color.
      */
-    public boolean setColour(String name, Color colour) throws ColorAlreadyTakenException, NoNameException {
-        for(Player player : lobby.getPlayers()){
-            if(player.getColor() == colour){
+    public boolean setColourAndLobbyisReadyToStart(String name, Color colour) throws ColorAlreadyTakenException, NoNameException {
+        for (Player player : lobby.getPlayers()) {
+            if (player.getColor() == colour) {
                 throw new ColorAlreadyTakenException();
             }
         }
 
         lobby.getPlayerFromName(name).setColour(colour);
-
-        //Check if all players have chosen a color
-        if(!lobby.getLock()){
-            return false;
-        }
 
         for (Player player : lobby.getPlayers()) {
             if (player.getColor() == null) {
@@ -214,6 +245,7 @@ public class Controller {
 
     /**
      * Gets the players and their pins.
+     * 
      * @return A map of players and their pins.
      */
     public HashMap<String, Color> getPlayersAndPins() {
@@ -222,6 +254,7 @@ public class Controller {
 
     /**
      * Checks if a player is the first player.
+     * 
      * @param nickname The player's nickname.
      * @return Whether the player is the first player.
      */
@@ -231,24 +264,27 @@ public class Controller {
 
     /**
      * Places a new card on the table.
-     * @param gold Whether the card is gold or not.
+     * 
+     * @param gold          Whether the card is gold or not.
      * @param onTableOrDeck The index of the card on the table or deck.
      * @return The id of the new card on the table, or -1 if is the deck
      */
     public int newCardOnTable(boolean gold, int onTableOrDeck) {
-        if(onTableOrDeck == -1) {
+        if (onTableOrDeck == -1) {
             return -1;
-        }else{
+        } else {
             return game.getCard(gold, onTableOrDeck);
         }
     }
+
     /**
      * Checks if all root cards are placed.
+     * 
      * @return Whether all root cards are placed.
      */
     public boolean areAllRootCardPlaced() {
-        for(Player player : lobby.getPlayers()) {
-            if(player.getRootCard() == null) {
+        for (Player player : lobby.getPlayers()) {
+            if (player.getRootCard() == null) {
                 return false;
             }
         }
@@ -271,8 +307,10 @@ public class Controller {
 
         return secretObjectiveCards;
     }
+
     /**
      * Gets the head of the deck.
+     * 
      * @param gold Whether the card is gold or not.
      * @return The head of the deck.
      */
@@ -282,11 +320,12 @@ public class Controller {
 
     /**
      * Checks if all players have chosen the secret objective card.
+     * 
      * @return Whether all secret objective cards are chosen.
      */
     public boolean areAllSecretObjectiveCardChosen() {
-        for(Player player : lobby.getPlayers()) {
-            if(player.getSecretObjective() == null) {
+        for (Player player : lobby.getPlayers()) {
+            if (player.getSecretObjective() == null) {
                 return false;
             }
         }
@@ -295,6 +334,7 @@ public class Controller {
 
     /**
      * Gets the hand of a player.
+     * 
      * @param nickname The player's nickname.
      * @throws NoNameException If the field does not exist.
      * @return The hand of the player.
@@ -304,7 +344,7 @@ public class Controller {
         int i;
         Integer[] hand = new Integer[3];
 
-        for(i = 0; i < 3; i++) {
+        for (i = 0; i < 3; i++) {
             hand[i] = player.getHand()[i].getId();
         }
         return hand;
@@ -312,6 +352,7 @@ public class Controller {
 
     /**
      * Gets the back card of player's hand.
+     * 
      * @param nickname The player's nickname.
      * @throws NoNameException If the field does not exist.
      * @return The hidden hand of the player.
@@ -321,13 +362,15 @@ public class Controller {
         Pair<Kingdom, Boolean>[] hiddenHand = new Pair[3];
         int i;
 
-        for(i = 0; i < 3; i++){
-            hiddenHand[i] = new Pair(player.getHand()[i].getKingdom(), (player.getHand()[i] instanceof GoldCard));
+        for (i = 0; i < 3; i++) {
+            hiddenHand[i] = new Pair<>(player.getHand()[i].getKingdom(), (player.getHand()[i] instanceof GoldCard));
         }
         return hiddenHand;
     }
+
     /**
      * Gets the game state.
+     * 
      * @return The game state.
      */
     public GameState getGameState() {
@@ -336,24 +379,29 @@ public class Controller {
 
     /**
      * Gets the extra points of the players.
+     * 
      * @return A map of the players and their extra points.
      */
     public HashMap<String, Integer> getExtraPoints() {
         HashMap<String, Integer> extraPoints = new HashMap<>();
-        for(Player player : lobby.getPlayers()) {
-           extraPoints.put(player.getName(), player.getObjectivePoints());
+        for (Player player : lobby.getPlayers()) {
+            extraPoints.put(player.getName(), player.getObjectivePoints());
         }
         return extraPoints;
     }
+
     /**
      * Returns the ranking of players.
+     * 
      * @return An ArrayList of players sorted by their ranking.
      */
     public ArrayList<Player> getRanking() {
         return game.getRanking();
     }
+
     /**
      * Checks if the game has ended.
+     * 
      * @return true if the game state is END, false otherwise.
      */
     public boolean isEndGame() {
@@ -363,6 +411,7 @@ public class Controller {
 
     /**
      * Returns the name of the first player in the lobby.
+     * 
      * @return The name of the first player.
      */
     public String getFirstPlayer() {
@@ -371,12 +420,12 @@ public class Controller {
 
     /**
      * Checks if the lobby is locked.
+     * 
      * @return true if the lobby is locked, false otherwise.
      */
-    public boolean isLobbyLocked(){
+    public boolean isLobbyLocked() {
         return lobby.getLock();
     }
-
 
     public Integer getResourceCards(int position) {
         return game.getResourceCard(position).getId();
@@ -386,5 +435,11 @@ public class Controller {
         return game.getGoldCard(position).getId();
     }
 
-}
+    public boolean isAdmitted(String nickname) {
+        return lobby.isAdmitted(nickname);
+    }
 
+    public boolean lobbyIsReady(){
+        return lobby.isReady();
+    }
+}

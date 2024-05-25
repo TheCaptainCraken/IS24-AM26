@@ -11,13 +11,11 @@ import it.polimi.ingsw.network.rmi.ClientRMI;
 import it.polimi.ingsw.network.client.ClientSocket;
 import it.polimi.ingsw.network.client.NetworkClient;
 import it.polimi.ingsw.network.rmi.RMIClientInterface;
-import it.polimi.ingsw.view.LittleModel;
-import it.polimi.ingsw.view.Phase;
-import it.polimi.ingsw.view.Tui;
+import it.polimi.ingsw.view.*;
 import javafx.util.Pair;
 
 import java.awt.*;
-import java.io.Serializable;
+import java.io.IOException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -28,12 +26,13 @@ public class Controller {
     public static Phase phase;
     private static RMIClientInterface clientRMI;
     private NetworkClient connection;
-    private Tui view;
+    private ViewInterface view;
     private LittleModel model;
 
     public Controller(){
         model = new LittleModel();
         phase = Phase.LOGIN;
+        ViewSubmissions.getInstance().setController(this);
     }
 
     public static synchronized Phase getPhase() {
@@ -44,7 +43,7 @@ public class Controller {
         Controller.phase = phase;
     }
 
-    public void setView(String typeOfView) throws InterruptedException {
+    public void setView(String typeOfView){
         model = new LittleModel();
         if(typeOfView.equals("TUI")){
             this.view = new Tui(model, this);
@@ -53,6 +52,7 @@ public class Controller {
             //TODO
             App.launch();
         }
+
     }
 
     public void createInstanceOfConnection(String typeOfConnection){
@@ -60,24 +60,22 @@ public class Controller {
             try {
                 clientRMI = new ClientRMI(this);
             } catch (RemoteException e) {
-                throw new RuntimeException(e);
-            } catch (SameNameException e) {
-                throw new RuntimeException(e);
-            } catch (LobbyCompleteException e) {
-                throw new RuntimeException(e);
+                //TODO
             } catch (NotBoundException e) {
-                throw new RuntimeException(e);
+                System.out.println("Not bound exception");
             }
+
             connection = (NetworkClient) clientRMI;
         }else if(typeOfConnection.equals("Socket")){
-            connection = new ClientSocket(this, "placeholder",0);
-            //TODO vanno aggiunti address e port al costruttore,
-            // il primo sarà una costante salvata nel codice l'altro sarà generato automaticamente
+            ClientSocket socket = null;
+            try {
+                socket = new ClientSocket(this, "localhost", 4567);
+            } catch (IOException e) {
+                //TODO
+            }
+            connection = (NetworkClient) socket;
+            new Thread(socket::run).start();
         }
-    }
-
-    public static RMIClientInterface getClientRMI() {
-        return clientRMI;
     }
 
     /**
@@ -96,7 +94,6 @@ public class Controller {
         return nickname;
     }
 
-
     /**
      * Triggers the view to ask the user for the number of players.
      *
@@ -104,7 +101,7 @@ public class Controller {
      * The actual input is handled by the view (TUI or GUI).
      */
     public void askNumberOfPlayer() {
-        view.showInsertNumberOfPlayer();
+        view.askNumberOfPlayers();
     }
     /**
      * Triggers the view to display a waiting message to the user.
@@ -136,12 +133,7 @@ public class Controller {
      * @param playersAndPins A HashMap where the keys are the nicknames of the players and the values are their associated colors.
      */
     public void refreshUsers(HashMap<String, Color> playersAndPins) {
-//        if(playersAndPins.containsKey(nickname) && playersAndPins.get(nickname) == null){
-//            Controller.phase = Phase.COLOR;
-//        }else if(playersAndPins.containsKey(nickname) && playersAndPins.get(nickname) != null){
-//            Controller.phase = Phase.GAMEFLOW;
-//        }
-
+        model.updateUsers(playersAndPins);
         view.refreshUsers(playersAndPins);
     }
 
@@ -156,6 +148,7 @@ public class Controller {
 
     public void cardsOnTable(Integer[] resourceCards, Integer[] goldCard, Kingdom resourceCardOnDeck, Kingdom goldCardOnDeck) {
         model.updateCommonTable(resourceCards, goldCard, resourceCardOnDeck, goldCardOnDeck);
+        view.showCommonTable();
     }
     /**
      * Triggers the view to display the starting card to the user.
@@ -204,7 +197,6 @@ public class Controller {
      */
     public void turnInfo(String currentPlayer, GameState gameState) {
         view.showTurnInfo(currentPlayer, gameState);
-        //TODO capire chiamate con Daniel
     }
 
     /**
@@ -232,9 +224,9 @@ public class Controller {
     }
 
     public void showSecretObjectiveCardsToChoose(Integer[] objectiveCardIds) {
-        Controller.setPhase(Phase.CHOOSE_SECRET_OBJECTIVE_CARD);
-        updateSecretObjectiveCardsToChoose(objectiveCardIds);
+        model.updateSecretObjectiveCardsToChoose(objectiveCardIds);
         view.showSecretObjectiveCardsToChoose(objectiveCardIds);
+        Controller.setPhase(Phase.CHOOSE_SECRET_OBJECTIVE_CARD);
     }
 
     public void updatePlaceCard(String nickname, int id, Point position, boolean side) {
@@ -245,8 +237,8 @@ public class Controller {
         model.updateResources(nickname, resources);
     }
 
-    public void updateDrawCard(String nickname, int cardId) {
-        model.updateDrawCard(nickname, cardId);
+    public void updateDrawCard(String nickname, Integer[] newHand) {
+        model.updatePrivateHand(newHand);
     }
 
     public void updateScore(String nickname, int points) {
@@ -261,7 +253,8 @@ public class Controller {
         model.updateCardOnTable(newCardId, gold, onTableOrDeck);
     }
     public void updateHand(String nickname, Integer[] hand) {
-        model.updateHand(nickname, hand);
+        model.updatePrivateHand(hand);
+        view.showHand();
     }
 
     public void updateHiddenHand(String nickname, Pair<Kingdom, Boolean>[] hand) {
@@ -280,15 +273,8 @@ public class Controller {
      * @param nickname The nickname of the player.
      */
     public void login(String nickname) {
-        try{
-            connection.login(nickname);
-        } catch (SameNameException e) {
-            view.sameName(nickname);
-        } catch (LobbyCompleteException e){
-            view.lobbyComplete();
-        } catch (RemoteException e) {
-            view.noConnection();
-        }
+        Controller.phase = Phase.WAIT;
+        connection.login(nickname);
     }
 
     /**
@@ -300,19 +286,8 @@ public class Controller {
      * @param numberOfPlayers The number of players.
      */
     public void insertNumberOfPlayers(int numberOfPlayers) {
-        try{
-            connection.insertNumberOfPlayers(numberOfPlayers);
-        } catch (RemoteException e) {
-            view.noConnection();
-        } catch (ClosingLobbyException e) {
-            view.closingLobbyError();
-        } catch (SameNameException e) {
-            view.sameName(nickname);
-        } catch (LobbyCompleteException e) {
-            view.lobbyComplete();
-        } catch (NoNameException e) {
-            view.noPlayer();
-        }
+        Controller.phase = Phase.WAIT;
+        connection.insertNumberOfPlayers(numberOfPlayers);
     }
 
     /**
@@ -324,15 +299,8 @@ public class Controller {
      * @param color The color chosen by the player.
      */
     public void chooseColor(Color color) {
-        try{
-            connection.chooseColor(color);
-        } catch (RemoteException e) {
-            view.noConnection();
-        } catch (ColorAlreadyTakenException e) {
-            view.colorAlreadyTaken();
-        } catch (NoNameException e) {
-            view.noPlayer();
-        }
+        Controller.phase = Phase.WAIT;
+        connection.chooseColor(color);
     }
     /**
      * Sets the side of the starting card for the player in the game.
@@ -343,19 +311,7 @@ public class Controller {
      * @param side The side chosen by the player.
      */
     public void chooseSideStartingCard(boolean side) {
-        try {
-            connection.chooseSideStartingCard(side);
-        }
-        catch (RemoteException e) {
-            view.noConnection();
-        }
-        catch (WrongGamePhaseException e) {
-            view.wrongGamePhase();
-        } catch (NoTurnException e) {
-            view.noTurn();
-        } catch (NoNameException e) {
-            view.noPlayer();
-        }
+        connection.chooseSideStartingCard(side);
     }
 
     /**
@@ -381,21 +337,7 @@ public class Controller {
      * @param side The side of the card.
      */
     public void playCard(int indexHand, Point position, boolean side) {
-        try{
-            connection.playCard(indexHand, position, side);
-        } catch (WrongGamePhaseException e) {
-            view.wrongGamePhase();
-        } catch (NoTurnException e) {
-            view.noTurn();
-        } catch (NotEnoughResourcesException e) {
-            view.notEnoughResources(nickname);
-        } catch (NoNameException e) {
-            view.noPlayer();
-        } catch (CardPositionException e) {
-            view.cardPositionError();
-        } catch (RemoteException e) {
-            view.noConnection();
-        }
+        connection.playCard(indexHand, position, side);
     }
 
     /**
@@ -408,42 +350,9 @@ public class Controller {
      * @param onTableOrDeck The location from where the card is drawn.
      */
     public void drawCard(boolean gold, int onTableOrDeck) {
-        try{
-            connection.drawCard(nickname, gold, onTableOrDeck);
-        } catch (WrongGamePhaseException e) {
-            view.wrongGamePhase();
-        } catch (NoTurnException e) {
-            view.noTurn();
-        } catch (NoNameException e) {
-            view.noPlayer();
-        } catch (RemoteException e) {
-            view.noConnection();
-        }
+        connection.drawCard(nickname, gold, onTableOrDeck);
     }
 
-    public void showTableOfPlayer(String name){
-        view.showTableOfPlayer(model.getTableOfPlayer(name));
-    }
-
-    public void showPoints(){
-        view.showPoints(model.getPoints());
-    }
-
-    public void showResources(){
-        view.showResourcesPlayer(getNickname());
-    }
-
-    public void showResourcesAllPlayers(){
-        view.showResourcesAllPlayers();
-    }
-
-    public void showHand(){
-        view.showHand();
-    }
-
-    public void showHiddenHand(String name){
-        view.showHiddenHand(name);
-    }
 
     public void correctNumberOfPlayers(int numberOfPlayers) {
         view.correctNumberOfPlayers(numberOfPlayers);
@@ -451,6 +360,7 @@ public class Controller {
 
     public void updateAndShowStartingCard(int startingCardId) {
         Controller.setPhase(Phase.CHOOSE_SIDE_STARTING_CARD);
+        System.out.println("Starting card id: " + startingCardId);
         view.showStartingCard(startingCardId);
     }
 
@@ -471,34 +381,40 @@ public class Controller {
     }
 
     public void notEnoughResources() {
-        view.notEnoughResources(nickname);
+        view.notEnoughResources();
     }
 
     public void NoName() {
-        //TODO
+        view.noPlayer();
     }
 
     public void cardPosition() {
         view.cardPositionError();
     }
 
-    public void sameName() {
-        view.sameName(nickname);
+    public void sameName(String name) {
+        view.sameName(name);
     }
 
     public void colorAlreadyTaken() {
         view.colorAlreadyTaken();
     }
 
+    public void updateAndShowSecretObjectiveCard(int indexCard) {
+        model.updateSecretObjectiveCard(indexCard);
+        view.showSecretObjectiveCard(model.getSecretObjectiveCard());
+    }
+
     public void updateSecretObjectiveCard(int indexCard) {
         model.updateSecretObjectiveCard(indexCard);
     }
 
-    public void updateSecretObjectiveCardsToChoose(Integer[] secretObjectiveCardsToChoose) {
-        model.updateSecretObjectiveCardsToChoose(secretObjectiveCardsToChoose);
+    public void cardPositionError() {
+        view.cardPositionError();
     }
 
-    public void updateCommonObjectiveCards(Integer[] commonObjectiveCards) {
-        model.updateCommonObjectiveCards(commonObjectiveCards);
+    public void fullLobby() {
+        view.closingLobbyError();
     }
 }
+

@@ -2,6 +2,7 @@ package it.polimi.ingsw.network.messages.server.gamestart;
 
 import it.polimi.ingsw.controller.client.Controller;
 import it.polimi.ingsw.network.messages.server.ServerMessage;
+import it.polimi.ingsw.view.Phase;
 
 public class ShowStartingCard extends ServerMessage {
     private final int id;
@@ -16,6 +17,7 @@ public class ShowStartingCard extends ServerMessage {
 
     @Override
     public void callController(Controller controller) {
+        Controller.setPhase(Phase.CHOOSE_SIDE_STARTING_CARD);
         controller.showStartingCard(id);
     }
 }
