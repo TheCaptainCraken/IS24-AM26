@@ -19,7 +19,7 @@ import java.util.List;
  *
  * @author PietroBenecchi
  */
-public class Tui implements ViewInterface {
+public class TUI implements ViewInterface {
     /**
      * Controller of the game. It is used to send player actions to the game.
      */
@@ -33,7 +33,7 @@ public class Tui implements ViewInterface {
      * Constructor for the TUI.
      * Initializes the TUI with default values.
      */
-    public Tui(LittleModel model, Controller controller) {
+    public TUI(LittleModel model, Controller controller) {
         this.model = model;
         this.controller = controller;
     }
@@ -1145,7 +1145,5 @@ public class Tui implements ViewInterface {
         int endSpaces = length - startSpaces - wordLength;
         return "|" + " ".repeat(startSpaces) + word + " ".repeat(endSpaces) + "|";
     }
-
-
 }
 
