@@ -26,29 +26,28 @@ import java.util.HashMap;
  * @author Daniel
  */
 public class ClientRMI implements RMIClientInterface, NetworkClient {
-    static int PORT = 1099;
+    static int PORT = 1099; //TODO porta dinamica
     Controller controller;
-    RMIClientInterface exportedClient = null;
-    RMIServerInterface stub = null;
-    Registry registry = null;
+    RMIClientInterface exportedClient;
+    RMIServerInterface stub;
+    Registry registry;
 
     public ClientRMI(Controller controller) throws RemoteException, NotBoundException {
         this.controller = controller;
 
-        // Esportazione dell'oggetto ClientRMI come oggetto remoto
+        //Exporting the ClientRMI object as a remote objec
          exportedClient = (RMIClientInterface) UnicastRemoteObject.exportObject(this, 0);
 
-        // Cerca il registro RMI
+        //Creating the RMI register
         registry = LocateRegistry.getRegistry("127.0.0.1", PORT);
 
-        // Cerca l'oggetto remoto del server
+        // Looking up the remote object
         stub = (RMIServerInterface) registry.lookup("Loggable");
 
     }
 
     /**
      * NetworkClient interface methods
-     *
      * Logs in the player with the given name.
      * This method is used to authenticate a player in the game.
      * If the player is the first to log in, the game will ask for the number of players.
@@ -92,7 +91,7 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
                         controller.waitLobby();
                     }
                 } catch (RemoteException e) {
-                    //TODO
+                    controller.noConnection();
                 }
             }
         }
@@ -116,11 +115,11 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
         } catch (RemoteException e) {
            controller.noConnection();
         } catch (ClosingLobbyException e) {
-            //TODO
+            controller.closingLobbyError();
         } catch (SameNameException e) {
             controller.sameName(controller.getNickname());
         } catch (LobbyCompleteException e) {
-            //TODO
+            controller.lobbyComplete();
         } catch (NoNameException e) {
            controller.noName();
         }
@@ -142,7 +141,7 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
             stub.chooseColor(controller.getNickname(), color);
         }
         catch (RemoteException e){
-            controller.noConnection(); //TODO
+            controller.noConnection();
         } catch (ColorAlreadyTakenException e) {
             // if the color is already taken, set FSM to COLOR and ask for color
             Controller.phase = Phase.COLOR;
@@ -167,7 +166,6 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
             //call remote method chooseSideStartingCard
             stub.chooseSideStartingCard(controller.getNickname(), side);
         } catch (RemoteException e) {
-            Controller.phase = Phase.CHOOSE_SIDE_STARTING_CARD; //TODO
             controller.noConnection();
         } catch (WrongGamePhaseException e) {
             // if the game phase is wrong, set FSM to CHOOSE_SIDE_STARTING_CARD and show the error message
@@ -200,7 +198,6 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
             //just show the secret objective card chosen
             controller.updateAndShowSecretObjectiveCard(indexCard);
         } catch (RemoteException e) {
-            Controller.phase = Phase.CHOOSE_SECRET_OBJECTIVE_CARD;
             controller.noConnection();
         } catch (WrongGamePhaseException e) {
             // if the game phase is wrong, set FSM to CHOOSE_SECRET_OBJECTIVE_CARD and show the error message
@@ -211,7 +208,7 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
             Controller.phase = Phase.CHOOSE_SECRET_OBJECTIVE_CARD;
             controller.noTurn();
         } catch (NoNameException e) {
-            controller.noName(); //TODO
+            controller.noName();
         }
     }
     /**
@@ -311,6 +308,7 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
      */
     @Override
     public void sendInfoOnTable(Integer[] resourceCards, Integer[] goldCard, Kingdom resourceCardOnDeck, Kingdom goldCardOnDeck){
+        //no need tho change the phase here. We do it in controller.showStartingCard
         controller.cardsOnTable(resourceCards, goldCard, resourceCardOnDeck, goldCardOnDeck);
     }
     /**
@@ -389,6 +387,7 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
      */
     @Override
     public void placeCard(String nickname, int id, Point position, boolean side, HashMap<Sign, Integer> resources, int points){
+        //TODO. Update the view
         controller.updatePlaceCard(nickname, id, position, side);
         controller.updateResources(nickname, resources);
         controller.updateScore(nickname, points);
@@ -404,6 +403,7 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
      */
     @Override
     public void moveCard(int newCardId, Kingdom headDeck, boolean gold, int onTableOrDeck){
+        //TODO Update the view
         controller.updateCardOnTable(newCardId, gold, onTableOrDeck);
         controller.updateHeadDeck(headDeck, gold);
     }
@@ -430,6 +430,17 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
         //set FSM to GAME_FLOW and show the first player
         Controller.setPhase(Phase.GAMEFLOW);
         controller.showIsFirst(firstPlayer);
+    }
+
+    @Override
+    public void stopGaming() throws RemoteException {
+        //TODO
+        //View.stopGaming();
+    }
+
+    @Override
+    public void isConnected() throws RemoteException {
+        //this method is used to check if the client is still connected. No implementation needed.
     }
 
 }

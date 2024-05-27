@@ -4,7 +4,6 @@ import it.polimi.ingsw.model.Color;
 import it.polimi.ingsw.model.GameState;
 import it.polimi.ingsw.model.Kingdom;
 import it.polimi.ingsw.model.Sign;
-import it.polimi.ingsw.model.exception.*;
 
 import it.polimi.ingsw.network.rmi.ClientRMI;
 import it.polimi.ingsw.network.client.ClientSocket;
@@ -29,8 +28,11 @@ public class Controller {
     private LittleModel model;
 
     public Controller(){
+        //initialize the model, all the required information will be stored in the model.
         model = new LittleModel();
+        //current phase: login, it asks the unique name of the player.
         phase = Phase.LOGIN;
+        //set the singleton to communicate with the controller through TUI/ GUI.
         ViewSubmissions.getInstance().setController(this);
     }
 
@@ -45,7 +47,7 @@ public class Controller {
     public void setView(String typeOfView){
         model = new LittleModel();
         if(typeOfView.equals("TUI")){
-            this.view = new Tui(model, this);
+            this.view = new TUI(model, this);
             view.start();
         }else if(typeOfView.equals("GUI")){
             //TODO
@@ -59,7 +61,7 @@ public class Controller {
             try {
                 clientRMI = new ClientRMI(this);
             } catch (RemoteException e) {
-                //TODO
+                System.out.println("Remote exception. Not able to connect to server, please try again.)");
             } catch (NotBoundException e) {
                 System.out.println("Not bound exception");
             }
@@ -68,15 +70,15 @@ public class Controller {
         }else if(typeOfConnection.equals("Socket")){
             ClientSocket socket = null;
             try {
+                //TODO porta nuova
                 socket = new ClientSocket(this, "localhost", 4567);
+                connection = socket;
+                new Thread(socket::run).start();
             } catch (IOException e) {
-                //TODO
+                System.out.println("Not able to connect to server, please try again.");
             }
-            connection = (NetworkClient) socket;
-            new Thread(socket::run).start();
         }
     }
-
     /**
      * Sets the nickname of the player.
      * @param nickname
@@ -366,6 +368,7 @@ public class Controller {
 
     public void noConnection() {
         view.noConnection();
+        System.exit(0);
     }
 
     public void wrongPhase() {
@@ -413,8 +416,18 @@ public class Controller {
         view.cardPositionError();
     }
 
-    public void fullLobby() {
+    public void closingLobbyError() {
         view.closingLobbyError();
     }
+
+    public void stopGaming() {
+        //TODO
+        //view.stopGaming();
+    }
+
+    public void lobbyComplete() {
+        view.lobbyComplete();
+    }
+
 }
 

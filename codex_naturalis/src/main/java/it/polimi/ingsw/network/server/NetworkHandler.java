@@ -164,4 +164,17 @@ public class NetworkHandler {
         }
     }
 
+    /**
+     * This method is used to disconnect all clients from all network interfaces.
+     * It iterates over all the network interfaces and calls their respective disconnectAll method.
+     */
+    public void disconnectBroadcast() {
+        for (NetworkPlug networkPlug : networkInterfacesAndConnections.values()) {
+            networkPlug.disconnectAll();
+        }
+        //close all server and connections.
+        System.out.println("All server connections are closed. Bye!");
+        System.exit(0);
+    }
+
 }

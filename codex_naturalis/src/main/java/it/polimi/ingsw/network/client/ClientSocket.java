@@ -222,7 +222,8 @@ public class ClientSocket implements Runnable, NetworkClient{
             ServerMessage serverMessage = receiveMessage();
             handleResponse(serverMessage);
         }
-    } //TODO implementazione
+    }
+
     /**
      * Handles the response from the server.
      * This method is called by the run method for each received server message.
@@ -241,27 +242,34 @@ public class ClientSocket implements Runnable, NetworkClient{
      * @return The received server message.
      */
     public ServerMessage receiveMessage(){
-        ServerMessage answer;
+        ServerMessage answer = null;
         try {
             answer = (ServerMessage) objInputStream.readObject();
         } catch (IOException e) {
-            throw new RuntimeException();
-        }
-        catch (ClassNotFoundException e) {
+            disconnect();
+        } catch (ClassNotFoundException e) {
             System.out.println("This error should never happen. The server is sending a message that the client does not know how to handle.");
-            return null;
         }
         return answer;
     }
 
-    public void disconnect(){
-        //TODO disconnessioni
+    public void disconnect() {
+        controller.stopGaming();
         try {
-            inputStream.close();
-            objInputStream.close();
-            objOutputStream.close();
+            if (objInputStream != null) {
+                objInputStream.close();
+            }
+            if (objOutputStream != null) {
+                objOutputStream.close();
+            }
+            if (socket != null) {
+                socket.close();
+            }
+
+            System.exit(0);
         } catch (IOException e) {
-            e.printStackTrace();
+            //close the communication and the program anyway
+            System.exit(0);
         }
     }
     /**
@@ -276,8 +284,7 @@ public class ClientSocket implements Runnable, NetworkClient{
         try{
             objOutputStream.writeObject(message);
         } catch (IOException e) {
-            //TODO
-            throw new RuntimeException(e);
+            disconnect();
         }
     }
 }

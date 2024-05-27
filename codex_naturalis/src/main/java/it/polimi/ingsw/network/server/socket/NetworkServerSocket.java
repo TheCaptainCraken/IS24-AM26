@@ -29,6 +29,7 @@ import it.polimi.ingsw.network.messages.client.login.LoginMessage;
 import it.polimi.ingsw.network.messages.client.login.NumberOfPlayersMessage;
 import it.polimi.ingsw.network.messages.server.ErrorMessage;
 import it.polimi.ingsw.network.messages.server.ServerMessage;
+import it.polimi.ingsw.network.messages.server.StopGaming;
 import it.polimi.ingsw.network.messages.server.endgame.ShowPointsFromObjectives;
 import it.polimi.ingsw.network.messages.server.endgame.ShowRanking;
 import it.polimi.ingsw.network.messages.server.gameflow.CardIsPositioned;
@@ -58,7 +59,7 @@ public class NetworkServerSocket implements NetworkPlug {
 
     private Controller controller;
 
-    private HashMap<String, ClientHandler> connections;
+    private static HashMap<String, ClientHandler> connections;
 
     /**
      * This constructor is used to create a new NetworkServerSocket.
@@ -96,6 +97,17 @@ public class NetworkServerSocket implements NetworkPlug {
     private void sendBroadCastMessage(ServerMessage message) {
         for (String client : connections.keySet()) {
             connections.get(client).sendMessage(message);
+        }
+    }
+
+
+    /**
+     * This method is used to send a message to all to disconnect all the clients.
+     * @param message The message to be sent.
+     */
+    private void sendBroadCastMessageDisconnection(ServerMessage message) {
+        for (String client : connections.keySet()) {
+            connections.get(client).sendMessageDisconnection(message);
         }
     }
 
@@ -175,8 +187,8 @@ public class NetworkServerSocket implements NetworkPlug {
             sendBroadCastMessage(new RefreshedPoints(nickname, controller.getPlayerPoints(nickname)));
             sendBroadCastMessage(new RefreshedResources(nickname, controller.getPlayerResources(nickname)));
         } catch (NoNameException e) {
-            // This should never occur
-            e.printStackTrace();
+            // disconnect all connections
+            NetworkHandler.getInstance().disconnectBroadcast();
         }
         sendBroadCastMessage(new TurnInfo(controller.getCurrentPlayer(), controller.getGameState()));
     }
@@ -194,6 +206,11 @@ public class NetworkServerSocket implements NetworkPlug {
         sendBroadCastMessage(new ShowRanking(controller.getRanking()));
     }
 
+    @Override
+    public void disconnectAll() {
+        sendBroadCastMessageDisconnection(new StopGaming());
+    }
+
     /**
      * This class is used to handle the connection with the client.
      */
@@ -208,6 +225,7 @@ public class NetworkServerSocket implements NetworkPlug {
         public ClientHandler(Socket socket) {
             this.clientSocket = socket;
             controller = Controller.getInstance();
+            //TODO anche no!
             networkHandler = NetworkHandler.getInstance();
         }
 
@@ -233,7 +251,8 @@ public class NetworkServerSocket implements NetworkPlug {
                     }
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                connections.remove(clientSocket.getRemoteSocketAddress().toString());
+                NetworkHandler.getInstance().disconnectBroadcast();
             }
         }
 
@@ -262,7 +281,7 @@ public class NetworkServerSocket implements NetworkPlug {
                     sendErrorMessage(ErrorType.LOBBY_ALREADY_FULL);
                     hastaLaVistaBaby(); // as per diagram
                 } catch (NoNameException e) {
-                    //TODO
+                    System.out.println("No name exception");
                 }
             } else if (message instanceof NumberOfPlayersMessage) {
                 NumberOfPlayersMessage parsedMessage = (NumberOfPlayersMessage) message;
@@ -391,7 +410,7 @@ public class NetworkServerSocket implements NetworkPlug {
                 out.close();
                 clientSocket.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                System.out.println("Error closing connection. Connection already closed.");
             }
         }
 
@@ -413,7 +432,22 @@ public class NetworkServerSocket implements NetworkPlug {
             try {
                 out.writeObject(message);
             } catch (IOException e) {
-                e.printStackTrace();
+                connections.remove(clientSocket.getRemoteSocketAddress().toString());
+                NetworkHandler.getInstance().disconnectBroadcast();
+            }
+        }
+
+        /**
+         * This method is used to send a message to the client, to disconnect all
+         *
+         * @param message The message to be sent.
+         */
+        public void sendMessageDisconnection(ServerMessage message) {
+            try {
+                out.writeObject(message);
+                hastaLaVistaBaby();
+            } catch (IOException e) {
+                System.out.println("Error closing connection. Connection already closed.");
             }
         }
 
@@ -421,7 +455,6 @@ public class NetworkServerSocket implements NetworkPlug {
          * This method is used to send the common objective cards to the clients. It is
          * a broadcast call.
          * 
-         * //@param objectiveCardIds The ids of the common objective cards.
          */
         public void sendSecretObjectives() {
             try {
@@ -429,7 +462,7 @@ public class NetworkServerSocket implements NetworkPlug {
                         Arrays.asList(controller.getSecretObjectiveCardsToChoose(nickname)));
                 sendMessage(new GiveSecretObjectiveCards(choices));
             } catch (NoNameException e) {
-                e.printStackTrace();
+                System.out.println("No name exception");
             }
         }
 
@@ -452,7 +485,7 @@ public class NetworkServerSocket implements NetworkPlug {
                 try {
                     sendMessage(new ShowHiddenHand(nickname, controller.getHiddenHand(nickname)));
                 } catch (NoNameException e) {
-                   //TODO
+                   System.out.println("No name exception");
                 }
             }
             sendMessage(new ShowNewTableCard(newCardId, gold, onTableOrDeck, headDeck));
