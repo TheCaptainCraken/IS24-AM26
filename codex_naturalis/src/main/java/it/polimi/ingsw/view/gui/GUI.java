@@ -18,8 +18,11 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.CountDownLatch;
 
 public class GUI extends Application implements ViewInterface {
+    private static ViewInterface instance;
+    private static final Object lock = new Object();
 
     private ViewSubmissions viewSubmissions; //TODO va final una volta finita implementazione
     private  LittleModel model; //TODO va final una volta finita implementazione
@@ -39,6 +42,10 @@ public class GUI extends Application implements ViewInterface {
     @Override
     public void start(Stage stage) throws IOException {
         //loginController = new LoginController();
+        synchronized (lock) {
+            instance = this;
+            lock.notify();
+        }
         root = loadFXML("loginView");
         loginController =(LoginController) fxmlLoader.getController();
         this.primaryStage = stage;
@@ -58,10 +65,15 @@ public class GUI extends Application implements ViewInterface {
         return fxmlLoader.load();
     }
 
-    public static void main(String[] args) throws InterruptedException {
-        launch(args);
+    // Method to get the singleton instance
+    public static ViewInterface getInstance() throws InterruptedException {
+        synchronized (lock) {
+            while (instance == null) {
+                lock.wait();
+            }
+            return instance;
+        }
     }
-
     @Override
     public void askNumberOfPlayers() {
         loginController.showInsertNumberOfPlayers();

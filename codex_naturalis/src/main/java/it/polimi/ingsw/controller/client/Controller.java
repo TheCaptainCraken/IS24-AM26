@@ -1,17 +1,16 @@
 package it.polimi.ingsw.controller.client;
 
-import it.polimi.ingsw.App;
 import it.polimi.ingsw.model.Color;
 import it.polimi.ingsw.model.GameState;
 import it.polimi.ingsw.model.Kingdom;
 import it.polimi.ingsw.model.Sign;
-import it.polimi.ingsw.model.exception.*;
 
 import it.polimi.ingsw.network.rmi.ClientRMI;
 import it.polimi.ingsw.network.client.ClientSocket;
 import it.polimi.ingsw.network.client.NetworkClient;
 import it.polimi.ingsw.network.rmi.RMIClientInterface;
 import it.polimi.ingsw.view.*;
+import it.polimi.ingsw.view.gui.GUI;
 import javafx.util.Pair;
 
 import java.awt.*;
@@ -20,6 +19,8 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import static javafx.application.Application.launch;
 
 public class Controller {
     private static String nickname;
@@ -43,16 +44,21 @@ public class Controller {
         Controller.phase = phase;
     }
 
-    public void setView(String typeOfView){
+    public void setView(String typeOfView) throws InterruptedException {
         model = new LittleModel();
         if(typeOfView.equals("TUI")){
             this.view = new TUI(model, this);
             view.start();
         }else if(typeOfView.equals("GUI")){
-            //TODO
-            App.launch();
-        }
+            new Thread(() -> {
+                launch(GUI.class);
+            }).start();
 
+            view = GUI.getInstance();
+            if(view != null) {
+                System.out.println("GUI started");
+            }
+        }
     }
 
     public void createInstanceOfConnection(String typeOfConnection){

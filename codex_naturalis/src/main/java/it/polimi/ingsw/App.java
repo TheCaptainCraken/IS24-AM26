@@ -1,6 +1,7 @@
 package it.polimi.ingsw;
 
 
+import it.polimi.ingsw.controller.client.Controller;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -13,11 +14,11 @@ import java.io.IOException;
 /**
  * JavaFX App
  */
-public class App extends Application {
+public class App{
 
     private static Scene scene;
+    private Controller controller;
 
-    @Override
     public void start(Stage stage) throws IOException {
         scene = new Scene(loadFXML("primary"), 640, 480);
         stage.setScene(scene);
@@ -34,7 +35,9 @@ public class App extends Application {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        launch();
+        Controller controller = new Controller();
+        controller.createInstanceOfConnection("RMI");
+        controller.setView("GUI");
     }
 //        Controller controller = null;
 //        Scanner myObj = new Scanner(System.in);
