@@ -7,9 +7,13 @@ import javafx.util.Pair;
 import org.json.simple.parser.ParseException;
 
 import java.awt.*;
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import java.io.Serializable;
 
 /**
  * This class represents the main controller of the game.
@@ -18,6 +22,7 @@ import java.util.HashMap;
 public class Controller {
     static String basePath = "codex_naturalis/src/main/java/it/polimi/ingsw/model/decks/";
     private static final Controller INSTANCE = new Controller();
+    private final String savePath = "savedGame.ser";
 
     Lobby lobby;
     GameMaster game = null;
@@ -68,11 +73,20 @@ public class Controller {
                     basePath + "goldCardsDeck.json",
                     basePath + "objectiveCardsDeck.json",
                     basePath + "startingCardsDeck.json");
-        } catch (IOException e) {
+            saveGame();
+        } catch (IOException | ParseException ex) {
             System.out.println("the file is not found");
-        } catch (ParseException e) {
-            System.out.println("the file is not valid");
         }
+    }
+
+    /**
+     * Tries to load a game from a file.
+     * 
+     * @throws IOException            If the file is not found.
+     * @throws ClassNotFoundException If the file is not valid.
+     */
+    public void tryLoadingGame() throws IOException, ClassNotFoundException {
+        game = GameMaster.tryLoadingGameMaster(savePath);
     }
 
     /**
@@ -98,7 +112,9 @@ public class Controller {
      */
     public int placeRootCard(String player, boolean side)
             throws WrongGamePhaseException, NoTurnException, NoNameException {
-        return game.placeRootCard(player, side);
+        int id = game.placeRootCard(player, side);
+        saveGame();
+        return id;
     }
 
     /**
@@ -126,6 +142,7 @@ public class Controller {
     public void chooseObjectiveCard(String player, int whichCard)
             throws WrongGamePhaseException, NoTurnException, NoNameException {
         game.chooseObjectiveCard(player, whichCard);
+        saveGame();
     }
 
     /**
@@ -144,7 +161,9 @@ public class Controller {
      */
     public int placeCard(String player, int indexHand, Point position, boolean side) throws WrongGamePhaseException,
             NoTurnException, NotEnoughResourcesException, NoNameException, CardPositionException {
-        return game.placeCard(player, indexHand, position, side);
+        int id = game.placeCard(player, indexHand, position, side);
+        saveGame();
+        return id;
     }
 
     /**
@@ -159,7 +178,9 @@ public class Controller {
      */
     public int drawCard(String player, boolean gold, int onTableOrDeck)
             throws WrongGamePhaseException, NoTurnException, NoNameException, CardPositionException {
-        return game.drawCard(player, gold, onTableOrDeck);
+        int id = game.drawCard(player, gold, onTableOrDeck);
+        saveGame();
+        return id;
     }
 
     /**
@@ -224,7 +245,8 @@ public class Controller {
      * @throws ColorAlreadyTakenException If the color is already taken.
      * @return Whether all players have chosen a color.
      */
-    public boolean setColourAndLobbyisReadyToStart(String name, Color colour) throws ColorAlreadyTakenException, NoNameException {
+    public boolean setColourAndLobbyisReadyToStart(String name, Color colour)
+            throws ColorAlreadyTakenException, NoNameException {
         for (Player player : lobby.getPlayers()) {
             if (player.getColor() == colour) {
                 throw new ColorAlreadyTakenException();
@@ -273,7 +295,9 @@ public class Controller {
         if (onTableOrDeck == -1) {
             return -1;
         } else {
-            return game.getCard(gold, onTableOrDeck);
+            int id = game.getCard(gold, onTableOrDeck);
+            saveGame();
+            return id;
         }
     }
 
@@ -396,7 +420,9 @@ public class Controller {
      * @return An ArrayList of players sorted by their ranking.
      */
     public ArrayList<Player> getRanking() {
-        return game.getRanking();
+        ArrayList<Player> ranking = game.getRanking();
+        saveGame();
+        return ranking;
     }
 
     /**
@@ -439,7 +465,23 @@ public class Controller {
         return lobby.isAdmitted(nickname);
     }
 
-    public boolean lobbyIsReady(){
+    public boolean lobbyIsReady() {
         return lobby.isReady();
+    }
+
+    /**
+     * Saves the game state to a file.
+     */
+    public void saveGame() {
+        try {
+            FileOutputStream saveFile = new FileOutputStream(savePath);
+            ObjectOutputStream save = new ObjectOutputStream(saveFile);
+            save.writeObject(game);
+
+            save.close();
+            saveFile.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

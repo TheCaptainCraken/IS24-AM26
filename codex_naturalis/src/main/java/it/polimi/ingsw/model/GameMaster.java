@@ -4,10 +4,13 @@ import it.polimi.ingsw.model.exception.*;
 import org.json.simple.parser.ParseException;
 
 import java.awt.*;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.*;
+import java.io.Serializable;
 
-public class GameMaster {
+public class GameMaster implements Serializable {
     private int globalTurn;
     private TurnType turnType;
     private Lobby lobby;
@@ -28,7 +31,8 @@ public class GameMaster {
 
     /**
      * The general functionalities of the game representing the peer point of the
-     * Model, the object is going to speak with the Controller
+     * Model, the object is going to speak with the Controller. If there is a saved
+     * GameMaster on the server, it will be loaded instead.
      *
      * @param lobby                      Lobby of user that are going to play
      * @param jsonResourceCardFileName   json file name to create the resource deck
@@ -80,6 +84,21 @@ public class GameMaster {
             hand[2] = (ResourceCard) goldDeck.draw();
             player.setHand(hand);
         }
+    }
+
+    /**
+     * Creates a GameMaster from a file.
+     */
+    public static GameMaster tryLoadingGameMaster(String path) throws IOException, ClassNotFoundException {
+        FileInputStream saveFile = new FileInputStream(path);
+        ObjectInputStream save = new ObjectInputStream(saveFile);
+
+        GameMaster gameMaster = (GameMaster) save.readObject();
+
+        save.close();
+        saveFile.close();
+
+        return gameMaster;
     }
 
     /**
@@ -151,14 +170,14 @@ public class GameMaster {
      * Let the Player capsule in a PlacedCard connected to the rootCard graph of the
      * Player
      *
-     * @param namePlayer  Player who sent the request
-     * @param index Which card wants to place
-     * @param position    In which position of the table the player wants to be
-     *                    place the card
-     * @param side        To which side wants the player to place the card
+     * @param namePlayer Player who sent the request
+     * @param index      Which card wants to place
+     * @param position   In which position of the table the player wants to be
+     *                   place the card
+     * @param side       To which side wants the player to place the card
      */
     public int placeCard(String namePlayer, int index, Point position, boolean side)
-            throws  NoTurnException, WrongGamePhaseException,
+            throws NoTurnException, WrongGamePhaseException,
             NotEnoughResourcesException, CardPositionException, NoNameException {
 
         // manage all possible exceptions
@@ -174,7 +193,8 @@ public class GameMaster {
         ResourceCard cardToPlace = currentPlayer.getHand()[index];
 
         HashMap<Corner, PlayedCard> attachments = isPositionable(currentPlayer.getRootCard(), position);
-        //the player positions the card in the back front. The card is one resource and 4 empty corners.
+        // the player positions the card in the back front. The card is one resource and
+        // 4 empty corners.
         if (!side) {
             new PlayedCard(cardToPlace, attachments, side, getTurn(), position);
             currentPlayer.addResource(fromKingdomToSign(cardToPlace.getKingdom()), 1);
@@ -256,7 +276,7 @@ public class GameMaster {
                     && getOrderPlayer(currentPlayer.getName()) + 1 == lobby.getPlayers().length) {
                 // if it is the last player in last turn cycle, go to end mode
                 gameState = GameState.END;
-                endGame(); //game transitions into the  calculating phase
+                endGame(); // game transitions into the calculating phase
             }
         } else {
             gameState = GameState.DRAWING_PHASE;
@@ -334,7 +354,7 @@ public class GameMaster {
                 && getOrderPlayer(currentPlayer.getName()) + 1 == lobby.getPlayers().length) {
             // if it is the last player in last turn cycle, go to end mode
             gameState = GameState.END;
-            endGame();//game transitions into the  calculating phase
+            endGame();// game transitions into the calculating phase
         } else if (currentPlayer.getPoints() >= 20 || areTheCardFinished()) {
             // if a player reached 20 points set this turn cycle as the second-last
             if (getOrderPlayer(currentPlayer.getName()) + 1 == lobby.getPlayers().length) {
@@ -356,18 +376,19 @@ public class GameMaster {
      * Represents the last part of the game, in which the points gained
      * from fulfilling the objectives are calculated.
      */
-    //TODO verificare questo metodo.
+    // TODO verificare questo metodo.
     public void endGame() throws WrongGamePhaseException {
         if (gameState != GameState.END) {
             throw new WrongGamePhaseException();
         } else {
             for (Player player : lobby.getPlayers()) {
-                //int numberOfObjective = 0;
+                // int numberOfObjective = 0;
                 ObjectiveCard secret = player.getSecretObjective();
-                int newPoints = calculateEndGamePoints(secret.getType(),secret.getMultiplier(),player,secret.getKingdom()); //secret objective is calculated first
+                int newPoints = calculateEndGamePoints(secret.getType(), secret.getMultiplier(), player,
+                        secret.getKingdom()); // secret objective is calculated first
                 player.addObjectivePoints(newPoints);
-                for(ObjectiveCard card : onTableObjectiveCards){
-                    newPoints = calculateEndGamePoints(card.getType(),card.getMultiplier(),player,card.getKingdom());
+                for (ObjectiveCard card : onTableObjectiveCards) {
+                    newPoints = calculateEndGamePoints(card.getType(), card.getMultiplier(), player, card.getKingdom());
                     player.addObjectivePoints(newPoints);
                 }
                 ranking.add(player);
@@ -378,21 +399,25 @@ public class GameMaster {
                 public int compare(Player p1, Player p2) {
                     int sum1 = p1.getPoints() + p1.getObjectivePoints();
                     int sum2 = p2.getPoints() + p2.getObjectivePoints();
-                    if(sum1 == sum2) {
-                        return Integer.compare(p1.getObjectivePoints(),p2.getObjectivePoints());
-                    } else if(sum1 > sum2){
+                    if (sum1 == sum2) {
+                        return Integer.compare(p1.getObjectivePoints(), p2.getObjectivePoints());
+                    } else if (sum1 > sum2) {
                         return 1;
                     } else {
                         return -1;
                     }
                 }
             });
-            /*quello che ho appena fatto è stato creare un'anonymous function per ordinare la lista
-            * in un colpo solo usando sort(), in alternativa avrei dovuto creare una classe apposita per fare
-            * l'overriding di compare, per usarlo solo qui (abbastanza inutile)*/
+            /*
+             * quello che ho appena fatto è stato creare un'anonymous function per ordinare
+             * la lista
+             * in un colpo solo usando sort(), in alternativa avrei dovuto creare una classe
+             * apposita per fare
+             * l'overriding di compare, per usarlo solo qui (abbastanza inutile)
+             */
 
-
-            //funzione ordina ranking e non restituisce nulla, ci penserà il controller a chiedere il ranking e decretare il vincitore
+            // funzione ordina ranking e non restituisce nulla, ci penserà il controller a
+            // chiedere il ranking e decretare il vincitore
         }
     }
 
@@ -421,7 +446,6 @@ public class GameMaster {
 
         // For each corner of the card to be placed, it checks if there is a possible
         // card to attach it. The switch case refers to the new Card.
-
 
         newCard = findCard(startingCard, position);
         if (newCard != null) {
@@ -605,7 +629,8 @@ public class GameMaster {
     }
 
     /**
-     * Controls if the resources of a Player are enough for the requirements of a GoldCard
+     * Controls if the resources of a Player are enough for the requirements of a
+     * GoldCard
      *
      * @param player   Player about we want to know if they can place the GoldCard
      * @param goldCard GoldCard that wants to be placed and has certain requirements
@@ -657,7 +682,7 @@ public class GameMaster {
      *
      * @param type       type of the objective card.
      * @param multiplier multiplier of the objective card.
-     * @param player     player who  is getting targeted.
+     * @param player     player who is getting targeted.
      * @param kingdom    kingdom of the objective card.
      * @return number of points to add to the player points
      */
@@ -908,7 +933,6 @@ public class GameMaster {
         return name.equals(currentPlayer.getName());
     }
 
-
     /**
      * Place card on the spot on table
      *
@@ -960,7 +984,7 @@ public class GameMaster {
      * @param namePlayer name of the player about is wanted to get info
      * @return resources of the player
      */
-    public HashMap<Sign, Integer> getPlayerResources(String namePlayer) throws  NoNameException {
+    public HashMap<Sign, Integer> getPlayerResources(String namePlayer) throws NoNameException {
         return lobby.getPlayerFromName(namePlayer).getResources();
     }
 
@@ -1038,18 +1062,18 @@ public class GameMaster {
     public GameState getGameState() {
         return gameState;
     }
+
     public GameState getState() {
         return gameState;
     }
 
     public int getCard(boolean gold, int onTableOrDeck) {
-        if (gold)
-        {
+        if (gold) {
             return onTableGoldCards[onTableOrDeck].getId();
         } else {
             return onTableResourceCards[onTableOrDeck].getId();
-            }
         }
+    }
 
     /**
      * Retrieves an objective card from the table in the game.
@@ -1087,4 +1111,3 @@ public class GameMaster {
         return startingCardToPosition[getOrderPlayer(nickname)];
     }
 }
-
