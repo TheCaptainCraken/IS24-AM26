@@ -105,7 +105,6 @@ public interface NetworkPlug {
      * @param onTableOrDeck An integer indicating whether the card is on the table
      *                      or the deck.
      */
-
     // TODO sistemare cosa invia, a volte inviamo meno uno per dire qualcosa, scriverlo.
     void sendDrawnCard(String nickname, int newCardId, Kingdom headDeck, boolean gold, int onTableOrDeck);
 
@@ -115,4 +114,10 @@ public interface NetworkPlug {
      * the players.
      */
     void sendEndGame();
+
+    /**
+     * This method is used to disconnect all clients from a specific network interface.
+     * It should be implemented by each network interface to handle the disconnection process according to its specific protocol.
+     */
+    void disconnectAll();
 }

@@ -117,4 +117,8 @@ public interface RMIClientInterface extends Remote {
     void stopWaiting() throws RemoteException;
 
     void disconnect() throws RemoteException;
+
+    void stopGaming() throws RemoteException;
+
+    void isConnected() throws RemoteException;
 }

@@ -27,8 +27,7 @@ public class Controller {
      * 
      * @return The instance of the controller.
      */
-    public static Controller getInstance() {
-        // TODO mutex here
+    public synchronized static Controller getInstance() {
         return INSTANCE;
     }
 

@@ -11,10 +11,7 @@ public interface ViewInterface {
     //create the GUI/UI. It is launched by controller
     //non credo debba essere implementato da gui, esiste già un metodo start() ma è della Classe Astratta Application
     void start();
-
-
     //Server to Client
-
     //It is the first player please: Print something to say choose number of Players.
     void askNumberOfPlayers();
     //Wait that all have performed the action. Remember we wait at color, choice of starting card and objective card. Also at the login. You can control the phase in the controller.
@@ -44,18 +41,13 @@ public interface ViewInterface {
     void showSecretObjectiveCard(int indexCard);
     //print the current player and the game state.
     void showTurnInfo(String currentPlayer, GameState gameState);
-    //TODO capire come fare differenziazione su controller.
     void showResourcesPlayer();
-    //TODO capire come fare differenziazione su controller.
     void showResourcesAllPlayers();
-    //TODO capire come fare differenziazione su controller.
     void showPoints();
     //Show points earned at the end
     void showExtraPoints(HashMap<String, Integer> extraPoints);
     //you should print just the order of their nickname. The order given is from winner to loser. It is set by model in the server.
     void showRanking(ArrayList<Player> ranking);
-
-
     //They are triggered by menus and listeners or they automatically appear on the screen if you are watching to them.
     //TODO Should be done also for the TUI
     //Show the cards placed of the player on the table.
@@ -65,9 +57,7 @@ public interface ViewInterface {
     //this is your private Hand. You can take this information from the model.
     void showHand();
 
-
     //Report Exceptions
-
     void sameName(String nickname);
     void colorAlreadyTaken();
     void noTurn();
@@ -77,5 +67,6 @@ public interface ViewInterface {
     void lobbyComplete();
     void wrongGamePhase();
     void noPlayer();
+    //error in insert number of players
     void closingLobbyError();
 }

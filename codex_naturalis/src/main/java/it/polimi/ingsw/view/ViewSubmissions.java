@@ -26,6 +26,7 @@ public class ViewSubmissions {
     //Client to Server
 
     //Input the number of players. The number of players can be 2, 3 or 4. The controller will check the input.
+    //TODO no, il controller non fa check di input.
     public void chooseNumberOfPlayers(int numberOfPlayers){
         controller.insertNumberOfPlayers(numberOfPlayers);
     }
