@@ -49,6 +49,7 @@ import it.polimi.ingsw.network.messages.server.login.PlayersAndColorPins;
 import it.polimi.ingsw.network.messages.server.login.StatusLogin;
 import it.polimi.ingsw.network.server.NetworkHandler;
 import it.polimi.ingsw.network.server.NetworkPlug;
+import it.polimi.ingsw.network.messages.server.MessageMessage;
 
 import java.io.*;
 
@@ -71,7 +72,7 @@ public class NetworkServerSocket implements NetworkPlug {
         NetworkHandler.getInstance().addNetworkPlug("socket", this);
         connections = new HashMap<>();
         controller = Controller.getInstance();
-        //TODO cosi distruggi sincronizzazione
+        // TODO cosi distruggi sincronizzazione
     }
 
     /**
@@ -102,15 +103,20 @@ public class NetworkServerSocket implements NetworkPlug {
     @Override
     // TODO
     public void finalizingNumberOfPlayers() {
-       for(ClientHandler client : connections.values()){
-           if(controller.isAdmitted(client.getNickname())){
-               client.sendMessage(new StopWaitingOrDisconnect(true));
-           }else{
-               //disconnessione
+        for (ClientHandler client : connections.values()) {
+            if (controller.isAdmitted(client.getNickname())) {
+                client.sendMessage(new StopWaitingOrDisconnect(true));
+            } else {
+                // disconnessione
                 client.sendMessage(new StopWaitingOrDisconnect(false));
                 client.hastaLaVistaBaby();
-           }
-       }
+            }
+        }
+    }
+
+    @Override
+    public void receiveMessage(String message, String sender) {
+        sendBroadCastMessage(new MessageMessage(message, sender));
     }
 
     @Override
@@ -252,7 +258,7 @@ public class NetworkServerSocket implements NetworkPlug {
                     nickname = parsedMessage.getNickname();
                     networkHandler.refreshUsersBroadcast();
                     sendMessage(new StatusLogin(controller.getIsFirst(parsedMessage.getNickname())));
-                    if(!controller.getIsFirst(parsedMessage.getNickname())){
+                    if (!controller.getIsFirst(parsedMessage.getNickname())) {
                         sendMessage(new LobbyIsReady(controller.lobbyIsReady()));
                     }
                     networkHandler.finalizingNumberOfPlayersBroadcast();
@@ -262,7 +268,7 @@ public class NetworkServerSocket implements NetworkPlug {
                     sendErrorMessage(ErrorType.LOBBY_ALREADY_FULL);
                     hastaLaVistaBaby(); // as per diagram
                 } catch (NoNameException e) {
-                    //TODO
+                    // TODO
                 }
             } else if (message instanceof NumberOfPlayersMessage) {
                 NumberOfPlayersMessage parsedMessage = (NumberOfPlayersMessage) message;
@@ -285,7 +291,8 @@ public class NetworkServerSocket implements NetworkPlug {
             } else if (message instanceof ColorChosen) {
                 ColorChosen parsedMessage = (ColorChosen) message;
                 try {
-                    boolean isLobbyReadyToStart = controller.setColourAndLobbyisReadyToStart(parsedMessage.getNickname(),
+                    boolean isLobbyReadyToStart = controller.setColourAndLobbyisReadyToStart(
+                            parsedMessage.getNickname(),
                             parsedMessage.getColor());
                     networkHandler.refreshUsersBroadcast();
                     if (isLobbyReadyToStart) {
@@ -356,7 +363,8 @@ public class NetworkServerSocket implements NetworkPlug {
                     int CardId = controller.drawCard(parsedMessage.getNickname(), parsedMessage.isGold(),
                             parsedMessage.getOnTableOrOnDeck());
 
-                    int newCardId = controller.newCardOnTable(parsedMessage.isGold(), parsedMessage.getOnTableOrOnDeck());
+                    int newCardId = controller.newCardOnTable(parsedMessage.isGold(),
+                            parsedMessage.getOnTableOrOnDeck());
 
                     Kingdom headDeck = controller.getHeadDeck(parsedMessage.isGold());
 
@@ -452,7 +460,7 @@ public class NetworkServerSocket implements NetworkPlug {
                 try {
                     sendMessage(new ShowHiddenHand(nickname, controller.getHiddenHand(nickname)));
                 } catch (NoNameException e) {
-                   //TODO
+                    // TODO
                 }
             }
             sendMessage(new ShowNewTableCard(newCardId, gold, onTableOrDeck, headDeck));
