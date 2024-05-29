@@ -279,7 +279,8 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
      */
     @Override
     public void stopWaiting() {
-            Controller.setPhase(Phase.COLOR);
+        Controller.setPhase(Phase.COLOR);
+        controller.stopWaiting();
     }
 
     @Override

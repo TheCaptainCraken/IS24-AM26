@@ -55,7 +55,6 @@ public class LoginController {
         } else {
             ViewSubmissions.getInstance().chooseNickname(name);
             input.setVisible(false);
-            button1.setVisible(false);
             label1.setText("Please Wait...");
         }
     }
@@ -64,7 +63,7 @@ public class LoginController {
         //showInsertNumberOfPlayers();
         //waitLobby();
         //showColorPrompt();
-        stopWaiting();
+        //stopWaiting();
         //colorAlreadyTaken();
         //sameName("test");
         /*HashMap <String,Color> map = new HashMap<>();
@@ -77,13 +76,14 @@ public class LoginController {
         map1.put("Pietro",Color.RED);
         map1.put("Daniel",Color.GREEN);
         refreshUsers(map1);*/
-
     }
+
     //METHODS CALLED BY GUI CLASS
     public void showInsertNumberOfPlayers() {
 
         label1.setText("You are the first player.\n Please enter the number of players");
         button1.setText("Submit");
+        button1.setVisible(true);
         ChoiceBox <Integer> box = new ChoiceBox<>();
         box.getItems().addAll(2,3,4);
         box.setValue(2);
@@ -100,7 +100,7 @@ public class LoginController {
     }
 
     public void disconnect(){
-        //TODO don't really know how to put it
+       label1.setText("The lobby is full. No other players can join");
     }
 
     public void stopWaiting(){
@@ -115,15 +115,15 @@ public class LoginController {
         setupColors();
     }
 
-    public void showIsFirst(String firstPlayer){
+    /*public void showIsFirst(String firstPlayer){
         label1.setText("The first player is " + firstPlayer +".\nThe game is about to start!");
-    }
+    }*/
 
     /**
      * method used to Set Up the Login View with its images
      */
     public void setup(){
-
+        debug.setVisible(false);
         Image img = new Image("logo.png");
         names = new ArrayList<>();
         avatars = new ArrayList<>();

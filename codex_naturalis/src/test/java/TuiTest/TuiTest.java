@@ -3,7 +3,6 @@ package TuiTest;
 import it.polimi.ingsw.controller.client.Controller;
 import it.polimi.ingsw.view.LittleModel;
 import it.polimi.ingsw.view.TUI;
-import it.polimi.ingsw.view.Tui;
 
 import java.util.ArrayList;
 

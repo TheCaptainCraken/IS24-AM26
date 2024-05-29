@@ -97,6 +97,9 @@ public class LittleModel {
     public HashMap<String, Integer> getPoints() {
         return points;
     }
+    public HashMap<String, Integer> getPlayersAndCardsNumber() {
+        return playersAndCardsNumber;
+    }
 
     public void updateDrawCard(String nickname, int cardId) {
         //TODO capire logica
@@ -307,6 +310,7 @@ public class LittleModel {
         ArrayList<CardClient> carte = findCard(card);
         return carte;
     }
+
 
     private ArrayList<CardClient> findCard(CardClient startingCard) {
         Stack<CardClient> stack = new Stack<>();
