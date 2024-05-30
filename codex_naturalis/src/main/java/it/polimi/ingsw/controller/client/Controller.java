@@ -58,6 +58,7 @@ public class Controller {
             }).start();
 
             view = GUI.getInstance();
+            ((GUI) view).setModel(model);
             if(view != null) {
                 System.out.println("GUI started");
             }

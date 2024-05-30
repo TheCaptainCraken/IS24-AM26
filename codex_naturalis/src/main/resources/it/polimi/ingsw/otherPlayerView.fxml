@@ -12,14 +12,13 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1080.0" prefWidth="1920.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw.view.gui.otherPlayerBoardController.">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1080.0" prefWidth="1920.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw.view.gui.OtherPlayerBoardController">
    <children>
       <SplitPane dividerPositions="0.15" prefHeight="160.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <items>
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+            <VBox prefHeight="200.0" prefWidth="100.0">
                <children>
-                  <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                  <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0" spacing="10.0">
                      <children>
                         <Label fx:id="playerName" text="Label">
                            <font>
@@ -29,7 +28,7 @@
                         <ImageView fx:id="hand1" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" />
                         <ImageView fx:id="hand2" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" />
                         <ImageView fx:id="hand3" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" />
-                        <Pane prefHeight="397.0" prefWidth="285.0" />
+                        <Pane prefHeight="0.0" prefWidth="285.0" />
                         <Button fx:id="goBack" mnemonicParsing="false" onMouseClicked="#handleReturn" text="Go Back">
                            <font>
                               <Font size="22.0" />
@@ -41,7 +40,7 @@
                      </padding>
                   </VBox>
                </children>
-            </AnchorPane>
+            </VBox>
             <ScrollPane hvalue="0.5" pannable="true" prefHeight="200.0" prefWidth="200.0" vvalue="0.5">
               <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="3000.0" prefWidth="3000.0">

@@ -115,10 +115,6 @@ public class LoginController {
         setupColors();
     }
 
-    /*public void showIsFirst(String firstPlayer){
-        label1.setText("The first player is " + firstPlayer +".\nThe game is about to start!");
-    }*/
-
     /**
      * method used to Set Up the Login View with its images
      */

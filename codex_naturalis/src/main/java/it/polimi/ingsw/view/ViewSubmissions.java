@@ -54,4 +54,8 @@ public class ViewSubmissions {
     public void drawCard(boolean gold, int onTableOrDeck){
         controller.drawCard(gold, onTableOrDeck);
     }
+
+    public String getNickname(){
+        return controller.getNickname();
+    }
 }

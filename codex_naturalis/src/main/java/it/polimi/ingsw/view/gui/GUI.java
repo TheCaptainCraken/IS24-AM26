@@ -14,25 +14,29 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import javafx.scene.control.SplitPane;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 
 public class GUI extends Application implements ViewInterface {
     private static ViewInterface instance;
     private static final Object lock = new Object();
 
-    private ViewSubmissions viewSubmissions; //TODO va final una volta finita implementazione
     private  LittleModel model; //TODO va final una volta finita implementazione
     private FXMLLoader fxmlLoader;
     public static LoginController loginController;
     public static MatchController matchController;
-    private static Scene scene;
-    private Stage primaryStage;
+    static Scene scene;
+    private static Stage primaryStage;
     private Parent root;
+    private static Parent match;
 
     /*public GUI(Controller controller, LittleModel model) {
         this.controller = controller;
@@ -49,21 +53,29 @@ public class GUI extends Application implements ViewInterface {
             instance = this;
             lock.notify();
         }
-        //root = loadFXML("loginView");
-        root = loadFXML("matchView");
+        root = loadFXML("loginView");
+        loginController =(LoginController) fxmlLoader.getController();
+        match = loadFXML("matchView");
         matchController = (MatchController) fxmlLoader.getController();
-        //loginController =(LoginController) fxmlLoader.getController();
-        this.primaryStage = stage;
-        //loginController.setStage(stage);
+        primaryStage = stage;
+        loginController.setStage(stage);
         scene = new Scene(root, 1920, 1080);
-        //loginController.setup();
+        //scene = new Scene(match, 1920, 1080);
+        loginController.setup();
         stage.setScene(scene);
         stage.show();
     }
 
     public void setRoot(String fxml) {
         scene.setRoot(loadFXML(fxml));
+    }
 
+    public static Stage getStage() {
+        return primaryStage;
+    }
+
+    public static Parent getMatch(){
+        return match;
     }
 
     private  Parent loadFXML(String fxml) {
@@ -72,7 +84,7 @@ public class GUI extends Application implements ViewInterface {
             return fxmlLoader.load();
 
         } catch (IOException e){
-            System.out.println("Could not load fxml file");
+            e.printStackTrace();
         }
         return null;
     }
@@ -106,10 +118,22 @@ public class GUI extends Application implements ViewInterface {
         Platform.runLater(() -> loginController.refreshUsers(playersAndPins));
     }
 
+    public void setModel(LittleModel model) {
+        this.model = model;
+    }
+
     @Override
     public void showCommonTable() {
-        setRoot("matchView");
-        matchController = (MatchController) fxmlLoader.getController();
+        ArrayList<String> players = new ArrayList<>(model.getPlayersAndCardsNumber().keySet());
+        HashMap<String,Parent> playerBoards = new HashMap<>();
+        for (String player : players) {
+            if(!player.equals(ViewSubmissions.getInstance().getNickname())){
+                Scene scene = new Scene(Objects.requireNonNull(loadFXML("otherPlayerView")),1920,1080);
+                playerBoards.put(player,scene.getRoot());
+            }
+        }
+        scene.setRoot(match);
+        matchController.setPlayerBoards(playerBoards);
         matchController.setStage(primaryStage);
         matchController.setModel(model);
         Platform.runLater(()->matchController.showCommonTable());
@@ -129,7 +153,7 @@ public class GUI extends Application implements ViewInterface {
     @Override
     public void showSecretObjectiveCard(int indexCard) {
 
-    }
+    } //questo metodo potrebbe essere inutile, una volta che ho scelto la carta la posso tenere in view/ oppure faccio apparire un dialog per scegliere la carta
 
     @Override
     public void showSecretObjectiveCardsToChoose(Integer[] objectiveCardIds) {
@@ -138,7 +162,7 @@ public class GUI extends Application implements ViewInterface {
 
     @Override
     public void showTurnInfo(String currentPlayer, GameState gameState) {
-
+        Platform.runLater(() -> matchController.showTurnInfo(currentPlayer, gameState));
     }
 
     @Override
@@ -159,7 +183,7 @@ public class GUI extends Application implements ViewInterface {
     @Override
     public void showTableOfPlayer(String nickname) {
 
-    }
+    } //mai usata ll'interno del progetto?
 
     @Override
     public void showHiddenHand(String nickname) {
@@ -184,22 +208,22 @@ public class GUI extends Application implements ViewInterface {
 
     @Override
     public void colorAlreadyTaken() {
-        loginController.colorAlreadyTaken();
+        Platform.runLater(() -> loginController.colorAlreadyTaken());
     }
 
     @Override
     public void sameName(String nickname) {
-        loginController.sameName(nickname);
+        Platform.runLater(() -> loginController.sameName(nickname));
     }
 
     @Override
     public void noTurn() {
-
+        Platform.runLater(() -> matchController.noTurn() );
     }
 
     @Override
     public void notEnoughResources() {
-
+        Platform.runLater(() -> matchController.notEnoughResources());
     }
 
     @Override
@@ -209,7 +233,7 @@ public class GUI extends Application implements ViewInterface {
 
     @Override
     public void cardPositionError() {
-
+        Platform.runLater(() -> matchController.cardPositionError());
     }
 
     @Override
@@ -219,12 +243,12 @@ public class GUI extends Application implements ViewInterface {
 
     @Override
     public void wrongGamePhase() {
-
+        Platform.runLater(() ->matchController.wrongGamePhase());
     }
 
     @Override
     public void noPlayer() {
-
+        //????
     }
 
     @Override
