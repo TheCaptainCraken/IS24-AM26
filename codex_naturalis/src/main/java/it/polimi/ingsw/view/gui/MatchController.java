@@ -63,8 +63,7 @@ public class MatchController {
 
     //TODO Refreshare mappe del client del giocatore + quelle degli altri giocatori, pescare le carte, refreshare i punteggi e settare la mano iniziale
 
-    public void showCommonTable(){
-        //TODO setuppare hashmap di User/scene, capire quale scena è la propria, capire come inizializzare i vari elementi della view senza scrivere troppo codice
+    public void setup(){
         labels = new ArrayList<>();
         for(String s: model.getPlayersAndCardsNumber().keySet()){
             ImageView img1 = new ImageView();
@@ -104,16 +103,16 @@ public class MatchController {
                         break;
 
                 }
-                    Label l2 = new Label("0");
-                    resources.getChildren().add(img);
-                    resources.getChildren().add(l2);
-                }
-                resources.setAlignment(Pos.TOP_LEFT);
-                VBox container = new VBox(box,resources);
-                container.setSpacing(15);
-                container.setAlignment(Pos.CENTER);
-                playerContainer.getChildren().add(container);
+                Label l2 = new Label("0");
+                resources.getChildren().add(img);
+                resources.getChildren().add(l2);
             }
+            resources.setAlignment(Pos.TOP_LEFT);
+            VBox container = new VBox(box,resources);
+            container.setSpacing(15);
+            container.setAlignment(Pos.CENTER);
+            playerContainer.getChildren().add(container);
+        }
         int i = 0;
         for(String s: model.getPlayersAndCardsNumber().keySet()){
             labels.get(i).setText(s);
@@ -135,17 +134,61 @@ public class MatchController {
             }
             i++;
         }
+    }
+    public void showCommonTable(){
         Integer[] resourceCards = model.getResourceCards();
-        res1.setImage(new Image("frontCard"+resourceCards[0]+".png"));
-        res2.setImage(new Image("frontCard"+resourceCards[1]+".png"));
+
+        if(!(resourceCards[0] == null)){
+            res1.setImage(new Image("frontCard"+resourceCards[0]+".png"));
+            res1.setOnMouseClicked(event -> setupDeckActions(false,0));
+        } else {
+            res1.setImage(new Image("defaultCard.png"));
+            res1.setOnMouseClicked(null);
+        }
+
+        if(!(resourceCards[1] == null)){
+            res2.setImage(new Image("frontCard"+resourceCards[1]+".png"));
+            res2.setOnMouseClicked(event -> setupDeckActions(false,1));
+        } else {
+            res2.setImage(new Image("defaultCard.png"));
+            res2.setOnMouseClicked(null);
+        }
         Integer[] goldCard = model.getGoldCards();
-        gold1.setImage(new Image("frontCard"+goldCard[0]+".png"));
-        gold2.setImage(new Image("frontCard"+goldCard[1]+".png"));
-        res_deck.setImage(KingdomToCard(model.getHeadDeckResource(),false));
-        gold_deck.setImage(KingdomToCard(model.getHeadDeckGold(),true));
+
+        if(!(goldCard[0] == null)) {
+            gold1.setImage(new Image("frontCard" + goldCard[0] + ".png"));
+            gold1.setOnMouseClicked(event -> setupDeckActions(true,0));
+        } else {
+            gold1.setImage(new Image("defaultCard.png"));
+            gold1.setOnMouseClicked(null);
+        }
+
+        if(!(goldCard[1] == null)) {
+            gold2.setImage(new Image("frontCard" + goldCard[1] + ".png"));
+            gold2.setOnMouseClicked(event -> setupDeckActions(true,1));
+        } else {
+            gold2.setImage(new Image("defaultCard.png"));
+            gold2.setOnMouseClicked(null);
+        }
+
+        if(!(model.getHeadDeckResource() == null)) {
+            res_deck.setImage(KingdomToCard(model.getHeadDeckResource(),false));
+            res_deck.setOnMouseClicked(event -> setupDeckActions(false,-1));
+        } else {
+            res_deck.setImage(new Image("defaultCard.png"));
+            res_deck.setOnMouseClicked(null);
+        }
+
+        if(!(model.getHeadDeckGold() == null)) {
+            gold_deck.setImage(KingdomToCard(model.getHeadDeckGold(),true));
+            gold_deck.setOnMouseClicked(event -> setupDeckActions(true,-1));
+        } else {
+            gold_deck.setImage(new Image("defaultCard.png"));
+            gold_deck.setOnMouseClicked(null);
+        }
     }
 
-    public void showStartingCard(int id){
+    public void showStartingCard(int id){ //TODO va sistemato il fatto di scegliere starting card quando non è il proprio turno
         status.setText("Please Choose the side of the starting Card");
         root.setImage(loadStartingCardResource(id,true));
         root.setOnMouseClicked((event) -> {
@@ -190,19 +233,26 @@ public class MatchController {
         secret2.setImage(new Image("frontCard"+objectiveCardIds[1]+".png"));
         secret1.setOnMouseClicked(event -> {
             status.setText("Please wait for the other players...");
-            secret1.setOnMouseClicked(null);
             lastDeleted = secret2;
-            secretContainer.getChildren().remove(secret2);
             ViewSubmissions.getInstance().chooseSecretObjectiveCard(0);
         });
         secret2.setOnMouseClicked(event -> {
             status.setText("Please wait for the other players...");
             statusMenu.getChildren().removeIf(node -> node instanceof HBox);
             lastDeleted = secret1;
-            secretContainer.getChildren().remove(secret1);
-            secret2.setOnMouseClicked(null);
             ViewSubmissions.getInstance().chooseSecretObjectiveCard(1);
         });
+    }
+
+    public void showSecretObjectiveCard(int indexCard){
+        status.setText("You have successfully chosen your Secret Objective Card!");
+        if(indexCard == 0){
+            secretContainer.getChildren().remove(secret2);
+            secret1.setOnMouseClicked(null);
+        } else {
+            secretContainer.getChildren().remove(secret1);
+            secret2.setOnMouseClicked(null);
+        }
     }
 
     public void showIsFirst(String name){
@@ -216,14 +266,28 @@ public class MatchController {
             }
         }
        if(name.equals(ViewSubmissions.getInstance().getNickname())){
-           status.setText("You are the first Player!\nThe game is about to start!");
+           status.setText("You are the first Player!\nPlease play a card.");
        } else {
-           status.setText("The first player is " + name +".\nThe game is about to start!");
+           status.setText("The first player is " + name +".\nPlease wait for your turn");
        }
     }
 
     public void showTurnInfo(String currentPlayer, GameState gameState){
-        status.setText("It is "+currentPlayer+"'s turn.\n"+gameState.toString());
+        String s;
+        switch(gameState){
+            case DRAWING_PHASE:
+                s = "The Player has to draw a card";
+                break;
+            case PLACING_PHASE:
+                s = "The Player has to place a card";
+                break;
+            case END:
+                s = "End Phase";
+                break;
+            default:
+                s = "Unknown Phase";
+        }
+        status.setText("It is "+currentPlayer+"'s turn.\n"+s);
     }
 
     public void noTurn(){
@@ -231,9 +295,6 @@ public class MatchController {
         dialog.setTitle("Turn error!");
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK);
         Label l = new Label("It is not your turn.\nPlease wait for the other players to finish their turn.");
-        if(secretContainer.getChildren().size() == 1){
-            secretContainer.getChildren().add(lastDeleted);
-        }
         l.setFont(Font.font(16));
         ImageView error = new ImageView("error_icon.png");
         HBox box = new HBox(error,l);
@@ -297,52 +358,6 @@ public class MatchController {
         card.setTranslateY(pos.getValue());
         card.setOnMouseClicked(event -> {revealSpots(card.getTranslateX(),card.getTranslateY());});
         board.getChildren().add(card);
-    }
-
-    public void revealSpots(double x,double y){
-        Button b1 = new Button("Altodx"), b2 = new Button("Altosx"), b3 = new Button("Bassosx"), b4 = new Button("Bassodx");
-        ArrayList<Button> buttons = new ArrayList<>();
-        ArrayList<Button> trueButtons = new ArrayList<>();
-        buttons.add(b1);
-        buttons.add(b2);
-        buttons.add(b3);
-        buttons.add(b4);
-
-        int i = 0;
-        for(Button b: buttons){
-            boolean isOccupied = false;
-            Pair <Double,Double> pos = null;
-            switch(i){
-                case 0:
-                    pos = loadPosition(1,0);
-                    break;
-                case 1:
-                    pos = loadPosition(0,1);
-                    break;
-                case 2:
-                    pos = loadPosition(-1,0);
-                    break;
-                case 3:
-                    pos = loadPosition(0,-1);
-                    break;
-            }
-            for(Node node: board.getChildren()){
-                ImageView card = (ImageView) node;
-                if(card.getTranslateX() == pos.getKey() && card.getTranslateY() == pos.getValue()){
-                    isOccupied = true;
-                    break;
-                }
-            }
-            if(!isOccupied){
-                setupButton(b,pos.getKey(),pos.getValue());
-                trueButtons.add(b);
-            }
-            i++;
-        }
-        for(Button b: trueButtons){
-            b.setOnMouseClicked(event -> handlePositionRequest(b));
-        }
-        board.getChildren().addAll(trueButtons);
     }
 
     //UTILITY FUNCTIONS
@@ -456,6 +471,58 @@ public class MatchController {
                 return new Image("TokenYellow.png");
         }
         return null;
+    }
+
+    //EVENT FUNCTIONS
+
+    public void revealSpots(double x,double y){
+        Button b1 = new Button("Altodx"), b2 = new Button("Altosx"), b3 = new Button("Bassosx"), b4 = new Button("Bassodx");
+        ArrayList<Button> buttons = new ArrayList<>();
+        ArrayList<Button> trueButtons = new ArrayList<>();
+        buttons.add(b1);
+        buttons.add(b2);
+        buttons.add(b3);
+        buttons.add(b4);
+
+        int i = 0;
+        for(Button b: buttons){
+            boolean isOccupied = false;
+            Pair <Double,Double> pos = null;
+            switch(i){
+                case 0:
+                    pos = loadPosition(1,0);
+                    break;
+                case 1:
+                    pos = loadPosition(0,1);
+                    break;
+                case 2:
+                    pos = loadPosition(-1,0);
+                    break;
+                case 3:
+                    pos = loadPosition(0,-1);
+                    break;
+            }
+            for(Node node: board.getChildren()){
+                ImageView card = (ImageView) node;
+                if(card.getTranslateX() == pos.getKey() && card.getTranslateY() == pos.getValue()){
+                    isOccupied = true;
+                    break;
+                }
+            }
+            if(!isOccupied){
+                setupButton(b,pos.getKey(),pos.getValue());
+                trueButtons.add(b);
+            }
+            i++;
+        }
+        for(Button b: trueButtons){
+            b.setOnMouseClicked(event -> handlePositionRequest(b));
+        }
+        board.getChildren().addAll(trueButtons);
+    }
+
+    public void setupDeckActions(boolean gold,int i){
+        ViewSubmissions.getInstance().drawCard(gold,i);
     }
 
     public void setupButton(Button b,double x,double y){

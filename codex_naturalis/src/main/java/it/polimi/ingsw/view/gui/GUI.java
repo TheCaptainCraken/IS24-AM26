@@ -29,26 +29,22 @@ public class GUI extends Application implements ViewInterface {
     private static ViewInterface instance;
     private static final Object lock = new Object();
 
+
     private  LittleModel model; //TODO va final una volta finita implementazione
     private FXMLLoader fxmlLoader;
     public static LoginController loginController;
     public static MatchController matchController;
     static Scene scene;
     private static Stage primaryStage;
+    private boolean gameAlreadyStarted = false;
     private Parent root;
     private static Parent match;
-
-    /*public GUI(Controller controller, LittleModel model) {
-        this.controller = controller;
-        this.model = model;
-    }*/ //TODO costruttore va usato, metodo launch sarà chiamato DOPO che controller ha creato oggetto GUI
 
     public static void main(String[] args) {
         Application.launch(GUI.class, args);
     }
     @Override
     public void start(Stage stage) throws IOException {
-        //loginController = new LoginController();
         synchronized (lock) {
             instance = this;
             lock.notify();
@@ -61,13 +57,13 @@ public class GUI extends Application implements ViewInterface {
         loginController.setStage(stage);
         scene = new Scene(root, 1920, 1080);
         //scene = new Scene(match, 1920, 1080);
-        loginController.setup();
+        Platform.runLater(() -> loginController.setup());
         stage.setScene(scene);
         stage.show();
     }
 
-    public void setRoot(String fxml) {
-        scene.setRoot(loadFXML(fxml));
+    public void setRoot(Parent parent) {
+        scene.setRoot(parent);
     }
 
     public static Stage getStage() {
@@ -124,19 +120,25 @@ public class GUI extends Application implements ViewInterface {
 
     @Override
     public void showCommonTable() {
-        ArrayList<String> players = new ArrayList<>(model.getPlayersAndCardsNumber().keySet());
-        HashMap<String,Parent> playerBoards = new HashMap<>();
-        for (String player : players) {
-            if(!player.equals(ViewSubmissions.getInstance().getNickname())){
-                Scene scene = new Scene(Objects.requireNonNull(loadFXML("otherPlayerView")),1920,1080);
-                playerBoards.put(player,scene.getRoot());
+        if(!gameAlreadyStarted){
+            gameAlreadyStarted = true;
+            ArrayList<String> players = new ArrayList<>(model.getPlayersAndCardsNumber().keySet());
+            HashMap<String,Parent> playerBoards = new HashMap<>();
+            for (String player : players) {
+                if(!player.equals(ViewSubmissions.getInstance().getNickname())){
+                    Scene scene = new Scene(Objects.requireNonNull(loadFXML("otherPlayerView")),1920,1080);
+                    playerBoards.put(player,scene.getRoot());
+                }
             }
+            scene.setRoot(match);
+            matchController.setPlayerBoards(playerBoards);
+            matchController.setStage(primaryStage);
+            matchController.setModel(model);
+            Platform.runLater(() -> matchController.setup());
+            Platform.runLater(()->matchController.showCommonTable());
+        } else {
+            Platform.runLater(() -> matchController.showCommonTable());
         }
-        scene.setRoot(match);
-        matchController.setPlayerBoards(playerBoards);
-        matchController.setStage(primaryStage);
-        matchController.setModel(model);
-        Platform.runLater(()->matchController.showCommonTable());
     }
 
 
@@ -152,8 +154,8 @@ public class GUI extends Application implements ViewInterface {
 
     @Override
     public void showSecretObjectiveCard(int indexCard) {
-
-    } //questo metodo potrebbe essere inutile, una volta che ho scelto la carta la posso tenere in view/ oppure faccio apparire un dialog per scegliere la carta
+        Platform.runLater(() -> matchController.showSecretObjectiveCard(indexCard));
+    }
 
     @Override
     public void showSecretObjectiveCardsToChoose(Integer[] objectiveCardIds) {
@@ -183,7 +185,7 @@ public class GUI extends Application implements ViewInterface {
     @Override
     public void showTableOfPlayer(String nickname) {
 
-    } //mai usata ll'interno del progetto?
+    }
 
     @Override
     public void showHiddenHand(String nickname) {
@@ -243,7 +245,7 @@ public class GUI extends Application implements ViewInterface {
 
     @Override
     public void wrongGamePhase() {
-        Platform.runLater(() ->matchController.wrongGamePhase());
+        Platform.runLater(() -> matchController.wrongGamePhase());
     }
 
     @Override
