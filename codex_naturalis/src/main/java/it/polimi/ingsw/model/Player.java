@@ -22,7 +22,7 @@ public class Player implements java.io.Serializable{
 
     /**
      * It is the constructor of Player, it set the  name and the color of the pin
-     * @param name
+     * @param name the name of the player
      */
     public Player(String name) {
         this.name = name;

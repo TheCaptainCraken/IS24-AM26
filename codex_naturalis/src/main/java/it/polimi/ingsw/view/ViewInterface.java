@@ -20,13 +20,6 @@ public interface ViewInterface {
     void stopWaiting();
     //after the choice of number of players, we just print the choice of the first player and in case generate the right number of profiles for GUI.
     void correctNumberOfPlayers(int numberOfPlayers);
-    //mi cade la connessione a me( perdo io connessione)
-    void disconnect();
-
-    // void disconnetOther(); indica che qualcun altro si è disconesso.
-
-    //void too many eople in lobby--> indica che ci sono troppi giocatori nella lobby.
-
     //refresh users. NOTE: color can be null if the player has not chosen a color yet.
     void refreshUsers(HashMap<String, Color> playersAndPins);
     //Show who has black pin and has to start.
@@ -73,6 +66,11 @@ public interface ViewInterface {
     void noPlayer();
     //error in insert number of players
     void closingLobbyError();
+
+    void stopGaming();
+
+    //mi disconntetto perchè non posso giocare
+    void disconnect();
 
     void showStartingCardChosen();
 }

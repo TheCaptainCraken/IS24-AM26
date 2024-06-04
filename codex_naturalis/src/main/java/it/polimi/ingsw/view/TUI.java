@@ -69,6 +69,11 @@ public class TUI implements ViewInterface {
         System.out.println("Lobby has been fulled with number of parameters chosen by the first player");
     }
 
+    @Override
+    public void showStartingCardChosen() {
+        //TODO
+    }
+
     /**
      * Displays the players in the lobby and their associated colors.
      *
@@ -465,6 +470,12 @@ public class TUI implements ViewInterface {
     public synchronized void closingLobbyError() {
         System.out.println("You haven't fill the lobby with the correct number of players. The lobby is closing");
     }
+
+    @Override
+    public void stopGaming() {
+
+    }
+
     /**
      * Displays to show the first player to enter the number of players.
      */
@@ -720,7 +731,7 @@ public class TUI implements ViewInterface {
                     // wait that the first player choice the number of players
                     //TODO
                     break;
-                case GAMEFLOW:
+                case GAME_FLOW:
                     // the game is started, the player can perform any action
                     defaultMenu();
                     break;

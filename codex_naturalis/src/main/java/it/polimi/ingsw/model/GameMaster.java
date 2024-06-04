@@ -129,7 +129,7 @@ public class GameMaster {
      * ObjectiveCard pick
      *
      * @param namePlayer player who sent the request
-     * @param whichCard  which of the two ObjectiveCard wants to be used
+     * @param whichCard  which of the two ObjectiveCard wants to be used (0, 1)
      */
     public void chooseObjectiveCard(String namePlayer, int whichCard)
             throws NoTurnException, WrongGamePhaseException, NoNameException {

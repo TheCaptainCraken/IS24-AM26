@@ -123,7 +123,7 @@ public class ClientSocket implements Runnable, NetworkClient {
     @Override
     public void chooseColor(Color color) {
         //wait that all players have chosen the color.
-        Controller.setPhase(Phase.WAIT_ALL_CHOOSEN_COLOR);
+        Controller.setPhase(Phase.WAIT_ALL_CHOSEN_COLOR);
         //send the message to the server.
         //Possible errors can be:
         // - the color is already taken: COLOR_UNAVAILABLE

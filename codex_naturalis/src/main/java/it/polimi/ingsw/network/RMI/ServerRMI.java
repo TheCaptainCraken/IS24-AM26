@@ -167,7 +167,7 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
         //Set the color of the player, returns true if the color was set successfully. If the color was set successfully, the game is starting.
         //Throws an exception if the color is already taken by another player.
 
-        boolean isGameStarting = Controller.getInstance().setColourAndLobbyIsReadyToStart(nickname, color);
+        boolean isGameStarting = Controller.getInstance().setColourAndGameIsReadyToStart(nickname, color);
         //Refresh the users list for all clients
         NetworkHandler.getInstance().refreshUsersBroadcast();
         if(isGameStarting){

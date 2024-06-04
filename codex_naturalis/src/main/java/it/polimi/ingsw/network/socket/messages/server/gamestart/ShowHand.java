@@ -22,6 +22,6 @@ public class ShowHand extends ServerMessage {
 
     @Override
     public void callController(Controller controller) {
-        controller.updateHand(nickname, cardsInHand);
+        controller.updateHand(cardsInHand);
     }
 }

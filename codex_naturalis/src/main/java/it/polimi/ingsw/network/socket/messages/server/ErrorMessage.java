@@ -25,7 +25,7 @@ public class ErrorMessage extends ServerMessage {
                 }else if(Controller.getPhase() == Phase.WAIT_ALL_CHOSEN_SECRET_CARD){
                     Controller.setPhase(Phase.CHOOSE_SECRET_OBJECTIVE_CARD);
                 }else{
-                    Controller.setPhase(Phase.GAMEFLOW);
+                    Controller.setPhase(Phase.GAME_FLOW);
                 }
                 controller.noTurn();
                 break;
@@ -36,7 +36,7 @@ public class ErrorMessage extends ServerMessage {
                 }else if(Controller.getPhase() == Phase.WAIT_ALL_CHOSEN_SECRET_CARD){
                     Controller.setPhase(Phase.CHOOSE_SECRET_OBJECTIVE_CARD);
                 }else{
-                    Controller.setPhase(Phase.GAMEFLOW);
+                    Controller.setPhase(Phase.GAME_FLOW);
                 }
                 controller.wrongPhase();
                 break;

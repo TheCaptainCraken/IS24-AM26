@@ -19,7 +19,7 @@ public class FirstPlayer extends ServerMessage {
     public void callController(Controller controller) {
         //TODO modificare la logica, attualemente questa carta non salva nulla.
         controller.showSecretObjectiveCard(-1);
-        Controller.setPhase(Phase.GAMEFLOW);
+        Controller.setPhase(Phase.GAME_FLOW);
         controller.showIsFirst(nickname);
     }
 }

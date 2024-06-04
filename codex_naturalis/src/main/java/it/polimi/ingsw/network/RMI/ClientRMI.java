@@ -258,7 +258,7 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
         Integer[] newHand;
         try {
             newHand = stub.drawCard(nickname, gold, onTableOrDeck);
-            controller.updateHand(nickname, newHand);
+            controller.updateHand(newHand);
         } catch (RemoteException e) {
             controller.noConnection();
         } catch (WrongGamePhaseException e) {
@@ -329,7 +329,7 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
      */
     @Override
     public void sendCommonObjectiveCards(Integer[] objectiveCardIds){
-        controller.showObjectiveCards(objectiveCardIds);
+        controller.showCommonObjectiveCards(objectiveCardIds);
     }
     /**
      * Sends the secret objective cards to the client for selection.
@@ -350,7 +350,7 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
      */
     @Override
     public void showHand(String nickname, Integer[] hand){
-        controller.updateHand(nickname, hand);
+        controller.updateHand(hand);
     }
     /**
      * Shows the player's hidden hand to the client.
@@ -426,7 +426,7 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
     @Override
     public void getIsFirstAndStartGame(String firstPlayer) {
         //set FSM to GAME_FLOW and show the first player
-        Controller.setPhase(Phase.GAMEFLOW);
+        Controller.setPhase(Phase.GAME_FLOW);
         controller.showIsFirst(firstPlayer);
     }
 

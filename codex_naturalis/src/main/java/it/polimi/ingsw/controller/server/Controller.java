@@ -14,12 +14,28 @@ import java.util.HashMap;
 /**
  * This class represents the main controller of the game.
  * It manages the game flow and interactions between server and the game model.
+ * It follows the Singleton design pattern to ensure only one instance of the controller exists.
+ *
+ * The controller is responsible for initializing the lobby, adding players, managing game flow,
+ * and handling interactions between the server and the game model.
+ *
  */
 public class Controller {
-    static String basePath = "codex_naturalis/src/main/java/it/polimi/ingsw/model/decks/";
-    private static final Controller INSTANCE = new Controller();
-
+    /**
+     * The base path of the decks of cards.
+     */
+    static String basePath = "src/main/java/it/polimi/ingsw/model/decks/";
+    /**
+     * The instance of the controller.
+     */
+    private static Controller INSTANCE = null;
+    /**
+     * The lobby of the game.
+     */
     Lobby lobby;
+    /**
+     * The GameMaster object which manages the game flow.
+     */
     GameMaster game = null;
 
     /**
@@ -27,8 +43,20 @@ public class Controller {
      * 
      * @return The instance of the controller.
      */
-    public synchronized static Controller getInstance() {
+    public static Controller getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new Controller();
+        }
         return INSTANCE;
+    }
+
+    /**
+     * Resets the instance of the controller.
+     * This method is used to reset the singleton instance of the controller.
+     * It can be used when you want to start a new game and need a fresh instance of the controller.
+     */
+    public void reset(){
+        INSTANCE = null;
     }
 
     /**
@@ -96,20 +124,6 @@ public class Controller {
     public int placeRootCard(String player, boolean side)
             throws WrongGamePhaseException, NoTurnException, NoNameException {
         return game.placeRootCard(player, side);
-    }
-
-    /**
-     * Gets the nicknames of the players in the lobby.
-     * 
-     * @return An ArrayList of the nicknames of the players.
-     */
-    public ArrayList<String> getNicknames() {
-        ArrayList<String> nicknames = new ArrayList<>();
-
-        for (Player player : lobby.getPlayers()) {
-            nicknames.add(player.getName());
-        }
-        return nicknames;
     }
 
     /**
@@ -221,22 +235,26 @@ public class Controller {
      * @throws ColorAlreadyTakenException If the color is already taken.
      * @return Whether all players have chosen a color.
      */
-    public boolean setColourAndLobbyIsReadyToStart(String name, Color colour) throws ColorAlreadyTakenException, NoNameException {
+    public boolean setColourAndGameIsReadyToStart(String name, Color colour) throws ColorAlreadyTakenException, NoNameException {
         for (Player player : lobby.getPlayers()) {
             if (player.getColor() == colour) {
                 throw new ColorAlreadyTakenException();
             }
         }
-
+        //set the color
         lobby.getPlayerFromName(name).setColour(colour);
 
+        //check if all players have chosen a color
         for (Player player : lobby.getPlayers()) {
             if (player.getColor() == null) {
                 return false;
             }
         }
 
+        //start the game
         start();
+
+        //return true if all players have chosen a color
         return true;
     }
 
@@ -267,13 +285,13 @@ public class Controller {
      * @return The id of the new card on the table, or -1 if is the deck
      */
     public int newCardOnTable(boolean gold, int onTableOrDeck) {
+        //it turns -1 since no card on table has updated, the little model client know how to manage it
         if (onTableOrDeck == -1) {
             return -1;
         } else {
             return game.getCard(gold, onTableOrDeck);
         }
     }
-
     /**
      * Checks if all root cards are placed.
      * 
@@ -287,7 +305,13 @@ public class Controller {
         }
         return true;
     }
-
+    /**
+     * Getter of the common objective cards for the game.
+     *
+     * This method is used to get the IDs of the common objective cards that are currently in play.
+     *
+     * @return An array of Integer representing the IDs of the common objective cards.
+     */
     public Integer[] getCommonObjectiveCards() {
         Integer[] objectiveCards = new Integer[2];
         objectiveCards[0] = game.getObjectiveCard(0).getId();
@@ -295,7 +319,16 @@ public class Controller {
 
         return objectiveCards;
     }
-
+    /**
+     * Retrieves the secret objective cards for a specific player to choose from.
+     *
+     * This method is used to get the IDs of the secret objective cards that the specified player can choose from.
+     * These cards are individual objectives that only the specific player can aim to achieve.
+     *
+     * @param name The name of the player.
+     * @throws NoNameException If the player's name does not exist.
+     * @return An array of Integer representing the IDs of the secret objective cards.
+     */
     public Integer[] getSecretObjectiveCardsToChoose(String name) throws NoNameException {
         Integer[] secretObjectiveCards = new Integer[2];
         int position = game.getOrderPlayer(name);
@@ -304,7 +337,6 @@ public class Controller {
 
         return secretObjectiveCards;
     }
-
     /**
      * Gets the head of the deck.
      * 
@@ -314,7 +346,6 @@ public class Controller {
     public Kingdom getHeadDeck(boolean gold) {
         return game.getHeadDeck(gold);
     }
-
     /**
      * Checks if all players have chosen the secret objective card.
      * 
@@ -414,7 +445,6 @@ public class Controller {
     public String getFirstPlayer() {
         return lobby.getPlayers()[0].getName();
     }
-
     /**
      * Checks if the lobby is locked.
      * 
@@ -423,28 +453,65 @@ public class Controller {
     public boolean isLobbyLocked() {
         return lobby.getLock();
     }
-
+    /**
+     * Retrieves the resource card at the specified position.
+     *
+     * @param position The position of the resource card.
+     * @return The ID of the resource card at the specified position.
+     */
     public Integer getResourceCards(int position) {
         return game.getResourceCard(position).getId();
     }
-
+    /**
+     * Retrieves the gold card at the specified position.
+     *
+     * @param position The position of the gold card.
+     * @return The ID of the gold card at the specified position.
+     */
     public Integer getGoldCard(int position) {
         return game.getGoldCard(position).getId();
     }
-
+    /**
+     * Checks if the player with the given nickname is admitted.
+     *
+     * @param nickname The nickname of the player.
+     * @return true if the player is admitted, false otherwise.
+     */
     public boolean isAdmitted(String nickname) {
         return lobby.isAdmitted(nickname);
     }
-
+    /**
+     * Checks if the lobby is ready.
+     *
+     * @return true if the lobby is ready, false otherwise.
+     */
     public boolean lobbyIsReady(){
         return lobby.isReady();
     }
-
+    /**
+     * Retrieves the current turn of the game.
+     *
+     * @return The current turn of the game.
+     */
     public int getTurn(){
         return game.getTurn();
     }
-
+    /**
+     * Retrieves the ID of the secret objective card of the player with the given nickname.
+     *
+     * @param nickname The nickname of the player.
+     * @throws NoNameException If the player's name does not exist.
+     * @return The ID of the secret objective card of the player.
+     */
     public int getSecretObjectiveCard(String nickname) throws NoNameException {
         return lobby.getPlayerFromName(nickname).getSecretObjective().getId();
+    }
+    /**
+     * Retrieves the lobby of the game.
+     *
+     * @return The lobby of the game.
+     */
+    public Lobby getLobby() {
+        return lobby;
     }
 }
