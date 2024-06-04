@@ -73,4 +73,6 @@ public interface ViewInterface {
     void noPlayer();
     //error in insert number of players
     void closingLobbyError();
+
+    void showStartingCardChosen();
 }

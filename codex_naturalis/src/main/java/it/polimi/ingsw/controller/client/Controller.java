@@ -1,10 +1,8 @@
 package it.polimi.ingsw.controller.client;
 
-import it.polimi.ingsw.model.Color;
-import it.polimi.ingsw.model.GameState;
-import it.polimi.ingsw.model.Kingdom;
-import it.polimi.ingsw.model.Sign;
+import it.polimi.ingsw.model.*;
 
+import it.polimi.ingsw.model.Color;
 import it.polimi.ingsw.network.RMI.ClientRMI;
 import it.polimi.ingsw.network.socket.ClientSocket;
 import it.polimi.ingsw.network.NetworkClient;
@@ -186,7 +184,17 @@ public class Controller {
         model.updateUsers(playersAndPins);
         view.refreshUsers(playersAndPins);
     }
-
+    /**
+     * Updates the cards on the table in the game model and triggers the view to display the common table.
+     *
+     * This method is called when the cards on the table change in the game.
+     * It updates the game model with the new cards on the table and then triggers the view to display the common table.
+     *
+     * @param resourceCards An array of integers representing the IDs of the resource cards on the table.
+     * @param goldCard An array of integers representing the IDs of the gold cards on the table.
+     * @param resourceCardOnDeck A Kingdom object representing the resource card on the deck.
+     * @param goldCardOnDeck A Kingdom object representing the gold card on the deck.
+     */
     public void cardsOnTable(Integer[] resourceCards, Integer[] goldCard, Kingdom resourceCardOnDeck, Kingdom goldCardOnDeck) {
         model.updateCommonTable(resourceCards, goldCard, resourceCardOnDeck, goldCardOnDeck);
         view.showCommonTable();
@@ -299,6 +307,25 @@ public class Controller {
      * @param turn The turn number when the card was placed.
      */
     public void updatePlaceCard(String nickname, int id, Point position, boolean side, int turn) {
+        //if the card is the starting card of the given client, show a message to inform the player.
+        if(position.x == 0 && position.y == 0 && nickname.equals(Controller.nickname))
+        {
+            model.updatePlaceCard(nickname, id, position, side, turn);
+            view.showStartingCardChosen();
+        }
+        //set the playedCardToNull, if the cards is correctly placed and is the owner of it.
+        if(nickname.equals(Controller.nickname)){
+            for(int i = 0; i < 3; i++){
+                if(model.getCardInHand(i) == id){
+                    //if is the card placed is the same card in the hand, set the card in hand to null.
+                    model.setCardInHand(i, null);
+                    break;
+                }
+            }
+            //notify the scene that the hand has been updated. The scene will update the view.
+            view.showHand();
+        }
+
         model.updatePlaceCard(nickname, id, position, side, turn);
         //notify the scene that a card has been placed. The scene will update the view.
         view.showTableOfPlayer(nickname);

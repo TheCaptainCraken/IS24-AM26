@@ -140,6 +140,14 @@ public class LittleModel {
     public Integer[] getHand() {
         return myCards;
     }
+
+    public Integer getCardInHand(int index){
+        return myCards[index];
+    }
+
+    public void setCardInHand(int index, Integer cardId){
+        myCards[index] = cardId;
+    }
     /**
      * Updates the hidden hand of the specified player.
      *
