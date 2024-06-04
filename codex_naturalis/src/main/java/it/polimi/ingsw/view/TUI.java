@@ -122,7 +122,6 @@ public class TUI implements ViewInterface {
             System.out.println();
         }
     }
-
     /**
      * Displays the common table of cards to the player. 2 resource cards, 2 gold card and the cards on the deck.
      *
