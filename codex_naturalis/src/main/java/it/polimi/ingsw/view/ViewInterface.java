@@ -20,8 +20,13 @@ public interface ViewInterface {
     void stopWaiting();
     //after the choice of number of players, we just print the choice of the first player and in case generate the right number of profiles for GUI.
     void correctNumberOfPlayers(int numberOfPlayers);
-    //you have been disconnected since you have been inactive for too long, or the lobby is already full.
+    //mi cade la connessione a me( perdo io connessione)
     void disconnect();
+
+    // void disconnetOther(); indica che qualcun altro si è disconesso.
+
+    //void too many eople in lobby--> indica che ci sono troppi giocatori nella lobby.
+
     //refresh users. NOTE: color can be null if the player has not chosen a color yet.
     void refreshUsers(HashMap<String, Color> playersAndPins);
     //Show who has black pin and has to start.
@@ -51,9 +56,9 @@ public interface ViewInterface {
     //TODO Should be done also for the TUI
     //Show the cards placed of the player on the table.
     void showTableOfPlayer(String nickname);
-    //show the new hand of another player
+    //show the new hand of another player. NULL
     void showHiddenHand(String nickname);
-    //this is your private Hand. You can take this information from the model.
+    //this is your private Hand. You can take this information from the model. NULL
     void showHand();
 
     //Report Exceptions

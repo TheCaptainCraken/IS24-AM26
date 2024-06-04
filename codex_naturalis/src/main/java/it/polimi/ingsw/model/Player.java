@@ -10,7 +10,7 @@ import java.lang.Math;
  * At the start phase, the game master should set rootCard, SecretObjective and the hand of the player(a fixed array of 3 cards).
  * At the beginning of the game, the game master set rootCard, secretObjective and the hand.
  */
-public class Player {
+public class Player implements java.io.Serializable{
     private final String name;
     private int points;
     private int objectivePoints;
