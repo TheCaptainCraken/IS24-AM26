@@ -76,4 +76,5 @@ public interface ViewInterface {
     void closingLobbyError();
 
     void showStartingCardChosen();
+    void stopGaming();
 }

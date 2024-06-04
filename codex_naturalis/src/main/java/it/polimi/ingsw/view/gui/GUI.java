@@ -30,7 +30,7 @@ public class GUI extends Application implements ViewInterface {
     private static final Object lock = new Object();
 
 
-    private  LittleModel model; //TODO va final una volta finita implementazione
+    private LittleModel model; //TODO va final una volta finita implementazione
     private FXMLLoader fxmlLoader;
     public static LoginController loginController;
     public static MatchController matchController;
@@ -122,7 +122,7 @@ public class GUI extends Application implements ViewInterface {
     public void showCommonTable() {
         if(!gameAlreadyStarted){
             gameAlreadyStarted = true;
-            ArrayList<String> players = new ArrayList<>(model.getPlayersAndCardsNumber().keySet());
+            ArrayList<String> players = new ArrayList<>(model.getPoints().keySet());
             HashMap<String,Parent> playerBoards = new HashMap<>();
             for (String player : players) {
                 if(!player.equals(ViewSubmissions.getInstance().getNickname())){
@@ -250,12 +250,23 @@ public class GUI extends Application implements ViewInterface {
 
     @Override
     public void noPlayer() {
-        //????
+        //???? errore che non dovrebbe mai verificarsi. Però da alucne parti è chiamato.
+        //stampa un messagggio semplice. Tipo non conosco il giocatore
     }
 
     @Override
     public void closingLobbyError() {
 
+    }
+
+    @Override
+    public void showStartingCardChosen() {
+
+    }
+
+    @Override
+    public void stopGaming() {
+        //TODO
     }
 
     @Override
