@@ -1,8 +1,7 @@
 package it.polimi.ingsw.view.gui;
 
+import it.polimi.ingsw.model.*;
 import it.polimi.ingsw.model.Color;
-import it.polimi.ingsw.model.GameState;
-import it.polimi.ingsw.model.Kingdom;
 import it.polimi.ingsw.view.CardClient;
 import it.polimi.ingsw.view.LittleModel;
 import it.polimi.ingsw.view.ViewSubmissions;
@@ -10,24 +9,22 @@ import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.*;
+import java.util.concurrent.Flow;
 
 /**
 * Controller responsible for the handling of the GUI components that are used during the Playing Phase of the game*/
@@ -38,12 +35,21 @@ public class MatchController {
 
     private final int X = 118;
     private final int Y = 60;
+    private final Image defaultCard = new Image("defaultCard.png");
+    private final Image mushroom = new Image("mushroom.png");
+    private final Image leaf = new Image("leaf.png");
+    private final Image wolf = new Image("wolf.png");
+    private final Image insect= new Image("insect.png");
+    private final Image inkwell = new Image("inkwell.png");
+    private final Image scroll = new Image("scroll.png");
+    private final Image quill = new Image("quill.png");
     private ImageView lastPlayed,triedToPlay,lastDeleted;
     private ArrayList<Label> labels;
+    private ArrayList<ImageView> hand;
     private boolean root_side = true;
     private HashMap<String, Parent> playerBoards;
     private Dialog<String> dialog;
-
+    private Scene scene;
 
     LittleModel model;
     Stage stage;
@@ -61,11 +67,16 @@ public class MatchController {
     @FXML
     Button debug;
 
-    //TODO Refreshare mappe del client del giocatore + quelle degli altri giocatori, pescare le carte, refreshare i punteggi e settare la mano iniziale
+    //TODO  capire come poter fare sparire i bottoni per posizionare le carte + gestire endgame + completare otherplayerView
 
     public void setup(){
+        hand = new ArrayList<>();
+        hand.add(hand1);
+        hand.add(hand2);
+        hand.add(hand3);
+
         labels = new ArrayList<>();
-        for(String s: model.getPlayersAndCardsNumber().keySet()){
+        for(String s: model.getTable().keySet()){
             ImageView img1 = new ImageView();
             Label l = new Label(s);
             Label l1 = new Label("0");
@@ -78,32 +89,32 @@ public class MatchController {
             FlowPane resources = new FlowPane();
             //Puo valere la pena di inserire ogni coppia (IconaRisorsa,Numero) in hbox dedicata per ordine
             for(int i = 0; i < 7; i++){
-                ImageView img = new ImageView();
+                ImageView img = new ImageView(); //figlo 0 di FlowPane
                 switch(i){
                     case 0:
-                        img.setImage(new Image("mushroom.png"));
+                        img.setImage(mushroom);
                         break;
                     case 1:
-                        img.setImage(new Image("leaf.png"));
+                        img.setImage(leaf);
                         break;
                     case 2:
-                        img.setImage(new Image("wolf.png"));
+                        img.setImage(wolf);
                         break;
                     case 3:
-                        img.setImage(new Image("insect.png"));
+                        img.setImage(insect);
                         break;
                     case 4:
-                        img.setImage(new Image("quill.png"));
+                        img.setImage(quill);
                         break;
                     case 5:
-                        img.setImage(new Image("scroll.png"));
+                        img.setImage(scroll);
                         break;
                     case 6:
-                        img.setImage(new Image("inkwell.png"));
+                        img.setImage(inkwell);
                         break;
 
                 }
-                Label l2 = new Label("0");
+                Label l2 = new Label("0"); //Figlio 1 di FlowPane
                 resources.getChildren().add(img);
                 resources.getChildren().add(l2);
             }
@@ -114,7 +125,7 @@ public class MatchController {
             playerContainer.getChildren().add(container);
         }
         int i = 0;
-        for(String s: model.getPlayersAndCardsNumber().keySet()){
+        for(String s: model.getTable().keySet()){
             labels.get(i).setText(s);
             if(!s.equals(ViewSubmissions.getInstance().getNickname())){
                 int finalI = i;
@@ -150,7 +161,7 @@ public class MatchController {
             res2.setImage(new Image("frontCard"+resourceCards[1]+".png"));
             res2.setOnMouseClicked(event -> setupDeckActions(false,1));
         } else {
-            res2.setImage(new Image("defaultCard.png"));
+            res2.setImage(defaultCard);
             res2.setOnMouseClicked(null);
         }
         Integer[] goldCard = model.getGoldCards();
@@ -159,7 +170,7 @@ public class MatchController {
             gold1.setImage(new Image("frontCard" + goldCard[0] + ".png"));
             gold1.setOnMouseClicked(event -> setupDeckActions(true,0));
         } else {
-            gold1.setImage(new Image("defaultCard.png"));
+            gold1.setImage(defaultCard);
             gold1.setOnMouseClicked(null);
         }
 
@@ -167,7 +178,7 @@ public class MatchController {
             gold2.setImage(new Image("frontCard" + goldCard[1] + ".png"));
             gold2.setOnMouseClicked(event -> setupDeckActions(true,1));
         } else {
-            gold2.setImage(new Image("defaultCard.png"));
+            gold2.setImage(defaultCard);
             gold2.setOnMouseClicked(null);
         }
 
@@ -175,7 +186,7 @@ public class MatchController {
             res_deck.setImage(KingdomToCard(model.getHeadDeckResource(),false));
             res_deck.setOnMouseClicked(event -> setupDeckActions(false,-1));
         } else {
-            res_deck.setImage(new Image("defaultCard.png"));
+            res_deck.setImage(defaultCard);
             res_deck.setOnMouseClicked(null);
         }
 
@@ -183,7 +194,7 @@ public class MatchController {
             gold_deck.setImage(KingdomToCard(model.getHeadDeckGold(),true));
             gold_deck.setOnMouseClicked(event -> setupDeckActions(true,-1));
         } else {
-            gold_deck.setImage(new Image("defaultCard.png"));
+            gold_deck.setImage(defaultCard);
             gold_deck.setOnMouseClicked(null);
         }
     }
@@ -205,20 +216,22 @@ public class MatchController {
         container.setSpacing(15);
         container.setAlignment(Pos.CENTER);
         b1.setOnMouseClicked(event -> {
-            status.setText("Please wait for the other players...");
-            statusMenu.getChildren().removeIf(node -> node instanceof HBox);
-            root.setOnMouseClicked(event1-> revealSpots(root.getTranslateX(),root.getTranslateY()));
             root.setImage(loadStartingCardResource(id,true));
             ViewSubmissions.getInstance().chooseStartingCard(true);
         });
         b2.setOnMouseClicked(event -> {
-            status.setText("Please wait for the other players...");
-            statusMenu.getChildren().removeIf(node -> node instanceof HBox);
-            root.setOnMouseClicked(event1 -> revealSpots(root.getTranslateX(),root.getTranslateY()));
             root.setImage(loadStartingCardResource(id,false));
             ViewSubmissions.getInstance().chooseStartingCard(false);
         });
         statusMenu.getChildren().add(container);
+    }
+
+    public void showStartingCard(){
+        status.setText("Please wait for the other players...");
+        statusMenu.getChildren().removeIf(node -> node instanceof HBox);
+        root.setOnMouseClicked(event -> {
+            revealSpots(root.getTranslateX(),root.getTranslateY());
+        });
     }
 
     public void showCommonObjectives(Integer[] objectiveCardIds){
@@ -255,6 +268,96 @@ public class MatchController {
         }
     }
 
+    public void showHand(){
+        Integer[] cards = model.getHand();
+        int i = 0;
+        for(ImageView v: hand){
+            if(cards[i] != null){
+                v.setImage(new Image("frontCard"+cards[i]+".png"));
+            } else {
+                v.setImage(defaultCard);
+            }
+            i++;
+        }
+
+    }
+
+    public void showPoints(){
+        for(String s: model.getPoints().keySet()){
+            for(Label l: labels){
+                if(l.getText().equals(s)){
+                    Node n = l.getParent();
+                    Label label = (Label) ((HBox) n).getChildren().get(2);
+                    label.setText(model.getPoints().get(s).toString());
+                }
+            }
+        }
+    }
+    public void showResourcesPlayer(){
+        for(String s: model.getResources().keySet()){
+            for(Label l: labels){
+                if(l.getText().equals(s)){
+                    Node box = l.getParent().getParent();
+                    Node flow = ((VBox)box).getChildren().get(1);
+                    Sign sign = null;
+                    for(Node n: ((FlowPane)flow).getChildren()){
+                        if(n instanceof ImageView){
+                            Image image = ((ImageView) n).getImage();
+                            if (image.equals(mushroom)) {
+                                sign = Sign.MUSHROOM;
+                            } else if (image.equals(leaf)) {
+                                sign = Sign.LEAF;
+                            } else if (image.equals(wolf)) {
+                                sign = Sign.WOLF;
+                            } else if (image.equals(insect)) {
+                                sign = Sign.BUTTERFLY;
+                            } else if (image.equals(quill)) {
+                                sign = Sign.QUILL;
+                            } else if (image.equals(scroll)) {
+                                sign = Sign.SCROLL;
+                            } else if (image.equals(inkwell)) {
+                                sign = Sign.INKWELL;
+                            } else {
+                                sign = null;
+                            }
+                        }
+                        if(n instanceof Label){
+                            if(sign != null){
+                                ((Label)n).setText(model.getResources().get(s).get(sign).toString());
+                            } else{
+                                System.out.println("Sign not found");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public void showTableOfPlayer(String nickname){
+        ArrayList<CardClient> cards = model.getListOfCards(nickname);
+        Optional<CardClient> c = cards.stream().max(Comparator.comparing(CardClient::getTurnOfPositioning));
+        if(c.isEmpty()){
+            System.out.println("No card found");
+            return;
+        }
+        CardClient latestCard = c.get();
+        ImageView img = setCard(latestCard);
+        if(ViewSubmissions.getInstance().getNickname().equals(nickname)){
+            img.setOnMouseClicked(event -> revealSpots(img.getTranslateX(),img.getTranslateY()));
+            board.getChildren().add(img);
+        }
+
+        Parent parent = playerBoards.get(nickname);
+        SplitPane s = (SplitPane) parent.getChildrenUnmodifiable().get(0);
+        ScrollPane scroll = (ScrollPane) s.getItems().get(1);
+        AnchorPane pane = (AnchorPane) scroll.getContent();
+        StackPane area = (StackPane) pane.getChildren().get(0);
+
+        area.getChildren().add(img);
+        //se sta roba funziona sono dio
+    }
+
     public void showIsFirst(String name){
         for(Label l: labels){
             Node n = l.getParent();
@@ -287,7 +390,7 @@ public class MatchController {
             default:
                 s = "Unknown Phase";
         }
-        status.setText("It is "+currentPlayer+"'s turn.\n"+s);
+        status.setText("It is "+currentPlayer+"'s turn.\n"+s+"!");
     }
 
     public void noTurn(){
@@ -338,7 +441,7 @@ public class MatchController {
         dialog.show();
     }
 
-    public void handleDebug(){
+    /*public void handleDebug(){
         root.setImage(new Image("frontCard97.png"));
         ImageView img = new ImageView(new Image("frontCard23.png"));
         img.setTranslateX(X);
@@ -347,18 +450,8 @@ public class MatchController {
         img.setFitHeight(100);
         board.getChildren().add(img);
         root.setOnMouseClicked(event -> revealSpots(root.getX(),root.getY()));
-    }
+    }*/
 
-    public void setCard(CardClient newCard){
-        ImageView card = findResourceOfCard(newCard);
-        card.setFitHeight(100);
-        card.setFitWidth(150);
-        Pair<Double,Double> pos = loadPosition(newCard.getPosition().getX(),newCard.getPosition().getY());
-        card.setTranslateX(pos.getKey());
-        card.setTranslateY(pos.getValue());
-        card.setOnMouseClicked(event -> {revealSpots(card.getTranslateX(),card.getTranslateY());});
-        board.getChildren().add(card);
-    }
 
     //UTILITY FUNCTIONS
 
@@ -371,6 +464,9 @@ public class MatchController {
     }
     public void setModel(LittleModel model) {
         this.model = model;
+    }
+    public void setScene(Scene scene) {
+        this.scene = scene;
     }
 
     private Pair<Double,Double> loadPosition(double x, double y){
@@ -402,7 +498,7 @@ public class MatchController {
         Image img = null;
         int id = newCard.getId();
         if(newCard.getSide()){
-            img = new Image("frontCard"+newCard.getId()+".png");
+            img = new Image("frontCard"+id+".png");
         } else {
             if(id > 16 && id < 27){
                 img = new Image("fungi_res_back.png");
@@ -420,9 +516,22 @@ public class MatchController {
                 img = new Image("animal_gold_back.png");
             } else if(id > 86 && id < 97) {
                 img = new Image("insect_gold_back.png");
+            } else if(id > 96 && id < 103){
+                img = new Image("backCard"+id+".png");
+            } else{
+                System.out.println("Card not found");
             }
         }
         return new ImageView(img);
+    }
+    public ImageView setCard(CardClient newCard){
+        ImageView card = findResourceOfCard(newCard);
+        card.setFitHeight(100);
+        card.setFitWidth(150);
+        Pair<Double,Double> pos = loadPosition(newCard.getPosition().getX(),newCard.getPosition().getY());
+        card.setTranslateX(pos.getKey());
+        card.setTranslateY(pos.getValue());
+        return card;
     }
 
     private Image KingdomToCard(Kingdom kingdom,Boolean isGold){
@@ -502,15 +611,16 @@ public class MatchController {
                     pos = loadPosition(0,-1);
                     break;
             }
+            Pair<Double,Double> p = new Pair<>(pos.getKey() + x,pos.getValue() + y);
             for(Node node: board.getChildren()){
                 ImageView card = (ImageView) node;
-                if(card.getTranslateX() == pos.getKey() && card.getTranslateY() == pos.getValue()){
+                if(card.getTranslateX() == p.getKey() && card.getTranslateY() == p.getValue()){
                     isOccupied = true;
                     break;
                 }
             }
             if(!isOccupied){
-                setupButton(b,pos.getKey(),pos.getValue());
+                setupButton(b,p.getKey(),p.getValue());
                 trueButtons.add(b);
             }
             i++;
@@ -518,6 +628,7 @@ public class MatchController {
         for(Button b: trueButtons){
             b.setOnMouseClicked(event -> handlePositionRequest(b));
         }
+        //scene.setOnMouseClicked(event1 -> board.getChildren().removeIf(item -> item instanceof Button ));
         board.getChildren().addAll(trueButtons);
     }
 
@@ -535,17 +646,13 @@ public class MatchController {
     }
 
     public void handlePositionRequest(Button b){
-        ArrayList<ImageView> hand = new ArrayList<>();
-        hand.add(hand1);
-        hand.add(hand2);
-        hand.add(hand3);
         Point pos = inversePosition(b.getTranslateX(),b.getTranslateY());
         int i = 0;
         for(ImageView card: hand){
             int finalI = i;
             card.setOnMouseClicked(event -> {
                 board.getChildren().removeIf(item -> item instanceof Button && !item.equals(b));
-                lastPlayed = card;
+                event.consume();
                 placeCardRequest(b,finalI,pos);
             });
 

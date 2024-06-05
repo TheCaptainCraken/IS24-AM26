@@ -45,10 +45,12 @@ public class GUI extends Application implements ViewInterface {
     }
     @Override
     public void start(Stage stage) throws IOException {
+
         synchronized (lock) {
             instance = this;
             lock.notify();
         }
+
         root = loadFXML("loginView");
         loginController =(LoginController) fxmlLoader.getController();
         match = loadFXML("matchView");
@@ -122,7 +124,7 @@ public class GUI extends Application implements ViewInterface {
     public void showCommonTable() {
         if(!gameAlreadyStarted){
             gameAlreadyStarted = true;
-            ArrayList<String> players = new ArrayList<>(model.getPoints().keySet());
+            ArrayList<String> players = new ArrayList<>(model.getTable().keySet());
             HashMap<String,Parent> playerBoards = new HashMap<>();
             for (String player : players) {
                 if(!player.equals(ViewSubmissions.getInstance().getNickname())){
@@ -134,6 +136,7 @@ public class GUI extends Application implements ViewInterface {
             matchController.setPlayerBoards(playerBoards);
             matchController.setStage(primaryStage);
             matchController.setModel(model);
+            matchController.setScene(scene);
             Platform.runLater(() -> matchController.setup());
             Platform.runLater(()->matchController.showCommonTable());
         } else {
@@ -169,7 +172,7 @@ public class GUI extends Application implements ViewInterface {
 
     @Override
     public void showResourcesPlayer() {
-
+        Platform.runLater(() -> matchController.showResourcesPlayer());
     }
 
     @Override
@@ -184,7 +187,7 @@ public class GUI extends Application implements ViewInterface {
 
     @Override
     public void showTableOfPlayer(String nickname) {
-
+        Platform.runLater(() -> matchController.showTableOfPlayer(nickname));
     }
 
     @Override
@@ -194,17 +197,17 @@ public class GUI extends Application implements ViewInterface {
 
     @Override
     public void showHand() {
-
+        Platform.runLater(() -> matchController.showHand());
     }
 
     @Override
     public void showResourcesAllPlayers() {
-
+        //questo metodo è utile effettivamente?
     }
 
     @Override
     public void showPoints() {
-
+        Platform.runLater(() -> matchController.showPoints());
     }
 
 
@@ -261,7 +264,7 @@ public class GUI extends Application implements ViewInterface {
 
     @Override
     public void showStartingCardChosen() {
-
+        Platform.runLater(() -> matchController.showStartingCard());
     }
 
     @Override

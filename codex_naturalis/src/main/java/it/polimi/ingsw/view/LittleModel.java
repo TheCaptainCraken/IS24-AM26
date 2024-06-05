@@ -617,7 +617,7 @@ public class LittleModel {
      * @param nickname The nickname of the player whose cards are to be retrieved.
      * @return An ArrayList of CardClient objects representing the cards linked to the card with the given nickname.
      */
-    public ArrayList<CardClient> getListOfCardForTui(String nickname){
+    public ArrayList<CardClient> getListOfCards(String nickname){
         CardClient card = table.get(nickname);
         return getAllCards(card);
     }
@@ -661,5 +661,8 @@ public class LittleModel {
         }
     }
 
+    public HashMap<String, CardClient> getTable() {
+        return table;
+    }
 }
 

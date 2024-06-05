@@ -9,6 +9,7 @@ import it.polimi.ingsw.network.NetworkClient;
 import it.polimi.ingsw.network.RMI.RMIClientInterface;
 import it.polimi.ingsw.view.*;
 import javafx.util.Pair;
+import it.polimi.ingsw.view.gui.GUI;
 
 import java.awt.*;
 import java.io.IOException;
@@ -18,6 +19,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import static javafx.application.Application.launch;
+
 /**
  * The Controller class is responsible for managing the game flow and interactions between the model and the view.
  * It handles user inputs, updates the model, and triggers the view to update its display.
@@ -94,14 +98,21 @@ public class Controller {
         Controller.phase = phase;
     }
 
-    public void setView(String typeOfView){
+    public void setView(String typeOfView) throws InterruptedException {
         model = new LittleModel();
         if(typeOfView.equals("TUI")){
             this.view = new TUI(model, this);
             view.start();
         }else if(typeOfView.equals("GUI")){
-            //TODO
-            //view = new GUI();
+            new Thread(() -> {
+                launch(GUI.class);
+            }).start();
+
+            view = GUI.getInstance();
+            ((GUI) view).setModel(model);
+            if(view != null) {
+                System.out.println("GUI started");
+            }
         }
     }
 
@@ -316,7 +327,7 @@ public class Controller {
         //set the playedCardToNull, if the cards is correctly placed and is the owner of it.
         if(nickname.equals(Controller.nickname)){
             for(int i = 0; i < 3; i++){
-                if(model.getCardInHand(i) == id){
+                if(model.getCardInHand(i) == id){ //TODO nel momento in cui piazzo la starting card nella gui salta una NUllPointerException, how?
                     //if is the card placed is the same card in the hand, set the card in hand to null.
                     model.setCardInHand(i, null);
                     break;

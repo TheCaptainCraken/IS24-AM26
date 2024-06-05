@@ -465,6 +465,17 @@ public class TUI implements ViewInterface {
     public synchronized void closingLobbyError() {
         System.out.println("You haven't fill the lobby with the correct number of players. The lobby is closing");
     }
+
+    @Override
+    public void showStartingCardChosen() {
+        //TODO
+    }
+
+    @Override
+    public void stopGaming() {
+        //TODO
+    }
+
     /**
      * Displays to show the first player to enter the number of players.
      */
@@ -777,7 +788,7 @@ public class TUI implements ViewInterface {
      * @param nickname The nickname of the player whose table area is to be printed.
      */
     private synchronized void printTableAreaOfPlayer(String nickname) {
-        ArrayList<CardClient> cards = model.getListOfCardForTui(nickname);
+        ArrayList<CardClient> cards = model.getListOfCards(nickname);
         ArrayList<String[]> cardsToPrint = new ArrayList<>();
 
         //order the cards by level at first, secondly by x. The level is the sum of x and y.

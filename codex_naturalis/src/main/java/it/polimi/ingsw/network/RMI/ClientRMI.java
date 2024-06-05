@@ -389,9 +389,10 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
     @Override
     public void placeCard(String nickname, int id, Point position, boolean side, int turn ,HashMap<Sign, Integer> resources, int points){
         //update the card on the table
-        controller.updatePlaceCard(nickname, id, position, side, turn);
         controller.updateResources(nickname, resources);
         controller.updateScore(nickname, points);
+        controller.updatePlaceCard(nickname, id, position, side, turn);
+
     }
     /**
      * Moves a card on the table.
