@@ -24,7 +24,7 @@ public class ReceivedChatMessage extends ServerMessage {
     }
 
     /**
-     * @param controller
+     * @param controller The controller that will handle the message.
      */
     @Override
     public void callController(Controller controller) {

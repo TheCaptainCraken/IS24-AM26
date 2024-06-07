@@ -43,13 +43,6 @@ public interface RMIClientInterface extends Remote {
     void sendInfoOnTable(Integer[] resourceCards, Integer[] goldCard, Kingdom resourceCardOnDeck,
             Kingdom goldCardOnDeck) throws RemoteException;
 
-    /**
-     * This method is used to deliver a message to the clients.
-     * @param sender
-     * @param message
-     * @throws RemoteException
-     */
-    void receiveMessage(String sender, String message) throws RemoteException;
 
     /**
      * This method is used to show the starting card to the clients.
@@ -167,6 +160,14 @@ public interface RMIClientInterface extends Remote {
     void getIsFirstAndStartGame(String firstPlayer) throws RemoteException;
 
     /**
+     * This method is used to deliver a message to the clients.
+     * @param sender The sender of the message.
+     * @param message The message.
+     * @throws RemoteException throws a RemoteException if there is a problem with the connection.
+     */
+    void receiveMessage(String sender, String message) throws RemoteException;
+
+    /**
      * This method sends to all the stopWaiting signal. When this call arrives, the
      * client knows that it can be in CHOOSE COLOR PHASE.
      *
@@ -175,9 +176,12 @@ public interface RMIClientInterface extends Remote {
      */
     void stopWaiting() throws RemoteException;
 
+    //TODO
     void disconnect() throws RemoteException;
 
+    //TODO
     void stopGaming() throws RemoteException;
 
+    //TODO
     void isConnected() throws RemoteException;
 }

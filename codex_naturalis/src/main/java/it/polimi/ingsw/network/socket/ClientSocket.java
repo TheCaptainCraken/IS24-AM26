@@ -244,7 +244,7 @@ public class ClientSocket implements Runnable, NetworkClient{
             ServerMessage serverMessage = receiveMessage();
             handleResponse(serverMessage);
         }
-    } //TODO implementazione
+    }
 
     /**
      * Handles the response from the server.
@@ -278,13 +278,12 @@ public class ClientSocket implements Runnable, NetworkClient{
     }
 
     public void disconnect(){
-        //TODO disconnessioni
         try {
             inputStream.close();
             objInputStream.close();
             objOutputStream.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            controller.noConnection();
         }
     }
 
@@ -300,8 +299,7 @@ public class ClientSocket implements Runnable, NetworkClient{
         try{
             objOutputStream.writeObject(message);
         } catch (IOException e) {
-            //TODO
-            throw new RuntimeException(e);
+            controller.noConnection();
         }
     }
 }

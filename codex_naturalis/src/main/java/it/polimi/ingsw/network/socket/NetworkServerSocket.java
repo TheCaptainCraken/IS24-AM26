@@ -174,7 +174,7 @@ public class NetworkServerSocket implements NetworkPlug {
         sendBroadCastMessage(new PlayersAndColorPins(playersAndPins));
     }
 
-
+    //TODO javadoc
     @Override
     public void sendingChatMessage(String message, String sender) {
         ArrayList<String> receivers = new ArrayList<>();
@@ -184,13 +184,12 @@ public class NetworkServerSocket implements NetworkPlug {
             }
         }
         if(receivers.isEmpty()){
+            //the message is sent to all the clients
             sendBroadCastMessage(new ReceivedChatMessage(sender, message));
         }else{
             for (String nickname : connections.keySet()) {
-                if(receivers.contains(nickname)){//TODO thread should be done right?
-                    new Thread(() -> {
+                if(receivers.contains(nickname)){
                         connections.get(nickname).sendChatMessageIfPlayer(sender, message);
-                    }).start();
                 }
             }
         }

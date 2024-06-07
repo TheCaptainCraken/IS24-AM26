@@ -188,6 +188,7 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
         }
     }
 
+    //TODO javadoc
     @Override
     public void sendChatMessage(String message, String sender) throws RemoteException {
         NetworkHandler.getInstance().sendChatMessageBroadcast(sender, message);
@@ -378,10 +379,13 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
     }
 
     /**
-     * It sends a message to all the clients, if they are tagged in the message like in this format "@player1 hi!", the message will be sent only to the player with "player1" nickname.
-     * Nickname are searched from the connection so all the given fake nicknames won't be sent and from other connections will be sent from that connection.
-     * @param sender nickname of the sender
-     * @param message message to be sent
+     * It sends a message to all the clients, if they are tagged in the message like in this format "@player1 hi!",
+     * the message will be sent only to the player with "player1" nickname.
+     * Nickname are searched from the connection so all the given fake nicknames won't be sent
+     * and from other connections will be sent from that connection.
+     *
+     * @param sender    nickname of the sender
+     * @param message   message to be sent
      */
     public void sendingChatMessage(String sender, String message){
         ArrayList<String> receivers = new ArrayList<>();
@@ -391,12 +395,14 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
             }
         }
         for (String nickname : connections.keySet()) {
+            //TODO reciverrsIsempty che significa?
             if(receivers.contains(nickname) || receivers.isEmpty()){
                 new Thread(() -> {
                     try {
                         connections.get(nickname).receiveMessage(sender, message);
                     } catch (RemoteException e) {
-                        // TODO
+                        connections.remove(nickname);
+                        NetworkHandler.getInstance().disconnectBroadcast();
                     }
                 }).start();
             }

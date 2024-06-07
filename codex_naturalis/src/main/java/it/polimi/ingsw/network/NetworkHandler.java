@@ -15,7 +15,7 @@ import java.util.HashMap;
  * It manages the connections with the clients and the broadcast of the
  * messages.
  * In particular protocol connection, when a message should be broadcast, the
- * message is sent to all different connection protocol.
+ * message is sent to all different connection protocols.
  * Each protocol will send the message to all the clients connected to it. Each
  * protocol has a different way to send the message to the clients, but all
  * its methods are override NetworkPlug.
@@ -71,7 +71,7 @@ public class NetworkHandler {
     public void finalizingNumberOfPlayersBroadcast() {
         // Filter players if lobby.size() > maxSize
         boolean lobbyIsReady = Controller.getInstance().lobbyIsReady();
-        //only done when all players are ready so the number of players is chosen and all players have entered the lobby.
+        //only done when all players are ready, so the number of players is chosen, and all players have entered the lobby.
         if(lobbyIsReady) {
             for (NetworkPlug networkPlug : networkInterfacesAndConnections.values()) {
                 networkPlug.finalizingNumberOfPlayers();
@@ -84,18 +84,10 @@ public class NetworkHandler {
      * Sends the message to all the different protocols. The message contains
      * Starting Card unicast and Common Cards.
      * 
-     * @throws RemoteException
-     * @throws NoNameException
      */
     public void gameIsStartingBroadcast() {
         for (NetworkPlug networkPlug : networkInterfacesAndConnections.values()) {
             networkPlug.gameIsStarting();
-        }
-    }
-
-    public void sendChatMessageBroadcast(String sender, String message) {
-        for (NetworkPlug networkPlug : networkInterfacesAndConnections.values()) {
-            networkPlug.sendingChatMessage(sender, message);
         }
     }
 
@@ -106,7 +98,6 @@ public class NetworkHandler {
      *
      */
     public void refreshUsersBroadcast() {
-        // TODO.
         for (NetworkPlug networkPlug : networkInterfacesAndConnections.values()) {
             networkPlug.refreshUsers();
         }
@@ -205,8 +196,12 @@ public class NetworkHandler {
         }
     }
 
-
-
+    //TODO javadoc
+    public void sendChatMessageBroadcast(String sender, String message) {
+        for (NetworkPlug networkPlug : networkInterfacesAndConnections.values()) {
+            networkPlug.sendingChatMessage(sender, message);
+        }
+    }
     /**
      * This method is used to disconnect all clients from all network interfaces.
      * It iterates over all the network interfaces and calls their respective disconnectAll method.
@@ -215,7 +210,7 @@ public class NetworkHandler {
         for (NetworkPlug networkPlug : networkInterfacesAndConnections.values()) {
             networkPlug.disconnectAll();
         }
-        //close all server and connections.
+        //close all servers and connections.
         System.out.println("All server connections are closed. Bye!");
         System.exit(0);
     }

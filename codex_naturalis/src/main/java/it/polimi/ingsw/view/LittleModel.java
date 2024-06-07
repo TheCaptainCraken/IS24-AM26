@@ -139,7 +139,7 @@ public class LittleModel {
             resourceCardsDeck = new Deck( resourcePath, true);
             goldCardsDeck = new Deck(goldPath, true);
         } catch (IOException e) {
-            System.out.println("file for TUI not foundAAAAAAAA");
+            System.out.println("file for TUI not found");
             throw new RuntimeException("file for TUI not found");
         } catch (ParseException e) {
             System.out.println("Error in parsing file for TUI");

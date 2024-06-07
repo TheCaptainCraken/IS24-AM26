@@ -154,7 +154,6 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
         }
     }
 
-
     /**
      * NetworkClient interface methods
      *
@@ -167,7 +166,7 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
         try {
             stub.sendChatMessage(nickname, message);
         } catch (RemoteException e) {
-            controller.noConnection();//TODO
+            controller.noConnection();
         }
     }
 
