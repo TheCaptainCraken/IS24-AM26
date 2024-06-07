@@ -198,6 +198,54 @@ public class TUI implements ViewInterface {
         System.out.println();
     }
     /**
+     *
+     * This method is responsible for asking the user to choose a color for their player.
+     * The user is presented with a list of colors to choose from, and their input is read from the console.
+     * The chosen color is then sent to server.
+     * If the user enters an invalid input, they are asked to choose a color again.
+     *
+     */
+    public void askChooseColor() {
+        System.out.println(Controller.getPhase());
+        System.out.println("Choose your color");
+        System.out.println("1 - Blue\n" +
+                "2 - Yellow\n" +
+                "3 - Green\n" +
+                "4 - Red\n");
+
+        Scanner scanner = new Scanner(System.in);
+        int color;
+        boolean validInput = false;
+        do {
+            try {
+                color = scanner.nextInt();
+                switch (color) {
+                    case 1:
+                        ViewSubmissions.getInstance().chooseColor(Color.BLUE);
+                        validInput = true;
+                        break;
+                    case 2:
+                        ViewSubmissions.getInstance().chooseColor(Color.YELLOW);
+                        validInput = true;
+                        break;
+                    case 3:
+                        ViewSubmissions.getInstance().chooseColor(Color.GREEN);
+                        validInput = true;
+                        break;
+                    case 4:
+                        ViewSubmissions.getInstance().chooseColor(Color.RED);
+                        validInput = true;
+                        break;
+                    default:
+                        System.out.println("Invalid input");
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid input. Please enter a number between 1 and 4.");
+                scanner.next(); // discard the invalid input
+            }
+        } while (!validInput);
+    }
+    /**
      * Displays the secret objective cards that the player can choose from.
      * This method retrieves the secret objective cards from the model, converts them into a printable format,
      * and then prints them to the console for the player to view and choose from.
@@ -719,6 +767,18 @@ public class TUI implements ViewInterface {
                 System.out.println("Invalid input");
         } while (!side.equals("true") && !side.equals("false"));
         ViewSubmissions.getInstance().chooseStartingCard(isFacingUp);
+    }
+
+    /**
+     * Allow the player to send a chat message to the others.
+     */
+    private void sendChatMessage(){
+        Scanner scanner = new Scanner(System.in);
+        String message;
+        System.out.println("Please enter your message, use @nickname to send it just to those players (es:\"@nickname1 @nickname2 hi!\"):");
+        message = scanner.nextLine();
+        //sent information to the server
+        ViewSubmissions.getInstance().sendChatMessage(message);
     }
     /**
      * Starts the game's Text User Interface (TUI).

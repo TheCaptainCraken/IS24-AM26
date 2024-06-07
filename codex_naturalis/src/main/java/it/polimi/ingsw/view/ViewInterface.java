@@ -170,4 +170,7 @@ public interface ViewInterface {
      *  The server disconnect you from the game, since enough players have joined the lobby.
      */
     void disconnect();
+    //TODO javadoc
+    //prints a message sent by another player. The sender is the nickname of the player who sent the message.
+    void receiveMessage(String sender, String message);
 }

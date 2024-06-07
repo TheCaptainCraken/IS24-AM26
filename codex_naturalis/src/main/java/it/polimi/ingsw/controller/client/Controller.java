@@ -4,9 +4,9 @@ import it.polimi.ingsw.model.*;
 
 import it.polimi.ingsw.model.Color;
 import it.polimi.ingsw.network.RMI.ClientRMI;
+import it.polimi.ingsw.network.RMI.RMIClientInterface;
 import it.polimi.ingsw.network.socket.ClientSocket;
 import it.polimi.ingsw.network.NetworkClient;
-import it.polimi.ingsw.network.RMI.RMIClientInterface;
 import it.polimi.ingsw.view.*;
 import javafx.util.Pair;
 
@@ -200,6 +200,20 @@ public class Controller {
         model.updateCommonTable(resourceCards, goldCard, resourceCardOnDeck, goldCardOnDeck);
         view.showCommonTable();
     }
+
+    /**
+     * Triggers the view to display a chat message to the user.
+     *
+     * This method is used to inform the user about a chat message in the game.
+     * The actual display of the chat message is handled by the view (TUI or GUI).
+     *
+     * @param sender The nickname of the player who sent the message.
+     * @param message The message sent by the player.
+     */
+    public void receiveMessage(String sender, String message) {
+        view.receiveMessage(sender, message);
+    }
+
     /**
      * Triggers the view to display the starting card to the user.
 
@@ -456,6 +470,19 @@ public class Controller {
         Controller.phase = Phase.WAIT;
         connection.chooseColor(color);
     }
+
+    /**
+     * Sends a chat message in the game.
+     *
+     * This method is used to send a chat message in the game.
+     * The actual sending of the chat message is handled by the connection object.
+     *
+     * @param message The message to be sent.
+     */
+    public void sendChatMessage(String message) {
+        connection.sendChatMessage(nickname, message);
+    }
+
     /**
      * Sets the side of the starting card for the player in the game.
 

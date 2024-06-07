@@ -94,4 +94,13 @@ public class ViewSubmissions {
     public void drawCard(boolean gold, int onTableOrDeck){
         controller.drawCard(gold, onTableOrDeck);
     }
+
+    /**
+     * Send a message from the player to the others
+     *
+     * @param message the message to send
+     */
+    public void sendChatMessage(String message){
+        controller.sendChatMessage(message);
+    }
 }

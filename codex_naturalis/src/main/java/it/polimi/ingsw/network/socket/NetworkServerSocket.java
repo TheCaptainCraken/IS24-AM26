@@ -18,8 +18,11 @@ import it.polimi.ingsw.model.exception.NoTurnException;
 import it.polimi.ingsw.model.exception.NotEnoughResourcesException;
 import it.polimi.ingsw.model.exception.SameNameException;
 import it.polimi.ingsw.model.exception.WrongGamePhaseException;
+import it.polimi.ingsw.network.NetworkHandler;
+import it.polimi.ingsw.network.NetworkPlug;
 import it.polimi.ingsw.network.socket.messages.ErrorType;
 import it.polimi.ingsw.network.socket.messages.client.ClientMessage;
+import it.polimi.ingsw.network.socket.messages.client.SentChatMessage;
 import it.polimi.ingsw.network.socket.messages.client.gameflow.CardToBeDrawn;
 import it.polimi.ingsw.network.socket.messages.client.gameflow.CardToBePositioned;
 import it.polimi.ingsw.network.socket.messages.client.gamestart.ChosenObjectiveCard;
@@ -28,33 +31,19 @@ import it.polimi.ingsw.network.socket.messages.client.login.ColorChosen;
 import it.polimi.ingsw.network.socket.messages.client.login.LoginMessage;
 import it.polimi.ingsw.network.socket.messages.client.login.NumberOfPlayersMessage;
 import it.polimi.ingsw.network.socket.messages.server.ErrorMessage;
+import it.polimi.ingsw.network.socket.messages.server.ReceivedChatMessage;
 import it.polimi.ingsw.network.socket.messages.server.ServerMessage;
 import it.polimi.ingsw.network.socket.messages.server.StopGaming;
 import it.polimi.ingsw.network.socket.messages.server.endgame.ShowPointsFromObjectives;
 import it.polimi.ingsw.network.socket.messages.server.endgame.ShowRanking;
-import it.polimi.ingsw.network.socket.messages.server.gameflow.CardIsPositioned;
-import it.polimi.ingsw.network.socket.messages.server.gameflow.RefreshedPoints;
-import it.polimi.ingsw.network.socket.messages.server.gameflow.RefreshedResources;
-import it.polimi.ingsw.network.socket.messages.server.gameflow.ShowNewTable;
-import it.polimi.ingsw.network.socket.messages.server.gameflow.TurnInfo;
+import it.polimi.ingsw.network.socket.messages.server.gameflow.*;
 import it.polimi.ingsw.network.socket.messages.server.gamestart.*;
 import it.polimi.ingsw.network.socket.messages.server.login.LobbyIsReady;
 import it.polimi.ingsw.network.socket.messages.server.login.PlayersAndColorPins;
 import it.polimi.ingsw.network.socket.messages.server.login.StatusLogin;
-import it.polimi.ingsw.network.NetworkHandler;
-import it.polimi.ingsw.network.NetworkPlug;
 
 import java.io.*;
-/**
- * The NetworkServerSocket class is responsible for managing the server-side logic of the socket network communication.
- * It maintains a list of connections to client sockets, representing the connected clients.
- *
- * The class provides methods for various game actions such as login, choosing color, placing cards, drawing cards, etc.
- * These methods are invoked by the client by sending a messages, and the corresponding actions are performed on the server side.
- *
- * The class also provides methods for broadcasting game state updates to all connected clients.
- * These methods are invoked by the server when the game state changes, and the updates are sent to the clients.
- */
+
 public class NetworkServerSocket implements NetworkPlug {
     /**
      * The ServerSocket object used to accept incoming connections from clients.
@@ -72,7 +61,7 @@ public class NetworkServerSocket implements NetworkPlug {
 
     /**
      * This constructor is used to create a new NetworkServerSocket.
-     * 
+     *
      * @param port The port of the server.
      * @throws IOException If there is an error creating the server socket.
      */
@@ -88,7 +77,7 @@ public class NetworkServerSocket implements NetworkPlug {
 
     /**
      * This method is used to start the server.
-     * 
+     *
      * @throws IOException If there is an error accepting a connection.
      */
     public void start() throws IOException {
@@ -102,7 +91,7 @@ public class NetworkServerSocket implements NetworkPlug {
     }
     /**
      * This method is used to send a message to all the clients.
-     * 
+     *
      * @param message The message to be sent.
      */
     private void sendBroadCastMessage(ServerMessage message) {
@@ -130,17 +119,17 @@ public class NetworkServerSocket implements NetworkPlug {
      */
     @Override
     public void finalizingNumberOfPlayers() {
-       for(ClientHandler client : connections.values()){
-           //if the client is admitted to the game, we send a message to stop waiting and start play
-           if(controller.isAdmitted(client.getNickname())){
-               client.sendMessage(new StopWaitingOrDisconnect(true));
-           }else{
-               //disconnection of the users not admitted
+        for(ClientHandler client : connections.values()){
+            //if the client is admitted to the game, we send a message to stop waiting and start play
+            if(controller.isAdmitted(client.getNickname())){
+                client.sendMessage(new StopWaitingOrDisconnect(true));
+            }else{
+                //disconnection of the users not admitted
                 client.sendMessage(new StopWaitingOrDisconnect(false));
                 //close the connection
                 client.hastaLaVistaBaby();
-           }
-       }
+            }
+        }
     }
     /**
      * Implements the gameIsStarting method of the NetworkPlug interface.
@@ -184,6 +173,29 @@ public class NetworkServerSocket implements NetworkPlug {
         HashMap<String, Color> playersAndPins = controller.getPlayersAndPins();
         sendBroadCastMessage(new PlayersAndColorPins(playersAndPins));
     }
+
+
+    @Override
+    public void sendingChatMessage(String message, String sender) {
+        ArrayList<String> receivers = new ArrayList<>();
+        for (String nickname : connections.keySet()) {
+            if (message.toLowerCase().contains("@"+nickname.toLowerCase())) {
+                receivers.add(nickname);
+            }
+        }
+        if(receivers.isEmpty()){
+            sendBroadCastMessage(new ReceivedChatMessage(sender, message));
+        }else{
+            for (String nickname : connections.keySet()) {
+                if(receivers.contains(nickname)){//TODO thread should be done right?
+                    new Thread(() -> {
+                        connections.get(nickname).sendChatMessageIfPlayer(sender, message);
+                    }).start();
+                }
+            }
+        }
+    }
+
     /**
      * Broadcasts the information of a root card that has been placed by a player.
      * This method is called when a player successfully places a root card on the board.
@@ -196,7 +208,7 @@ public class NetworkServerSocket implements NetworkPlug {
      */
     @Override
     public void sendingPlacedRootCardAndWhenCompleteObjectiveCards(String nickname, boolean side, int cardId,
-            boolean allWithRootCardPlaced) {
+                                                                   boolean allWithRootCardPlaced) {
         //send the card placed to all the clients, turn is 0 since it is the first card placed.
         sendBroadCastMessage(new CardIsPositioned(nickname, cardId, new Point(0, 0), side, 0));
         try {
@@ -231,7 +243,7 @@ public class NetworkServerSocket implements NetworkPlug {
     @Override
     //this method is called when all the players have chosen their secret objective cards.
     public void sendingHandsAndWhenSecretObjectiveCardsCompleteStartGameFlow(String nickname,
-            boolean allWithSecretObjectiveCardChosen) {
+                                                                             boolean allWithSecretObjectiveCardChosen) {
         //sendHand method manages the sending of the hand to the client(private if it is the client, hidden to all others)
         //if allWithSecretObjectiveCardChosen sends to all the clients the starting player.
         for (ClientHandler connection : connections.values()) {
@@ -378,7 +390,7 @@ public class NetworkServerSocket implements NetworkPlug {
         }
         /**
          * This method is used to handle the messages received from the client.
-         * 
+         *
          * @param message The message received from the client.
          * @throws ClassNotFoundException If the message is not recognized.
          */
@@ -435,6 +447,9 @@ public class NetworkServerSocket implements NetworkPlug {
                 } catch (ColorAlreadyTakenException e) {
                     sendErrorMessage(ErrorType.COLOR_UNAVAILABLE);
                 }
+            } else if(message instanceof SentChatMessage){
+                SentChatMessage sentChatMessage = (SentChatMessage) message;
+                networkHandler.sendChatMessageBroadcast(sentChatMessage.getSender(), sentChatMessage.getMessage());
             } else if (message instanceof ChosenStartingCardSide) {
                 //this message is used to choose the side of the root card of the player.
                 ChosenStartingCardSide parsedMessage = (ChosenStartingCardSide) message;
@@ -550,7 +565,7 @@ public class NetworkServerSocket implements NetworkPlug {
 
         /**
          * This method is used to send an error message to the client.
-         * 
+         *
          * @param errorType The type of the error.
          */
         public void sendErrorMessage(ErrorType errorType) {
@@ -559,7 +574,7 @@ public class NetworkServerSocket implements NetworkPlug {
 
         /**
          * This method is used to send a message to the client.
-         * 
+         *
          * @param message The message to be sent.
          */
         public void sendMessage(ServerMessage message) {
@@ -570,6 +585,16 @@ public class NetworkServerSocket implements NetworkPlug {
                 connections.remove(clientSocket.getRemoteSocketAddress().toString());
                 NetworkHandler.getInstance().disconnectBroadcast();
             }
+        }
+
+        /**
+         * This method is used to send a chat message to a specific client without using broadcast.
+         *
+         * @param sender  The nickname of the sender.
+         * @param message The message.
+         */
+        public void sendChatMessageIfPlayer(String sender, String message){
+            sendMessage(new ReceivedChatMessage(sender, message));
         }
 
         /**
@@ -589,7 +614,7 @@ public class NetworkServerSocket implements NetworkPlug {
         /**
          * This method is used to send the common objective cards to the clients. It is
          * a broadcast call.
-         * 
+         *
          */
         public void sendSecretObjectives() {
             try {
@@ -603,7 +628,7 @@ public class NetworkServerSocket implements NetworkPlug {
         /**
          * This method is used to send the drawn card to the clients. It is a broadcast
          * call.
-         * 
+         *
          * @param nickname      The nickname of the player.
          * @param newCardId     The id of the new card.
          * @param headDeck      The head deck.
@@ -614,13 +639,13 @@ public class NetworkServerSocket implements NetworkPlug {
          *                      the deck.
          */
         public void sendDrawnCardIfPlayer(String nickname, int newCardId, Kingdom headDeck, boolean gold,
-                int onTableOrDeck) {
+                                          int onTableOrDeck) {
             //if the player is the one that has drawn the card, we send the hidden hand to the player.
             if (!this.nickname.equals(nickname)) {
                 try {
                     sendMessage(new ShowHiddenHand(nickname, controller.getHiddenHand(nickname)));
                 } catch (NoNameException e) {
-                   System.out.println("No name exception");
+                    System.out.println("No name exception");
                 }
             }
             //this message has two cards information: the new card drawn and the head deck
@@ -631,7 +656,7 @@ public class NetworkServerSocket implements NetworkPlug {
         /**
          * This method is used to send the hand of the player.
          * This method is used the first time, we send the hand to the player.
-         * 
+         *
          * @param nickname                         The nickname of the player.
          * @param allWithSecretObjectiveCardChosen A boolean indicating whether all the
          *                                         players have chosen their secret
@@ -676,5 +701,4 @@ public class NetworkServerSocket implements NetworkPlug {
             }
         }
     }
-
 }

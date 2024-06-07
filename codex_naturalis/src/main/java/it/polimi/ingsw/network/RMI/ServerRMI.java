@@ -4,6 +4,7 @@ import it.polimi.ingsw.controller.server.Controller;
 import it.polimi.ingsw.model.Color;
 import it.polimi.ingsw.model.Kingdom;
 import it.polimi.ingsw.model.Player;
+import it.polimi.ingsw.model.Sign;
 import it.polimi.ingsw.model.exception.*;
 import it.polimi.ingsw.network.NetworkHandler;
 import it.polimi.ingsw.network.NetworkPlug;
@@ -136,6 +137,7 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
         //Return whether the player is the first one to log in
         return isFirst;
     }
+
     /**
      * RMIs interface method
      *
@@ -161,6 +163,7 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
         //refresh here since some players can be eliminated
         NetworkHandler.getInstance().refreshUsersBroadcast();
     }
+
     /**
      * RMIServerInterface interface method
      * This method is responsible for handling the color selection process of a player.
@@ -183,6 +186,11 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
         if(isGameStarting){
             NetworkHandler.getInstance().gameIsStartingBroadcast();
         }
+    }
+
+    @Override
+    public void sendChatMessage(String message, String sender) throws RemoteException {
+        NetworkHandler.getInstance().sendChatMessageBroadcast(sender, message);
     }
 
     /**
@@ -324,6 +332,7 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
                 try {
                     connection.refreshUsers(playersAndPins);
                 } catch (RemoteException e) {
+                    //TODO rimuovere connessione
                     NetworkHandler.getInstance().disconnectBroadcast();
                 }
             }).start();
@@ -368,6 +377,31 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
         }
     }
 
+    /**
+     * It sends a message to all the clients, if they are tagged in the message like in this format "@player1 hi!", the message will be sent only to the player with "player1" nickname.
+     * Nickname are searched from the connection so all the given fake nicknames won't be sent and from other connections will be sent from that connection.
+     * @param sender nickname of the sender
+     * @param message message to be sent
+     */
+    public void sendingChatMessage(String sender, String message){
+        ArrayList<String> receivers = new ArrayList<>();
+        for (String nickname : connections.keySet()) {
+            if (message.toLowerCase().contains("@"+nickname.toLowerCase())) {
+                receivers.add(nickname);
+            }
+        }
+        for (String nickname : connections.keySet()) {
+            if(receivers.contains(nickname) || receivers.isEmpty()){
+                new Thread(() -> {
+                    try {
+                        connections.get(nickname).receiveMessage(sender, message);
+                    } catch (RemoteException e) {
+                        // TODO
+                    }
+                }).start();
+            }
+        }
+    }
     /**
      * This method is part of the NetworkPlug interface implementation.
      *
@@ -626,6 +660,7 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
             }).start();
         }
     }
+
     /**
      * This method is used to disconnect all clients from the server.
      * It iterates over all the connections and calls the disconnect method on each client.

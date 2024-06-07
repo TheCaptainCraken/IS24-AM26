@@ -22,6 +22,7 @@ public interface NetworkClient {
      * @param nickname The nickname of the player.
      */
     void login(String nickname);
+
     /**
      * Inserts the number of players in the game.
      * This method is used to set the number of players that will participate in the game.
@@ -29,6 +30,7 @@ public interface NetworkClient {
      * @param numberOfPlayers The number of players.
      */
     void insertNumberOfPlayers(int numberOfPlayers);
+
     /**
      * Chooses the color for the player.
      * This method is used to set the color of the player in the game.
@@ -36,6 +38,16 @@ public interface NetworkClient {
      * @param color The color chosen by the player.
      */
     void chooseColor(Color color);
+
+    /**
+     * Sends a chat message.
+     * This method is used to send a chat message to the other players in the game.
+     *
+     * @param sender The nickname of the player who sent the message.
+     * @param message The message sent by the player.
+     */
+    void sendChatMessage(String sender, String message);
+
     /**
      * Chooses the side of the starting card for the player.
      * This method is used to set the side of the starting card of the player in the game.
@@ -43,6 +55,7 @@ public interface NetworkClient {
      * @param side The side of the starting card chosen by the player.
      */
     void chooseSideStartingCard(boolean side);
+
     /**
     * Chooses the secret objective card for the player.
     * This method is used to set the secret objective card of the player in the game.
@@ -51,6 +64,7 @@ public interface NetworkClient {
     *  @param indexCard The index of the secret objective card chosen by the player.
     */
     void chooseSecretObjectiveCard(int indexCard);
+
     /**
      * Plays a card from the player's hand.
      * This method is used to play a card from the player's hand onto the game table.
@@ -61,6 +75,7 @@ public interface NetworkClient {
      * @param side The side of the card.
      */
     void playCard(int indexHand, Point position, boolean side);
+
     /**
      * Draws a card for the player.
      * This method is used to draw a card for the player.
