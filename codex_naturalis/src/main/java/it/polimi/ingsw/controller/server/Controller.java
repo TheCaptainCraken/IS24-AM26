@@ -381,7 +381,7 @@ public class Controller {
     /**
      * Gets the back card of player's hand.
      * 
-     * @param nickname The player's nickname.
+     * @param nickname The player's nickname. TODO
      * @throws NoNameException If the field does not exist.
      * @return The hidden hand of the player.
      */
