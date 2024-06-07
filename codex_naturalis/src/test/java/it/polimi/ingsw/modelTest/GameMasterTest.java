@@ -50,7 +50,7 @@ public class GameMasterTest {
 
     @Test
     @DisplayName("Test of constructor")
-    public void BasicGettersTest() throws IOException, ParseException, NoSuchFieldException, NoNameException {
+    public void BasicGettersTest() throws IOException{
         assertEquals("pietro", game.getCurrentPlayer().getName());
         assertEquals(lobby.getPlayers().length,4);
 
@@ -93,7 +93,7 @@ public class GameMasterTest {
     public void setUp2() throws SameNameException, LobbyCompleteException, IOException, ParseException,
             WrongGamePhaseException, NoTurnException, NoNameException {
         //create player
-        lobby2 = new Lobby();//TODO
+        lobby2 = new Lobby();
         lobby2.addPlayer("pietro");
         lobby2.addPlayer("marco");
 
@@ -342,6 +342,22 @@ public class GameMasterTest {
     }
 
     @Test
+    @DisplayName("NoCardException")
+    public void noCardException() throws WrongGamePhaseException, NoTurnException,
+            NotEnoughResourcesException, CardPositionException, NoNameException {
+        int Card = game3.getCurrentPlayer().getHand()[0].getId();
+        game3.placeCard("pietro", 0, new Point(-1, 0), false);
+        game3.drawCard("pietro",false,0);
+
+        game3.placeCard("pietro", 0, new Point(-2, 0), false);
+        game3.drawCard("pietro",false,0);
+
+        assertThrows(CardPositionException.class, ()->
+                game3.placeCard("pietro", 0, new Point(-1,0), false));
+
+    }
+
+    @Test
     @DisplayName("Card is Attached to 2 cards")
     public void TwoAttachments() throws WrongGamePhaseException, NoTurnException,
             NotEnoughResourcesException, CardPositionException, NoNameException {
@@ -471,7 +487,7 @@ public class GameMasterTest {
 
 
     }
-//    @Test
+//    @Test  //TODO arturo non funziona.
 //    @DisplayName("Test for Decks Emptying")
 //    public void deckEmpty() throws IOException, ParseException, WrongGamePhaseException, NoTurnException,
 //            NotExistsPlayerException, NoSuchFieldException, NotEnoughResourcesException, CardPositionException {

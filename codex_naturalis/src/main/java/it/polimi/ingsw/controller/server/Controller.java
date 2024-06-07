@@ -24,7 +24,7 @@ public class Controller {
     /**
      * The base path of the decks of cards.
      */
-    static String basePath = "src/main/java/it/polimi/ingsw/model/decks/";
+    static String basePath = "codex_naturalis/src/main/java/it/polimi/ingsw/model/decks/";
     /**
      * The instance of the controller.
      */
@@ -273,7 +273,7 @@ public class Controller {
      * @param nickname The player's nickname.
      * @return Whether the player is the first player.
      */
-    public boolean getIsFirst(String nickname) {
+    public boolean isFirst(String nickname) {
         return lobby.getPlayers()[0].getName().equals(nickname);
     }
 
@@ -391,7 +391,13 @@ public class Controller {
         int i;
 
         for (i = 0; i < 3; i++) {
-            hiddenHand[i] = new Pair<>(player.getHand()[i].getKingdom(), (player.getHand()[i] instanceof GoldCard));
+            //hiddenHand[i] can be null since one player has placed a card, but not yet drawn a new one.
+            try {
+                hiddenHand[i] = new Pair<>(player.getHand()[i].getKingdom(), (player.getHand()[i] instanceof GoldCard));
+            }
+            catch (NullPointerException e) {
+                hiddenHand[i] = null;
+            }
         }
         return hiddenHand;
     }

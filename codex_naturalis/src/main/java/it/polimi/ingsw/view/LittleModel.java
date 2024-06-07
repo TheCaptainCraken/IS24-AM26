@@ -120,6 +120,33 @@ public class LittleModel {
            System.out.println("Error in parsing file for TUI");
         }
     }
+
+    public LittleModel(String path) {
+        points = new HashMap<>();
+        resources = new HashMap<>();
+        myCards = new Integer[3];
+        otherPlayersCards = new HashMap<>();
+        table = new HashMap<>();
+
+        String resourcePath = path + "resourceCardsDeck.json";
+        String goldPath = path + "goldCardsDeck.json";
+        String startingPath = path + "startingCardsDeck.json";
+        String objectivePath = path + "objectiveCardsDeck.json";
+
+        try{
+            startingCardsDeck = new Deck(startingPath, true);
+            objectiveCardsDeck = new Deck(objectivePath, true);
+            resourceCardsDeck = new Deck( resourcePath, true);
+            goldCardsDeck = new Deck(goldPath, true);
+        } catch (IOException e) {
+            System.out.println("file for TUI not foundAAAAAAAA");
+            throw new RuntimeException("file for TUI not found");
+        } catch (ParseException e) {
+            System.out.println("Error in parsing file for TUI");
+            throw new RuntimeException("Error in parsing file for TUI");
+        }
+}
+
     /**
      * Updates the player's hand with the given array of card IDs.
      *
@@ -146,6 +173,7 @@ public class LittleModel {
     }
 
     public void setCardInHand(int index, Integer cardId){
+        //set the card at null
         myCards[index] = cardId;
     }
     /**

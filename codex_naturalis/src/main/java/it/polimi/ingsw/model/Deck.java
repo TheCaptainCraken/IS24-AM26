@@ -39,7 +39,7 @@ public class Deck {
     }
 
     //TODO javaddock
-    public Deck(String cardsFile, boolean toFile) throws FileNotFoundException, IOException, ParseException, IllegalArgumentException {
+    public Deck(String cardsFile, boolean toFile) throws IOException, ParseException {
         cards = new ArrayList<Card>();
         this.generateDeck(cardsFile);
     }

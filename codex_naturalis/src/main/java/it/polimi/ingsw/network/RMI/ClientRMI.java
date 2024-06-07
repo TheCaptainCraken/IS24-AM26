@@ -38,7 +38,7 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
         //Exporting the ClientRMI object as a remote object
          exportedClient = (RMIClientInterface) UnicastRemoteObject.exportObject(this, 0);
 
-        //Creating the RMI register
+        //Creating the RMI register //TODO indirizzo ip diverso
         registry = LocateRegistry.getRegistry("127.0.0.1", PORT);
 
         // Looking up the remote object
@@ -66,7 +66,7 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
         }catch(RemoteException e){
             controller.noConnection();
         }catch (LobbyCompleteException e){
-            //TODO
+            controller.lobbyComplete();
         }catch (SameNameException e){
             Controller.phase = Phase.LOGIN;
             controller.sameName(name);
@@ -280,6 +280,7 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
     @Override
     public void stopWaiting() {
             Controller.setPhase(Phase.COLOR);
+            controller.stopWaiting();
     }
 
     @Override

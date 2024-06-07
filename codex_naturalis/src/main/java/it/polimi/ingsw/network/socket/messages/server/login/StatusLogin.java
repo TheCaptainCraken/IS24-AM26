@@ -22,7 +22,6 @@ public class StatusLogin extends ServerMessage {
             controller.askNumberOfPlayer();
         } else {
             Controller.setPhase(Phase.WAIT);
-            controller.waitLobby();
         }
     }
 }

@@ -11,6 +11,7 @@ import org.junit.jupiter.api.DisplayName;
 
 
 public class ControllerServerTest {
+        //il base path è differente per entrambi(test e non test) quindi non c'è bisogno di fare il controllo
         static String basePath = "src/main/java/it/polimi/ingsw/model/decks/";
 
         @BeforeEach

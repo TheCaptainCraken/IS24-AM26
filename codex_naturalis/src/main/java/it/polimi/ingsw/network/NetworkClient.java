@@ -11,8 +11,8 @@ import java.awt.*;
  * The methods in this interface are related to game actions such as login, choosing color, drawing cards etc.
  */
 public interface NetworkClient {
-    //all input are controlled by the controller or client interface. It contacts the server appropriately with the communication protocol
-    //the communication protocol always communicate with a unique nickname, so the server can identify the player/client.
+    //All inputs are controlled by the controller or client interface.It contacts the server appropriately with the communication protocol
+    //the communication protocols always communicate with a unique nickname,so the server can identify the player/client.
 
     /**
      * Logs in the player with the given nickname.

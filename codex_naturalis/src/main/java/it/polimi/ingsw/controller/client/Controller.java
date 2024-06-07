@@ -82,7 +82,7 @@ public class Controller {
      *
      * @return The current phase of the game.
      */
-    public static Phase getPhase() {
+    public static synchronized Phase getPhase() {
         return Controller.phase;
     }
     /**
@@ -90,7 +90,7 @@ public class Controller {
      *
      * @param phase The phase to set as the current phase.
      */
-    public static void setPhase(Phase phase) {
+    public static synchronized void setPhase(Phase phase) {
         Controller.phase = phase;
     }
 
@@ -150,6 +150,7 @@ public class Controller {
      * The actual input is handled by the view (TUI or GUI).
      */
     public void askNumberOfPlayer() {
+        phase = Phase.NUMBER_OF_PLAYERS;
         view.askNumberOfPlayers();
     }
     /**
@@ -313,8 +314,9 @@ public class Controller {
             model.updatePlaceCard(nickname, id, position, side, turn);
             view.showStartingCardChosen();
         }
+        //else if since for starting card we haven't set the hand yet.
         //set the playedCardToNull, if the cards is correctly placed and is the owner of it.
-        if(nickname.equals(Controller.nickname)){
+        else if(nickname.equals(Controller.nickname)){
             for(int i = 0; i < 3; i++){
                 if(model.getCardInHand(i) == id){
                     //if is the card placed is the same card in the hand, set the card in hand to null.

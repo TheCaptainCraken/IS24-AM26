@@ -98,6 +98,7 @@ public class GameMaster {
         } else if (gameState != GameState.CHOOSING_ROOT_CARD) {
             throw new WrongGamePhaseException();
         } else {
+            //first card, all the corners are not linked to any card
             HashMap<Corner, PlayedCard> defaultAttachments = new HashMap<>();
             for (Corner corner : Corner.values()) {
                 defaultAttachments.put(corner, null);
@@ -111,6 +112,7 @@ public class GameMaster {
                     currentPlayer.addResource(sign, 1);
                 }
             } else {
+                // if the card is placed on the top side, the player gets the resources of the corner. Each corner has a resource
                 for (Corner corner : Corner.values()) {
                     currentPlayer.addResource(rootCard.getCorners().get(corner), 1);
                 }
@@ -202,7 +204,7 @@ public class GameMaster {
             // if corner points to null doesn't remove any resources, resources are
             // subtracted only if the PlayedCards
             // present in the attachments HashMap are played on their front side or are
-            // referencing the StartingCard
+            // referencing the StartingCard(starting card has backside corner e front corner)
             if (attachments.get(corner) != null && (attachments.get(corner).isFacingUp()
                     || attachments.get(corner).getCard() instanceof StartingCard)) {
                 switch (corner) {
@@ -608,11 +610,11 @@ public class GameMaster {
      *
      * @param player   Player about we want to know if they can place the GoldCard
      * @param goldCard GoldCard that wants to be placed and has certain requirements
-     * @return
+     * @return true if the player has enough resources to place the GoldCard, false otherwise
      */
     public boolean requirementsSatisfied(Player player, GoldCard goldCard) {
         for (Sign sign : Sign.values()) {
-            if (sign != Sign.EMPTY) {
+            if (sign != Sign.EMPTY && sign != Sign.NULL) {
                 if (player.getResources().get(sign) < goldCard.getRequirements().get(sign)) {
                     return false;
                 }
@@ -631,7 +633,7 @@ public class GameMaster {
      *                        resource count
      * @param specialGoldCard specialGoldCard given to find the effect
      * @param attachments     other card corners used to calculate the corners
-     *                        covered for Countable.CORNER type
+     *                        covered for Countable corner type
      * @return number of points to add to the player points
      * @throws IllegalArgumentException
      */

@@ -78,6 +78,7 @@ public class NetworkServerSocket implements NetworkPlug {
      */
     public NetworkServerSocket(int port) throws IOException {
         serverSocket = new ServerSocket(port);
+        System.out.println("Server started on port " + serverSocket.getLocalPort());
         //add the network plug to the network handler, who manages the different connections protocols.
         NetworkHandler.getInstance().addNetworkPlug("socket", this);
 
@@ -393,10 +394,10 @@ public class NetworkServerSocket implements NetworkPlug {
                     //communicate to all the clients the new user
                     networkHandler.refreshUsersBroadcast();
                     //send the status of the login to the client
-                    sendMessage(new StatusLogin(controller.getIsFirst(parsedMessage.getNickname())));
+                    sendMessage(new StatusLogin(controller.isFirst(parsedMessage.getNickname())));
 
                     //if is not first, it delivers if the lobby is ready to start
-                    if(!controller.getIsFirst(parsedMessage.getNickname())){
+                    if(!controller.isFirst(parsedMessage.getNickname())){
                         sendMessage(new LobbyIsReady(controller.lobbyIsReady()));
                     }
                     //check if all players have join the lobby(number of players chosen and enough number of players)

@@ -11,8 +11,10 @@ import it.polimi.ingsw.network.socket.NetworkServerSocket;
 
 import java.awt.*;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
+import java.rmi.UnknownHostException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
@@ -41,7 +43,7 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
 
     public static void main(String[] args) throws IOException {
         ServerRMI obj = new ServerRMI();
-        NetworkServerSocket networkServerSocket = new NetworkServerSocket(4567);
+        NetworkServerSocket networkServerSocket = new NetworkServerSocket(0);
         new Thread(()-> {
             try {
                 networkServerSocket.start();
@@ -68,8 +70,7 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
             System.out.println("Server skeleton created");
         } catch (RemoteException e) {
             System.out.println("Server skeleton not created");
-            System.out.println("Server exception: " + e.toString());
-            e.printStackTrace();
+            System.out.println("Server exception: " + e.toString());;
         }
 
         try {
@@ -78,7 +79,6 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
         } catch (RemoteException e) {
             System.out.println("Registry not created");
             System.out.println("Registry exception: " + e.toString());
-            e.printStackTrace();
         }
 
         if (registry != null && serverSkeleton != null) {
@@ -88,10 +88,8 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
                 System.out.println("Server ready");
             } catch (RemoteException e) {
                 System.out.println("Rebind exception: " + e.toString());
-                e.printStackTrace();
             } catch (AlreadyBoundException e) {
                 System.out.println("Already bound exception: " + e.toString());
-                e.printStackTrace();
             }
         } else {
             if (registry == null) {
@@ -100,6 +98,14 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
             if (serverSkeleton == null) {
                 System.out.println("serverSkeleton is null, cannot bind the object.");
             }
+        }
+        //TODO testare questo
+        try {
+            InetAddress inetAddress = InetAddress.getLocalHost();
+            System.out.println("Server is listening on IP: " + inetAddress.getHostAddress());
+            System.out.println("Server is listening on Port: " + PORT);
+        } catch (java.net.UnknownHostException e) {
+            throw new RuntimeException(e);
         }
 
     }
@@ -123,9 +129,12 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
         //Add the player to the connections map
         connections.put(nickname, clientRMI);
         //We told players if all joined in
+        //before finalizing the number of players, since if lobby is ready we do the shuffle of the players
+        boolean isFirst = Controller.getInstance().isFirst(nickname);
+
         NetworkHandler.getInstance().finalizingNumberOfPlayersBroadcast();
         //Return whether the player is the first one to log in
-        return Controller.getInstance().getIsFirst(nickname);
+        return isFirst;
     }
     /**
      * RMIs interface method
@@ -143,12 +152,13 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
 
     @Override
     public void insertNumberOfPlayers(int numberOfPlayers) throws
-            RemoteException, ClosingLobbyException, SameNameException, LobbyCompleteException, NoNameException {
+            RemoteException, ClosingLobbyException {
 
         Controller.getInstance().initializeLobby(numberOfPlayers);
         //Deletes all other connections that are not in the lobby
 
         NetworkHandler.getInstance().finalizingNumberOfPlayersBroadcast();
+        //refresh here since some players can be eliminated
         NetworkHandler.getInstance().refreshUsersBroadcast();
     }
     /**
@@ -314,13 +324,11 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
                 try {
                     connection.refreshUsers(playersAndPins);
                 } catch (RemoteException e) {
-                    //TODO rimuovere connessione
                     NetworkHandler.getInstance().disconnectBroadcast();
                 }
             }).start();
         }
     }
-
     /**
      * Implements the gameIsStarting method of the NetworkPlug interface.
      * This method is responsible for initiating the game start process.
@@ -342,21 +350,14 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
         Kingdom goldCardOnDeck = Controller.getInstance().getHeadDeck(true);
         Kingdom resourceCardOnDeck = Controller.getInstance().getHeadDeck(false);
 
-        for(String nicknameRefresh : connections.keySet()){
+        for (String nicknameRefresh : connections.keySet()) {
             new Thread(() -> {
                 try {
                     //send the resource cards and gold card to the client
                     connections.get(nicknameRefresh).sendInfoOnTable(resourceCards, goldCard, resourceCardOnDeck, goldCardOnDeck);
-                } catch (RemoteException e) {
-                    connections.remove(nicknameRefresh);
-                    NetworkHandler.getInstance().disconnectBroadcast();
-                }
-            }).start();
-
-            new Thread(() -> {
-                try {
                     //send the starting card to the client, based on the player's nickname. It is  unicast method call.
                     connections.get(nicknameRefresh).showStartingCard(Controller.getInstance().getStartingCard(nicknameRefresh));
+
                 } catch (RemoteException e) {
                     connections.remove(nicknameRefresh);
                     NetworkHandler.getInstance().disconnectBroadcast();
@@ -366,8 +367,14 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
             }).start();
         }
     }
-    //TODO javadoc and comment
 
+    /**
+     * This method is part of the NetworkPlug interface implementation.
+     *
+     * This method is responsible for finalizing the number of players in the game.
+     * It iterates over all the connections and sends a stop waiting signal to each client that is admitted to the game.
+     * For the clients that are not admitted to the game, it sends a disconnect signal and removes them from the connections map.
+     */
     @Override
     public void finalizingNumberOfPlayers() {
         for(String nickname : connections.keySet()){
@@ -390,7 +397,6 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
             }).start();
         }
     }
-
     /**
      * It implements the sendingHandsAndWhenSecretObjectiveCardsCompleteStartGameFlow method of the NetworkPlug interface.
      *
