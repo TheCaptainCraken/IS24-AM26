@@ -36,6 +36,16 @@ public class ViewSubmissions {
     public void chooseColor(Color color){
         controller.chooseColor(color);
     }
+
+    /**
+     * Send a message from the player to the others
+     *
+     * @param message
+     */
+    public void sendChatMessage(String message){
+        controller.sendChatMessage(message);
+    }
+
     //Input the side of the card. The side can be true or false. The controller will check the input.
     public void chooseStartingCard(boolean isFacingUp){
         controller.chooseSideStartingCard(isFacingUp);

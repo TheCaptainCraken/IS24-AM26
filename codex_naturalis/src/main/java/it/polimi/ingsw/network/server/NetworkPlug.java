@@ -39,6 +39,12 @@ public interface NetworkPlug {
         void finalizingNumberOfPlayers();
 
         /**
+         * Refreshes the list of users.
+         * Send a hashmap with the players and their colors to all clients.
+         */
+        void refreshUsers();
+
+        /**
          * Communicates to the clients that the game is starting. The message should be
          * broadcast to all clients.
          * It should notify the Common Card on Table (2 gold cards, 2 resource card, 1
@@ -47,13 +53,13 @@ public interface NetworkPlug {
          */
         void gameIsStarting();
 
-        void receiveMessage(String message, String sender);
-
         /**
-         * Refreshes the list of users.
-         * Send a hashmap with the players and their colors to all clients.
+         * Sends a chat message to players checking tags.
+         *
+         * @param sender  The nickname of the player who sent the message.
+         * @param message The message sent by the player.
          */
-        void refreshUsers();
+        void sendingChatMessage(String sender, String message);
 
         /**
          * Sends the placed root card broadcast to all client.

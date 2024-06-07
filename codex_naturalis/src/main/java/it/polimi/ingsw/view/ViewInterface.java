@@ -33,6 +33,8 @@ public interface ViewInterface {
     void showStartingCard(int startingCardId);
     //prints the card on the table or the update
     void showCommonTable();
+    //prints a message sent by another player. The sender is the nickname of the player who sent the message.
+    void receiveMessage(String sender, String message);
     //print the common objectives card. They are fixed for all the game.
     void showCommonObjectives(Integer[] objectiveCardIds);
     //The to card to choose from. You should allow the player to choose one of them.

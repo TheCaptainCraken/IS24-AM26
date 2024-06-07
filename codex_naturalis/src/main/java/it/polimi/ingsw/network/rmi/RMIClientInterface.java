@@ -44,6 +44,14 @@ public interface RMIClientInterface extends Remote {
             Kingdom goldCardOnDeck) throws RemoteException;
 
     /**
+     * This method is used to deliver a message to the clients.
+     * @param sender
+     * @param message
+     * @throws RemoteException
+     */
+    void receiveMessage(String sender, String message) throws RemoteException;
+
+    /**
      * This method is used to show the starting card to the clients.
      * 
      * @param startingCardId The id of the starting card.
@@ -168,8 +176,6 @@ public interface RMIClientInterface extends Remote {
      *                         the connection.
      */
     void stopWaiting() throws RemoteException;
-
-    void receiveMessage(String message, String sender) throws RemoteException;
 
     void disconnect() throws RemoteException;
 }

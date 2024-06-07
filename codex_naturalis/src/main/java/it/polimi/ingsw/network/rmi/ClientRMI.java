@@ -105,11 +105,6 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
         }
     }
 
-    @Override
-    public void receiveMessage(String message, String sender) {
-        // controller.receiveMessage(message, sender);
-    }
-
     /**
      * NetworkClient interface methods
      *
@@ -163,6 +158,23 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
             controller.colorAlreadyTaken();
         } catch (NoNameException e) {
             controller.noName();
+        }
+    }
+
+
+    /**
+     * NetworkClient interface methods
+     *
+     * Sends a chat message.
+     * This method is used to send a chat message to the other players in the game.
+     *
+     * @param message The message sent by the player.
+     */
+    public void sendChatMessage(String nickname, String message){
+        try {
+            stub.sendChatMessage(nickname, message);
+        } catch (RemoteException e) {
+            controller.noConnection();//TODO
         }
     }
 
@@ -343,6 +355,19 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
     public void sendInfoOnTable(Integer[] resourceCards, Integer[] goldCard, Kingdom resourceCardOnDeck,
             Kingdom goldCardOnDeck) {
         controller.cardsOnTable(resourceCards, goldCard, resourceCardOnDeck, goldCardOnDeck);
+    }
+
+    /**
+     * Receives a chat message from the server.
+     * This method is used to receive a chat message from the server and display it
+     * to the client.
+     *
+     * @param message The message sent by the player.
+     * @param sender  The nickname of the player who sent the message.
+     */
+    @Override
+    public void receiveMessage(String message, String sender) {
+        controller.receiveMessage(message, sender);
     }
 
     /**

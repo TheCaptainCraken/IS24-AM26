@@ -4,12 +4,10 @@ import it.polimi.ingsw.controller.server.Controller;
 import it.polimi.ingsw.model.Color;
 import it.polimi.ingsw.model.Kingdom;
 import it.polimi.ingsw.model.Player;
-import it.polimi.ingsw.model.Sign;
 import it.polimi.ingsw.model.exception.*;
 import it.polimi.ingsw.network.server.NetworkHandler;
 import it.polimi.ingsw.network.server.NetworkPlug;
 import it.polimi.ingsw.network.server.socket.NetworkServerSocket;
-import javafx.util.Pair;
 
 import java.awt.*;
 import java.io.IOException;
@@ -137,19 +135,6 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
         return Controller.getInstance().getIsFirst(nickname);
     }
 
-    @Override
-    public void receiveMessage(String message, String sender) {
-        for (String nickname : connections.keySet()) {
-            new Thread(() -> {
-                try {
-                    connections.get(nickname).receiveMessage(message, sender);
-                } catch (RemoteException e) {
-                    // TODO
-                }
-            }).start();
-        }
-    }
-
     /**
      * RMIs interface method
      *
@@ -205,6 +190,11 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
         // TODO qua sicuri?
         // Refresh the users list for all clients
         NetworkHandler.getInstance().refreshUsersBroadcast();
+    }
+
+    @Override
+    public void sendChatMessage(String message, String sender) throws RemoteException {
+        NetworkHandler.getInstance().sendChatMessageBroadcast(sender, message);
     }
 
     /**
@@ -367,6 +357,30 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
         return Controller.getInstance().getHand(nickname);
     }
 
+    @Override
+    public void finalizingNumberOfPlayers() {
+        for (String nickname : connections.keySet()) {
+            new Thread(() -> {
+                if (Controller.getInstance().isAdmitted(nickname)) {
+                    try {
+                        connections.get(nickname).stopWaiting();
+                    } catch (RemoteException e) {
+                        // TODO
+                    }
+                } else {
+                    // TODO eliminare dalle disconnesioni tabella.
+                    try {
+                        connections.get(nickname).disconnect();
+                    } catch (RemoteException e) {
+                        connections.remove(nickname);
+                        // TODO
+                    }
+                    connections.remove(nickname);
+                }
+            }).start();
+        }
+    }
+
     /**
      * Implements the login method of the NetworkPlug interface.
      * This method is responsible for refreshing the user list for all connected
@@ -446,27 +460,29 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
     }
     // TODO javadoc and comment
 
-    @Override
-    public void finalizingNumberOfPlayers() {
+    /**
+     * It sends a message to all the clients, if they are tagged in the message like in this format "@player1 hi!", the message will be sent only to the player with "player1" nickname.
+     * Nickname are searched from the connection so all the given fake nicknames won't be sent and from other connections will be sent from that connection.
+     * @param sender nickname of the sender
+     * @param message message to be sent
+     */
+    public void sendingChatMessage(String sender, String message){
+        ArrayList<String> receivers = new ArrayList<>();
         for (String nickname : connections.keySet()) {
-            new Thread(() -> {
-                if (Controller.getInstance().isAdmitted(nickname)) {
+            if (message.toLowerCase().contains("@"+nickname.toLowerCase())) {
+                receivers.add(nickname);
+            }
+        }
+        for (String nickname : connections.keySet()) {
+            if(receivers.contains(nickname) || receivers.isEmpty()){
+                new Thread(() -> {
                     try {
-                        connections.get(nickname).stopWaiting();
+                        connections.get(nickname).receiveMessage(sender, message);
                     } catch (RemoteException e) {
                         // TODO
                     }
-                } else {
-                    // TODO eliminare dalle disconnesioni tabella.
-                    try {
-                        connections.get(nickname).disconnect();
-                    } catch (RemoteException e) {
-                        connections.remove(nickname);
-                        // TODO
-                    }
-                    connections.remove(nickname);
-                }
-            }).start();
+                }).start();
+            }
         }
     }
 
@@ -605,6 +621,50 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
     }
 
     /**
+     * It implements the sendPlacedCard method of the NetworkPlug interface.
+     *
+     * This method is responsible for broadcasting the information of the placed
+     * card.
+     * It is called when a player places a card successfully.
+     * It broadcasts the information of the placed card, the player's resources and
+     * points.
+     *
+     * @param nickname The nickname of the player who has placed the card.
+     * @param cardId   The id of the card that has been placed.
+     * @param position The position where the card has been placed.
+     * @param side     The side chosen by the player. True for one side, false for
+     *                 the other.
+     * @throws NoNameException If a player with the given nickname does not exist.
+     */
+    // TODO thread
+    @Override
+    public void sendPlacedCard(String nickname, int cardId, Point position, boolean side) {
+        for (String nicknameRefresh : connections.keySet()) {
+            new Thread(() -> {
+                try {
+                    // Broadcast the placed card information, the player's resources and points
+                    connections.get(nicknameRefresh).placeCard(nickname, cardId, position, side,
+                            Controller.getInstance().getPlayerResources(nickname),
+                            Controller.getInstance().getPlayerPoints(nickname));
+                } catch (RemoteException e) {
+                    // TODO
+                } catch (NoNameException e) {
+                    System.out.println("NonameException. Debugging purpose only");
+                }
+
+                try {
+                    // Refresh the turn information
+                    connections.get(nicknameRefresh).refreshTurnInfo(Controller.getInstance().getCurrentPlayer(),
+                            Controller.getInstance().getGameState());
+                } catch (RemoteException e) {
+                    // TODO;
+                }
+
+            }).start();
+        }
+    }
+
+    /**
      *
      * It implements the sendPlacedCard method of the NetworkPlug interface.
      *
@@ -661,50 +721,6 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
                 } catch (RemoteException e) {
                     // TODO
                 }
-            }).start();
-        }
-    }
-
-    /**
-     * It implements the sendPlacedCard method of the NetworkPlug interface.
-     *
-     * This method is responsible for broadcasting the information of the placed
-     * card.
-     * It is called when a player places a card successfully.
-     * It broadcasts the information of the placed card, the player's resources and
-     * points.
-     *
-     * @param nickname The nickname of the player who has placed the card.
-     * @param cardId   The id of the card that has been placed.
-     * @param position The position where the card has been placed.
-     * @param side     The side chosen by the player. True for one side, false for
-     *                 the other.
-     * @throws NoNameException If a player with the given nickname does not exist.
-     */
-    // TODO thread
-    @Override
-    public void sendPlacedCard(String nickname, int cardId, Point position, boolean side) {
-        for (String nicknameRefresh : connections.keySet()) {
-            new Thread(() -> {
-                try {
-                    // Broadcast the placed card information, the player's resources and points
-                    connections.get(nicknameRefresh).placeCard(nickname, cardId, position, side,
-                            Controller.getInstance().getPlayerResources(nickname),
-                            Controller.getInstance().getPlayerPoints(nickname));
-                } catch (RemoteException e) {
-                    // TODO
-                } catch (NoNameException e) {
-                    System.out.println("NonameException. Debugging purpose only");
-                }
-
-                try {
-                    // Refresh the turn information
-                    connections.get(nicknameRefresh).refreshTurnInfo(Controller.getInstance().getCurrentPlayer(),
-                            Controller.getInstance().getGameState());
-                } catch (RemoteException e) {
-                    // TODO;
-                }
-
             }).start();
         }
     }

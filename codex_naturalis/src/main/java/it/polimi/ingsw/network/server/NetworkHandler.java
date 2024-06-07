@@ -87,9 +87,9 @@ public class NetworkHandler {
         }
     }
 
-    public void receiveMessageBroadcast(String message, String sender) {
+    public void sendChatMessageBroadcast(String sender, String message) {
         for (NetworkPlug networkPlug : networkInterfacesAndConnections.values()) {
-            networkPlug.receiveMessage(message, sender);
+            networkPlug.sendingChatMessage(sender, message);
         }
     }
 

@@ -20,6 +20,7 @@ import it.polimi.ingsw.model.exception.SameNameException;
 import it.polimi.ingsw.model.exception.WrongGamePhaseException;
 import it.polimi.ingsw.network.messages.ErrorType;
 import it.polimi.ingsw.network.messages.client.ClientMessage;
+import it.polimi.ingsw.network.messages.client.SentChatMessage;
 import it.polimi.ingsw.network.messages.client.gameflow.CardToBeDrawn;
 import it.polimi.ingsw.network.messages.client.gameflow.CardToBePositioned;
 import it.polimi.ingsw.network.messages.client.gamestart.ChosenObjectiveCard;
@@ -49,7 +50,7 @@ import it.polimi.ingsw.network.messages.server.login.PlayersAndColorPins;
 import it.polimi.ingsw.network.messages.server.login.StatusLogin;
 import it.polimi.ingsw.network.server.NetworkHandler;
 import it.polimi.ingsw.network.server.NetworkPlug;
-import it.polimi.ingsw.network.messages.server.MessageMessage;
+import it.polimi.ingsw.network.messages.server.ReceivedChatMessage;
 
 import java.io.*;
 
@@ -115,11 +116,6 @@ public class NetworkServerSocket implements NetworkPlug {
     }
 
     @Override
-    public void receiveMessage(String message, String sender) {
-        sendBroadCastMessage(new MessageMessage(message, sender));
-    }
-
-    @Override
     public void gameIsStarting() {
         int resourceCard0 = controller.getResourceCards(0);
         int resourceCard1 = controller.getResourceCards(1);
@@ -139,9 +135,39 @@ public class NetworkServerSocket implements NetworkPlug {
     }
 
     @Override
+    public void sendingChatMessage(String message, String sender) {
+        ArrayList<String> receivers = new ArrayList<>();
+        for (String nickname : connections.keySet()) {
+            if (message.toLowerCase().contains("@"+nickname.toLowerCase())) {
+                receivers.add(nickname);
+            }
+        }
+        if(receivers.isEmpty()){
+            sendBroadCastMessage(new ReceivedChatMessage(sender, message));
+        }else{
+            for (String nickname : connections.keySet()) {
+                if(receivers.contains(nickname)){//TODO thread should be done right?
+                    new Thread(() -> {
+                        connections.get(nickname).sendChatMessageIfPlayer(sender, message);
+                    }).start();
+                }
+            }
+        }
+    }
+
+    @Override
     public void refreshUsers() {
         HashMap<String, Color> playersAndPins = controller.getPlayersAndPins();
         sendBroadCastMessage(new PlayersAndColorPins(playersAndPins));
+    }
+
+    @Override
+    public void sendingHandsAndWhenSecretObjectiveCardsCompleteStartGameFlow(String nickname,
+                                                                             boolean allWithSecretObjectiveCardChosen) {
+
+        for (ClientHandler connection : connections.values()) {
+            connection.sendHand(nickname, allWithSecretObjectiveCardChosen);
+        }
     }
 
     @Override
@@ -162,15 +188,6 @@ public class NetworkServerSocket implements NetworkPlug {
             for (ClientHandler connection : connections.values()) {
                 connection.sendSecretObjectives();
             }
-        }
-    }
-
-    @Override
-    public void sendingHandsAndWhenSecretObjectiveCardsCompleteStartGameFlow(String nickname,
-            boolean allWithSecretObjectiveCardChosen) {
-
-        for (ClientHandler connection : connections.values()) {
-            connection.sendHand(nickname, allWithSecretObjectiveCardChosen);
         }
     }
 
@@ -303,7 +320,10 @@ public class NetworkServerSocket implements NetworkPlug {
                 } catch (ColorAlreadyTakenException e) {
                     sendErrorMessage(ErrorType.COLOR_UNAVAILABLE);
                 }
-            } else if (message instanceof ChosenStartingCardSide) {
+            } else if(message instanceof SentChatMessage){
+                SentChatMessage sentChatMessage = (SentChatMessage) message;
+                networkHandler.sendChatMessageBroadcast(sentChatMessage.getSender(), sentChatMessage.getMessage());
+            }else if (message instanceof ChosenStartingCardSide) {
                 ChosenStartingCardSide parsedMessage = (ChosenStartingCardSide) message;
                 try {
                     int cardId = controller.placeRootCard(parsedMessage.getNickname(), parsedMessage.isSide());
@@ -423,6 +443,16 @@ public class NetworkServerSocket implements NetworkPlug {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+
+        /**
+         * This method is used to send a chat message to a specific client without using broadcast.
+         *
+         * @param sender  The nickname of the sender.
+         * @param message The message.
+         */
+        public void sendChatMessageIfPlayer(String sender, String message){
+            sendMessage(new ReceivedChatMessage(sender, message));
         }
 
         /**

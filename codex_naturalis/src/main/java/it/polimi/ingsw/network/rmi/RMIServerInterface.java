@@ -17,8 +17,6 @@ import java.rmi.RemoteException;
  */
 public interface RMIServerInterface extends Remote {
 
-    void receiveMessage(String message, String sender) throws RemoteException;
-
     /**
      * This method is used to log in a client and check if it is the first player to
      * login.
@@ -79,6 +77,16 @@ public interface RMIServerInterface extends Remote {
      *                                    the given nickname does not exist.
      */
     void chooseColor(String nickname, Color color) throws RemoteException, ColorAlreadyTakenException, NoNameException;
+
+    /**
+     * This method is used to send a chat message to the other players.
+     *
+     * @param message The message sent by the player.
+     * @param sender  The nickname of the player who sent the message.
+     * @throws RemoteException throws a RemoteException if there is a problem with the
+     *                         connection.
+     */
+    void sendChatMessage(String message, String sender) throws RemoteException;
 
     /**
      * This method is used to choose the starting card of the player.
@@ -168,4 +176,5 @@ public interface RMIServerInterface extends Remote {
      */
     Integer[] drawCard(String nickname, boolean gold, int onTableOrDeck)
             throws RemoteException, WrongGamePhaseException, NoTurnException, NoNameException, CardPositionException;
+
 }

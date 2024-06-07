@@ -5,6 +5,5 @@ import it.polimi.ingsw.network.messages.Message;
 
 public abstract class ServerMessage extends Message {
 
-    public void callController(Controller controller){
-    };
+    public abstract void callController(Controller controller);
 }

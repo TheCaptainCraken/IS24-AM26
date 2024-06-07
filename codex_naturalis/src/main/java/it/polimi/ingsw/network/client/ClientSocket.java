@@ -5,6 +5,7 @@ import it.polimi.ingsw.model.Color;
 import it.polimi.ingsw.model.exception.*;
 import it.polimi.ingsw.network.messages.Message;
 import it.polimi.ingsw.network.messages.client.ClientMessage;
+import it.polimi.ingsw.network.messages.client.SentChatMessage;
 import it.polimi.ingsw.network.messages.client.gameflow.CardToBeDrawn;
 import it.polimi.ingsw.network.messages.client.gameflow.CardToBePositioned;
 import it.polimi.ingsw.network.messages.client.gamestart.ChosenObjectiveCard;
@@ -96,6 +97,7 @@ public class ClientSocket implements Runnable, NetworkClient{
         ClientMessage message = new LoginMessage(nickname);
         sendMessage(message);
     }
+
     /**
      * NetworkClient implementation
      *
@@ -112,6 +114,7 @@ public class ClientSocket implements Runnable, NetworkClient{
         ClientMessage message = new NumberOfPlayersMessage(numberOfPlayers);
         sendMessage(message);
     }
+
     /**
      * NetworkClient implementation
      *
@@ -130,6 +133,22 @@ public class ClientSocket implements Runnable, NetworkClient{
         ClientMessage message = new ColorChosen(controller.getNickname(), color);
         sendMessage(message);
     }
+
+    /**
+     * NetworkClient implementation
+     *
+     * Sends a chat message.
+     * This method is used to send a chat message to the other players in the game.
+     *
+     * @param sender The nickname of the player who sent the message.
+     * @param message The message sent by the player.
+     */
+    @Override
+    public void sendChatMessage(String sender, String message) {
+        SentChatMessage sentChatMessage = new SentChatMessage(sender, message);
+        sendMessage(sentChatMessage);
+    }
+
     /**
      * NetworkClient implementation
      *
@@ -150,6 +169,7 @@ public class ClientSocket implements Runnable, NetworkClient{
         ClientMessage message = new ChosenStartingCardSide(controller.getNickname(), side);
         sendMessage(message);
     }
+
     /**
      * NetworkClient implementation
      *
@@ -171,6 +191,7 @@ public class ClientSocket implements Runnable, NetworkClient{
         ClientMessage message = new ChosenObjectiveCard(controller.getNickname(), indexCard);
         sendMessage(message);
     }
+
     /**
      * NetworkClient implementation
      *
@@ -190,6 +211,7 @@ public class ClientSocket implements Runnable, NetworkClient{
         ClientMessage message = new CardToBePositioned(controller.getNickname(), indexHand, position, side);
         sendMessage(message);
     }
+
     /**
      * NetworkClient implementation
      *
@@ -223,6 +245,7 @@ public class ClientSocket implements Runnable, NetworkClient{
             handleResponse(serverMessage);
         }
     } //TODO implementazione
+
     /**
      * Handles the response from the server.
      * This method is called by the run method for each received server message.
@@ -233,6 +256,7 @@ public class ClientSocket implements Runnable, NetworkClient{
     public void handleResponse(ServerMessage message){
         message.callController(controller);
     }
+
     /**
      * Receives a message from the server.
      * This method is called by the run method to receive a server message.
@@ -246,8 +270,7 @@ public class ClientSocket implements Runnable, NetworkClient{
             answer = (ServerMessage) objInputStream.readObject();
         } catch (IOException e) {
             throw new RuntimeException();
-        }
-        catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException e) {
             System.out.println("This error should never happen. The server is sending a message that the client does not know how to handle.");
             return null;
         }
@@ -264,6 +287,7 @@ public class ClientSocket implements Runnable, NetworkClient{
             e.printStackTrace();
         }
     }
+
     /**
      * Sends a message to the server.
      * This method is used to send a message to the server over the socket connection.
