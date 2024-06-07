@@ -129,7 +129,7 @@ public class GameMaster {
      * ObjectiveCard pick
      *
      * @param namePlayer player who sent the request
-     * @param whichCard  which of the two ObjectiveCard wants to be used
+     * @param whichCard  which of the two ObjectiveCard wants to be used (0, 1)
      */
     public void chooseObjectiveCard(String namePlayer, int whichCard)
             throws NoTurnException, WrongGamePhaseException, NoNameException {
@@ -274,7 +274,7 @@ public class GameMaster {
      *                     gold or not
      * @param CardPosition If the card is taken from the table or not: -1 means from
      *                     deck, 0 and 1 are the position onTable array
-     * @return
+     * @return the id of the card drawn
      */
     public int drawCard(String namePlayer, boolean Gold, int CardPosition)
             throws WrongGamePhaseException, NoTurnException, NoNameException, CardPositionException {
@@ -397,7 +397,6 @@ public class GameMaster {
     }
 
     // Finding methods
-
     /**
      * Given a position it gives attachments to the card, the Corner keys are
      * referred to the Corner of the new card
@@ -868,7 +867,6 @@ public class GameMaster {
      */
     public int getTurn() {
         return globalTurn / lobby.getPlayers().length - 1;
-        // non conta giro rootCard (turn = -1) e giro ObjectiveCard (turn = 0)
     }
 
     /**
@@ -902,7 +900,7 @@ public class GameMaster {
      *
      * @param name          player who sent the request
      * @param currentPlayer the player who is the turn right now
-     * @return
+     * @return true if it's the turn of the player who sent the request
      */
     private boolean isCurrentPlayer(String name, Player currentPlayer) {
         return name.equals(currentPlayer.getName());

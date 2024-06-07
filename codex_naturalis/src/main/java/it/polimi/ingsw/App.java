@@ -33,7 +33,7 @@ public class App extends Application {
         return fxmlLoader.load();
     }
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) {
         Controller controller = null;
         Scanner myObj = new Scanner(System.in);
 

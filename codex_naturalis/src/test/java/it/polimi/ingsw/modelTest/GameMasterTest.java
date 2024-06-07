@@ -1,10 +1,8 @@
 package it.polimi.ingsw.modelTest;
 
 import it.polimi.ingsw.model.*;
-import it.polimi.ingsw.model.Color;
 import it.polimi.ingsw.model.exception.*;
 import org.json.simple.parser.ParseException;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,7 +27,7 @@ public class GameMasterTest {
     static String alternatebasePath = "src/test/java/it/polimi/ingsw/test_decks/";
 
     @BeforeEach
-    public void setUp() throws SameNameException, LobbyCompleteException, IOException, ParseException {
+    public void setUp() throws SameNameException, LobbyCompleteException {
         //create player
         lobby = new Lobby();
         lobby.addPlayer("pietro");
@@ -37,11 +35,17 @@ public class GameMasterTest {
         lobby.addPlayer("giovanni");
         lobby.addPlayer("francesco");
 
-        game = new GameMaster(lobby,
-                basePath + "resourceCardsDeck.json",
-                "src/main/java/it/polimi/ingsw/model/decks/goldCardsDeck.json",
-                basePath + "objectiveCardsDeck.json",
-                basePath + "startingCardsDeck.json");
+        try {
+            game = new GameMaster(lobby,
+                    basePath + "resourceCardsDeck.json",
+                    "src/main/java/it/polimi/ingsw/model/decks/goldCardsDeck.json",
+                    basePath + "objectiveCardsDeck.json",
+                    basePath + "startingCardsDeck.json");
+        } catch (IOException e) {
+            System.out.println("File not found");
+        } catch (ParseException e) {
+            System.out.println("Error in parsing");
+        }
     }
 
     @Test
@@ -655,8 +659,6 @@ public class GameMasterTest {
     //TODO test for L formation
 
     //TODO test for resourcs @Arturo
-
-
 }
 
 
