@@ -322,11 +322,13 @@ public class Controller {
      * @param turn The turn number when the card was placed.
      */
     public void updatePlaceCard(String nickname, int id, Point position, boolean side, int turn) {
+        boolean start = false;
         //if the card is the starting card of the given client, show a message to inform the player.
         if(position.x == 0 && position.y == 0 && nickname.equals(Controller.nickname))
         {
             model.updatePlaceCard(nickname, id, position, side, turn);
             view.showStartingCardChosen();
+            start = true;
         }
         //else if since for starting card we haven't set the hand yet.
         //set the playedCardToNull, if the cards is correctly placed and is the owner of it.
@@ -341,10 +343,12 @@ public class Controller {
             //notify the scene that the hand has been updated. The scene will update the view.
             view.showHand();
         }
-
-        model.updatePlaceCard(nickname, id, position, side, turn);
-        //notify the scene that a card has been placed. The scene will update the view.
-        view.showTableOfPlayer(nickname);
+        //we update the model with the card placed, only if it is not the starting card chosen by the player.
+        if(!start) {
+            model.updatePlaceCard(nickname, id, position, side, turn);
+            //notify the scene that a card has been placed. The scene will update the view.
+            view.showTableOfPlayer(nickname);
+        }
     }
     /**
      * Updates the resources of a player in the game model.

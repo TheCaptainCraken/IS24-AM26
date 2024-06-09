@@ -44,7 +44,7 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
 
     public static void main(String[] args) throws IOException {
         ServerRMI obj = new ServerRMI();
-        NetworkServerSocket networkServerSocket = new NetworkServerSocket(0);
+        NetworkServerSocket networkServerSocket = new NetworkServerSocket(4567);
         new Thread(()-> {
             try {
                 networkServerSocket.start();
@@ -188,7 +188,14 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
         }
     }
 
-    //TODO javadoc
+    /**
+     * Sends a chat message to all connected clients. If a client is mentioned in the message using the "@nickname" format,
+     * the message will be sent only to that client. Nicknames are extracted from the connections map, so any non-existent
+     * nicknames mentioned in the message will be ignored. The message will be sent from the connection associated with the sender's nickname.
+     *
+     * @param sender The nickname of the client sending the message.
+     * @param message The message to be sent.
+     */
     @Override
     public void sendChatMessage(String message, String sender) throws RemoteException {
         NetworkHandler.getInstance().sendChatMessageBroadcast(sender, message);
@@ -395,7 +402,7 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
             }
         }
         for (String nickname : connections.keySet()) {
-            //TODO reciverrsIsempty che significa?
+            //recivers is empty means that the message is for all the players. Otherwise is a single message to a specific client.
             if(receivers.contains(nickname) || receivers.isEmpty()){
                 new Thread(() -> {
                     try {

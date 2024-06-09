@@ -31,7 +31,7 @@ import it.polimi.ingsw.network.socket.messages.client.login.ColorChosen;
 import it.polimi.ingsw.network.socket.messages.client.login.LoginMessage;
 import it.polimi.ingsw.network.socket.messages.client.login.NumberOfPlayersMessage;
 import it.polimi.ingsw.network.socket.messages.server.ErrorMessage;
-import it.polimi.ingsw.network.socket.messages.server.ReceivedChatMessage;
+import it.polimi.ingsw.network.socket.messages.server.gameflow.ReceivedChatMessage;
 import it.polimi.ingsw.network.socket.messages.server.ServerMessage;
 import it.polimi.ingsw.network.socket.messages.server.StopGaming;
 import it.polimi.ingsw.network.socket.messages.server.endgame.ShowPointsFromObjectives;
@@ -174,12 +174,23 @@ public class NetworkServerSocket implements NetworkPlug {
         sendBroadCastMessage(new PlayersAndColorPins(playersAndPins));
     }
 
-    //TODO javadoc
+    /**
+     * Sends a chat message to players checking tags.
+     *
+     * This method is used to send a chat message from a sender to one or more receivers.
+     * If the message contains a "@nickname" tag, the message will be sent only to the client associated with that nickname.
+     * If no such tags are found in the message, it will be broadcast to all connected clients.
+     *
+     * @param sender  The nickname of the player who sent the message.
+     * @param message The message sent by the player.
+     */
     @Override
     public void sendingChatMessage(String message, String sender) {
         ArrayList<String> receivers = new ArrayList<>();
         for (String nickname : connections.keySet()) {
-            if (message.toLowerCase().contains("@"+nickname.toLowerCase())) {
+            //see how connections work. It is a map with the address of the client as key and the ClientHandler as value.
+            //client handler has the nickname of the client.
+            if (message.toLowerCase().contains("@"+connections.get(nickname).getNickname().toLowerCase())) {
                 receivers.add(nickname);
             }
         }
@@ -188,7 +199,7 @@ public class NetworkServerSocket implements NetworkPlug {
             sendBroadCastMessage(new ReceivedChatMessage(sender, message));
         }else{
             for (String nickname : connections.keySet()) {
-                if(receivers.contains(nickname)){
+                if(receivers.contains(connections.get(nickname).getNickname())){
                         connections.get(nickname).sendChatMessageIfPlayer(sender, message);
                 }
             }

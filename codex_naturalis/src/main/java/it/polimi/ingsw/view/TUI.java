@@ -281,7 +281,6 @@ public class TUI implements ViewInterface {
     /**
      * Shows the resources of all players.
      */
-    @Override
     public synchronized void showResourcesAllPlayers() {
         HashMap<String, HashMap<Sign, Integer>> resources = model.getResources();
         for (String player : resources.keySet()) {
@@ -804,10 +803,7 @@ public class TUI implements ViewInterface {
         ViewSubmissions.getInstance().sendChatMessage(message);
     }
 
-    /**
-     * Prints the default menu, with all the options to choose from.
-     */
-    private void defaultMenu() {
+    private synchronized void menu(){
         System.out.println("please insert a number for choosing the option");
         System.out.println("" +
                 "1 - place a card\n" +
@@ -819,6 +815,13 @@ public class TUI implements ViewInterface {
                 "7 - show my hand\n" +
                 "8 - show the hidden hand of a player\n" +
                 "9 - send a chat message\n");
+    }
+
+    /**
+     * Prints the default menu, with all the options to choose from.
+     */
+    private void defaultMenu() {
+        menu();
         int choice = 0;
         Scanner scanner = new Scanner(System.in);
         boolean validInput = false;

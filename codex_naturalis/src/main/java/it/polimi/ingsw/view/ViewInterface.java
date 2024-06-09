@@ -89,10 +89,6 @@ public interface ViewInterface {
      */
     void showResourcesPlayer();
     /**
-     * This method is responsible for showing the resources of all players.
-     */
-    void showResourcesAllPlayers();
-    /**
      * This method is responsible for showing the points of all player.
      */
     void showPoints();

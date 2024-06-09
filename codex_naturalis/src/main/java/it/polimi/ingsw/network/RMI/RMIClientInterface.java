@@ -176,12 +176,32 @@ public interface RMIClientInterface extends Remote {
      */
     void stopWaiting() throws RemoteException;
 
-    //TODO
+    /**
+     * This method is used to disconnect the client from the server.
+     *
+     * It is called when enough players have joined the lobby and the player cannot continue gaming.
+     *
+     * @throws RemoteException if there is a problem with the network connection.
+     */
     void disconnect() throws RemoteException;
 
-    //TODO
+    /**
+     * This method is used to stop the game for a client.
+     *
+     * It is called when the server decides to end the game or when the client decides to leave the game or
+     * lose the connection with the server.
+     *
+     * @throws RemoteException if there is a problem with the network connection.
+     */
     void stopGaming() throws RemoteException;
 
-    //TODO
+    /**
+     * This method is used to check if the client is still connected to the server.
+     *
+     * It is called periodically by the server to ensure that the client's connection is still active.
+     * If the client is not connected, a RemoteException will be thrown.
+     *
+     * @throws RemoteException if there is a problem with the network connection or the client is not connected.
+     */
     void isConnected() throws RemoteException;
 }

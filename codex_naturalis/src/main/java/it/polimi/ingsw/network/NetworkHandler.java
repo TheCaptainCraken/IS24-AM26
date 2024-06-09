@@ -196,7 +196,13 @@ public class NetworkHandler {
         }
     }
 
-    //TODO javadoc
+    /**
+     * Broadcasts a chat message to all connected clients across all network interfaces.
+     * The message is sent to all the different protocols.
+     *
+     * @param sender The nickname of the client sending the message.
+     * @param message The message to be sent.
+     */
     public void sendChatMessageBroadcast(String sender, String message) {
         for (NetworkPlug networkPlug : networkInterfacesAndConnections.values()) {
             networkPlug.sendingChatMessage(sender, message);
