@@ -23,8 +23,8 @@ import java.awt.*;
  * of network connections.
  * Each connection protocol will implement this interface, to send messages to
  * the clients broadcast.
- * Currently, the implemented connections protocol are
- * 1. the socket connection
+ * Currently, the implemented connections protocols are
+ * 1. Socket connection
  * 2. RMI connection
  */
 public interface NetworkPlug {
@@ -114,9 +114,6 @@ public interface NetworkPlug {
          * @param onTableOrDeck An integer indicating whether the card is on the table
          *                      or the deck.
          */
-
-        // TODO sistemare cosa invia, a volte inviamo meno uno per dire qualcosa,
-        // scriverlo.
         void sendDrawnCard(String nickname, int newCardId, Kingdom headDeck, boolean gold, int onTableOrDeck);
 
         /**

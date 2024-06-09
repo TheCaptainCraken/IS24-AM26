@@ -2,9 +2,8 @@ package it.polimi.ingsw.network.socket;
 
 import it.polimi.ingsw.controller.client.Controller;
 import it.polimi.ingsw.model.Color;
-import it.polimi.ingsw.model.exception.*;
 import it.polimi.ingsw.network.NetworkClient;
-import it.polimi.ingsw.network.socket.messages.client.SentChatMessage;
+import it.polimi.ingsw.network.socket.messages.client.gameflow.SentChatMessage;
 import it.polimi.ingsw.network.socket.messages.client.ClientMessage;
 import it.polimi.ingsw.network.socket.messages.client.gameflow.CardToBeDrawn;
 import it.polimi.ingsw.network.socket.messages.client.gameflow.CardToBePositioned;

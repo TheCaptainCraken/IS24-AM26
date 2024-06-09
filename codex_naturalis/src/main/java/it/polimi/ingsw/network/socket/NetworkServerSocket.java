@@ -22,7 +22,7 @@ import it.polimi.ingsw.network.NetworkHandler;
 import it.polimi.ingsw.network.NetworkPlug;
 import it.polimi.ingsw.network.socket.messages.ErrorType;
 import it.polimi.ingsw.network.socket.messages.client.ClientMessage;
-import it.polimi.ingsw.network.socket.messages.client.SentChatMessage;
+import it.polimi.ingsw.network.socket.messages.client.gameflow.SentChatMessage;
 import it.polimi.ingsw.network.socket.messages.client.gameflow.CardToBeDrawn;
 import it.polimi.ingsw.network.socket.messages.client.gameflow.CardToBePositioned;
 import it.polimi.ingsw.network.socket.messages.client.gamestart.ChosenObjectiveCard;
@@ -505,10 +505,10 @@ public class NetworkServerSocket implements NetworkPlug {
                 CardToBePositioned parsedMessage = (CardToBePositioned) message;
                 try {
                     int cardId = controller.placeCard(parsedMessage.getNickname(), parsedMessage.getHandPlacement(),
-                            parsedMessage.getPosition(), parsedMessage.isSide());
+                            parsedMessage.getPosition(), parsedMessage.getSide());
                     //send the card placed to all the clients
                     networkHandler.sendPlacedCardBroadcast(parsedMessage.getNickname(), cardId,
-                            parsedMessage.getPosition(), parsedMessage.isSide());
+                            parsedMessage.getPosition(), parsedMessage.getSide());
                     //two possible end game situations: deck finished we finished in placing phase, or we normally finish in drawing phase.
                     if (controller.isEndGame()) {
                         networkHandler.sendEndGameBroadcast();

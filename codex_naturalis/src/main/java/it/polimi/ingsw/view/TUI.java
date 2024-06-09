@@ -261,27 +261,27 @@ public class TUI implements ViewInterface {
         System.out.println("The game phase is: " + gameState);
         System.out.println();
     }
-    /**
-     * Shows the resources of the client.
-     *
-     */
-    @Override
-    public synchronized void showResourcesPlayer() {
-        String name = controller.getNickname();
-        HashMap<String, HashMap<Sign, Integer>> resources = model.getResources();
-
-        System.out.println("You have the following resources:");
-        for (Sign sign : resources.get(name).keySet()) {
-            if(sign != Sign.NULL && sign != Sign.EMPTY) {
-                System.out.println(sign + " - " + resources.get(name).get(sign));
-            }
-        }
-        System.out.println();
-    }
+//    /**
+//     * Shows the resources of the client.
+//     *
+//     */
+//    @Override
+//    public synchronized void showResourcesPlayer() {
+//        String name = controller.getNickname();
+//        HashMap<String, HashMap<Sign, Integer>> resources = model.getResources();
+//
+//        System.out.println("You have the following resources:");
+//        for (Sign sign : resources.get(name).keySet()) {
+//            if(sign != Sign.NULL && sign != Sign.EMPTY) {
+//                System.out.println(sign + " - " + resources.get(name).get(sign));
+//            }
+//        }
+//        System.out.println();
+//    }
     /**
      * Shows the resources of all players.
      */
-    public synchronized void showResourcesAllPlayers() {
+    public synchronized void showResourcesPlayer() {
         HashMap<String, HashMap<Sign, Integer>> resources = model.getResources();
         for (String player : resources.keySet()) {
             System.out.println();
@@ -809,12 +809,11 @@ public class TUI implements ViewInterface {
                 "1 - place a card\n" +
                 "2 - draw a card\n" +
                 "3 - show the table of a player\n" +
-                "4 - show my resources\n" +
-                "5 - show all players resources\n" +
-                "6 - show the points of the players\n" +
-                "7 - show my hand\n" +
-                "8 - show the hidden hand of a player\n" +
-                "9 - send a chat message\n");
+                "4 - show all players resources\n" +
+                "5 - show the points of the players\n" +
+                "6 - show my hand\n" +
+                "7 - show the hidden hand of a player\n" +
+                "8 - send a chat message\n");
     }
 
     /**
@@ -849,19 +848,16 @@ public class TUI implements ViewInterface {
                 showResourcesPlayer();
                 break;
             case 5:
-                showResourcesAllPlayers();
-                break;
-            case 6:
                 showPoints();
                 break;
-            case 7:
+            case 6:
                 showHand();
                 break;
-            case 8:
+            case 7:
                 //Name is not used, but is necessary for the interface
                 showHiddenHand(null);
                 break;
-            case 9:
+            case 8:
                 sendChatMessage();
                 break;
             default:
@@ -943,7 +939,7 @@ public class TUI implements ViewInterface {
                             "                                  ",
                             "                                  ",
                             "                                  ",
-                            "            SHIFTSOPRA            ",
+                            "                                  ",
                             "                                  ",
                             "                                  ",
                             "                                  ",
@@ -965,7 +961,7 @@ public class TUI implements ViewInterface {
                             "                                  ",
                             "                                  ",
                             "                                  ",
-                            "             SHIFT                ",
+                            "                                  ",
                             "                                  ",
                             "                                  ",
                             "                                  ",
