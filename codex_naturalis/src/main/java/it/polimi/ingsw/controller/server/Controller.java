@@ -467,7 +467,8 @@ public class Controller {
     }
 
     /**
-     * Saves the game state to a file.
+     * Saves the game state to a file. This implements the game saving advanced
+     * functionality.
      */
     public void saveGame() {
         try {
