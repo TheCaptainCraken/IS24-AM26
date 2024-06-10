@@ -128,6 +128,9 @@ public class GameMaster implements Serializable {
             if (!side) {
                 for (Sign sign : rootCard.getBonusResources()) {
                     currentPlayer.addResource(sign, 1);
+                    for (Corner corner : Corner.values()) {
+                        currentPlayer.addResource(rootCard.getBacksideCorners().get(corner), 1);
+                    }
                 }
             } else {
                 for (Corner corner : Corner.values()) {
@@ -223,8 +226,7 @@ public class GameMaster implements Serializable {
             // subtracted only if the PlayedCards
             // present in the attachments HashMap are played on their front side or are
             // referencing the StartingCard
-            if (attachments.get(corner) != null && (attachments.get(corner).isFacingUp()
-                    || attachments.get(corner).getCard() instanceof StartingCard)) {
+             if (attachments.get(corner) != null && attachments.get(corner).isFacingUp()) {
                 switch (corner) {
                     case TOP_LEFT: {
                         currentPlayer.removeResources(
@@ -247,7 +249,30 @@ public class GameMaster implements Serializable {
                         break;
                     }
                 }
-            }
+            } else if(attachments.get(corner) != null && attachments.get(corner).getCard() instanceof StartingCard){
+                 switch (corner) {
+                    case TOP_LEFT: {
+                        currentPlayer.removeResources(
+                                ((StartingCard)attachments.get(corner).getCard()).getBacksideCorners().get(Corner.BOTTOM_RIGHT), 1);
+                        break;
+                    }
+                    case TOP_RIGHT: {
+                        currentPlayer.removeResources(
+                                ((StartingCard)attachments.get(corner).getCard()).getBacksideCorners().get(Corner.BOTTOM_LEFT), 1);
+                        break;
+                    }
+                    case BOTTOM_LEFT: {
+                        currentPlayer.removeResources(
+                                ((StartingCard)attachments.get(corner).getCard()).getBacksideCorners().get(Corner.TOP_RIGHT), 1);
+                        break;
+                    }
+                    case BOTTOM_RIGHT: {
+                        currentPlayer.removeResources(
+                                ((StartingCard)attachments.get(corner).getCard()).getBacksideCorners().get(Corner.TOP_LEFT), 1);
+                        break;
+                    }
+                }
+             }
         }
 
         // At the end because I need to know resources values at the end and how many
@@ -294,7 +319,7 @@ public class GameMaster implements Serializable {
      *                     gold or not
      * @param CardPosition If the card is taken from the table or not: -1 means from
      *                     deck, 0 and 1 are the position onTable array
-     * @return
+     * @return the id of the card drawn
      */
     public int drawCard(String namePlayer, boolean Gold, int CardPosition)
             throws WrongGamePhaseException, NoTurnException, NoNameException, CardPositionException {
@@ -422,7 +447,6 @@ public class GameMaster implements Serializable {
     }
 
     // Finding methods
-
     /**
      * Given a position it gives attachments to the card, the Corner keys are
      * referred to the Corner of the new card
@@ -893,7 +917,6 @@ public class GameMaster implements Serializable {
      */
     public int getTurn() {
         return globalTurn / lobby.getPlayers().length - 1;
-        // non conta giro rootCard (turn = -1) e giro ObjectiveCard (turn = 0)
     }
 
     /**
@@ -927,7 +950,7 @@ public class GameMaster implements Serializable {
      *
      * @param name          player who sent the request
      * @param currentPlayer the player who is the turn right now
-     * @return
+     * @return true if it's the turn of the player who sent the request
      */
     private boolean isCurrentPlayer(String name, Player currentPlayer) {
         return name.equals(currentPlayer.getName());

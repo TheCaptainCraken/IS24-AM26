@@ -32,8 +32,7 @@ public class Controller {
      * 
      * @return The instance of the controller.
      */
-    public static Controller getInstance() {
-        // TODO mutex here
+    public synchronized static Controller getInstance() {
         return INSTANCE;
     }
 
@@ -63,8 +62,6 @@ public class Controller {
      * The actual initialization of the GameMaster is handled by the GameMaster's
      * constructor.
      *
-     * @throws IOException    If the file is not found.
-     * @throws ParseException If the file is not valid.
      */
     public void start() {
         try {
@@ -245,7 +242,7 @@ public class Controller {
      * @throws ColorAlreadyTakenException If the color is already taken.
      * @return Whether all players have chosen a color.
      */
-    public boolean setColourAndLobbyisReadyToStart(String name, Color colour)
+    public boolean setColourAndLobbyIsReadyToStart(String name, Color colour)
             throws ColorAlreadyTakenException, NoNameException {
         for (Player player : lobby.getPlayers()) {
             if (player.getColor() == colour) {
@@ -483,5 +480,13 @@ public class Controller {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public int getTurn() {
+        return game.getTurn();
+    }
+
+    public int getSecretObjectiveCard(String nickname) throws NoNameException {
+        return lobby.getPlayerFromName(nickname).getSecretObjective().getId();
     }
 }

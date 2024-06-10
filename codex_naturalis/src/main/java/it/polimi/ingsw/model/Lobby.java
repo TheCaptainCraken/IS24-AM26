@@ -73,9 +73,7 @@ public class Lobby {
     }
 
     public void setMaxSize(int maxSize) throws ClosingLobbyException {
-        // TODO questa eccezione è inutile, input gestito da client. complete okay ma
-        // già bloccante in AddPlayer.
-        if (complete || maxSize > 4 || maxSize < 2) {
+        if(complete || maxSize > 4 || maxSize < 2){
             throw new ClosingLobbyException();
         }
         this.maxSize = maxSize;

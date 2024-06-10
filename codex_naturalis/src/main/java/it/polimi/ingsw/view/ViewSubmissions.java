@@ -24,7 +24,9 @@ public class ViewSubmissions {
     }
 
     //Client to Server
+
     //Input the number of players. The number of players can be 2, 3 or 4. The controller will check the input.
+    //TODO no, il controller non fa check di input.
     public void chooseNumberOfPlayers(int numberOfPlayers){
         controller.insertNumberOfPlayers(numberOfPlayers);
     }
@@ -51,5 +53,9 @@ public class ViewSubmissions {
     //Input where to draw the card. The controller will check the input.
     public void drawCard(boolean gold, int onTableOrDeck){
         controller.drawCard(gold, onTableOrDeck);
+    }
+
+    public String getNickname(){
+        return controller.getNickname();
     }
 }

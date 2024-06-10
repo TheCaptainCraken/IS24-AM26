@@ -2,17 +2,17 @@ package TuiTest;
 
 import it.polimi.ingsw.controller.client.Controller;
 import it.polimi.ingsw.view.LittleModel;
-import it.polimi.ingsw.view.Tui;
+import it.polimi.ingsw.view.TUI;
 
 import java.util.ArrayList;
 
 public class TuiTest {
-    public static Tui tui;
+    public static TUI tui;
 
     public static void main(String[] args) {
         LittleModel model = new LittleModel();
         Controller controller = new Controller();
-        Tui tui = new Tui(model, controller);
+        tui = new TUI(model, controller);
 
         System.out.println(tui.signToEmoji("INKWELL")); // This will print the mushroom emoji
 //
