@@ -103,7 +103,7 @@ public class Controller {
         model = new LittleModel();
         if(typeOfView.equals("TUI")){
             this.view = new TUI(model, this);
-            view.start();
+            ((TUI) view).start();
         }else if(typeOfView.equals("GUI")){
             new Thread(() -> {
                 launch(GUI.class);

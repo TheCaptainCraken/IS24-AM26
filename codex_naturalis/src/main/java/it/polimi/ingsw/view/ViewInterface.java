@@ -14,12 +14,6 @@ import java.util.HashMap;
  */
 public interface ViewInterface {
     /**
-     * This method is responsible for initializing the View in the MVC pattern.
-     * It sets up the user interface and prepares it for interaction with the user.
-     * The specific implementation of this method will depend on the type of View (e.g., GUI or TUI).
-     */
-    void start();
-    /**
      * This method is responsible for prompting the user to input the number of players for the game.
      * It is typically called at the beginning of the game setup process.
      */

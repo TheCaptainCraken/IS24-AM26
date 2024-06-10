@@ -777,7 +777,6 @@ public class TUI implements ViewInterface {
      * It continuously runs a loop to keep the game running until it ends.
      * Inside the loop, it displays the default menu to the user and handles their input.
      */
-    @Override
     public void start() {
         while (true) {
             switch (Controller.getPhase()) {

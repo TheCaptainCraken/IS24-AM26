@@ -285,12 +285,6 @@ public class GUI extends Application implements ViewInterface {
         Platform.runLater(() -> matchController.showIsFirst(firstPlayer));
     }
 
-
-    @Override
-    public void start() {
-
-    }
-
     public void waitLobby(){
        Platform.runLater(() -> loginController.waitLobby());
     }
@@ -298,5 +292,10 @@ public class GUI extends Application implements ViewInterface {
     @Override
     public void correctNumberOfPlayers(int numberOfPlayers) {
         Platform.runLater(() -> loginController.correctNumberOfPlayers(numberOfPlayers));
+    }
+
+    @Override
+    public void receiveMessage(String sender, String message) {
+        //TODO chat
     }
 }

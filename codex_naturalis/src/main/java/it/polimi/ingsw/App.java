@@ -9,6 +9,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.Scanner;
 
 
 /**
@@ -61,7 +62,12 @@ public class App{
            switch(choice){
                case "TUI":
                case "GUI":
-                   controller.setView(choice);
+                   try {
+                       controller.setView(choice);
+                   } catch (InterruptedException e) {
+                       System.out.println("Error in setting the view");
+                       System.exit(0);
+                   }
                    break;
                default:
                    System.out.println("Invalid choice, please insert TUI or GUI");
