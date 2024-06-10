@@ -17,7 +17,7 @@
             <VBox fx:id="playerContainer" prefHeight="980.0" prefWidth="287.0" spacing="25.0" BorderPane.alignment="CENTER" />
          </left>
          <center>
-            <ScrollPane hbarPolicy="ALWAYS" hvalue="0.5" pannable="true" vbarPolicy="ALWAYS" vvalue="0.5" BorderPane.alignment="BOTTOM_LEFT">
+            <ScrollPane hbarPolicy="NEVER" hvalue="0.5" pannable="true" vbarPolicy="NEVER" vvalue="0.5" BorderPane.alignment="BOTTOM_LEFT">
               <content>
                 <AnchorPane prefHeight="3000.0" prefWidth="3000.0">
                      <children>
@@ -62,13 +62,14 @@
             </VBox>
          </right>
          <top>
-            <VBox fx:id="statusMenu" alignment="CENTER" prefHeight="119.0" prefWidth="1920.0" BorderPane.alignment="CENTER">
+            <VBox fx:id="statusMenu" alignment="CENTER" prefHeight="119.0" prefWidth="1920.0">
                <children>
-                  <Label fx:id="status" text="StatusMessagesHere">
+                  <Label fx:id="status" alignment="CENTER" contentDisplay="CENTER" prefHeight="87.0" prefWidth="866.0" text="StatusMessageHere">
                      <font>
                         <Font size="23.0" />
                      </font>
                   </Label>
+                  <HBox fx:id="statusButtons" alignment="CENTER" prefHeight="35.0" prefWidth="1920.0" spacing="15.0" />
                </children>
             </VBox>
          </top>

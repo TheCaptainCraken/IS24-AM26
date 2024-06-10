@@ -54,43 +54,20 @@ public class LoginController {
             dialog.show();
         } else {
             ViewSubmissions.getInstance().chooseNickname(name);
-            input.setVisible(false);
             label1.setText("Please Wait...");
         }
     }
 
-    public void handleDebug() throws InterruptedException {
-        //showInsertNumberOfPlayers();
-        //waitLobby();
-        //showColorPrompt();
-        //stopWaiting();
-        //colorAlreadyTaken();
-        //sameName("test");
-        /*HashMap <String,Color> map = new HashMap<>();
-        map.put("Arturo",Color.BLUE);
-        map.put("Pietro",null);
-        map.put("Daniel",Color.GREEN);
-        refreshUsers(map);
-        HashMap <String,Color> map1 = new HashMap<>();
-        map1.put("Arturo",Color.BLUE);
-        map1.put("Pietro",Color.RED);
-        map1.put("Daniel",Color.GREEN);
-        refreshUsers(map1);*/
-    }
-
     //METHODS CALLED BY GUI CLASS
     public void showInsertNumberOfPlayers() {
-
         label1.setText("You are the first player.\n Please enter the number of players");
         button1.setText("Submit");
-        button1.setVisible(true);
         ChoiceBox <Integer> box = new ChoiceBox<>();
         box.getItems().addAll(2,3,4);
         box.setValue(2);
         inputBox.getChildren().remove(input);
         inputBox.getChildren().add(box);
         button1.setOnMouseClicked(event -> ViewSubmissions.getInstance().chooseNumberOfPlayers(box.getValue()));
-
     }
 
     public void waitLobby(){
@@ -111,15 +88,104 @@ public class LoginController {
 
     public void showColorPrompt(){
         button1.setVisible(false);
-        inputBox.getChildren().remove(input);
+        inputBox.getChildren().removeIf(node -> node instanceof TextField);
         setupColors();
     }
 
     /**
      * method used to Set Up the Login View with its images
      */
+
+    public void refreshUsers(HashMap<String,Color> map){
+        int i;
+        for(String s: map.keySet()){
+            i = 0;
+            for(Label l: names){
+                Color c = map.get(s);
+                if(l.getText().equals(s)){
+                    if(c != null && avatars.get(i).getImage().equals(DEFAULT_TOKEN) ){
+                        Image img = loadColor(c);
+                        avatars.get(i).setImage(img);
+                    }
+                    break;
+                } else if(l.getText().equals(DEFAULT_LABEL)){
+                    l.setText(s);
+                    if(c != null){
+                        Image img = loadColor(c);
+                        avatars.get(i).setImage(img);
+
+                    }
+                    break;
+                }
+                i++;
+            }
+        }
+    }
+
+    public void correctNumberOfPlayers(int number){
+        label1.setText("You have correctly set the number of players\nThe number of players is " + number);
+        inputBox.getChildren().removeIf(node->node instanceof ChoiceBox);
+        button1.setVisible(false);
+    }
+
+
+    //Exception Handling
+    public void colorAlreadyTaken(){
+        dialog = new Dialog<>();
+        dialog.setTitle("Color Already Taken!");
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK);
+        Label l = new Label("The color you have selected\n has been chosen by another player.\n Please try again");
+        l.setFont(Font.font(16));
+        ImageView error = new ImageView("error_icon.png");
+        HBox box = new HBox(error,l);
+        dialog.getDialogPane().setContent(box);
+        dialog.show();
+        showColorPrompt();
+    }
+
+    public void sameName(String nickname) {
+        input.setText("");
+        dialog = new Dialog<>();
+        dialog.setTitle("Username Already Taken!");
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK);
+        Label l = new Label("The username "+"'"+ nickname +"'"+ "\n has already been selected by another player.\nPlease try again");
+        l.setFont(Font.font(16));
+        ImageView error = new ImageView("error_icon.png");
+        HBox box = new HBox(error,l);
+        dialog.getDialogPane().setContent(box);
+        dialog.show();
+    }
+    public void noConnection() {
+        dialog = new Dialog<>();
+        dialog.setTitle("Username Already Taken!");
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK);
+        Label l = new Label("You are not connected to the server. Game will end soon.\nThank you for playing. Goodbye!");
+        l.setFont(Font.font(16));
+        ImageView error = new ImageView("error_icon.png");
+        HBox box = new HBox(error,l);
+        dialog.getDialogPane().setContent(box);
+        dialog.show();
+    }
+
+    public void lobbyComplete() {
+        input.setVisible(false);
+        button1.setVisible(false);
+        label1.setText("The lobby is full. No other players can join");
+    }
+
+    public void closingLobbyError(){
+        dialog = new Dialog<>();
+        dialog.setTitle("Error");
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK);
+        Label l = new Label("An error occurred while closing the lobby.\n Please try again");
+        l.setFont(Font.font(16));
+        ImageView error = new ImageView("error_icon.png");
+        HBox box = new HBox(error,l);
+        dialog.getDialogPane().setContent(box);
+        dialog.show();
+    }
+    //Utility Functions
     public void setup(){
-        debug.setVisible(false);
         Image img = new Image("logo.png");
         names = new ArrayList<>();
         avatars = new ArrayList<>();
@@ -177,9 +243,9 @@ public class LoginController {
         bButton.setGraphic(b);
         Label l2 = new Label("BLUE");
         bButton.setOnMouseClicked(event -> {
-                label1.setText("Color Submitted!");
-                inputBox.getChildren().clear();
-                ViewSubmissions.getInstance().chooseColor(Color.BLUE);
+            label1.setText("Color Submitted!");
+            inputBox.getChildren().clear();
+            ViewSubmissions.getInstance().chooseColor(Color.BLUE);
         });
 
         Button gButton = new Button();
@@ -226,74 +292,6 @@ public class LoginController {
         }
         return null;
     }
-
-    public void refreshUsers(HashMap<String,Color> map){
-        int i;
-        for(String s: map.keySet()){
-            i = 0;
-            for(Label l: names){
-                Color c = map.get(s);
-                if(l.getText().equals(s)){
-                    if(c != null && avatars.get(i).getImage().equals(DEFAULT_TOKEN) ){
-                        Image img = loadColor(c);
-                        avatars.get(i).setImage(img);
-                    }
-                    break;
-                } else if(l.getText().equals(DEFAULT_LABEL)){
-                    l.setText(s);
-                    if(c != null){
-                        Image img = loadColor(c);
-                        avatars.get(i).setImage(img);
-
-                    }
-                    break;
-                }
-                i++;
-            }
-        }
-    }
-
-    public void correctNumberOfPlayers(int number){
-        label1.setText("You have correctly set the number of players\nThe number of players is " + number);
-    }
-
-
-    //Exception Handling
-    public void colorAlreadyTaken(){
-        dialog = new Dialog<>();
-        dialog.setTitle("Color Already Taken!");
-        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK);
-        Label l = new Label("The color you have selected\n has been chosen by another player.\n Please try again");
-        l.setFont(Font.font(16));
-        ImageView error = new ImageView("error_icon.png");
-        HBox box = new HBox(error,l);
-        dialog.getDialogPane().setContent(box);
-        dialog.show();
-        showColorPrompt();
-    }
-
-    public void sameName(String nickname) {
-        dialog = new Dialog<>();
-        dialog.setTitle("Username Already Taken!");
-        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK);
-        Label l = new Label("The username "+"'"+ nickname +"'"+ "\n has already been selected by another player.\n Please try again");
-        l.setFont(Font.font(16));
-        ImageView error = new ImageView("error_icon.png");
-        HBox box = new HBox(error,l);
-        dialog.getDialogPane().setContent(box);
-        dialog.show();
-        button1.setVisible(true);
-    }
-    public void noConnection() {
-
-    }
-
-    public void lobbyComplete() {
-        input.setVisible(false);
-        button1.setVisible(false);
-        label1.setText("The lobby is full. No other players can join");
-    }
-
     public void setStage(Stage stage) {
         this.stage = stage;
     }

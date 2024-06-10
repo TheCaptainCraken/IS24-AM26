@@ -318,16 +318,18 @@ public class Controller {
      * @param turn The turn number when the card was placed.
      */
     public void updatePlaceCard(String nickname, int id, Point position, boolean side, int turn) {
+        boolean start = false;
         //if the card is the starting card of the given client, show a message to inform the player.
         if(position.x == 0 && position.y == 0 && nickname.equals(Controller.nickname))
         {
             model.updatePlaceCard(nickname, id, position, side, turn);
             view.showStartingCardChosen();
-        }
-        //set the playedCardToNull, if the cards is correctly placed and is the owner of it.
-        if(nickname.equals(Controller.nickname)){
+            start = true;
+
+        //set the playedCardToNull, if the cards is correctly placed, the player is the owner of it and his hand is not empty.
+        } else if(nickname.equals(Controller.nickname)){
             for(int i = 0; i < 3; i++){
-                if(model.getCardInHand(i) == id){ //TODO nel momento in cui piazzo la starting card nella gui salta una NUllPointerException, how?
+                if(model.getCardInHand(i) == id){ //TODO nel momento in cui piazzo la starting card nella gui, qui salta una NUllPointerException, how?
                     //if is the card placed is the same card in the hand, set the card in hand to null.
                     model.setCardInHand(i, null);
                     break;
@@ -337,9 +339,11 @@ public class Controller {
             view.showHand();
         }
 
-        model.updatePlaceCard(nickname, id, position, side, turn);
-        //notify the scene that a card has been placed. The scene will update the view.
-        view.showTableOfPlayer(nickname);
+       if(!start){
+           model.updatePlaceCard(nickname, id, position, side, turn);
+           //notify the scene that a card has been placed. The scene will update the view.
+           view.showTableOfPlayer(nickname);
+       }
     }
     /**
      * Updates the resources of a player in the game model.

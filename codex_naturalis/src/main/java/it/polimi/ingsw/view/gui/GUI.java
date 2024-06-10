@@ -30,15 +30,18 @@ public class GUI extends Application implements ViewInterface {
     private static final Object lock = new Object();
 
 
-    private LittleModel model; //TODO va final una volta finita implementazione
+    private LittleModel model;
     private FXMLLoader fxmlLoader;
     public static LoginController loginController;
     public static MatchController matchController;
+    public static EndgameHandler endgameHandler;
     static Scene scene;
     private static Stage primaryStage;
     private boolean gameAlreadyStarted = false;
     private Parent root;
+    private HashMap<String,Color> playerColors;
     private static Parent match;
+    private Parent end;
 
     public static void main(String[] args) {
         Application.launch(GUI.class, args);
@@ -55,10 +58,11 @@ public class GUI extends Application implements ViewInterface {
         loginController =(LoginController) fxmlLoader.getController();
         match = loadFXML("matchView");
         matchController = (MatchController) fxmlLoader.getController();
+        end = loadFXML("endgameView");
+        endgameHandler = (EndgameHandler) fxmlLoader.getController();
         primaryStage = stage;
         loginController.setStage(stage);
         scene = new Scene(root, 1920, 1080);
-        //scene = new Scene(match, 1920, 1080);
         Platform.runLater(() -> loginController.setup());
         stage.setScene(scene);
         stage.show();
@@ -113,6 +117,7 @@ public class GUI extends Application implements ViewInterface {
 
     @Override
     public void refreshUsers(HashMap<String, Color> playersAndPins) {
+        playerColors = playersAndPins;
         Platform.runLater(() -> loginController.refreshUsers(playersAndPins));
     }
 
@@ -125,14 +130,15 @@ public class GUI extends Application implements ViewInterface {
         if(!gameAlreadyStarted){
             gameAlreadyStarted = true;
             ArrayList<String> players = new ArrayList<>(model.getTable().keySet());
-            HashMap<String,Parent> playerBoards = new HashMap<>();
+            HashMap<String,Scene> playerBoards = new HashMap<>();
             for (String player : players) {
                 if(!player.equals(ViewSubmissions.getInstance().getNickname())){
                     Scene scene = new Scene(Objects.requireNonNull(loadFXML("otherPlayerView")),1920,1080);
-                    playerBoards.put(player,scene.getRoot());
+                    playerBoards.put(player,scene);
                 }
             }
             scene.setRoot(match);
+            matchController.setPlayerColors(playerColors);
             matchController.setPlayerBoards(playerBoards);
             matchController.setStage(primaryStage);
             matchController.setModel(model);
@@ -177,12 +183,15 @@ public class GUI extends Application implements ViewInterface {
 
     @Override
     public void showExtraPoints(HashMap<String, Integer> extraPoints) {
-
+        endgameHandler.setExtraPoints(extraPoints);
+        Platform.runLater(() -> matchController.gameIsEnding());
     }
 
     @Override
     public void showRanking(ArrayList<Player> ranking) {
-
+        Scene scene1 = new Scene(end,500,400);
+        Platform.runLater(() -> endgameHandler.showRanking(ranking));
+        primaryStage.setScene(scene1);
     }
 
     @Override
@@ -192,17 +201,12 @@ public class GUI extends Application implements ViewInterface {
 
     @Override
     public void showHiddenHand(String nickname) {
-
+        Platform.runLater(() -> matchController.showHiddenHand(nickname));
     }
 
     @Override
     public void showHand() {
         Platform.runLater(() -> matchController.showHand());
-    }
-
-    @Override
-    public void showResourcesAllPlayers() {
-        //questo metodo è utile effettivamente?
     }
 
     @Override
@@ -233,7 +237,11 @@ public class GUI extends Application implements ViewInterface {
 
     @Override
     public void noConnection() {
-
+        if(gameAlreadyStarted){
+            matchController.noConnection();
+        } else{
+            loginController.noConnection();
+        }
     }
 
     @Override
@@ -243,7 +251,7 @@ public class GUI extends Application implements ViewInterface {
 
     @Override
     public void lobbyComplete() {
-
+        loginController.lobbyComplete();
     }
 
     @Override
@@ -259,7 +267,7 @@ public class GUI extends Application implements ViewInterface {
 
     @Override
     public void closingLobbyError() {
-
+        loginController.closingLobbyError();
     }
 
     @Override
@@ -269,7 +277,7 @@ public class GUI extends Application implements ViewInterface {
 
     @Override
     public void stopGaming() {
-        //TODO
+
     }
 
     @Override
@@ -291,6 +299,4 @@ public class GUI extends Application implements ViewInterface {
     public void correctNumberOfPlayers(int numberOfPlayers) {
         Platform.runLater(() -> loginController.correctNumberOfPlayers(numberOfPlayers));
     }
-
-
 }

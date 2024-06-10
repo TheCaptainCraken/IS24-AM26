@@ -24,7 +24,7 @@ import javafx.util.Pair;
 
 import java.awt.*;
 import java.util.*;
-import java.util.concurrent.Flow;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
 * Controller responsible for the handling of the GUI components that are used during the Playing Phase of the game*/
@@ -43,13 +43,15 @@ public class MatchController {
     private final Image inkwell = new Image("inkwell.png");
     private final Image scroll = new Image("scroll.png");
     private final Image quill = new Image("quill.png");
-    private ImageView lastPlayed,triedToPlay,lastDeleted;
+    private boolean cancelExists = false;
     private ArrayList<Label> labels;
     private ArrayList<ImageView> hand;
+    private HashMap<String,Color> playerColors;
     private boolean root_side = true;
-    private HashMap<String, Parent> playerBoards;
+    private HashMap<String, Scene> playerBoards;
     private Dialog<String> dialog;
     private Scene scene;
+    private Button cancel;
 
     LittleModel model;
     Stage stage;
@@ -61,7 +63,7 @@ public class MatchController {
     @FXML
     VBox playerContainer,statusMenu;
     @FXML
-    HBox secretContainer,handContainer;
+    HBox secretContainer,handContainer,statusButtons;
     @FXML
     StackPane board;
     @FXML
@@ -74,10 +76,19 @@ public class MatchController {
         hand.add(hand1);
         hand.add(hand2);
         hand.add(hand3);
+        for(ImageView i: hand){
+            i.setImage(defaultCard);
+        }
+        secret1.setImage(defaultCard);
+        secret2.setImage(defaultCard);
+        common1.setImage(defaultCard);
+        common2.setImage(defaultCard);
 
         labels = new ArrayList<>();
         for(String s: model.getTable().keySet()){
-            ImageView img1 = new ImageView();
+            ImageView img1 = new ImageView(loadColor(playerColors.get(s)));
+            img1.setFitWidth(25);
+            img1.setFitHeight(25);
             Label l = new Label(s);
             Label l1 = new Label("0");
             l.setFont(Font.font(25));
@@ -138,7 +149,7 @@ public class MatchController {
                     labels.get(finalI).setUnderline(false);
                 });
                 labels.get(i).setOnMouseClicked(event -> {
-                    stage.setScene(playerBoards.get(s).getScene());
+                    stage.setScene(playerBoards.get(s));
                 });
             } else {
                 labels.get(i).setTextFill(javafx.scene.paint.Color.RED);
@@ -202,7 +213,7 @@ public class MatchController {
     public void showStartingCard(int id){ //TODO va sistemato il fatto di scegliere starting card quando non è il proprio turno
         status.setText("Please Choose the side of the starting Card");
         root.setImage(loadStartingCardResource(id,true));
-        root.setOnMouseClicked((event) -> {
+        root.setOnMouseClicked(event -> {
             if(root_side){
                 root.setImage(loadStartingCardResource(id,true));
                 root_side = false;
@@ -212,9 +223,7 @@ public class MatchController {
             }
         });
         Button b1 = new Button("Front"), b2 = new Button("Back");
-        HBox container = new HBox(b1,b2);
-        container.setSpacing(15);
-        container.setAlignment(Pos.CENTER);
+        statusButtons.getChildren().addAll(b1,b2);
         b1.setOnMouseClicked(event -> {
             root.setImage(loadStartingCardResource(id,true));
             ViewSubmissions.getInstance().chooseStartingCard(true);
@@ -223,12 +232,11 @@ public class MatchController {
             root.setImage(loadStartingCardResource(id,false));
             ViewSubmissions.getInstance().chooseStartingCard(false);
         });
-        statusMenu.getChildren().add(container);
     }
 
     public void showStartingCard(){
         status.setText("Please wait for the other players...");
-        statusMenu.getChildren().removeIf(node -> node instanceof HBox);
+        statusButtons.getChildren().removeIf(node -> node instanceof Button);
         root.setOnMouseClicked(event -> {
             revealSpots(root.getTranslateX(),root.getTranslateY());
         });
@@ -246,26 +254,19 @@ public class MatchController {
         secret2.setImage(new Image("frontCard"+objectiveCardIds[1]+".png"));
         secret1.setOnMouseClicked(event -> {
             status.setText("Please wait for the other players...");
-            lastDeleted = secret2;
             ViewSubmissions.getInstance().chooseSecretObjectiveCard(0);
         });
         secret2.setOnMouseClicked(event -> {
             status.setText("Please wait for the other players...");
-            statusMenu.getChildren().removeIf(node -> node instanceof HBox);
-            lastDeleted = secret1;
             ViewSubmissions.getInstance().chooseSecretObjectiveCard(1);
         });
     }
 
     public void showSecretObjectiveCard(int indexCard){
         status.setText("You have successfully chosen your Secret Objective Card!");
-        if(indexCard == 0){
-            secretContainer.getChildren().remove(secret2);
-            secret1.setOnMouseClicked(null);
-        } else {
-            secretContainer.getChildren().remove(secret1);
-            secret2.setOnMouseClicked(null);
-        }
+        secretContainer.getChildren().remove(secret2);
+        secret1.setImage(new Image("frontCard"+indexCard+".png"));
+        secret1.setOnMouseClicked(null);
     }
 
     public void showHand(){
@@ -344,18 +345,20 @@ public class MatchController {
         CardClient latestCard = c.get();
         ImageView img = setCard(latestCard);
         if(ViewSubmissions.getInstance().getNickname().equals(nickname)){
-            img.setOnMouseClicked(event -> revealSpots(img.getTranslateX(),img.getTranslateY()));
+            img.setOnMouseClicked(event ->{
+                revealSpots(img.getTranslateX(),img.getTranslateY());
+            });
+
             board.getChildren().add(img);
+        } else {
+            AnchorPane parent = (AnchorPane) playerBoards.get(nickname).getRoot();
+            SplitPane s = (SplitPane) parent.getChildrenUnmodifiable().get(0);
+            ScrollPane scroll = (ScrollPane) s.getItems().get(1);
+            AnchorPane pane = (AnchorPane) scroll.getContent();
+            StackPane area = (StackPane) pane.getChildren().get(0);
+            area.getChildren().add(img);
         }
 
-        Parent parent = playerBoards.get(nickname);
-        SplitPane s = (SplitPane) parent.getChildrenUnmodifiable().get(0);
-        ScrollPane scroll = (ScrollPane) s.getItems().get(1);
-        AnchorPane pane = (AnchorPane) scroll.getContent();
-        StackPane area = (StackPane) pane.getChildren().get(0);
-
-        area.getChildren().add(img);
-        //se sta roba funziona sono dio
     }
 
     public void showIsFirst(String name){
@@ -391,6 +394,30 @@ public class MatchController {
                 s = "Unknown Phase";
         }
         status.setText("It is "+currentPlayer+"'s turn.\n"+s+"!");
+    }
+
+    public void showHiddenHand(String nickname){
+        for(String s: playerBoards.keySet()) {
+            Parent parent = playerBoards.get(s).getRoot();
+            SplitPane split = (SplitPane) parent.getChildrenUnmodifiable().get(0);
+            VBox v = (VBox) split.getItems().get(0);
+            Pair<Kingdom, Boolean>[] hand = model.getHiddenHand(s);
+            int i = 0;
+            for (Node n : v.getChildren()) {
+                if (n instanceof ImageView) {
+                    ImageView img = (ImageView) n;
+                    img.setImage(KingdomToCard(hand[i].getKey(), hand[i].getValue()));
+                    i++;
+                } else if(n instanceof Label){
+                    Label label = (Label) n;
+                    label.setText("Hand of " + s);
+                }
+            }
+        }
+    }
+
+    public void gameIsEnding(){
+        status.setText("The game is ending.\nPlease wait for the final ranking...");
     }
 
     public void noTurn(){
@@ -441,6 +468,18 @@ public class MatchController {
         dialog.show();
     }
 
+    public void noConnection() {
+        dialog = new Dialog<>();
+        dialog.setTitle("Username Already Taken!");
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK);
+        Label l = new Label("You are not connected to the server. Game will end soon.\nThank you for playing. Goodbye!");
+        l.setFont(Font.font(16));
+        ImageView error = new ImageView("error_icon.png");
+        HBox box = new HBox(error,l);
+        dialog.getDialogPane().setContent(box);
+        dialog.show();
+    }
+
     /*public void handleDebug(){
         root.setImage(new Image("frontCard97.png"));
         ImageView img = new ImageView(new Image("frontCard23.png"));
@@ -455,7 +494,11 @@ public class MatchController {
 
     //UTILITY FUNCTIONS
 
-    public void setPlayerBoards(HashMap<String, Parent> playerBoards) {
+    public void setPlayerColors(HashMap<String, Color> playerColors) {
+        this.playerColors = playerColors;
+    }
+
+    public void setPlayerBoards(HashMap<String, Scene> playerBoards) {
         this.playerBoards = playerBoards;
     }
 
@@ -585,7 +628,8 @@ public class MatchController {
     //EVENT FUNCTIONS
 
     public void revealSpots(double x,double y){
-        Button b1 = new Button("Altodx"), b2 = new Button("Altosx"), b3 = new Button("Bassosx"), b4 = new Button("Bassodx");
+        Button b1 = new Button(), b2 = new Button(), b3 = new Button(), b4 = new Button();
+        cancel = new Button("Go Back");
         ArrayList<Button> buttons = new ArrayList<>();
         ArrayList<Button> trueButtons = new ArrayList<>();
         buttons.add(b1);
@@ -613,11 +657,13 @@ public class MatchController {
             }
             Pair<Double,Double> p = new Pair<>(pos.getKey() + x,pos.getValue() + y);
             for(Node node: board.getChildren()){
-                ImageView card = (ImageView) node;
-                if(card.getTranslateX() == p.getKey() && card.getTranslateY() == p.getValue()){
-                    isOccupied = true;
-                    break;
-                }
+              if(node instanceof ImageView){
+                  ImageView card = (ImageView) node;
+                  if(card.getTranslateX() == p.getKey() && card.getTranslateY() == p.getValue()){
+                      isOccupied = true;
+                      break;
+                  }
+              }
             }
             if(!isOccupied){
                 setupButton(b,p.getKey(),p.getValue());
@@ -626,10 +672,26 @@ public class MatchController {
             i++;
         }
         for(Button b: trueButtons){
-            b.setOnMouseClicked(event -> handlePositionRequest(b));
+            b.setOnMouseClicked(event -> {
+                handlePositionRequest(b);
+            });
         }
-        //scene.setOnMouseClicked(event1 -> board.getChildren().removeIf(item -> item instanceof Button ));
         board.getChildren().addAll(trueButtons);
+        cancel.setOnMouseClicked(event -> {
+            board.getChildren().removeIf(node -> node instanceof Button);
+            statusButtons.getChildren().removeIf(node -> node instanceof Button);
+            cancelExists = false;
+
+        });
+        for(Node n: statusButtons.getChildren()){
+            if(n instanceof Button && ((Button) n).getText().equals("Go Back")){
+                cancelExists = true;
+                break;
+            }
+        }
+        if(!cancelExists){
+            statusButtons.getChildren().add(cancel);
+        }
     }
 
     public void setupDeckActions(boolean gold,int i){
@@ -640,19 +702,21 @@ public class MatchController {
         b.setTranslateX(x);
         b.setTranslateY(y);
         b.setOpacity(0.2);
+        b.setBorder(new Border(new BorderStroke(javafx.scene.paint.Color.DARKGOLDENROD,BorderStrokeStyle.SOLID,CornerRadii.EMPTY,BorderWidths.DEFAULT)));
         b.setStyle("-fx-background-color: #FFD700;"); //gold color
         b.setPrefWidth(150);
         b.setPrefHeight(100);
     }
 
     public void handlePositionRequest(Button b){
+        b.setOpacity(0.8);
+        b.setBorder(new Border(new BorderStroke(javafx.scene.paint.Color.RED,BorderStrokeStyle.SOLID,CornerRadii.EMPTY,BorderWidths.DEFAULT)));
         Point pos = inversePosition(b.getTranslateX(),b.getTranslateY());
         int i = 0;
         for(ImageView card: hand){
             int finalI = i;
             card.setOnMouseClicked(event -> {
                 board.getChildren().removeIf(item -> item instanceof Button && !item.equals(b));
-                event.consume();
                 placeCardRequest(b,finalI,pos);
             });
 
@@ -662,18 +726,19 @@ public class MatchController {
 
     public void placeCardRequest(Button b,int handIndex, Point position){
         Button b1 = new Button("Front"), b2 = new Button("Back");
-        HBox container = new HBox(b1,b2);
-        container.setSpacing(15);
-        container.setAlignment(Pos.CENTER);
-        statusMenu.getChildren().add(container);
+        statusButtons.getChildren().add(0,b1);
+        statusButtons.getChildren().add(1,b2);
+
         b1.setOnMouseClicked(event -> {
+            cancelExists = false;
             board.getChildren().remove(b);
-            statusMenu.getChildren().removeIf(node -> node instanceof HBox);
+            statusButtons.getChildren().removeIf(node -> node instanceof Button);
             ViewSubmissions.getInstance().placeCard(handIndex,position,true);
         });
         b2.setOnMouseClicked(event -> {
+            cancelExists = false;
             board.getChildren().remove(b);
-            statusMenu.getChildren().removeIf(node -> node instanceof HBox);
+            statusButtons.getChildren().removeIf(node -> node instanceof Button);
             ViewSubmissions.getInstance().placeCard(handIndex,position,false);
 
         });

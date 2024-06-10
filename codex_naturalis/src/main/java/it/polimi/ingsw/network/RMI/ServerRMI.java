@@ -422,7 +422,7 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
                     try {
                         // Send the hidden hand of the player to all other clients.
                         // It is a broadcast call, all other players can see the hidden hand of the player.
-                        connections.get(nicknameRefresh).showHiddenHand(nicknameRefresh, Controller.getInstance().getHiddenHand(nickname));
+                        connections.get(nicknameRefresh).showHiddenHand(nickname, Controller.getInstance().getHiddenHand(nickname));
                     } catch (RemoteException e) {
                         connections.remove(nicknameRefresh);
                         NetworkHandler.getInstance().disconnectBroadcast();
@@ -523,7 +523,7 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
             if (!nickname.equals(nicknameRefresh)) {
                 new Thread(() -> {
                     try {
-                        connections.get(nicknameRefresh).showHiddenHand(nicknameRefresh, Controller.getInstance().getHiddenHand(nickname));
+                        connections.get(nicknameRefresh).showHiddenHand(nickname, Controller.getInstance().getHiddenHand(nickname));
                     } catch (NoNameException e) {
                         System.out.println("NoNameException. This error should never occur. Debugging purpose only");
                     } catch (RemoteException e) {

@@ -306,7 +306,6 @@ public class TUI implements ViewInterface {
     /**
      * Shows the resources of all players.
      */
-    @Override
     public synchronized void showResourcesAllPlayers() {
         HashMap<String, HashMap<Sign, Integer>> resources = model.getResources();
         for (String player : resources.keySet()) {

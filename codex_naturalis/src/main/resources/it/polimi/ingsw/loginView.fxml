@@ -78,14 +78,7 @@
             <ImageView fx:id="logo" fitHeight="223.0" fitWidth="400.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER" />
          </top>
          <left>
-            <Pane prefHeight="622.0" prefWidth="600.0" BorderPane.alignment="CENTER">
-               <children>
-                  <Button fx:id="debug" layoutX="345.0" layoutY="32.0" mnemonicParsing="false" onMouseClicked="#handleDebug" text="Debug">
-                     <font>
-                        <Font size="25.0" />
-                     </font>
-                  </Button>
-               </children></Pane>
+            <Pane prefHeight="622.0" prefWidth="600.0" BorderPane.alignment="CENTER" />
          </left>
          <right>
             <Pane prefHeight="622.0" prefWidth="600.0" BorderPane.alignment="CENTER" />

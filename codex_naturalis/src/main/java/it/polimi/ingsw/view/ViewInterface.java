@@ -47,7 +47,6 @@ public interface ViewInterface {
     //print the current player and the game state.
     void showTurnInfo(String currentPlayer, GameState gameState);
     void showResourcesPlayer();
-    void showResourcesAllPlayers();
     void showPoints();
     //Show points earned at the end
     void showExtraPoints(HashMap<String, Integer> extraPoints);
