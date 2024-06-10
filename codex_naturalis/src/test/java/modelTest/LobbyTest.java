@@ -1,7 +1,8 @@
-package it.polimi.ingsw.modelTest;
+package modelTest;
 
 import it.polimi.ingsw.model.Color;
 import it.polimi.ingsw.model.exception.*;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeAll;
@@ -19,7 +20,7 @@ public class LobbyTest {
     @Test
     @DisplayName("check correct function when lobby is complete")
     public void CheckCorrectFunctionLobbyComplete(){
-        assertThrows(SameNameException.class, () -> {
+        Assertions.assertThrows(SameNameException.class, () -> {
             Lobby lobby = new Lobby();
             lobby.addPlayer("pietro");
             lobby.addPlayer("marco");
@@ -42,13 +43,13 @@ public class LobbyTest {
     @DisplayName("Search player")
     public void SearchPlayerTest() throws  NoNameException {
         Player p1 = lobby.getPlayerFromName("pietro");
-        assertEquals("pietro", p1.getName());
+        Assertions.assertEquals("pietro", p1.getName());
 
         Player p2 = lobby.getPlayerFromName("marco");
-        assertEquals("marco", p2.getName());
+        Assertions.assertEquals("marco", p2.getName());
 
         Player p3 = lobby.getPlayerFromName("daniel");
-        assertEquals("daniel", p3.getName());
+        Assertions.assertEquals("daniel", p3.getName());
 
     }
 }

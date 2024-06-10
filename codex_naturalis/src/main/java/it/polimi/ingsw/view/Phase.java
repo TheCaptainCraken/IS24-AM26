@@ -44,8 +44,7 @@ public enum Phase {
      */
     NUMBER_OF_PLAYERS,
 
-
-    //All this phase are set by the controller client.
+    //All these phases are set by the controller client.
     /**
      * The WAIT phase is used to wait for the other players to choose their color, and in all phases for RMI
      */

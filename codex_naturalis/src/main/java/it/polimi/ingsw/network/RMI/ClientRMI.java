@@ -16,6 +16,9 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * The ClientRMI class implements the RMIClientInterface and NetworkClient interfaces and
@@ -27,11 +30,33 @@ import java.util.HashMap;
  */
 public class ClientRMI implements RMIClientInterface, NetworkClient {
     static int PORT = 1099; //TODO porta dinamica
+    /**
+     * The controller that handles the client's view.
+     */
     Controller controller;
+    /**
+     * The exported client object.
+     */
     RMIClientInterface exportedClient;
+    /**
+     * The remote server interface.
+     */
     RMIServerInterface stub;
+    /**
+     * The RMI registry.
+     */
     Registry registry;
+    /**
+     * The scheduler for checking the connection.
+     */
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
+    /**
+     * Constructor for ClientRMI.
+     * @param controller The controller that handles the client's view.
+     * @throws RemoteException if there is a problem with the connection.
+     * @throws NotBoundException if the server is not bound.
+     */
     public ClientRMI(Controller controller) throws RemoteException, NotBoundException {
         this.controller = controller;
 
@@ -44,6 +69,8 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
         // Looking up the remote object
         stub = (RMIServerInterface) registry.lookup("Loggable");
 
+        //periodically check if the client is still connected to the server
+        new Thread(this::isClientConnectedToServer).start();
     }
 
     /**
@@ -160,7 +187,8 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
      * Sends a chat message.
      * This method is used to send a chat message to the other players in the game.
      *
-     * @param message The message sent by the player.
+     * @param nickname The nickname of the player who sent the message.
+     * @param message The message sent by the player and the information about the receiver.
      */
     public void sendChatMessage(String nickname, String message){
         try {
@@ -488,15 +516,46 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
         controller.showIsFirst(firstPlayer);
     }
 
+    /**
+     * This method is used to stop the game for the client.
+     * It is called when the client needs to stop the game, for example, when the client disconnects from the server.
+     *
+     * @throws RemoteException throws a RemoteException if there is a problem with the connection.
+     */
     @Override
     public void stopGaming() throws RemoteException {
-        //TODO
-        //View.stopGaming();
+        controller.stopGaming();
     }
 
+    /**
+     * This method is used to check if the client is still connected to the server.
+     * The server will call this method to check if the connection with the client is still active.
+     *
+     * @throws RemoteException throws a RemoteException if there is a problem with the connection.
+     */
     @Override
     public void isConnected() throws RemoteException {
         //this method is used to check if the client is still connected. No implementation needed.
     }
+
+    /**
+     * This method is used to periodically check if the client is still connected to the server.
+     * It creates a Runnable that calls the isConnected method and schedules it to run at a fixed rate.
+     * The Runnable is scheduled to run every 30 seconds.
+     */
+    public void isClientConnectedToServer(){
+        final Runnable checker = new Runnable() {
+            public void run() {
+                try {
+                    stub.connectToServer();
+                } catch (RemoteException e) {
+                    controller.noConnection();
+                }
+            }
+        };
+        scheduler.scheduleAtFixedRate(checker, 30, 30, TimeUnit.SECONDS);
+    }
+
+
 
 }

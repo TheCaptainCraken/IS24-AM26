@@ -100,11 +100,11 @@ public interface RMIClientInterface extends Remote {
      * This method is used to send TurnInfo to the clients. It contains the current
      * player and the game state.
      *
-     * @param currentPlayer
+     * @param currentPlayer The current player.
      * @param gameState     The game state. It is a enum that can be
      *                      CHOOSING_ROOT_CARD, CHOOSING_OBJECTIVE_CARD,
      *                      DRAWING_PHASE, PLACING_PHASE, END
-     * @throws RemoteException
+     * @throws RemoteException throws a RemoteException if there is a problem with
      */
     void refreshTurnInfo(String currentPlayer, GameState gameState) throws RemoteException;
 

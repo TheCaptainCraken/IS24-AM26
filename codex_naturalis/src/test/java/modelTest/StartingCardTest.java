@@ -1,6 +1,7 @@
-package it.polimi.ingsw.modelTest;
+package modelTest;
 
 import it.polimi.ingsw.model.*;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -35,7 +36,7 @@ public class StartingCardTest {
     @Test
     void NormalTest(){
         s1 = new StartingCard(3, Kingdom.FUNGI,map,map2,a1);
-        assertEquals(s1.getBacksideCorners(),map2);
-        assertEquals(s1.getBonusResources(),a1);
+        Assertions.assertEquals(s1.getBacksideCorners(),map2);
+        Assertions.assertEquals(s1.getBonusResources(),a1);
     }
 }

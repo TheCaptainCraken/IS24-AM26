@@ -182,7 +182,7 @@ public class LittleModel {
      * The cards are represented by a Pair array where each Pair consists of a Kingdom and a Boolean.
      *
      * @param nickname The nickname of the player whose hand is to be updated.
-     * @param hand An array of Pairs representing the Kingdom and visibility of the cards in the player's hand.
+     * @param hand     An array of Pairs representing the Kingdom and visibility of the cards in the player's hand.
      */
     public void updateHiddenHand(String nickname, Pair<Kingdom, Boolean>[] hand){
         otherPlayersCards.put(nickname, hand);
@@ -629,7 +629,7 @@ public class LittleModel {
      * Returns the hidden hands of all other players in the game.
      *
      * This method is used to retrieve the hidden hands of all other players in the game.
-     * The hands are represented by a HashMap where the key is the player's nickname and the value is an array of Pairs representing the Kingdom and visibility of the cards in the player's hand.
+     * The hands are represented by a HashMap where the key is the player's nickname, and the value is an array of Pairs representing the Kingdom and visibility of the cards in the player's hand.
      *
      * @return A HashMap representing the nicknames of the players and their corresponding hidden hands.
      */

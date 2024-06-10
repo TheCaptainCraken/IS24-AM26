@@ -8,6 +8,9 @@ import javafx.util.Pair;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * This class represents the Text User Interface (TUI) of the game.
@@ -73,12 +76,28 @@ public class TUI implements ViewInterface {
         System.out.println();
     }
 
+    /**
+     * Displays a received chat message to the player.
+     *
+     * This method is called when a chat message is received from another player.
+     * It takes the sender's nickname and the message content as parameters, and displays the message to the console.
+     *
+     * @param sender The nickname of the player who sent the message.
+     * @param message The content of the message.
+     */
     @Override
-    public void receiveMessage(String sender, String message) {
-        System.out.println(sender + ": " + message);
-        //TODO
+    public synchronized void receiveMessage(String sender, String message) {
+        System.out.println("There is a new message from " + sender);
+        System.out.println(message);
     }
 
+    /**
+     * Informs the player that the starting card has been chosen.
+     *
+     * This method is called when the starting card has been selected in the game.
+     * It displays a message to the console indicating that the starting card has been chosen,
+     * and then prints the player's table area to the console.
+     */
     @Override
     public synchronized void showStartingCardChosen() {
         System.out.println("The starting card has been chosen");
@@ -171,9 +190,9 @@ public class TUI implements ViewInterface {
         //create the gold deck to print
         goldCardsToPrint.add(createCardToPrint(fromKingdomToCard(goldCardOnDeck)));
 
-        System.out.println("This is the resource card deck:\n");
+        System.out.println("This is the resource cards deck:\n");
         printCardArray(cardsToPrint);
-        System.out.println("This is the gold card deck:\n");
+        System.out.println("This is the gold cards deck:\n");
         printCardArray(goldCardsToPrint);
         System.out.println();
     }
@@ -231,6 +250,7 @@ public class TUI implements ViewInterface {
         }
         System.out.println();
         System.out.println("Enter 0 or 1:");
+        System.out.println();
     }
     /**
      * Prints the secret objective card of the player.
@@ -354,6 +374,10 @@ public class TUI implements ViewInterface {
         ArrayList<String[]> cards = new ArrayList<>();
 
         for (Integer cardId : myCards) {
+            System.out.println(cardId);
+        }
+
+        for (Integer cardId : myCards) {
             if(cardId == null){
                 cards.add(new String[]  {
                         "                                  ",
@@ -387,6 +411,7 @@ public class TUI implements ViewInterface {
     @Override
     public synchronized void colorAlreadyTaken() {
         System.out.println("The color you chose is already taken. Please choose another one");
+        System.out.println();
     }
     /**
      * Informs the player that the chosen nickname is already taken.
@@ -396,6 +421,7 @@ public class TUI implements ViewInterface {
     @Override
     public synchronized void sameName(String nickname) {
         System.out.println("The nickname " + nickname + " is already taken. Please choose another one");
+        System.out.println();
     }
     /**
      * Informs the player that it's not their turn.
@@ -403,6 +429,7 @@ public class TUI implements ViewInterface {
     @Override
     public synchronized void noTurn() {
         System.out.println("It's not your turn. You can't perform this action");
+        System.out.println();
     }
     /**
      * Informs the player that they don't have enough resources.
@@ -411,6 +438,7 @@ public class TUI implements ViewInterface {
     @Override
     public synchronized void notEnoughResources() {
         System.out.println("You don't have enough resources to perform this action");
+        System.out.println();
     }
     /**
      * Informs the player that they are not connected to the server.
@@ -419,6 +447,7 @@ public class TUI implements ViewInterface {
     public synchronized void noConnection() {
         System.out.println("You are not connected to the server. Game will end soon.\n");
         System.out.println("Thank you for playing. Goodbye!");
+        System.out.println();
     }
     /**
      * Informs the player that they can't position the card there.
@@ -426,6 +455,7 @@ public class TUI implements ViewInterface {
     @Override
     public synchronized void cardPositionError() {
         System.out.println("You can't position the card there. Please try another position");
+        System.out.println();
     }
     /**
      * Informs the player that the lobby is full.
@@ -433,6 +463,7 @@ public class TUI implements ViewInterface {
     @Override
     public synchronized void lobbyComplete() {
         System.out.println("The lobby is full. No other players can join");
+        System.out.println();
     }
     /**
      * Informs the player that he can't perform the action in this game phase.
@@ -440,6 +471,7 @@ public class TUI implements ViewInterface {
     @Override
     public synchronized void wrongGamePhase() {
         System.out.println("You can't perform this action in this game phase");
+        System.out.println();
     }
     /**
      * Informs the client that the name given doesn't exist.
@@ -447,6 +479,7 @@ public class TUI implements ViewInterface {
     @Override
     public synchronized void noPlayer() {
         System.out.println("The player doesn't exist");
+        System.out.println();
     }
     /**
      * Informs the player that the lobby is closed. A game already started.
@@ -454,11 +487,20 @@ public class TUI implements ViewInterface {
     @Override
     public synchronized void closingLobbyError() {
         System.out.println("You haven't fill the lobby with the correct number of players. The lobby is closing");
+        System.out.println();
+
     }
 
+    /**
+     * Informs the player that the game has ended due to a client disconnection.
+     *
+     * This method is called when a client has disconnected from the game and the game cannot continue.
+     * It displays a message to the console indicating that the game has ended and thanks the player for playing.
+     */
     @Override
-    public void stopGaming() {
-        //TODO
+    public synchronized void stopGaming() {
+        System.out.println("Some client has disconnected. You cannot continue the game");
+        System.out.println("The game is over. Thank you for playing");
     }
 
     /**
@@ -755,11 +797,9 @@ public class TUI implements ViewInterface {
                     askChooseSecretObjectiveCard();
                     break;
                 case WAIT:
-                    //TODO per ora potrei anche non fare nulla
                     break;
                 case WAIT_NUMBER_OF_PLAYERS:
                     // wait that the first player choice the number of players
-                    //TODO
                     break;
                 case GAME_FLOW:
                     // the game is started, the player can perform any action
@@ -804,7 +844,7 @@ public class TUI implements ViewInterface {
     }
 
     private synchronized void menu(){
-        System.out.println("please insert a number for choosing the option");
+        System.out.println("Please insert a number for choosing the option");
         System.out.println("" +
                 "1 - place a card\n" +
                 "2 - draw a card\n" +
@@ -862,9 +902,10 @@ public class TUI implements ViewInterface {
                 break;
             default:
                 System.out.println("Invalid input. Please retry");
-                defaultMenu();
-        }
 
+                ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+                executor.schedule(this::defaultMenu, 3, TimeUnit.SECONDS); //just wait 4 seconds to reprint the menu
+        }
     }
     /**
      * Prints an array of cards.
@@ -930,6 +971,9 @@ public class TUI implements ViewInterface {
 //        System.out.println("min: " + min);
         int inizialier = min;
 
+        System.out.println("This is the table area of " + nickname + ":");
+        System.out.println();
+
         for(CardClient card: cards){
             //level is the previous, if it's different from the current card, print the previous cards
             if(level == card.getPosition().x + card.getPosition().y){
@@ -973,6 +1017,7 @@ public class TUI implements ViewInterface {
         }
         //for the last one print the cards
         printCardArray(cardsToPrint);
+        System.out.println();
     }
     /**
      * Created the objective card of the player.

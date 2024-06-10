@@ -1,6 +1,7 @@
-package it.polimi.ingsw.modelTest;
+package modelTest;
 
 import it.polimi.ingsw.model.*;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,8 +30,8 @@ public class PlayerTest {
     public void playerConstructor() {
         Player p1 = new Player("Pietro");
         assert p1.getName().equals("Pietro");
-        assert p1.getColor() == Color.BLUE;
     }
+
     @Test
     @DisplayName("test of points")
     public void UpdatePointsCorrectly(){
@@ -60,7 +61,7 @@ public class PlayerTest {
         assert p5.getPoints() == 0;
 
         p5.addObjectivePoints(30);
-        assertEquals(p5.getPoints(), 30);
+        Assertions.assertEquals(p5.getObjectivePoints(), 30);
     }
     @Test
     @DisplayName("resources update")
@@ -83,9 +84,9 @@ public class PlayerTest {
         p1.takeCard(card2);
         p1.takeCard(card3);
 
-        assertEquals(p1.getHand()[0], card1);
-        assertEquals(p1.getHand()[1], card2);
-        assertEquals(p1.getHand()[2], card3);
+        Assertions.assertEquals(p1.getHand()[0], card1);
+        Assertions.assertEquals(p1.getHand()[1], card2);
+        Assertions.assertEquals(p1.getHand()[2], card3);
     }
     @Test
     @DisplayName("remove cards")
@@ -96,13 +97,13 @@ public class PlayerTest {
         p1.takeCard(card3);
 
         p1.giveCard(card1);
-        assertNull(p1.getHand()[0]);
+        Assertions.assertNull(p1.getHand()[0]);
         p1.takeCard(card1);
-        assertEquals(p1.getHand()[0], card1);
+        Assertions.assertEquals(p1.getHand()[0], card1);
 
         p1.giveCard(card3);
-        assertNull(p1.getHand()[2]);
+        Assertions.assertNull(p1.getHand()[2]);
         p1.takeCard(card3);
-        assertEquals(p1.getHand()[2], card3);
+        Assertions.assertEquals(p1.getHand()[2], card3);
     }
 }

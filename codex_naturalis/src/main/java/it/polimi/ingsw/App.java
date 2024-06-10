@@ -43,6 +43,7 @@ public class App extends Application {
 
       do{
           choice = myObj.nextLine();
+
           switch(choice){
               case "RMI":
               case "Socket":

@@ -1,6 +1,7 @@
-package it.polimi.ingsw.modelTest;
+package modelTest;
 
 import it.polimi.ingsw.model.*;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -28,10 +29,10 @@ public class PlayedCardTest {
     @Test
     public void NullHashMapTest() {
         PlayedCard t1 = new PlayedCard(test, map, true, 1, p);
-        assertNull(t1.getAttached(Corner.TOP_LEFT));
-        assertNull(t1.getAttached(Corner.TOP_RIGHT));
-        assertNull(t1.getAttached(Corner.BOTTOM_LEFT));
-        assertNull(t1.getAttached(Corner.BOTTOM_RIGHT));
+        Assertions.assertNull(t1.getAttached(Corner.TOP_LEFT));
+        Assertions.assertNull(t1.getAttached(Corner.TOP_RIGHT));
+        Assertions.assertNull(t1.getAttached(Corner.BOTTOM_LEFT));
+        Assertions.assertNull(t1.getAttached(Corner.BOTTOM_RIGHT));
     }
 
     @Test

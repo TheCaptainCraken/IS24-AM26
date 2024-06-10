@@ -1,4 +1,4 @@
-package it.polimi.ingsw.modelTest;
+package modelTest;
 
 import org.junit.jupiter.api.Test;
 import it.polimi.ingsw.model.Deck;

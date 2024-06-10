@@ -416,7 +416,7 @@ public class Controller {
      * It updates the game model with the new hidden hand of the player.
      *
      * @param nickname The nickname of the player whose hidden hand has been updated.
-     * @param hand An array of Pair objects, each containing a Kingdom and a Boolean, representing the cards in the player's hidden hand.
+     * @param hand     An array of Pair objects, each containing a Kingdom and a Boolean, representing the cards in the player's hidden hand.
      */
     public void updateHiddenHand(String nickname, Pair<Kingdom, Boolean>[] hand) {
         model.updateHiddenHand(nickname, hand);

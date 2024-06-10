@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
-import java.rmi.UnknownHostException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
@@ -44,7 +43,7 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
 
     public static void main(String[] args) throws IOException {
         ServerRMI obj = new ServerRMI();
-        NetworkServerSocket networkServerSocket = new NetworkServerSocket(4567);
+        NetworkServerSocket networkServerSocket = new NetworkServerSocket(0);
         new Thread(()-> {
             try {
                 networkServerSocket.start();
@@ -52,6 +51,7 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
                 System.out.println("Cannot start the socket server. Please restart the server.");
             }
         }).start();
+
         obj.startClientConnectionCheck();
     }
 
@@ -124,7 +124,7 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
      */
     @Override
     public boolean loginAndIsFirst(RMIClientInterface clientRMI, String nickname)
-            throws RemoteException, SameNameException, LobbyCompleteException, NoNameException {
+            throws RemoteException, SameNameException, LobbyCompleteException{
         //Add player to the starting lobby, throws exception if the lobby is already complete or the nickname is already taken
         Controller.getInstance().addPlayer(nickname);
         //Add the player to the connections map
@@ -213,7 +213,7 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
      */
     @Override
     public void chooseSideStartingCard(String nickname, boolean side)
-            throws WrongGamePhaseException, NoTurnException, NoNameException {
+            throws WrongGamePhaseException, NoTurnException, NoNameException, RemoteException{
 
         // The player chooses the side of their starting card
         int cardId = Controller.getInstance().placeRootCard(nickname, side);
@@ -228,7 +228,7 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
     /**
      * RMIServerInterface interface method
      * This method is responsible for handling the secret objective card selection process of a player.
-     * It is called when a player chooses a secret objective card ( position 0 or position 1).
+     * It is called when a player chooses a secret objective card (position 0 or position 1).
      * if all players have chosen their secret objective card, broadcast the information of Common and Hidden hands.
      *
      *
@@ -239,7 +239,7 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
      * @throws NoNameException If a player with the given nickname does not exist.
      */
     public void chooseSecretObjectiveCard(String nickname, int indexCard)
-            throws WrongGamePhaseException, NoTurnException, NoNameException {
+            throws WrongGamePhaseException, NoTurnException, NoNameException, RemoteException{
         //set the secret objective card for the player. indexCard is the position of the card in the list of secret objective cards to choose
         //it can be 0 or 1: the input of client verify this.
         Controller.getInstance().chooseObjectiveCard(nickname, indexCard);
@@ -269,7 +269,7 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
     @Override
     public void placeCard(String nickname, int indexHand, Point position, boolean side)
             throws WrongGamePhaseException, NoTurnException,
-            NotEnoughResourcesException, NoNameException, CardPositionException {
+            NotEnoughResourcesException, NoNameException, CardPositionException, RemoteException {
 
         // The player places the card, returns the id of the placed card. Throws an exception if the card cannot be placed,
         // or if the player does not have enough resources, or if it's not the player's turn, or if the game is not in the correct phase.
@@ -301,7 +301,7 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
      */
     @Override
     public Integer[] drawCard(String nickname, boolean gold, int onTableOrDeck)
-            throws WrongGamePhaseException, NoTurnException, NoNameException, CardPositionException {
+            throws WrongGamePhaseException, NoTurnException, NoNameException, CardPositionException, RemoteException {
         // The player draws the card, returns the id of the drawn card. Throws an exception if the card cannot be drawn,
         // or if it's not the player's turn, or if the game is not in the correct phase.
          Controller.getInstance().drawCard(nickname, gold, onTableOrDeck);
@@ -340,7 +340,6 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
                 try {
                     connection.refreshUsers(playersAndPins);
                 } catch (RemoteException e) {
-                    //TODO rimuovere connessione
                     NetworkHandler.getInstance().disconnectBroadcast();
                 }
             }).start();
@@ -376,7 +375,6 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
                     connections.get(nicknameRefresh).showStartingCard(Controller.getInstance().getStartingCard(nicknameRefresh));
 
                 } catch (RemoteException e) {
-                    connections.remove(nicknameRefresh);
                     NetworkHandler.getInstance().disconnectBroadcast();
                 } catch (NoNameException e) {
                     System.out.println("NoNameException. Debugging error, this error should never occur");
@@ -391,7 +389,7 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
      * Nickname are searched from the connection so all the given fake nicknames won't be sent
      * and from other connections will be sent from that connection.
      *
-     * @param sender    nickname of the sender
+     * @param sender    nicknames of the sender
      * @param message   message to be sent
      */
     public void sendingChatMessage(String sender, String message){
@@ -402,7 +400,7 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
             }
         }
         for (String nickname : connections.keySet()) {
-            //recivers is empty means that the message is for all the players. Otherwise is a single message to a specific client.
+            //receivers is empty means that the message is for all the players. Otherwise, is a single message to a specific client.
             if(receivers.contains(nickname) || receivers.isEmpty()){
                 new Thread(() -> {
                     try {
@@ -458,13 +456,13 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
     public void sendingHandsAndWhenSecretObjectiveCardsCompleteStartGameFlow(String nickname, boolean allWithSecretObjectiveCardChosen)
              {
          for(String nicknameRefresh : connections.keySet()){
+             //if is the connection of the player, we send the secret cards
             if(nickname.equals(nicknameRefresh)){
                 new Thread(() -> {
                     try {
-                        // Send the player's hand to the client. It is unicast call, only the player can see their hand.
+                        // Send the player's hand to the client. It is an unicast call, only the player can see their hand.
                         connections.get(nicknameRefresh).showHand(nickname, Controller.getInstance().getHand(nickname));
                     } catch (RemoteException e) {
-                        connections.remove(nicknameRefresh);
                         NetworkHandler.getInstance().disconnectBroadcast();
                     } catch (NoNameException e) {
                         System.out.println("NoNameException. Debugging error, this error should never occur");
@@ -475,9 +473,8 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
                     try {
                         // Send the hidden hand of the player to all other clients.
                         // It is a broadcast call, all other players can see the hidden hand of the player.
-                        connections.get(nicknameRefresh).showHiddenHand(nicknameRefresh, Controller.getInstance().getHiddenHand(nickname));
+                        connections.get(nicknameRefresh).showHiddenHand(nickname, Controller.getInstance().getHiddenHand(nickname));
                     } catch (RemoteException e) {
-                        connections.remove(nicknameRefresh);
                         NetworkHandler.getInstance().disconnectBroadcast();
                     } catch (NoNameException e) {
                         System.out.println("NoNameException. Debugging error, this error should never occur");
@@ -492,7 +489,6 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
                         // The game start signal includes the information of the first player.
                         connections.get(nicknameRefresh).getIsFirstAndStartGame(Controller.getInstance().getFirstPlayer());
                     } catch (RemoteException e) {
-                        connections.remove(nicknameRefresh);
                         NetworkHandler.getInstance().disconnectBroadcast();
                     }
                 }).start();
@@ -521,7 +517,6 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
                     connections.get(nicknameRefresh).placeCard(nickname, cardId, new Point(0, 0), side, 0,
                             Controller.getInstance().getPlayerResources(nickname), Controller.getInstance().getPlayerPoints(nickname));
                 } catch (RemoteException e) {
-                    connections.remove(nicknameRefresh);
                     NetworkHandler.getInstance().disconnectBroadcast();
                 } catch (NoNameException e) {
                     System.out.println("NoNameException. Debugging error, this error should never occur");
@@ -536,7 +531,6 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
                         connections.get(nicknameRefresh).
                                 sendCommonObjectiveCards(Controller.getInstance().getCommonObjectiveCards());
                     } catch (RemoteException e) {
-                        connections.remove(nicknameRefresh);
                         NetworkHandler.getInstance().disconnectBroadcast();
                     }
                     try {
@@ -548,7 +542,6 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
                             System.out.println("NoNameException. Debugging error, this error should never occur");
                         }
                     } catch (RemoteException e) {
-                        connections.remove(nicknameRefresh);
                         NetworkHandler.getInstance().disconnectBroadcast();
                     }
                 }).start();
@@ -576,7 +569,7 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
             if (!nickname.equals(nicknameRefresh)) {
                 new Thread(() -> {
                     try {
-                        connections.get(nicknameRefresh).showHiddenHand(nicknameRefresh, Controller.getInstance().getHiddenHand(nickname));
+                        connections.get(nicknameRefresh).showHiddenHand(nickname, Controller.getInstance().getHiddenHand(nickname));
                     } catch (NoNameException e) {
                         System.out.println("NoNameException. This error should never occur. Debugging purpose only");
                     } catch (RemoteException e) {
@@ -589,10 +582,9 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
             new Thread(() -> {
                 try {
                     //send the information of the drawn card to the client. It is a card on the table and the new on deck.
-                    //if a player draws a onDeck card, the headDeckParameter is -1, and client don't update that information.
+                    //if a player draws a onDeck card, the headDeckParameter is -1, and a client doesn't update that information.
                     connections.get(nicknameRefresh).moveCard(newCardId, headDeck, gold, onTableOrDeck);
                 } catch (RemoteException e) {
-                    connections.remove(nicknameRefresh);
                     NetworkHandler.getInstance().disconnectBroadcast();
                 }
                 try {
@@ -600,7 +592,6 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
                     connections.get(nicknameRefresh).
                             refreshTurnInfo(Controller.getInstance().getCurrentPlayer(), Controller.getInstance().getGameState());
                 } catch (RemoteException e) {
-                    connections.remove(nicknameRefresh);
                     NetworkHandler.getInstance().disconnectBroadcast();
                 }
             }).start();
@@ -639,7 +630,6 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
                     connections.get(nicknameRefresh).
                             refreshTurnInfo(Controller.getInstance().getCurrentPlayer(), Controller.getInstance().getGameState());
                 } catch (RemoteException e) {
-                    connections.remove(nicknameRefresh);
                     NetworkHandler.getInstance().disconnectBroadcast();
                 }
 
@@ -667,7 +657,6 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
                     connections.get(playerConnection).
                             showEndGame(extraPoints, ranking);
                 } catch (RemoteException e) {
-                    connections.remove(playerConnection);
                     NetworkHandler.getInstance().disconnectBroadcast();
                 }
             }).start();
@@ -683,13 +672,17 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
         for(String nickname : connections.keySet()){
             try {
                 connections.get(nickname).stopGaming();
-                connections.remove(nickname);
             } catch (RemoteException e) {
                 System.out.println("Cannot communicate with " + nickname + "Already disconnected");
             }
         }
     }
-
+    /**
+     * This method is used to start the periodic check of client connections.
+     *
+     * It creates a Runnable that calls the isClientConnected method and schedules it to run at a fixed rate.
+     * The Runnable is scheduled to run every 30 seconds.
+     */
     public void startClientConnectionCheck() {
         final Runnable checker = new Runnable() {
             public void run() {
@@ -698,15 +691,28 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
         };
         scheduler.scheduleAtFixedRate(checker, 30, 30, TimeUnit.SECONDS);
     }
-
+    /**
+     * This method is used to check if the clients are still connected to the server.
+     *
+     * It iterates over all the connections and calls the isConnected method on each client.
+     * If a RemoteException is thrown, it means that the client is not connected, so broadcasts a disconnect signal.
+     */
     public void isClientConnected(){
         for(String nickname : connections.keySet()){
             try {
                 connections.get(nickname).isConnected();
             } catch (RemoteException e) {
-                connections.remove(nickname);
                 NetworkHandler.getInstance().disconnectBroadcast();
             }
         }
+    }
+
+    /**
+     * This method is used to know if a client is connected to the server.
+     * The client will call this method to check if the connection is still active.
+     *
+     * @throws RemoteException throws a RemoteException if there is a problem with the connection.
+     */
+    public void connectToServer() throws RemoteException{
     }
 }

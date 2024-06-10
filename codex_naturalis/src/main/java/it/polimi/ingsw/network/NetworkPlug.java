@@ -11,7 +11,7 @@ import java.awt.*;
  * manages the network connections.
  * When something happens in the game and this should be notified in a broadcast
  * way, NetworkHandler call the methods for all
- * the different type of connections protocols.
+ * the different types of connection protocols.
  * 
  * It includes methods for finalizing the number of players, starting the game,
  * refreshing users,
@@ -118,7 +118,7 @@ public interface NetworkPlug {
 
         /**
          * Sends the end game signal. Broadcast to all clients.
-         * With controller methods you should get the extra points and the ranking of
+         * With controller methods, you should get the extra points and the ranking of
          * the players.
          */
         void sendEndGame();

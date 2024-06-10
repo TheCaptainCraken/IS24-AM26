@@ -177,4 +177,12 @@ public interface RMIServerInterface extends Remote {
     Integer[] drawCard(String nickname, boolean gold, int onTableOrDeck)
             throws RemoteException, WrongGamePhaseException, NoTurnException, NoNameException, CardPositionException;
 
+    /**
+     * This method is used to know if a client is connected to the server.
+     * The client will call this method to check if the connection is still active.
+     *
+     * @throws RemoteException throws a RemoteException if there is a problem with the connection.
+     */
+    void connectToServer() throws RemoteException;
+
 }

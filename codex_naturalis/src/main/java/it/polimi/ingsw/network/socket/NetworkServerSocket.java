@@ -20,6 +20,7 @@ import it.polimi.ingsw.model.exception.SameNameException;
 import it.polimi.ingsw.model.exception.WrongGamePhaseException;
 import it.polimi.ingsw.network.NetworkHandler;
 import it.polimi.ingsw.network.NetworkPlug;
+import it.polimi.ingsw.network.socket.messages.server.Connection;
 import it.polimi.ingsw.network.socket.messages.ErrorType;
 import it.polimi.ingsw.network.socket.messages.client.ClientMessage;
 import it.polimi.ingsw.network.socket.messages.client.gameflow.SentChatMessage;
@@ -71,6 +72,15 @@ public class NetworkServerSocket implements NetworkPlug {
         //add the network plug to the network handler, who manages the different connections protocols.
         NetworkHandler.getInstance().addNetworkPlug("socket", this);
 
+        //TODO testare questo
+        try {
+
+            System.out.println("Server is listening on IP: " + InetAddress.getLocalHost().getHostAddress());
+            System.out.println("Server is listening on Port: " + serverSocket.getLocalPort());
+        } catch (Exception e) {
+            System.out.println("Error in getting the IP address and port of the server: " + e.getMessage());
+        }
+
         connections = new HashMap<>();
         controller = Controller.getInstance();
     }
@@ -119,15 +129,17 @@ public class NetworkServerSocket implements NetworkPlug {
      */
     @Override
     public void finalizingNumberOfPlayers() {
-        for(ClientHandler client : connections.values()){
+        for(String client : connections.keySet()){
             //if the client is admitted to the game, we send a message to stop waiting and start play
-            if(controller.isAdmitted(client.getNickname())){
-                client.sendMessage(new StopWaitingOrDisconnect(true));
+            if(controller.isAdmitted(connections.get(client).getNickname())){
+                connections.get(client).sendMessage(new StopWaitingOrDisconnect(true));
             }else{
-                //disconnection of the users not admitted
-                client.sendMessage(new StopWaitingOrDisconnect(false));
+                //disconnection of the users isn't admitted
+                connections.get(client).sendMessage(new StopWaitingOrDisconnect(false));
                 //close the connection
-                client.hastaLaVistaBaby();
+                connections.get(client).hastaLaVistaBaby();
+                //remove from the connection list
+                connections.remove(client);
             }
         }
     }
@@ -185,7 +197,7 @@ public class NetworkServerSocket implements NetworkPlug {
      * @param message The message sent by the player.
      */
     @Override
-    public void sendingChatMessage(String message, String sender) {
+    public void sendingChatMessage(String sender, String message) {
         ArrayList<String> receivers = new ArrayList<>();
         for (String nickname : connections.keySet()) {
             //see how connections work. It is a map with the address of the client as key and the ClientHandler as value.
@@ -200,7 +212,7 @@ public class NetworkServerSocket implements NetworkPlug {
         }else{
             for (String nickname : connections.keySet()) {
                 if(receivers.contains(connections.get(nickname).getNickname())){
-                        connections.get(nickname).sendChatMessageIfPlayer(sender, message);
+                        connections.get(nickname).sendMessage(new ReceivedChatMessage(sender, message));
                 }
             }
         }
@@ -219,7 +231,7 @@ public class NetworkServerSocket implements NetworkPlug {
     @Override
     public void sendingPlacedRootCardAndWhenCompleteObjectiveCards(String nickname, boolean side, int cardId,
                                                                    boolean allWithRootCardPlaced) {
-        //send the card placed to all the clients, turn is 0 since it is the first card placed.
+        //send the card placed to all the clients; turn is 0 since it is the first card placed.
         sendBroadCastMessage(new CardIsPositioned(nickname, cardId, new Point(0, 0), side, 0));
         try {
             //send the points and resources of the player to all the clients
@@ -360,6 +372,10 @@ public class NetworkServerSocket implements NetworkPlug {
          */
         private String nickname;
         /**
+         * The connection status of the client.
+         */
+        private boolean connection;
+        /**
          * This constructor is used to create a new ClientHandler.
          * @param socket The client socket to be handled.
          */
@@ -382,7 +398,13 @@ public class NetworkServerSocket implements NetworkPlug {
             try {
                 out = new ObjectOutputStream(clientSocket.getOutputStream());
                 in = new ObjectInputStream(clientSocket.getInputStream());
+                connection = true;
+
                 ClientMessage message;
+
+                new Thread(this::isClientConnected).start();
+                new Thread(this::askForConnection).start();
+
                 while (clientSocket.isConnected()) {
                     try {
                         message = (ClientMessage) in.readObject();
@@ -394,10 +416,33 @@ public class NetworkServerSocket implements NetworkPlug {
                 }
             } catch (IOException e) {
                 //disconnect all the clients connected to the server RMI and Socket
-                connections.remove(clientSocket.getRemoteSocketAddress().toString());
                 NetworkHandler.getInstance().disconnectBroadcast();
             }
         }
+
+        /**
+         * This method is used to periodically check if the client is still connected to the server.
+         * It runs in a separate thread and pauses for a specified interval (30 seconds in this case) between each check.
+         * If the client is no longer connected, it triggers a broadcast to disconnect all clients.
+         */
+        private void isClientConnected() {
+            while (connection) {
+                try {
+                    Thread.sleep(30000); // 30 seconds
+                } catch (InterruptedException e) {
+                    System.out.println("Error in sleep");
+                }
+            }
+            NetworkHandler.getInstance().disconnectBroadcast();
+        }
+
+        /**
+         * This method is used to send a message to the client.
+         *
+         */
+        private void askForConnection() {
+        }
+
         /**
          * This method is used to handle the messages received from the client.
          *
@@ -555,6 +600,8 @@ public class NetworkServerSocket implements NetworkPlug {
                 } catch (CardPositionException e) {
                     sendErrorMessage(ErrorType.CARD_POSITION);
                 }
+            } else if(message instanceof Connection){
+                connection = true;
             } else {
                 throw new ClassNotFoundException();
             }
@@ -592,19 +639,8 @@ public class NetworkServerSocket implements NetworkPlug {
                 out.writeObject(message);
             } catch (IOException e) {
                 //disconnect all the clients connected to the server RMI and Socket
-                connections.remove(clientSocket.getRemoteSocketAddress().toString());
                 NetworkHandler.getInstance().disconnectBroadcast();
             }
-        }
-
-        /**
-         * This method is used to send a chat message to a specific client without using broadcast.
-         *
-         * @param sender  The nickname of the sender.
-         * @param message The message.
-         */
-        public void sendChatMessageIfPlayer(String sender, String message){
-            sendMessage(new ReceivedChatMessage(sender, message));
         }
 
         /**

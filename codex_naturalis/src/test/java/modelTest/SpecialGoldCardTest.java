@@ -1,6 +1,7 @@
-package it.polimi.ingsw.modelTest;
+package modelTest;
 
 import it.polimi.ingsw.model.*;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -28,6 +29,6 @@ public class SpecialGoldCardTest {
     @Test
     void NormalTest(){
         g1 = new SpecialGoldCard(2, Kingdom.FUNGI,map,0,map1,Countable.CORNER);
-        assertEquals(g1.getThingToCount(),Countable.CORNER);
+        Assertions.assertEquals(g1.getThingToCount(),Countable.CORNER);
     }
 }
