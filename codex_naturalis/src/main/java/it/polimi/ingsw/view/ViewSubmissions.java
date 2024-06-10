@@ -94,6 +94,10 @@ public class ViewSubmissions {
     public void drawCard(boolean gold, int onTableOrDeck){
         controller.drawCard(gold, onTableOrDeck);
     }
+    //TODO javadco
+    public String getNickname(){
+        return controller.getNickname();
+    }
 
     /**
      * Send a message from the player to the others

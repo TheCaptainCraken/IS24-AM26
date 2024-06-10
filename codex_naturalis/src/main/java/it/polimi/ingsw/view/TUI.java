@@ -8,6 +8,7 @@ import javafx.util.Pair;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
+//TODO
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -281,27 +282,28 @@ public class TUI implements ViewInterface {
         System.out.println("The game phase is: " + gameState);
         System.out.println();
     }
-//    /**
-//     * Shows the resources of the client.
-//     *
-//     */
-//    @Override
-//    public synchronized void showResourcesPlayer() {
-//        String name = controller.getNickname();
-//        HashMap<String, HashMap<Sign, Integer>> resources = model.getResources();
-//
-//        System.out.println("You have the following resources:");
-//        for (Sign sign : resources.get(name).keySet()) {
-//            if(sign != Sign.NULL && sign != Sign.EMPTY) {
-//                System.out.println(sign + " - " + resources.get(name).get(sign));
-//            }
-//        }
-//        System.out.println();
-//    }
+    /**
+     * Shows the resources of the client.
+     *
+     */
+    @Override
+    public synchronized void showResourcesPlayer() {
+        String name = controller.getNickname();
+        HashMap<String, HashMap<Sign, Integer>> resources = model.getResources();
+
+        System.out.println("You have the following resources:");
+        for (Sign sign : resources.get(name).keySet()) {
+            if(sign != Sign.NULL && sign != Sign.EMPTY) {
+                System.out.println(sign + " - " + resources.get(name).get(sign));
+            }
+        }
+        System.out.println();
+    }
     /**
      * Shows the resources of all players.
      */
-    public synchronized void showResourcesPlayer() {
+    //TODO
+    public synchronized void showResourcesAllPlayers() {
         HashMap<String, HashMap<Sign, Integer>> resources = model.getResources();
         for (String player : resources.keySet()) {
             System.out.println();
@@ -957,7 +959,7 @@ public class TUI implements ViewInterface {
      * @param nickname The nickname of the player whose table area is to be printed.
      */
     private synchronized void printTableAreaOfPlayer(String nickname) {
-        ArrayList<CardClient> cards = model.getListOfCardForTui(nickname);
+        ArrayList<CardClient> cards = model.getListOfCards(nickname);
         ArrayList<String[]> cardsToPrint = new ArrayList<>();
 
         //order the cards by level at first, secondly by x. The level is the sum of x and y.

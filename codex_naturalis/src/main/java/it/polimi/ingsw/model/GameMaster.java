@@ -108,8 +108,13 @@ public class GameMaster {
             currentPlayer.setRootCard(rootCardPlaced);
 
             if (!side) {
+                //add bonus resources
                 for (Sign sign : rootCard.getBonusResources()) {
                     currentPlayer.addResource(sign, 1);
+                }
+                //add back side corners
+                for (Corner corner : Corner.values()) {
+                    currentPlayer.addResource(rootCard.getBacksideCorners().get(corner), 1);
                 }
             } else {
                 // if the card is placed on the top side, the player gets the resources of the corner. Each corner has a resource
@@ -204,9 +209,8 @@ public class GameMaster {
             // if corner points to null doesn't remove any resources, resources are
             // subtracted only if the PlayedCards
             // present in the attachments HashMap are played on their front side or are
-            // referencing the StartingCard(starting card has backside corner e front corner)
-            if (attachments.get(corner) != null && (attachments.get(corner).isFacingUp()
-                    || attachments.get(corner).getCard() instanceof StartingCard)) {
+            // referencing the StartingCard
+             if (attachments.get(corner) != null && attachments.get(corner).isFacingUp()) {
                 switch (corner) {
                     case TOP_LEFT: {
                         currentPlayer.removeResources(
@@ -229,7 +233,30 @@ public class GameMaster {
                         break;
                     }
                 }
-            }
+            } else if(attachments.get(corner) != null && attachments.get(corner).getCard() instanceof StartingCard){
+                 switch (corner) {
+                    case TOP_LEFT: {
+                        currentPlayer.removeResources(
+                                ((StartingCard)attachments.get(corner).getCard()).getBacksideCorners().get(Corner.BOTTOM_RIGHT), 1);
+                        break;
+                    }
+                    case TOP_RIGHT: {
+                        currentPlayer.removeResources(
+                                ((StartingCard)attachments.get(corner).getCard()).getBacksideCorners().get(Corner.BOTTOM_LEFT), 1);
+                        break;
+                    }
+                    case BOTTOM_LEFT: {
+                        currentPlayer.removeResources(
+                                ((StartingCard)attachments.get(corner).getCard()).getBacksideCorners().get(Corner.TOP_RIGHT), 1);
+                        break;
+                    }
+                    case BOTTOM_RIGHT: {
+                        currentPlayer.removeResources(
+                                ((StartingCard)attachments.get(corner).getCard()).getBacksideCorners().get(Corner.TOP_LEFT), 1);
+                        break;
+                    }
+                }
+             }
         }
 
         // At the end because I need to know resources values at the end and how many

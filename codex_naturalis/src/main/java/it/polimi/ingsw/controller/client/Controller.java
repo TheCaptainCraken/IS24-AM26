@@ -7,8 +7,10 @@ import it.polimi.ingsw.network.RMI.ClientRMI;
 import it.polimi.ingsw.network.RMI.RMIClientInterface;
 import it.polimi.ingsw.network.socket.ClientSocket;
 import it.polimi.ingsw.network.NetworkClient;
+import it.polimi.ingsw.network.RMI.RMIClientInterface;
 import it.polimi.ingsw.view.*;
 import javafx.util.Pair;
+import it.polimi.ingsw.view.gui.GUI;
 
 import java.awt.*;
 import java.io.IOException;
@@ -18,23 +20,26 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import static javafx.application.Application.launch;
+
 /**
  * The Controller class is responsible for managing the game flow and interactions between the model and the view.
  * It handles user inputs, updates the model, and triggers the view to update its display.
  * The Controller class also communicates with the server to perform actions.
-
+ *
  * The Controller class uses a singleton pattern for the ViewSubmissions instance to ensure that there is only one instance of it in the application.
  * This singleton instance is used to communicate with the controller through the TUI or GUI.
-
+ *
  * The Controller class also uses a phase attribute to keep track of the current phase of the game.
- * Different phases of the game include LOGIN, WAIT, CHOOSE_SIDE_STARTING_CARD, CHOOSE_SECRET_OBJECTIVE_CARD, and GAME FLOW.
-
+ * Different phases of the game include LOGIN, WAIT, CHOOSE_SIDE_STARTING_CARD, CHOOSE_SECRET_OBJECTIVE_CARD, and GAMEFLOW.
+ *
  * The Controller class uses a NetworkClient object to handle network communications.
  * The NetworkClient object can be either a ClientRMI object or a ClientSocket object, depending on the type of connection chosen by the user.
-
+ *
  * The Controller class uses a ViewInterface object to handle the display of the game.
  * The ViewInterface object can be either a TUI object or a GUI object, depending on the type of view chosen by the user.
-
+ *
  * The Controller class uses a LittleModel object to store all the required information about the game.
  * The LittleModel object is updated by the Controller class and used by the ViewInterface object to update the display.
  */
@@ -65,7 +70,7 @@ public class Controller {
     private LittleModel model;
     /**
      * Constructs a new Controller object and initializes the game model, phase, and ViewSubmissions instance.
-
+     *
      * It sets the current phase of the game to LOGIN, which prompts the user to input their unique player name.
      * It also sets the singleton ViewSubmissions instance to communicate with the controller through the TUI or GUI.
      */
@@ -94,14 +99,21 @@ public class Controller {
         Controller.phase = phase;
     }
 
-    public void setView(String typeOfView){
+    public void setView(String typeOfView) throws InterruptedException {
         model = new LittleModel();
         if(typeOfView.equals("TUI")){
             this.view = new TUI(model, this);
             view.start();
         }else if(typeOfView.equals("GUI")){
-            //TODO
-            //view = new GUI();
+            new Thread(() -> {
+                launch(GUI.class);
+            }).start();
+
+            view = GUI.getInstance();
+            ((GUI) view).setModel(model);
+            if(view != null) {
+                System.out.println("GUI started");
+            }
         }
     }
 
@@ -116,12 +128,12 @@ public class Controller {
 
             connection = (NetworkClient) clientRMI;
         }else if(typeOfConnection.equals("Socket")){
-            ClientSocket socket;
+            ClientSocket socket = null;
             try {
                 //TODO porta nuova
                 socket = new ClientSocket(this, "localhost", 4567);
                 connection = socket;
-                new Thread(socket).start();
+                new Thread(socket::run).start();
             } catch (IOException e) {
                 System.out.println("Not able to connect to server, please try again.");
             }
@@ -145,7 +157,7 @@ public class Controller {
 
     /**
      * Triggers the view to ask the user for the number of players.
-
+     *
      * This method is used to prompt the user to input the number of players that will be participating in the game.
      * The actual input is handled by the view (TUI or GUI).
      */
@@ -155,7 +167,7 @@ public class Controller {
     }
     /**
      * Triggers the view to display a waiting message to the user.
-
+     *
      * This method is used to inform the user that they are waiting for other players to join the game lobby.
      * The actual display of the waiting message is handled by the view (TUI or GUI).
      */
@@ -165,7 +177,7 @@ public class Controller {
 
     /**
      * Triggers the view to stop displaying the waiting message.
-
+     *
      * This method is used to inform the user that the waiting phase is over and the game is starting.
      * The actual removal of the waiting message is handled by the view (TUI or GUI).
      */
@@ -175,7 +187,7 @@ public class Controller {
 
     /**
      * Triggers the view to refresh the display of users.
-
+     *
      * This method is used to update the display of users and their associated colors in the game.
      * The actual display update is handled by the view (TUI or GUI).
      *
@@ -187,7 +199,7 @@ public class Controller {
     }
     /**
      * Updates the cards on the table in the game model and triggers the view to display the common table.
-
+     *
      * This method is called when the cards on the table change in the game.
      * It updates the game model with the new cards on the table and then triggers the view to display the common table.
      *
@@ -252,7 +264,7 @@ public class Controller {
     }
     /**
      * Triggers the view to refresh the turn information.
-
+     *
      * This method is used to update the display of the current player and the game state.
      * The actual display update is handled by the view (TUI or GUI).
      *
