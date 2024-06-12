@@ -43,10 +43,11 @@ public class MatchController {
     private final Image inkwell = new Image("inkwell.png");
     private final Image scroll = new Image("scroll.png");
     private final Image quill = new Image("quill.png");
-    private boolean cancelExists = false;
+    private boolean cancelExists = false,optionExist = false;
     private ArrayList<Label> labels;
     private ArrayList<ImageView> hand;
     private HashMap<String,Color> playerColors;
+    private Button lastClicked = null;
     private boolean root_side = true;
     private HashMap<String, Scene> playerBoards;
     private Dialog<String> dialog;
@@ -155,6 +156,17 @@ public class MatchController {
                 labels.get(i).setTextFill(javafx.scene.paint.Color.RED);
             }
             i++;
+        }
+        for(String s: playerBoards.keySet()) {
+            Parent parent = playerBoards.get(s).getRoot();
+            SplitPane split = (SplitPane) parent.getChildrenUnmodifiable().get(0);
+            VBox v = (VBox) split.getItems().get(0);
+            for (Node n : v.getChildren()) {
+                 if(n instanceof Label){
+                    Label label = (Label) n;
+                    label.setText("Waiting for " + s + "'s hand...");
+                }
+            }
         }
     }
     public void showCommonTable(){
@@ -681,6 +693,7 @@ public class MatchController {
             board.getChildren().removeIf(node -> node instanceof Button);
             statusButtons.getChildren().removeIf(node -> node instanceof Button);
             cancelExists = false;
+            optionExist = false;
 
         });
         for(Node n: statusButtons.getChildren()){
@@ -709,8 +722,13 @@ public class MatchController {
     }
 
     public void handlePositionRequest(Button b){
+        if(lastClicked != null){
+            lastClicked.setOpacity(0.2);
+            b.setBorder(new Border(new BorderStroke(javafx.scene.paint.Color.DARKGOLDENROD,BorderStrokeStyle.SOLID,CornerRadii.EMPTY,BorderWidths.DEFAULT)));
+        }
         b.setOpacity(0.8);
         b.setBorder(new Border(new BorderStroke(javafx.scene.paint.Color.RED,BorderStrokeStyle.SOLID,CornerRadii.EMPTY,BorderWidths.DEFAULT)));
+        lastClicked = b;
         Point pos = inversePosition(b.getTranslateX(),b.getTranslateY());
         int i = 0;
         for(ImageView card: hand){
@@ -726,17 +744,24 @@ public class MatchController {
 
     public void placeCardRequest(Button b,int handIndex, Point position){
         Button b1 = new Button("Front"), b2 = new Button("Back");
-        statusButtons.getChildren().add(0,b1);
-        statusButtons.getChildren().add(1,b2);
+        if(!optionExist){
+            statusButtons.getChildren().add(0,b1);
+            statusButtons.getChildren().add(1,b2);
+            optionExist = true;
+        }
 
         b1.setOnMouseClicked(event -> {
             cancelExists = false;
+            optionExist = false;
+            lastClicked = null;
             board.getChildren().remove(b);
             statusButtons.getChildren().removeIf(node -> node instanceof Button);
             ViewSubmissions.getInstance().placeCard(handIndex,position,true);
         });
         b2.setOnMouseClicked(event -> {
             cancelExists = false;
+            optionExist = false;
+            lastClicked = null;
             board.getChildren().remove(b);
             statusButtons.getChildren().removeIf(node -> node instanceof Button);
             ViewSubmissions.getInstance().placeCard(handIndex,position,false);
