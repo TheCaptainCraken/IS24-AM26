@@ -43,7 +43,7 @@ public class MatchController {
     private final Image inkwell = new Image("inkwell.png");
     private final Image scroll = new Image("scroll.png");
     private final Image quill = new Image("quill.png");
-    private boolean cancelExists = false,optionExist = false;
+    private boolean cancelExists = false,optionExist = false,positionSelected = false;
     private ArrayList<Label> labels;
     private ArrayList<ImageView> hand;
     private HashMap<String,Color> playerColors;
@@ -693,6 +693,7 @@ public class MatchController {
             board.getChildren().removeIf(node -> node instanceof Button);
             statusButtons.getChildren().removeIf(node -> node instanceof Button);
             cancelExists = false;
+            positionSelected = false; //avrei potuto settare a null le azioni delle carte, sono troppo pigro
             optionExist = false;
 
         });
@@ -729,6 +730,7 @@ public class MatchController {
         b.setOpacity(0.8);
         b.setBorder(new Border(new BorderStroke(javafx.scene.paint.Color.RED,BorderStrokeStyle.SOLID,CornerRadii.EMPTY,BorderWidths.DEFAULT)));
         lastClicked = b;
+        positionSelected = true;
         Point pos = inversePosition(b.getTranslateX(),b.getTranslateY());
         int i = 0;
         for(ImageView card: hand){
@@ -744,7 +746,7 @@ public class MatchController {
 
     public void placeCardRequest(Button b,int handIndex, Point position){
         Button b1 = new Button("Front"), b2 = new Button("Back");
-        if(!optionExist){
+        if(!optionExist && positionSelected){
             statusButtons.getChildren().add(0,b1);
             statusButtons.getChildren().add(1,b2);
             optionExist = true;
@@ -753,6 +755,7 @@ public class MatchController {
         b1.setOnMouseClicked(event -> {
             cancelExists = false;
             optionExist = false;
+            positionSelected = false;
             lastClicked = null;
             board.getChildren().remove(b);
             statusButtons.getChildren().removeIf(node -> node instanceof Button);
@@ -761,6 +764,7 @@ public class MatchController {
         b2.setOnMouseClicked(event -> {
             cancelExists = false;
             optionExist = false;
+            positionSelected = false;
             lastClicked = null;
             board.getChildren().remove(b);
             statusButtons.getChildren().removeIf(node -> node instanceof Button);
