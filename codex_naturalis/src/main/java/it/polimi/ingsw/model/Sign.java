@@ -1,6 +1,8 @@
 package it.polimi.ingsw.model;
 
-public enum Sign {
+import java.io.Serializable;
+
+public enum Sign implements Serializable {
     LEAF,
     WOLF,
     MUSHROOM,

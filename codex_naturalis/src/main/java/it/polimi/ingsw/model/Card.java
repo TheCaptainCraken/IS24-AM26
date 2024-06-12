@@ -4,7 +4,7 @@ package it.polimi.ingsw.model;
 /**
  * This class represents a generic card.
  */
-public abstract class Card {
+public abstract class Card implements java.io.Serializable {
     /**
      * The card's id.
      */

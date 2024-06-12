@@ -155,9 +155,10 @@ public class LoginController {
         dialog.getDialogPane().setContent(box);
         dialog.show();
     }
+
     public void noConnection() {
         dialog = new Dialog<>();
-        dialog.setTitle("Username Already Taken!");
+        dialog.setTitle("No active connection");
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK);
         Label l = new Label("You are not connected to the server. Game will end soon.\nThank you for playing. Goodbye!");
         l.setFont(Font.font(16));

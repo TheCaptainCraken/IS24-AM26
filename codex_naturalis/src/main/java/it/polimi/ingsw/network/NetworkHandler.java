@@ -179,7 +179,7 @@ public class NetworkHandler {
      *                      or deck.
      * @throws NoNameException If a player with the given nickname does not exist.
      */
-    public void sendDrawnCardBroadcast(String nickname, int newCardId, Kingdom headDeck, boolean gold,
+    public void sendDrawnCardBroadcast(String nickname, Integer newCardId, Kingdom headDeck, boolean gold,
             int onTableOrDeck) throws NoNameException {
         for (NetworkPlug networkPlug : networkInterfacesAndConnections.values()) {
             networkPlug.sendDrawnCard(nickname, newCardId, headDeck, gold, onTableOrDeck);

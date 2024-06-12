@@ -7,8 +7,9 @@ import it.polimi.ingsw.network.RMI.ClientRMI;
 import it.polimi.ingsw.network.RMI.RMIClientInterface;
 import it.polimi.ingsw.network.socket.ClientSocket;
 import it.polimi.ingsw.network.NetworkClient;
-import it.polimi.ingsw.network.RMI.RMIClientInterface;
 import it.polimi.ingsw.view.*;
+import it.polimi.ingsw.view.model.LittleModel;
+import it.polimi.ingsw.view.model.Phase;
 import javafx.util.Pair;
 import it.polimi.ingsw.view.gui.GUI;
 
@@ -401,7 +402,7 @@ public class Controller {
      * @param onTableOrDeck The location of the new card. 0 for on the table, 1 for on the deck.
      * @param headDeck The new head of the deck.
      */
-    public void updateAndShowCommonTable(int newCardId, boolean gold, int onTableOrDeck, Kingdom headDeck) {
+    public void updateAndShowCommonTable(Integer newCardId, boolean gold, int onTableOrDeck, Kingdom headDeck) {
         model.updateHeadDeck(headDeck, gold);
         model.updateCardOnTable(newCardId, gold, onTableOrDeck);
         //notify the scene that the table has been updated. The scene will update the view.
@@ -687,5 +688,8 @@ public class Controller {
         exitDelay();
     }
 
+    public NetworkClient getConnection() {
+        return connection;
+    }
 }
 

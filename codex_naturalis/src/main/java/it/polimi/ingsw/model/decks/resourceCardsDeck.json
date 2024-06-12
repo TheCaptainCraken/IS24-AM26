@@ -125,10 +125,10 @@
     "kingdom": "PLANT",
     "points": 0,
     "corners": {
-      "TOP_LEFT": null,
-      "TOP_RIGHT": "LEAF",
-      "BOTTOM_LEFT": "EMPTY",
-      "BOTTOM_RIGHT": "LEAF"
+      "TOP_LEFT": "LEAF",
+      "TOP_RIGHT": "EMPTY",
+      "BOTTOM_LEFT": "LEAF",
+      "BOTTOM_RIGHT": null
     }
   },
   {

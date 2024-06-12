@@ -2,7 +2,7 @@ package it.polimi.ingsw.network.socket.messages.server.login;
 
 import it.polimi.ingsw.controller.client.Controller;
 import it.polimi.ingsw.network.socket.messages.server.ServerMessage;
-import it.polimi.ingsw.view.Phase;
+import it.polimi.ingsw.view.model.Phase;
 
 /**
  * This class represents a server message that indicates whether the lobby is ready or not.
@@ -42,7 +42,7 @@ public class LobbyIsReady extends ServerMessage {
     public void callController(Controller controller) {
         if(isReady) {
             // Stop waiting for the lobby.
-            controller.stopWaiting();
+            // I do nothing since it will arrive a new message in the queue. (stopWaitingOrDisconnect)
         } else{
             // Continue waiting for the lobby.
             Controller.setPhase(Phase.WAIT_NUMBER_OF_PLAYERS);

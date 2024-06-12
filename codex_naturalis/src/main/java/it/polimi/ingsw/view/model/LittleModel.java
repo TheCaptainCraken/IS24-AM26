@@ -1,4 +1,4 @@
-package it.polimi.ingsw.view;
+package it.polimi.ingsw.view.model;
 
 import it.polimi.ingsw.model.*;
 
@@ -45,7 +45,7 @@ public class LittleModel {
      */
     private Integer[] myCards;
     /**
-     * The table HashMap stores the cards on the table.
+     * The table HashMap stores the starting card of each player on the table.
      */
     private HashMap<String, CardClient> table;
     /**
@@ -207,7 +207,7 @@ public class LittleModel {
      * @param gold A boolean indicating if the card is a gold card.
      * @param onTableOrDeck An integer indicating the position of the card on the table or deck.
      */
-    public void updateCardOnTable(int newCardId, boolean gold, int onTableOrDeck) {
+    public void updateCardOnTable(Integer newCardId, boolean gold, int onTableOrDeck) {
         //if it -1, means that the card is on the deck and not on the table, thus noupdate is needed
         if(onTableOrDeck != -1) {
             if (gold) {

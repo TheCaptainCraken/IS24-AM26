@@ -114,7 +114,7 @@ public interface NetworkPlug {
          * @param onTableOrDeck An integer indicating whether the card is on the table
          *                      or the deck.
          */
-        void sendDrawnCard(String nickname, int newCardId, Kingdom headDeck, boolean gold, int onTableOrDeck);
+        void sendDrawnCard(String nickname, Integer newCardId, Kingdom headDeck, boolean gold, int onTableOrDeck);
 
         /**
          * Sends the end game signal. Broadcast to all clients.

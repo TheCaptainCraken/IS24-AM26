@@ -3,6 +3,8 @@ package it.polimi.ingsw.view;
 import it.polimi.ingsw.controller.client.Controller;
 import it.polimi.ingsw.model.*;
 import it.polimi.ingsw.model.Color;
+import it.polimi.ingsw.view.model.CardClient;
+import it.polimi.ingsw.view.model.LittleModel;
 import javafx.util.Pair;
 
 import java.awt.*;
@@ -33,6 +35,10 @@ public class TUI implements ViewInterface {
      * Model of the game. It is used to retrieve information about the game state
      */
     private final LittleModel model;
+    /**
+     * Object used for synchronization.
+     */
+    private final Object syncornizedObject;
 
     /**
      * Constructor for the TUI.
@@ -40,6 +46,7 @@ public class TUI implements ViewInterface {
      */
     public TUI(LittleModel model, Controller controller) {
         this.model = model;
+        this.syncornizedObject = new Object();
         this.controller = controller;
     }
 
@@ -48,8 +55,10 @@ public class TUI implements ViewInterface {
      */
     @Override
     public void waitLobby() {
-        System.out.println("You are connected to the server. Please wait for all players to join the game");
-        System.out.println();
+        synchronized (syncornizedObject) {
+            System.out.println("You are connected to the server. Please wait for all players to join the game");
+            System.out.println();
+        }
     }
 
     /**
@@ -57,15 +66,19 @@ public class TUI implements ViewInterface {
      */
     @Override
     public void stopWaiting() {
-        System.out.println("The game is starting");
-        System.out.println();
+        synchronized (syncornizedObject) {
+            System.out.println("The game is starting");
+            System.out.println();
+        }
     }
 
     @Override
-    public synchronized void correctNumberOfPlayers(int numberOfPlayers) {
-        System.out.println("You have correctly set the number of players");
-        System.out.println("The number of players are " + numberOfPlayers);
-        System.out.println();
+    public void correctNumberOfPlayers(int numberOfPlayers) {
+        synchronized (syncornizedObject) {
+            System.out.println("You have correctly set the number of players");
+            System.out.println("The number of players are " + numberOfPlayers);
+            System.out.println();
+        }
     }
 
     /**
@@ -73,8 +86,10 @@ public class TUI implements ViewInterface {
      */
     @Override
     public void disconnect() {
-        System.out.println("Lobby has been fulled with number of parameters chosen by the first player");
-        System.out.println();
+        synchronized (syncornizedObject) {
+            System.out.println("Lobby has been fulled with number of parameters chosen by the first player");
+            System.out.println();
+        }
     }
 
     /**
@@ -87,9 +102,11 @@ public class TUI implements ViewInterface {
      * @param message The content of the message.
      */
     @Override
-    public synchronized void receiveMessage(String sender, String message) {
-        System.out.println("There is a new message from " + sender);
-        System.out.println(message);
+    public void receiveMessage(String sender, String message) {
+        synchronized (syncornizedObject) {
+            System.out.println("There is a new message from " + sender);
+            System.out.println(message);
+        }
     }
 
     /**
@@ -100,9 +117,11 @@ public class TUI implements ViewInterface {
      * and then prints the player's table area to the console.
      */
     @Override
-    public synchronized void showStartingCardChosen() {
-        System.out.println("The starting card has been chosen");
-        printTableAreaOfPlayer(controller.getNickname());
+    public void showStartingCardChosen() {
+        synchronized (syncornizedObject) {
+            System.out.println("The starting card has been chosen");
+            printTableAreaOfPlayer(controller.getNickname());
+        }
     }
     /**
      * Displays the players in the lobby and their associated colors.
@@ -111,12 +130,14 @@ public class TUI implements ViewInterface {
      */
     @Override
     public void refreshUsers(HashMap<String, Color> playersAndPins) {
-        System.out.println("The players in the lobby are:");
-        for (String nickname : playersAndPins.keySet()) {
-            Color color = playersAndPins.get(nickname);
-            System.out.println(nickname + " - " + Objects.requireNonNullElse(color, "no color"));
+        synchronized (syncornizedObject) {
+            System.out.println("The players in the lobby are:");
+            for (String nickname : playersAndPins.keySet()) {
+                Color color = playersAndPins.get(nickname);
+                System.out.println(nickname + " - " + Objects.requireNonNullElse(color, "no color"));
+            }
+            System.out.println();
         }
-        System.out.println();
     }
     /**
      * Displays the name of the first player in the game.
@@ -127,9 +148,11 @@ public class TUI implements ViewInterface {
      * @param firstPlayer The name of the first player.
      */
     @Override
-    public synchronized void showIsFirst(String firstPlayer) {
-        System.out.println("The first player is " + firstPlayer + ". The game is starting");
-        System.out.println();
+    public void showIsFirst(String firstPlayer) {
+        synchronized (syncornizedObject) {
+            System.out.println("The first player is " + firstPlayer + ". The game is starting");
+            System.out.println();
+        }
     }
     /**
      * Displays the starting card to the player.
@@ -137,7 +160,7 @@ public class TUI implements ViewInterface {
      * @param startingCardId The ID of the starting card.
      */
     @Override
-    public synchronized void showStartingCard(int startingCardId) {
+    public void showStartingCard(int startingCardId) {
         //same starting card, we simply change the side
         PlayedCard card = model.getStartingCard(startingCardId, true);
         PlayedCard cardBack = model.getStartingCard(startingCardId, false);
@@ -148,17 +171,19 @@ public class TUI implements ViewInterface {
         cards.add(createCardToPrint(card));
         cards.add(createCardToPrint(cardBack));
 
-        System.out.println("Choose the side of the starting Card. The one on the left is the back, the one on the right is the top");
-        System.out.println("Enter true for the top, false for the back");
-        int size = cards.get(0).length;
-        for (i = 0; i < size; i++) {
-            for (String[] cardsToPrint : cards) {
-                System.out.print(cardsToPrint[i]);
-                System.out.print("   ");
+        synchronized (syncornizedObject) {
+            System.out.println("Choose the side of the starting Card. The one on the left is the back, the one on the right is the top");
+            System.out.println("Enter true for the top, false for the back");
+            int size = cards.get(0).length;
+            for (i = 0; i < size; i++) {
+                for (String[] cardsToPrint : cards) {
+                    System.out.print(cardsToPrint[i]);
+                    System.out.print("   ");
+                }
+                System.out.println();
             }
             System.out.println();
         }
-        System.out.println();
     }
     /**
      * Displays the common table of cards to the player. 2 resource cards, 2 gold card and the cards on the deck.
@@ -167,35 +192,37 @@ public class TUI implements ViewInterface {
      * It retrieves the cards from the model and prints them to the console for the player to view.
      */
     @Override
-    public synchronized void showCommonTable() {
-        //the cards on the table
-        Integer[] resourceCards = model.getResourceCards();
-        Integer[] goldCard = model.getGoldCards();
-        //the cards on the deck
-        Kingdom resourceCardOnDeck = model.getHeadDeckResource();
-        Kingdom goldCardOnDeck = model.getHeadDeckGold();
+    public void showCommonTable() {
+        synchronized (syncornizedObject) {
+            //the cards on the table
+            Integer[] resourceCards = model.getResourceCards();
+            Integer[] goldCard = model.getGoldCards();
+            //the cards on the deck
+            Kingdom resourceCardOnDeck = model.getHeadDeckResource();
+            Kingdom goldCardOnDeck = model.getHeadDeckGold();
 
-        //create the cards to print(resource cards)
-        ArrayList<String[]> cardsToPrint = new ArrayList<>();
-        for (Integer cardId : resourceCards) {
-            cardsToPrint.add(createCardToPrint(model.getCard(cardId, true)));
+            //create the cards to print(resource cards)
+            ArrayList<String[]> cardsToPrint = new ArrayList<>();
+            for (Integer cardId : resourceCards) {
+                cardsToPrint.add(createCardToPrint(model.getCard(cardId, true)));
+            }
+            //create the resource deck to print
+            cardsToPrint.add(createCardToPrint(fromKingdomToCard(resourceCardOnDeck)));
+
+            //create the cards to print(gold cards)
+            ArrayList<String[]> goldCardsToPrint = new ArrayList<>();
+            for (Integer cardId : goldCard) {
+                goldCardsToPrint.add(createCardToPrint(model.getCard(cardId, true)));
+            }
+            //create the gold deck to print
+            goldCardsToPrint.add(createCardToPrint(fromKingdomToCard(goldCardOnDeck)));
+
+            System.out.println("This is the resource cards deck:\n");
+            printCardArray(cardsToPrint);
+            System.out.println("This is the gold cards deck:\n");
+            printCardArray(goldCardsToPrint);
+            System.out.println();
         }
-        //create the resource deck to print
-        cardsToPrint.add(createCardToPrint(fromKingdomToCard(resourceCardOnDeck)));
-
-        //create the cards to print(gold cards)
-        ArrayList<String[]> goldCardsToPrint = new ArrayList<>();
-        for (Integer cardId : goldCard) {
-            goldCardsToPrint.add(createCardToPrint(model.getCard(cardId, true)));
-        }
-        //create the gold deck to print
-        goldCardsToPrint.add(createCardToPrint(fromKingdomToCard(goldCardOnDeck)));
-
-        System.out.println("This is the resource cards deck:\n");
-        printCardArray(cardsToPrint);
-        System.out.println("This is the gold cards deck:\n");
-        printCardArray(goldCardsToPrint);
-        System.out.println();
     }
     /**
      * Displays the common objective cards to the player.
@@ -203,7 +230,7 @@ public class TUI implements ViewInterface {
      * @param objectiveCardIds The IDs of the objective cards.
      */
     @Override
-    public synchronized void showCommonObjectives(Integer[] objectiveCardIds) {
+    public void showCommonObjectives(Integer[] objectiveCardIds) {
         List<String[]> cards = new ArrayList<>();
 
         for (Integer cardId : objectiveCardIds) {
@@ -212,16 +239,17 @@ public class TUI implements ViewInterface {
 
         int size = cards.get(0).length;
         int i;
-
-        System.out.println("These are the common objective cards:");
-        for (i = 0; i < size; i++) {
-            for (String[] row : cards) {
-                System.out.print(row[i]);
-                System.out.print("    ");
+        synchronized (syncornizedObject) {
+            System.out.println("These are the common objective cards:");
+            for (i = 0; i < size; i++) {
+                for (String[] row : cards) {
+                    System.out.print(row[i]);
+                    System.out.print("    ");
+                }
+                System.out.println();
             }
             System.out.println();
         }
-        System.out.println();
     }
     /**
      * Displays the secret objective cards that the player can choose from.
@@ -231,27 +259,28 @@ public class TUI implements ViewInterface {
      * @param objectiveCardIds An array of IDs of the secret objective cards that the player can choose from.
      */
     @Override
-    public synchronized void showSecretObjectiveCardsToChoose(Integer[] objectiveCardIds) {
-        List<String[]> cards = new ArrayList<>();
+    public void showSecretObjectiveCardsToChoose(Integer[] objectiveCardIds) {
+        synchronized (syncornizedObject) {
+            List<String[]> cards = new ArrayList<>();
 
-        for (Integer cardId : objectiveCardIds) {
-            cards.add(createObjectiveCardToPrint(cardId));
-        }
+            for (Integer cardId : objectiveCardIds) {
+                cards.add(createObjectiveCardToPrint(cardId));
+            }
 
-        int size = cards.get(0).length;
-        int i;
-
-        System.out.println("These are the secret objective cards you can choose. Please choose one");
-        for (i = 0; i < size; i++) {
-            for (String[] row : cards) {
-                System.out.print(row[i]);
-                System.out.print("    ");
+            int size = cards.get(0).length;
+            int i;
+            System.out.println("These are the secret objective cards you can choose. Please choose one");
+            for (i = 0; i < size; i++) {
+                for (String[] row : cards) {
+                    System.out.print(row[i]);
+                    System.out.print("    ");
+                }
+                System.out.println();
             }
             System.out.println();
+            System.out.println("Enter 0 or 1:");
+            System.out.println();
         }
-        System.out.println();
-        System.out.println("Enter 0 or 1:");
-        System.out.println();
     }
     /**
      * Prints the secret objective card of the player.
@@ -262,13 +291,15 @@ public class TUI implements ViewInterface {
      * @param indexCard The index of the secret objective card to print.
      */
     @Override
-    public synchronized void showSecretObjectiveCard(int indexCard) {
-        System.out.println("This is your secret objective card: ");
-        String[] secretObjective = createObjectiveCardToPrint(indexCard);
-        for (String row : secretObjective) {
-            System.out.println(row);
+    public void showSecretObjectiveCard(int indexCard) {
+        synchronized (syncornizedObject) {
+            System.out.println("This is your secret objective card: ");
+            String[] secretObjective = createObjectiveCardToPrint(indexCard);
+            for (String row : secretObjective) {
+                System.out.println(row);
+            }
+            System.out.println();
         }
-        System.out.println();
     }
     /**
      * Displays the turn information to the player.
@@ -277,27 +308,33 @@ public class TUI implements ViewInterface {
      * @param gameState     The current game state.
      */
     @Override
-    public synchronized void showTurnInfo(String currentPlayer, GameState gameState) {
-        System.out.println("It's " + currentPlayer + "'s turn");
-        System.out.println("The game phase is: " + gameState);
-        System.out.println();
+    public void showTurnInfo(String currentPlayer, GameState gameState) {
+        synchronized (syncornizedObject) {
+            System.out.println("It's " + currentPlayer + "'s turn");
+            System.out.println("The game phase is: " + gameState);
+            System.out.println();
+        }
     }
     /**
-     * Shows the resources of the client.
+     * Shows the resources of all clients.
      *
      */
     @Override
-    public synchronized void showResourcesPlayer() {
-        String name = controller.getNickname();
+    public void showResourcesPlayer() {
         HashMap<String, HashMap<Sign, Integer>> resources = model.getResources();
 
-        System.out.println("You have the following resources:");
-        for (Sign sign : resources.get(name).keySet()) {
-            if(sign != Sign.NULL && sign != Sign.EMPTY) {
-                System.out.println(sign + " - " + resources.get(name).get(sign));
+        synchronized (syncornizedObject) {
+            for(String name : resources.keySet()){
+                System.out.println(name + " has the following resources:");
+                for (Sign sign : resources.get(name).keySet()) {
+                    if (sign != Sign.NULL && sign != Sign.EMPTY) {
+                        System.out.println(sign + " - " + resources.get(name).get(sign));
+                    }
+                }
+                System.out.println();
             }
+            System.out.println();
         }
-        System.out.println();
     }
     /**
      * Shows the resources of all players.
@@ -322,13 +359,15 @@ public class TUI implements ViewInterface {
      * The points are displayed in the format: player - points.
      */
     @Override
-    public synchronized void showPoints() {
+    public void showPoints() {
         HashMap<String, Integer> points = model.getPoints();
-        System.out.println("The points of the players are:");
-        for (String player : points.keySet()) {
-            System.out.println(player + " has " + points.get(player));
+        synchronized (syncornizedObject) {
+            System.out.println("The points of the players are:");
+            for (String player : points.keySet()) {
+                System.out.println(player + " has " + points.get(player));
+            }
+            System.out.println();
         }
-        System.out.println();
     }
     /**
      * Displays the extra points to the player.
@@ -336,12 +375,14 @@ public class TUI implements ViewInterface {
      * @param extraPoints The extra points of the players.
      */
     @Override
-    public synchronized void showExtraPoints(HashMap<String, Integer> extraPoints) {
-        System.out.println("The points made by ObjectiveCards are:");
-        for (String player : extraPoints.keySet()) {
-            System.out.println(player + " - " + extraPoints.get(player));
+    public void showExtraPoints(HashMap<String, Integer> extraPoints) {
+        synchronized (syncornizedObject) {
+            System.out.println("The points made by ObjectiveCards are:");
+            for (String player : extraPoints.keySet()) {
+                System.out.println(player + " - " + extraPoints.get(player));
+            }
+            System.out.println();
         }
-        System.out.println();
     }
     /**
      * Displays the ranking to the player.
@@ -349,12 +390,14 @@ public class TUI implements ViewInterface {
      * @param ranking The ranking of the players.
      */
     @Override
-    public synchronized void showRanking(ArrayList<Player> ranking) {
-        System.out.println("The ranking is:");
-        for (Player player : ranking) {
-            System.out.println(player.getName() + " - " + player.getPoints() + player.getObjectivePoints());
+    public void showRanking(ArrayList<Player> ranking) {
+        synchronized (syncornizedObject) {
+            System.out.println("The ranking is:");
+            for (Player player : ranking) {
+                System.out.println(player.getName() + " - " + player.getPoints() + player.getObjectivePoints());
+            }
+            System.out.println();
         }
-        System.out.println();
     }
     /**
      * Displays the table of a specific player.
@@ -365,19 +408,17 @@ public class TUI implements ViewInterface {
      */
     @Override
     public void showTableOfPlayer(String nickname) {
-        printTableAreaOfPlayer(nickname);
+        synchronized (syncornizedObject) {
+            printTableAreaOfPlayer(nickname);
+        }
     }
     /**
      * Shows the hand of the client.
      */
     @Override
-    public synchronized void showHand() {
+    public void showHand() {
         Integer[] myCards = model.getHand();
         ArrayList<String[]> cards = new ArrayList<>();
-
-        for (Integer cardId : myCards) {
-            System.out.println(cardId);
-        }
 
         for (Integer cardId : myCards) {
             if(cardId == null){
@@ -395,25 +436,28 @@ public class TUI implements ViewInterface {
                 cards.add(createCardToPrint(model.getCard(cardId, true)));
             }
         }
-
-        System.out.println("These are your cards:");
-        int size = cards.get(0).length;
-        for (int i = 0; i < size; i++) {
-            for (String[] carte : cards) {
-                System.out.print(carte[i]);
-                System.out.print("   ");
+        synchronized (syncornizedObject) {
+            System.out.println("These are your cards:");
+            int size = cards.get(0).length;
+            for (int i = 0; i < size; i++) {
+                for (String[] carte : cards) {
+                    System.out.print(carte[i]);
+                    System.out.print("   ");
+                }
+                System.out.println();
             }
             System.out.println();
         }
-        System.out.println();
     }
     /**
      * Informs the player that the chosen color is already taken.
      */
     @Override
-    public synchronized void colorAlreadyTaken() {
-        System.out.println("The color you chose is already taken. Please choose another one");
-        System.out.println();
+    public void colorAlreadyTaken() {
+        synchronized (syncornizedObject) {
+            System.out.println("The color you chose is already taken. Please choose another one");
+            System.out.println();
+        }
     }
     /**
      * Informs the player that the chosen nickname is already taken.
@@ -421,75 +465,93 @@ public class TUI implements ViewInterface {
      * @param nickname The chosen nickname.
      */
     @Override
-    public synchronized void sameName(String nickname) {
-        System.out.println("The nickname " + nickname + " is already taken. Please choose another one");
-        System.out.println();
+    public void sameName(String nickname) {
+        synchronized (syncornizedObject) {
+            System.out.println("The nickname " + nickname + " is already taken. Please choose another one");
+            System.out.println();
+        }
     }
     /**
      * Informs the player that it's not their turn.
      */
     @Override
-    public synchronized void noTurn() {
-        System.out.println("It's not your turn. You can't perform this action");
-        System.out.println();
+    public void noTurn() {
+        synchronized (syncornizedObject) {
+            System.out.println("It's not your turn. You can't perform this action");
+            System.out.println();
+        }
     }
     /**
      * Informs the player that they don't have enough resources.
      *
      */
     @Override
-    public synchronized void notEnoughResources() {
-        System.out.println("You don't have enough resources to perform this action");
-        System.out.println();
+    public void notEnoughResources() {
+        synchronized (syncornizedObject) {
+            System.out.println("You don't have enough resources to perform this action");
+            System.out.println();
+        }
     }
     /**
      * Informs the player that they are not connected to the server.
      */
     @Override
-    public synchronized void noConnection() {
-        System.out.println("You are not connected to the server. Game will end soon.\n");
-        System.out.println("Thank you for playing. Goodbye!");
-        System.out.println();
+    public void noConnection() {
+        synchronized (syncornizedObject) {
+            System.out.println("You are not connected to the server. Game will end soon.");
+            System.out.println("Thank you for playing. Goodbye!");
+            System.out.println();
+        }
     }
     /**
      * Informs the player that they can't position the card there.
      */
     @Override
-    public synchronized void cardPositionError() {
-        System.out.println("You can't position the card there. Please try another position");
-        System.out.println();
+    public void cardPositionError() {
+        synchronized (syncornizedObject) {
+            System.out.println("You can't position the card there. Please try another position");
+            System.out.println();
+        }
     }
     /**
      * Informs the player that the lobby is full.
      */
     @Override
-    public synchronized void lobbyComplete() {
-        System.out.println("The lobby is full. No other players can join");
-        System.out.println();
+    public void lobbyComplete() {
+        synchronized (syncornizedObject) {
+            System.out.println("The lobby is full. No other players can join");
+            System.out.println();
+        }
     }
     /**
      * Informs the player that he can't perform the action in this game phase.
      */
     @Override
-    public synchronized void wrongGamePhase() {
-        System.out.println("You can't perform this action in this game phase");
-        System.out.println();
+    public void wrongGamePhase() {
+        synchronized (syncornizedObject) {
+            System.out.println("You can't perform this action in this game phase");
+            System.out.println();
+        }
     }
     /**
      * Informs the client that the name given doesn't exist.
      */
     @Override
-    public synchronized void noPlayer() {
-        System.out.println("The player doesn't exist");
-        System.out.println();
+    public void noPlayer() {
+        synchronized (syncornizedObject) {
+            System.out.println("The player doesn't exist");
+            System.out.println();
+        }
     }
     /**
      * Informs the player that the lobby is closed. A game already started.
      */
     @Override
-    public synchronized void closingLobbyError() {
-        System.out.println("You haven't fill the lobby with the correct number of players. The lobby is closing");
-        System.out.println();
+    public void closingLobbyError() {
+        synchronized (syncornizedObject) {
+            System.out.println("You haven't fill the lobby with the correct number of players. The lobby is closing");
+            System.out.println();
+        }
 
     }
 
@@ -500,9 +562,11 @@ public class TUI implements ViewInterface {
      * It displays a message to the console indicating that the game has ended and thanks the player for playing.
      */
     @Override
-    public synchronized void stopGaming() {
-        System.out.println("Some client has disconnected. You cannot continue the game");
-        System.out.println("The game is over. Thank you for playing");
+    public void stopGaming() {
+        synchronized (syncornizedObject) {
+            System.out.println("Some client has disconnected. You cannot continue the game");
+            System.out.println("The game is over. Thank you for playing");
+        }
     }
 
     /**
@@ -510,8 +574,10 @@ public class TUI implements ViewInterface {
      */
     @Override
     public void askNumberOfPlayers() {
-        System.out.println("You are the first player. Please enter the number of players");
-        System.out.println("The number of players must be between 2 and 4");
+        synchronized (syncornizedObject) {
+            System.out.println("You are the first player. Please enter the number of players");
+            System.out.println("The number of players must be between 2 and 4");
+        }
     }
     /**
      *
@@ -522,11 +588,13 @@ public class TUI implements ViewInterface {
      *
      */
     public void askChooseColor() {
-        System.out.println("Choose your color");
-        System.out.println("1 - Blue\n" +
-                "2 - Yellow\n" +
-                "3 - Green\n" +
-                "4 - Red\n");
+        synchronized (syncornizedObject) {
+            System.out.println("Choose your color");
+            System.out.println("1 - Blue\n" +
+                    "2 - Yellow\n" +
+                    "3 - Green\n" +
+                    "4 - Red\n");
+        }
 
         Scanner scanner = new Scanner(System.in);
         int color;
@@ -555,8 +623,10 @@ public class TUI implements ViewInterface {
                         System.out.println("Invalid input");
                 }
             } catch (InputMismatchException e) {
-                System.out.println("Invalid input. Please enter a number between 1 and 4.");
-                scanner.next(); // discard the invalid input
+                synchronized (syncornizedObject) {
+                    System.out.println("Invalid input. Please enter a number between 1 and 4.");
+                    scanner.next(); // discard the invalid input
+                }
             }
         } while (!validInput);
     }
@@ -571,19 +641,28 @@ public class TUI implements ViewInterface {
     private void showTableOfPlayerGivenName() {
         Scanner scanner = new Scanner(System.in);
         String nickname;
-        System.out.println("Please insert the nickname of the player you want to see the table of");
-        for(String player: model.getOtherPlayersCards().keySet()){
-            System.out.println(player);
+
+        synchronized (syncornizedObject) {
+            System.out.println("Please insert the nickname of the player you want to see the table of");
+
+            for (String player : model.getOtherPlayersCards().keySet()) {
+                System.out.println(player);
+            }
         }
         //open the scanner for the nickname. The nickname must be valid
         nickname = scanner.nextLine();
         //if is not valid, it asks again
-        while(!model.getOtherPlayersCards().containsKey(nickname)){
-            System.out.println("The nickname you inserted is not valid. Please insert a valid nickname");
-            nickname = scanner.nextLine();
+        while (!model.getOtherPlayersCards().containsKey(nickname)) {
+            synchronized (syncornizedObject) {
+                System.out.println("The nickname you inserted is not valid. Please insert a valid nickname");
+                nickname = scanner.nextLine();
+            }
         }
-        //print the table given a correct name.
-        printTableAreaOfPlayer(nickname);
+        synchronized (syncornizedObject) {
+            //print the table given a correct name.
+            printTableAreaOfPlayer(nickname);
+        }
+
     }
     /**
      * Asks the user to draw a card from the game deck.
@@ -599,22 +678,32 @@ public class TUI implements ViewInterface {
         int onTableOrDeck;
         boolean validInput = false;
 
-        showCommonTable();
+        synchronized (syncornizedObject) {
+            showCommonTable();
+        }
         while (!validInput) {
             try {
-                System.out.println("Enter true if the card is gold, false otherwise:");
+                synchronized (syncornizedObject) {
+                    System.out.println("Enter true if the card is gold, false otherwise:");
+                }
                 gold = scanner.nextBoolean();
-                System.out.println("Enter -1, 0 or 1 if the card is on table, if it's on deck:");
+                synchronized (syncornizedObject) {
+                    System.out.println("Enter -1, 0 or 1 if the card is on table, if it's on deck:");
+                }
                 onTableOrDeck = scanner.nextInt();
                 if (onTableOrDeck != -1 && onTableOrDeck != 0 && onTableOrDeck != 1) {
-                    System.out.println("Invalid input. Value must be -1, 0 or 1.");
+                    synchronized (syncornizedObject) {
+                        System.out.println("Invalid input. Value must be -1, 0 or 1.");
+                    }
                     continue;
                 }
                 ViewSubmissions.getInstance().drawCard(gold, onTableOrDeck);
                 validInput = true;
-            } catch (InputMismatchException e) {
-                System.out.println("Invalid input. Please enter the correct values.");
-                scanner.next(); // Consumes the invalid input
+            } catch (InputMismatchException e){
+                    synchronized (syncornizedObject) {
+                    System.out.println("Invalid input. Please enter the correct values.");
+                    scanner.next(); // Consumes the invalid input
+                }
             }
         }
     }
@@ -632,28 +721,42 @@ public class TUI implements ViewInterface {
         boolean isFacingUp;
         boolean validInput = false;
 
+
         showHand();
         while (!validInput) {
             try {
-                System.out.println("Enter index of the card in hand (1-3):");
+                synchronized (syncornizedObject) {
+                    System.out.println("Enter index of the card in hand (1-3):");
+                }
                 indexHand = scanner.nextInt();
                 if (indexHand < 1 || indexHand > 3) {
-                    System.out.println("Invalid input. Index must be between 1 and 3.");
+                    synchronized (syncornizedObject) {
+                        System.out.println("Invalid input. Index must be between 1 and 3.");
+                    }
                     continue;
                 }
-                System.out.println("Enter position x:");
+                synchronized (syncornizedObject) {
+                    System.out.println("Enter position x:");
+                }
                 position.x = scanner.nextInt();
-                System.out.println("Enter position y:");
+                synchronized (syncornizedObject) {
+                    System.out.println("Enter position y:");
+                }
                 position.y = scanner.nextInt();
-                System.out.println("Enter true if the card is facing up, false otherwise:");
+                synchronized (syncornizedObject) {
+                    System.out.println("Enter true if the card is facing up, false otherwise:");
+                }
                 isFacingUp = scanner.nextBoolean();
                 ViewSubmissions.getInstance().placeCard(indexHand - 1, position, isFacingUp);
                 validInput = true;
             } catch (InputMismatchException e) {
-                System.out.println("Invalid input. Please enter the correct values.");
-                scanner.next(); // Consumes the invalid input
+                synchronized (syncornizedObject) {
+                    System.out.println("Invalid input. Please enter the correct values.");
+                    scanner.next(); // Consumes the invalid input
+                }
             }
         }
+
     }
     /**
      * This method is responsible for asking the user to choose a nickname for their player.
@@ -666,7 +769,9 @@ public class TUI implements ViewInterface {
         String nickname;
 
         do {
-            System.out.println("Please enter your nickname (without spaces):");
+            synchronized (syncornizedObject) {
+                System.out.println("Please enter your nickname (without spaces):");
+            }
             nickname = scanner.nextLine();
         } while (nickname.contains(" "));
         //sent information to the server
@@ -676,7 +781,7 @@ public class TUI implements ViewInterface {
      * Shows the hidden hand of a player.
      */
     @Override
-    public synchronized void showHiddenHand(String name) {
+    public void showHiddenHand(String name) {
         //name is not used, but is necessary for the interface
         Set<String> players = model.getOtherPlayersCards().keySet();
 
@@ -688,7 +793,7 @@ public class TUI implements ViewInterface {
 
             // Create a printable representation for each card in the hand
             for (i = 0; i < hand.length; i++) {
-                try{
+                try {
                     //if the card is not null, it creates the card to print. Card can be null
                     cards.add(createCardToPrint(fromKingdomToCard(hand[i].getKey())));
                 } catch (NullPointerException e) {
@@ -704,17 +809,18 @@ public class TUI implements ViewInterface {
                     });
                 }
             }
-
-            int size = cards.get(0).length;
-            System.out.println("These are the hidden cards of " + player + ":");
-            for (i = 0; i < size; i++) {
-                for (String[] card : cards) {
-                    System.out.print(card[i]);
-                    System.out.print("   ");
+            synchronized (syncornizedObject) {
+                int size = cards.get(0).length;
+                System.out.println("These are the hidden cards of " + player + ":");
+                for (i = 0; i < size; i++) {
+                    for (String[] card : cards) {
+                        System.out.print(card[i]);
+                        System.out.print("   ");
+                    }
+                    System.out.println();
                 }
                 System.out.println();
             }
-            System.out.println();
         }
     }
     /**
@@ -737,11 +843,15 @@ public class TUI implements ViewInterface {
                     ViewSubmissions.getInstance().chooseSecretObjectiveCard(indexCard);
                     validInput = true;
                 } else {
-                    System.out.println("Invalid input. Please enter 0 or 1.");
+                    synchronized (syncornizedObject) {
+                        System.out.println("Invalid input. Please enter 0 or 1.");
+                    }
                 }
             } catch (InputMismatchException e) {
-                System.out.println("Invalid input. Please enter 0 or 1.");
-                scanner.next(); // Consumes the invalid input
+                synchronized (syncornizedObject) {
+                    System.out.println("Invalid input. Please enter 0 or 1.");
+                    scanner.next(); // Consumes the invalid input
+                }
             }
         }
     }
@@ -764,8 +874,11 @@ public class TUI implements ViewInterface {
                 isFacingUp = true;
             else if (side.equals("false")) {
                 isFacingUp = false;}
-            else
-                System.out.println("Invalid input");
+            else {
+                synchronized (syncornizedObject) {
+                    System.out.println("Invalid input");
+                }
+            }
         } while (!side.equals("true") && !side.equals("false"));
         ViewSubmissions.getInstance().chooseStartingCard(isFacingUp);
     }
@@ -821,11 +934,15 @@ public class TUI implements ViewInterface {
                 if (numberOfPlayers >= 2 && numberOfPlayers <= 4) {
                     validInput = true;
                 } else {
-                    System.out.println("Invalid input. Please enter a number between 2 and 4.");
+                    synchronized (syncornizedObject) {
+                        System.out.println("Invalid input. Please enter a number between 2 and 4.");
+                    }
                 }
             } catch (InputMismatchException e) {
-                System.out.println("Invalid input. Please enter a number between 2 and 4.");
-                scanner.next(); // discard the invalid input
+                synchronized (syncornizedObject){
+                    System.out.println("Invalid input. Please enter a number between 2 and 4.");
+                    scanner.next(); // discard the invalid input
+                }
             }
         }
         ViewSubmissions.getInstance().chooseNumberOfPlayers(numberOfPlayers);
@@ -838,23 +955,29 @@ public class TUI implements ViewInterface {
         Scanner scanner = new Scanner(System.in);
         String message;
 
-        System.out.println("Please enter your message, use @nickname to send it just to those players (es:\"@nickname1 @nickname2 hi!\"):");
+        synchronized (syncornizedObject) {
+            System.out.println("Please enter your message, use @nickname to send it just to those players (es:\"@nickname1 @nickname2 hi!\"):");
+        }
+
         message = scanner.nextLine();
+
         //sent information to the server
         ViewSubmissions.getInstance().sendChatMessage(message);
     }
 
-    private synchronized void menu(){
-        System.out.println("Please insert a number for choosing the option");
-        System.out.println("" +
-                "1 - place a card\n" +
-                "2 - draw a card\n" +
-                "3 - show the table of a player\n" +
-                "4 - show all players resources\n" +
-                "5 - show the points of the players\n" +
-                "6 - show my hand\n" +
-                "7 - show the hidden hand of a player\n" +
-                "8 - send a chat message\n");
+    private void menu(){
+        synchronized (syncornizedObject) {
+            System.out.println("Please insert a number for choosing the option");
+            System.out.println("" +
+                    "1 - place a card\n" +
+                    "2 - draw a card\n" +
+                    "3 - show the table of a player\n" +
+                    "4 - show all players resources\n" +
+                    "5 - show the points of the players\n" +
+                    "6 - show my hand\n" +
+                    "7 - show the hidden hand of a player\n" +
+                    "8 - send a chat message\n");
+        }
     }
 
     /**
@@ -870,13 +993,17 @@ public class TUI implements ViewInterface {
                 choice = scanner.nextInt();
                 validInput = true;
             } catch (InputMismatchException e) {
-                System.out.println("Input not valid. Please insert a number.");
-                scanner.next(); // consume the invalid input
+                synchronized (syncornizedObject) {
+                    System.out.println("Input not valid. Please insert a number.");
+                    scanner.next(); // consume the invalid input
+                }
             }
         }
         switch (choice) {
             case 1:
-                printTableAreaOfPlayer(controller.getNickname());
+                synchronized (syncornizedObject) {
+                    printTableAreaOfPlayer(controller.getNickname());
+                }
                 askPlaceCard();
                 break;
             case 2:
@@ -902,10 +1029,10 @@ public class TUI implements ViewInterface {
                 sendChatMessage();
                 break;
             default:
-                System.out.println("Invalid input. Please retry");
-
-                ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-                executor.schedule(this::defaultMenu, 3, TimeUnit.SECONDS); //just wait 4 seconds to reprint the menu
+                synchronized (syncornizedObject) {
+                    System.out.println("Invalid input. Please retry");
+                }
+                defaultMenu();
         }
     }
     /**
@@ -957,7 +1084,7 @@ public class TUI implements ViewInterface {
      *
      * @param nickname The nickname of the player whose table area is to be printed.
      */
-    private synchronized void printTableAreaOfPlayer(String nickname) {
+    private void printTableAreaOfPlayer(String nickname) {
         ArrayList<CardClient> cards = model.getListOfCards(nickname);
         ArrayList<String[]> cardsToPrint = new ArrayList<>();
 
@@ -969,11 +1096,11 @@ public class TUI implements ViewInterface {
         int level = cards.get(0).getPosition().x + cards.get(0).getPosition().y;
         //get the minimum x of the cards.
         int min = cards.stream().mapToInt(card -> card.getPosition().x - card.getPosition().y).min().orElse(0);
-//        System.out.println("min: " + min);
         int inizialier = min;
 
         System.out.println("This is the table area of " + nickname + ":");
         System.out.println();
+
 
         for(CardClient card: cards){
             //level is the previous, if it's different from the current card, print the previous cards

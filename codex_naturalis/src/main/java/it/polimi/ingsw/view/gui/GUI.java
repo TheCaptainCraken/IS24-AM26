@@ -1,29 +1,22 @@
 package it.polimi.ingsw.view.gui;
 
-import it.polimi.ingsw.controller.client.Controller;
 import it.polimi.ingsw.model.Color;
 import it.polimi.ingsw.model.GameState;
-import it.polimi.ingsw.model.Kingdom;
 import it.polimi.ingsw.model.Player;
-import it.polimi.ingsw.view.LittleModel;
+import it.polimi.ingsw.view.model.LittleModel;
 import it.polimi.ingsw.view.ViewInterface;
 import it.polimi.ingsw.view.ViewSubmissions;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.control.SplitPane;
-import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
-import java.util.concurrent.CountDownLatch;
 
 public class GUI extends Application implements ViewInterface {
     private static ViewInterface instance;

@@ -21,7 +21,7 @@ public class Player implements java.io.Serializable{
     private ResourceCard[] hand;
 
     /**
-     * It is the constructor of Player, it set the  name and the color of the pin
+     * It is the constructor of Player, it set the name and the color of the pin
      * @param name the name of the player
      */
     public Player(String name) {
@@ -69,7 +69,7 @@ public class Player implements java.io.Serializable{
     }
 
     /**
-     * getter of symbol counter. It tracks the resources for gold card and special objects.
+     * Getter of symbol counter. It tracks the resources for gold card and special objects.
      */
     public HashMap<Sign, Integer> getResources() {
         return resources;

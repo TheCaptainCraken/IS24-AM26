@@ -1,13 +1,14 @@
 package it.polimi.ingsw.model;
 
 import java.awt.*;
+import java.io.Serializable;
 import java.util.HashMap;
 
 
 /** The class is used to represent the card placed onto the board, it's role is to keep track of the moves that a player makes
  * during the match
  * *@author Arturo*/
-public class PlayedCard {
+public class PlayedCard implements Serializable {
     /**It's the PlayableCard that this instance of PlayedCard references
      * */
     private final PlayableCard card;

@@ -2,7 +2,7 @@ package it.polimi.ingsw.network.socket.messages.server;
 
 import it.polimi.ingsw.controller.client.Controller;
 import it.polimi.ingsw.network.socket.messages.ErrorType;
-import it.polimi.ingsw.view.Phase;
+import it.polimi.ingsw.view.model.Phase;
 /**
  * This class represents an error message that can be sent from the server to a client.
  * It is send when the client sends an invalid message or performs an invalid action.

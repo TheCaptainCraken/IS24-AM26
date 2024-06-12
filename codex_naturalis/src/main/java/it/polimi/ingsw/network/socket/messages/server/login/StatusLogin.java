@@ -2,7 +2,7 @@ package it.polimi.ingsw.network.socket.messages.server.login;
 
 import it.polimi.ingsw.controller.client.Controller;
 import it.polimi.ingsw.network.socket.messages.server.ServerMessage;
-import it.polimi.ingsw.view.Phase;
+import it.polimi.ingsw.view.model.Phase;
 /**
  * This class represents a status message sent from the server to a client during the login phase.
  * It is used to inform the client about the status of the login phase.

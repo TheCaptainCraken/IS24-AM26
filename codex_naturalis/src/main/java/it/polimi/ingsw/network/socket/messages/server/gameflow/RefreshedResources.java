@@ -22,7 +22,7 @@ public class RefreshedResources extends ServerMessage {
     /**
      * The updated resources of the player.
      */
-    private final HashMap<Sign,Integer> resources;
+    private final HashMap<Sign, Integer> resources;
     /**
      * Constructor for RefreshedResources.
      *
@@ -59,6 +59,6 @@ public class RefreshedResources extends ServerMessage {
      */
     @Override
     public void callController(Controller controller) {
-        controller.updateResources(nickname,resources);
+        controller.updateResources(nickname, resources);
     }
 }

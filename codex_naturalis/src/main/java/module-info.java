@@ -17,4 +17,6 @@ module it.polimi.ingsw {
     exports it.polimi.ingsw.network;
     exports it.polimi.ingsw.view.gui;
     exports it.polimi.ingsw.view;
+    exports it.polimi.ingsw.view.model;
+    exports it.polimi.ingsw.network.socket.messages.server;
 }

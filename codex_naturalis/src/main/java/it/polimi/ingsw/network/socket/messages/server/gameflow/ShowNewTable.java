@@ -16,7 +16,7 @@ public class ShowNewTable extends ServerMessage {
     /**
      * The id of the card.
      */
-    private final int idCard;
+    private final Integer idCard;
     /**
      * The gold status of the card.
      */
@@ -37,7 +37,7 @@ public class ShowNewTable extends ServerMessage {
      * @param onTableOrDeck The status of the card, whether it's on table or deck.
      * @param topCard The top card of the kingdom.
      */
-    public ShowNewTable(int idCard, boolean gold, int onTableOrDeck, Kingdom topCard) {
+    public ShowNewTable(Integer idCard, boolean gold, int onTableOrDeck, Kingdom topCard) {
         this.idCard = idCard;
         this.gold = gold;
         this.onTableOrDeck = onTableOrDeck;

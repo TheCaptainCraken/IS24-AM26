@@ -284,11 +284,12 @@ public class Controller {
      * @param onTableOrDeck The index of the card on the table or deck.
      * @return The id of the new card on the table, or -1 if is the deck
      */
-    public int newCardOnTable(boolean gold, int onTableOrDeck) {
+    public Integer newCardOnTable(boolean gold, int onTableOrDeck) {
         //it turns -1 since no card on table has updated, the little model client know how to manage it
         if (onTableOrDeck == -1) {
             return -1;
         } else {
+            //can be null, correct to manage it
             return game.getCard(gold, onTableOrDeck);
         }
     }
@@ -343,7 +344,7 @@ public class Controller {
      * @param gold Whether the card is gold or not.
      * @return The head of the deck.
      */
-    public Kingdom getHeadDeck(boolean gold) {
+    public Kingdom getHeadDeck(boolean gold){
         return game.getHeadDeck(gold);
     }
     /**

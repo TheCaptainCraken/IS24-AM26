@@ -9,6 +9,7 @@ import java.awt.Point;
 import it.polimi.ingsw.controller.server.Controller;
 import it.polimi.ingsw.model.Color;
 import it.polimi.ingsw.model.Kingdom;
+import it.polimi.ingsw.model.Sign;
 import it.polimi.ingsw.model.exception.CardPositionException;
 import it.polimi.ingsw.model.exception.ClosingLobbyException;
 import it.polimi.ingsw.model.exception.ColorAlreadyTakenException;
@@ -20,7 +21,7 @@ import it.polimi.ingsw.model.exception.SameNameException;
 import it.polimi.ingsw.model.exception.WrongGamePhaseException;
 import it.polimi.ingsw.network.NetworkHandler;
 import it.polimi.ingsw.network.NetworkPlug;
-import it.polimi.ingsw.network.socket.messages.server.Connection;
+import it.polimi.ingsw.network.socket.messages.client.ConnectionClient;
 import it.polimi.ingsw.network.socket.messages.ErrorType;
 import it.polimi.ingsw.network.socket.messages.client.ClientMessage;
 import it.polimi.ingsw.network.socket.messages.client.gameflow.SentChatMessage;
@@ -31,6 +32,7 @@ import it.polimi.ingsw.network.socket.messages.client.gamestart.ChosenStartingCa
 import it.polimi.ingsw.network.socket.messages.client.login.ColorChosen;
 import it.polimi.ingsw.network.socket.messages.client.login.LoginMessage;
 import it.polimi.ingsw.network.socket.messages.client.login.NumberOfPlayersMessage;
+import it.polimi.ingsw.network.socket.messages.server.ConnectionServer;
 import it.polimi.ingsw.network.socket.messages.server.ErrorMessage;
 import it.polimi.ingsw.network.socket.messages.server.gameflow.ReceivedChatMessage;
 import it.polimi.ingsw.network.socket.messages.server.ServerMessage;
@@ -288,12 +290,16 @@ public class NetworkServerSocket implements NetworkPlug {
     public void sendPlacedCard(String nickname, int cardId, Point position, boolean side) {
         //send the card placed to all the clients
         sendBroadCastMessage(new CardIsPositioned(nickname, cardId, position, side, controller.getTurn()));
+
         try {
+            HashMap<Sign, Integer> resources = controller.getPlayerResources(nickname);
+
+            sendBroadCastMessage(new RefreshedResources(nickname, resources));
             sendBroadCastMessage(new RefreshedPoints(nickname, controller.getPlayerPoints(nickname)));
-            sendBroadCastMessage(new RefreshedResources(nickname, controller.getPlayerResources(nickname)));
         } catch (NoNameException e) {
             System.out.println("Debugging error: NoNameException in sendPlacedCard");
         }
+
         //notify the new turn to all the clients
         sendBroadCastMessage(new TurnInfo(controller.getCurrentPlayer(), controller.getGameState()));
     }
@@ -311,7 +317,7 @@ public class NetworkServerSocket implements NetworkPlug {
      * @param onTableOrDeck An integer indicating whether the card is on the table or the deck.
      */
     @Override
-    public void sendDrawnCard(String nickname, int newCardId, Kingdom headDeck, boolean gold, int onTableOrDeck) {
+    public void sendDrawnCard(String nickname, Integer newCardId, Kingdom headDeck, boolean gold, int onTableOrDeck) {
         for (String player : connections.keySet()) {
             //send the hiddenHand to the players different from the player that has drawn the card.
             //the player that has drawn the card receives the new card in the hand(different method)
@@ -402,8 +408,8 @@ public class NetworkServerSocket implements NetworkPlug {
 
                 ClientMessage message;
 
+                //start the thread to check if the client is still connected
                 new Thread(this::isClientConnected).start();
-                new Thread(this::askForConnection).start();
 
                 while (clientSocket.isConnected()) {
                     try {
@@ -418,29 +424,6 @@ public class NetworkServerSocket implements NetworkPlug {
                 //disconnect all the clients connected to the server RMI and Socket
                 NetworkHandler.getInstance().disconnectBroadcast();
             }
-        }
-
-        /**
-         * This method is used to periodically check if the client is still connected to the server.
-         * It runs in a separate thread and pauses for a specified interval (30 seconds in this case) between each check.
-         * If the client is no longer connected, it triggers a broadcast to disconnect all clients.
-         */
-        private void isClientConnected() {
-            while (connection) {
-                try {
-                    Thread.sleep(30000); // 30 seconds
-                } catch (InterruptedException e) {
-                    System.out.println("Error in sleep");
-                }
-            }
-            NetworkHandler.getInstance().disconnectBroadcast();
-        }
-
-        /**
-         * This method is used to send a message to the client.
-         *
-         */
-        private void askForConnection() {
         }
 
         /**
@@ -577,7 +560,7 @@ public class NetworkServerSocket implements NetworkPlug {
                     controller.drawCard(parsedMessage.getNickname(), parsedMessage.isGold(),
                             parsedMessage.getOnTableOrOnDeck());
                     // this get the new card on the table. It is -1, we send anyway the newCardId to the client, but is the same as previous.
-                    int newCardId = controller.newCardOnTable(parsedMessage.isGold(), parsedMessage.getOnTableOrOnDeck());
+                    Integer newCardId = controller.newCardOnTable(parsedMessage.isGold(), parsedMessage.getOnTableOrOnDeck());
                     //this get the head of the deck, the new card is drawn from.
                     Kingdom headDeck = controller.getHeadDeck(parsedMessage.isGold());
 
@@ -600,7 +583,7 @@ public class NetworkServerSocket implements NetworkPlug {
                 } catch (CardPositionException e) {
                     sendErrorMessage(ErrorType.CARD_POSITION);
                 }
-            } else if(message instanceof Connection){
+            } else if(message instanceof ConnectionClient){
                 connection = true;
             } else {
                 throw new ClassNotFoundException();
@@ -621,6 +604,24 @@ public class NetworkServerSocket implements NetworkPlug {
         }
 
         /**
+         * This method is used to periodically check if the client is still connected to the server.
+         * It runs in a separate thread and pauses for a specified interval (30 seconds in this case) between each check.
+         * If the client is no longer connected, it triggers a broadcast to disconnect all clients.
+         */
+        private void isClientConnected() {
+            while (connection) {
+                try {
+                    connection = false;
+                    sendMessage(new ConnectionServer());
+                    Thread.sleep(30000); // 30 seconds
+                } catch (InterruptedException e) {
+                    System.out.println("Error in sleep");
+                }
+            }
+            NetworkHandler.getInstance().disconnectBroadcast();
+        }
+
+        /**
          * This method is used to send an error message to the client.
          *
          * @param errorType The type of the error.
@@ -637,6 +638,7 @@ public class NetworkServerSocket implements NetworkPlug {
         public void sendMessage(ServerMessage message) {
             try {
                 out.writeObject(message);
+                out.reset();
             } catch (IOException e) {
                 //disconnect all the clients connected to the server RMI and Socket
                 NetworkHandler.getInstance().disconnectBroadcast();
@@ -684,7 +686,7 @@ public class NetworkServerSocket implements NetworkPlug {
          *                      or
          *                      the deck.
          */
-        public void sendDrawnCardIfPlayer(String nickname, int newCardId, Kingdom headDeck, boolean gold,
+        public void sendDrawnCardIfPlayer(String nickname, Integer newCardId, Kingdom headDeck, boolean gold,
                                           int onTableOrDeck) {
             //if the player is the one that has drawn the card, we send the hidden hand to the player.
             if (!this.nickname.equals(nickname)) {

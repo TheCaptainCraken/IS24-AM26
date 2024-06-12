@@ -273,9 +273,12 @@ public class GameMaster {
         currentPlayer.giveCard(cardToPlace);
         gameState = GameState.DRAWING_PHASE;
 
+        //if card are not finished, we check in draw phase if is last/second last turn
         if (areTheCardFinished()) {
             // only when the card are finished and the game is in the final phase
+            // normally, the turn is updated in draw Phase,but since areTheCardFinished() is true we need to update it here.
             nextGlobalTurn();
+            //no need to check for GameFlow: drawPhase check if all card are finished. If so, change the phase to SECOND_LAST_TURN.
             if (turnType == TurnType.SECOND_LAST_TURN
                     && getOrderPlayer(currentPlayer.getName()) + 1 == lobby.getPlayers().length) {
                 // if it is the last player in second-last turn cycle, say the next is the last
@@ -353,6 +356,7 @@ public class GameMaster {
         }
 
         // next player will play?
+
         if (turnType == TurnType.SECOND_LAST_TURN
                 && getOrderPlayer(currentPlayer.getName()) + 1 == lobby.getPlayers().length) {
             // if it is the last player in second-last turn cycle, say the next is the last
@@ -391,12 +395,11 @@ public class GameMaster {
             throw new WrongGamePhaseException();
         } else {
             for (Player player : lobby.getPlayers()) {
-                //int numberOfObjective = 0;
                 ObjectiveCard secret = player.getSecretObjective();
-                int newPoints = calculateEndGamePoints(secret.getType(),secret.getMultiplier(),player,secret.getKingdom()); //secret objective is calculated first
+                int newPoints = calculateEndGamePoints(secret.getType(), secret.getMultiplier(), player, secret.getKingdom()); //secret objective is calculated first
                 player.addObjectivePoints(newPoints);
                 for(ObjectiveCard card : onTableObjectiveCards){
-                    newPoints = calculateEndGamePoints(card.getType(),card.getMultiplier(),player,card.getKingdom());
+                    newPoints = calculateEndGamePoints(card.getType(), card.getMultiplier(), player, card.getKingdom());
                     player.addObjectivePoints(newPoints);
                 }
                 ranking.add(player);
@@ -408,7 +411,7 @@ public class GameMaster {
                     int sum1 = p1.getPoints() + p1.getObjectivePoints();
                     int sum2 = p2.getPoints() + p2.getObjectivePoints();
                     if(sum1 == sum2) {
-                        return Integer.compare(p1.getObjectivePoints(),p2.getObjectivePoints());
+                        return Integer.compare(p1.getObjectivePoints(), p2.getObjectivePoints());
                     } else if(sum1 > sum2){
                         return 1;
                     } else {
@@ -662,7 +665,6 @@ public class GameMaster {
      * @param attachments     other card corners used to calculate the corners
      *                        covered for Countable corner type
      * @return number of points to add to the player points
-     * @throws IllegalArgumentException
      */
     private int calculatesSpecialGoldPoints(Player player, SpecialGoldCard specialGoldCard,
             HashMap<Corner, PlayedCard> attachments) {
@@ -685,7 +687,7 @@ public class GameMaster {
      *
      * @param type       type of the objective card.
      * @param multiplier multiplier of the objective card.
-     * @param player     player who  is getting targeted.
+     * @param player     player who is getting targeted.
      * @param kingdom    kingdom of the objective card.
      * @return number of points to add to the player points
      */
@@ -1069,14 +1071,21 @@ public class GameMaster {
         return gameState;
     }
 
-    public int getCard(boolean gold, int onTableOrDeck) {
-        if (gold)
-        {
-            return onTableGoldCards[onTableOrDeck].getId();
+    public Integer getCard(boolean gold, int onTableOrDeck) {
+        if (gold) {
+            try {
+                return onTableGoldCards[onTableOrDeck].getId();
+            } catch (NullPointerException e) {
+                return null;
+            }
         } else {
-            return onTableResourceCards[onTableOrDeck].getId();
+            try {
+                return onTableResourceCards[onTableOrDeck].getId();
+            } catch (NullPointerException e) {
+                return null;
             }
         }
+    }
 
     /**
      * Retrieves an objective card from the table in the game.
@@ -1094,11 +1103,15 @@ public class GameMaster {
         return objectiveCardToChoose[i][j];
     }
 
-    public Kingdom getHeadDeck(boolean gold) {
-        if (gold) {
-            return goldDeck.getKingdomFirstCard();
-        } else {
-            return resourceDeck.getKingdomFirstCard();
+    public Kingdom getHeadDeck(boolean gold){
+        try{
+            if (gold) {
+                return goldDeck.getKingdomFirstCard();
+            } else {
+                return resourceDeck.getKingdomFirstCard();
+            }
+        } catch(IndexOutOfBoundsException e){
+            return null;
         }
     }
 

@@ -1,8 +1,7 @@
 package TuiTest;
 
-import it.polimi.ingsw.controller.client.Controller;
 import it.polimi.ingsw.model.Color;
-import it.polimi.ingsw.view.LittleModel;
+import it.polimi.ingsw.view.model.LittleModel;
 import it.polimi.ingsw.view.TUI;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

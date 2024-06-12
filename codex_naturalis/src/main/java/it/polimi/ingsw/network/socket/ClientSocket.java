@@ -3,6 +3,7 @@ package it.polimi.ingsw.network.socket;
 import it.polimi.ingsw.controller.client.Controller;
 import it.polimi.ingsw.model.Color;
 import it.polimi.ingsw.network.NetworkClient;
+import it.polimi.ingsw.network.socket.messages.client.ConnectionClient;
 import it.polimi.ingsw.network.socket.messages.client.gameflow.SentChatMessage;
 import it.polimi.ingsw.network.socket.messages.client.ClientMessage;
 import it.polimi.ingsw.network.socket.messages.client.gameflow.CardToBeDrawn;
@@ -12,8 +13,10 @@ import it.polimi.ingsw.network.socket.messages.client.gamestart.ChosenStartingCa
 import it.polimi.ingsw.network.socket.messages.client.login.ColorChosen;
 import it.polimi.ingsw.network.socket.messages.client.login.LoginMessage;
 import it.polimi.ingsw.network.socket.messages.client.login.NumberOfPlayersMessage;
+import it.polimi.ingsw.network.socket.messages.server.ConnectionServer;
 import it.polimi.ingsw.network.socket.messages.server.ServerMessage;
-import it.polimi.ingsw.view.Phase;
+import it.polimi.ingsw.network.socket.messages.server.gameflow.RefreshedResources;
+import it.polimi.ingsw.view.model.Phase;
 
 
 import java.awt.*;
@@ -32,6 +35,7 @@ public class ClientSocket implements Runnable, NetworkClient{
      * The controller that manages the client's view and game logic.
      */
     private final Controller controller;
+
     /**
      * The socket connection to the server.
      */
@@ -112,6 +116,7 @@ public class ClientSocket implements Runnable, NetworkClient{
         Controller.setPhase(Phase.WAIT);
         ClientMessage message = new NumberOfPlayersMessage(numberOfPlayers);
         sendMessage(message);
+        controller.correctNumberOfPlayers(numberOfPlayers);
     }
 
     /**
@@ -181,7 +186,6 @@ public class ClientSocket implements Runnable, NetworkClient{
     public void chooseSecretObjectiveCard(int indexCard) {
         //input control by the client interface.
         //wait that all players have chosen the secret objective card.
-        controller.updateAndShowSecretObjectiveCard(indexCard);
         Controller.setPhase(Phase.WAIT_ALL_CHOSEN_SECRET_CARD);
         //send the message to the server.
         //possible errors can be:
@@ -239,6 +243,7 @@ public class ClientSocket implements Runnable, NetworkClient{
      */
     @Override
     public void run() {
+        int i = 0;
         while(true){
             ServerMessage serverMessage = receiveMessage();
             handleResponse(serverMessage);
@@ -252,10 +257,15 @@ public class ClientSocket implements Runnable, NetworkClient{
      *
      * @param message The server message to be handled.
      */
-    public void handleResponse(ServerMessage message){
-        message.callController(controller);
+    public void handleResponse(ServerMessage message) {
+        if (message instanceof ConnectionServer) {
+            sendMessage(new ConnectionClient());
+        } else if (message != null) {
+            message.callController(controller);
+        }  else {
+            controller.noConnection();
+        }
     }
-
     /**
      * Receives a message from the server.
      * This method is called by the run method to receive a server message.
@@ -268,7 +278,8 @@ public class ClientSocket implements Runnable, NetworkClient{
         try {
             answer = (ServerMessage) objInputStream.readObject();
         } catch (IOException e) {
-            throw new RuntimeException();
+            controller.noConnection();
+            return null;
         } catch (ClassNotFoundException e) {
             System.out.println("This error should never happen. The server is sending a message that the client does not know how to handle.");
             return null;

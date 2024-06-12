@@ -5,7 +5,7 @@ import it.polimi.ingsw.model.*;
 import it.polimi.ingsw.model.Color;
 import it.polimi.ingsw.model.exception.*;
 import it.polimi.ingsw.network.NetworkClient;
-import it.polimi.ingsw.view.Phase;
+import it.polimi.ingsw.view.model.Phase;
 import javafx.util.Pair;
 
 import java.awt.*;
@@ -484,7 +484,7 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
      *                      or the deck.
      */
     @Override
-    public void moveCard(int newCardId, Kingdom headDeck, boolean gold, int onTableOrDeck){
+    public void moveCard(Integer newCardId, Kingdom headDeck, boolean gold, int onTableOrDeck){
         controller.updateAndShowCommonTable(newCardId, gold, onTableOrDeck, headDeck);
     }
 

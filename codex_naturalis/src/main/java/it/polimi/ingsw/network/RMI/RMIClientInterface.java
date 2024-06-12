@@ -136,7 +136,7 @@ public interface RMIClientInterface extends Remote {
      * @throws RemoteException throws a RemoteException if there is a problem with
      *                         the connection.
      */
-    void moveCard(int newCardId, Kingdom headDeck, boolean gold, int onTableOrDeck) throws RemoteException;
+    void moveCard(Integer newCardId, Kingdom headDeck, boolean gold, int onTableOrDeck) throws RemoteException;
 
     /**
      * This method is used to show the end game to the clients. It is a broadcast

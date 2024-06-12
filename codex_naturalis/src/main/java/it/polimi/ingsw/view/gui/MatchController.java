@@ -2,8 +2,8 @@ package it.polimi.ingsw.view.gui;
 
 import it.polimi.ingsw.model.*;
 import it.polimi.ingsw.model.Color;
-import it.polimi.ingsw.view.CardClient;
-import it.polimi.ingsw.view.LittleModel;
+import it.polimi.ingsw.view.model.CardClient;
+import it.polimi.ingsw.view.model.LittleModel;
 import it.polimi.ingsw.view.ViewSubmissions;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
@@ -24,7 +24,6 @@ import javafx.util.Pair;
 
 import java.awt.*;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
 * Controller responsible for the handling of the GUI components that are used during the Playing Phase of the game*/
@@ -482,7 +481,7 @@ public class MatchController {
 
     public void noConnection() {
         dialog = new Dialog<>();
-        dialog.setTitle("Username Already Taken!");
+        dialog.setTitle("No active connection");
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK);
         Label l = new Label("You are not connected to the server. Game will end soon.\nThank you for playing. Goodbye!");
         l.setFont(Font.font(16));

@@ -1,7 +1,7 @@
 package controllerAndNetworkTest;
 
 import it.polimi.ingsw.controller.client.Controller;
-import it.polimi.ingsw.view.LittleModel;
+import it.polimi.ingsw.view.model.LittleModel;
 import it.polimi.ingsw.view.TUI;
 import it.polimi.ingsw.view.ViewInterface;
 import it.polimi.ingsw.view.ViewSubmissions;

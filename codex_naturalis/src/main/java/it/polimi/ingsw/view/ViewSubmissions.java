@@ -94,7 +94,13 @@ public class ViewSubmissions {
     public void drawCard(boolean gold, int onTableOrDeck){
         controller.drawCard(gold, onTableOrDeck);
     }
-    //TODO javadco
+    /**
+     * Retrieves the nickname of the client player.
+     *
+     * This method is used to get the nickname of the player from the controller.
+     *
+     * @return The nickname of the current player as a String.
+     */
     public String getNickname(){
         return controller.getNickname();
     }

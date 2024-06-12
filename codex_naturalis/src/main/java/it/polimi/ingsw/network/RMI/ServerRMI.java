@@ -4,7 +4,6 @@ import it.polimi.ingsw.controller.server.Controller;
 import it.polimi.ingsw.model.Color;
 import it.polimi.ingsw.model.Kingdom;
 import it.polimi.ingsw.model.Player;
-import it.polimi.ingsw.model.Sign;
 import it.polimi.ingsw.model.exception.*;
 import it.polimi.ingsw.network.NetworkHandler;
 import it.polimi.ingsw.network.NetworkPlug;
@@ -43,7 +42,7 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
 
     public static void main(String[] args) throws IOException {
         ServerRMI obj = new ServerRMI();
-        NetworkServerSocket networkServerSocket = new NetworkServerSocket(0);
+        NetworkServerSocket networkServerSocket = new NetworkServerSocket(4567);
         new Thread(()-> {
             try {
                 networkServerSocket.start();
@@ -129,6 +128,8 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
         Controller.getInstance().addPlayer(nickname);
         //Add the player to the connections map
         connections.put(nickname, clientRMI);
+        NetworkHandler.getInstance().refreshUsersBroadcast();
+
         //We told players if all joined in
         //before finalizing the number of players, since if lobby is ready we do the shuffle of the players
         boolean isFirst = Controller.getInstance().isFirst(nickname);
@@ -306,7 +307,7 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
         // or if it's not the player's turn, or if the game is not in the correct phase.
          Controller.getInstance().drawCard(nickname, gold, onTableOrDeck);
         // Get the id of the new card on the table
-        int newCardId = Controller.getInstance().newCardOnTable(gold, onTableOrDeck);
+        Integer newCardId = Controller.getInstance().newCardOnTable(gold, onTableOrDeck);
         // Get the head of the deck, the new card is drawn from. It is used to update the head of the deck on the client side.
         Kingdom headDeck = Controller.getInstance().getHeadDeck(gold);
 
@@ -563,7 +564,7 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
      * @param onTableOrDeck An integer indicating whether the card is on the table or deck.
      */
     @Override
-    public void sendDrawnCard(String nickname, int newCardId, Kingdom headDeck, boolean gold, int onTableOrDeck) {
+    public void sendDrawnCard(String nickname, Integer newCardId, Kingdom headDeck, boolean gold, int onTableOrDeck) {
         for(String nicknameRefresh : connections.keySet()) {
             //if is not the player who has drawn the card, send the hidden hand of the player.
             if (!nickname.equals(nicknameRefresh)) {
@@ -619,7 +620,6 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
                     connections.get(nicknameRefresh).placeCard(nickname, cardId, position, side, Controller.getInstance().getTurn(),
                             Controller.getInstance().getPlayerResources(nickname), Controller.getInstance().getPlayerPoints(nickname));
                 } catch (RemoteException e) {
-                    connections.remove(nicknameRefresh);
                     NetworkHandler.getInstance().disconnectBroadcast();
                 } catch (NoNameException e) {
                     System.out.println("NonameException. Debugging purpose only");
