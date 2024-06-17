@@ -21,6 +21,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import static javafx.application.Application.launch;
 
@@ -69,6 +72,9 @@ public class Controller {
      * The little model used for storing all the required information about the game.
      */
     private LittleModel model;
+
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+
     /**
      * Constructs a new Controller object and initializes the game model, phase, and ViewSubmissions instance.
      *
@@ -648,18 +654,13 @@ public class Controller {
      * The delay is currently set to 10 seconds (10000 milliseconds).
      */
     private void exitDelay() {
-        // Create a new Timer instance
-        Timer timer = new Timer();
+        scheduler.schedule(() -> {
+            System.exit(0);
+        }, 10, TimeUnit.SECONDS); // Ritardo di 10 secondi
 
-        // Schedule a new TimerTask (anonymous class), to be executed after a delay
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                System.exit(0);
-            }
-        }, 10000);  // Delay in milliseconds, 10000ms = 10s
     }
 
+    
     /**
      * Triggers the view to display the end of the game, since a player has been disconnected.
      */

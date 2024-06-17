@@ -73,13 +73,14 @@ public class GUI extends Application implements ViewInterface {
         return match;
     }
 
-    private  Parent loadFXML(String fxml) {
+    private Parent loadFXML(String fxml) {
         try{
             fxmlLoader = new FXMLLoader(it.polimi.ingsw.App.class.getResource(fxml + ".fxml"));
             return fxmlLoader.load();
 
         } catch (IOException e){
             e.printStackTrace();
+            //TODO sistemare l'eccezione. COsi non la stai gestendo, la'pplicazione si blocca e stampa lo stack della eccezione. Ma non è il modo corretto di farlo.
         }
         return null;
     }
@@ -231,9 +232,9 @@ public class GUI extends Application implements ViewInterface {
     @Override
     public void noConnection() {
         if(gameAlreadyStarted){
-            matchController.noConnection();
+            Platform.runLater(() -> matchController.noConnection());
         } else{
-            loginController.noConnection();
+            Platform.runLater(() -> loginController.noConnection());
         }
     }
 
@@ -244,7 +245,7 @@ public class GUI extends Application implements ViewInterface {
 
     @Override
     public void lobbyComplete() {
-        loginController.lobbyComplete();
+        Platform.runLater(() ->loginController.lobbyComplete());
     }
 
     @Override
@@ -254,13 +255,14 @@ public class GUI extends Application implements ViewInterface {
 
     @Override
     public void noPlayer() {
+        //TODO
         //???? errore che non dovrebbe mai verificarsi. Però da alucne parti è chiamato.
         //stampa un messagggio semplice. Tipo non conosco il giocatore
     }
 
     @Override
     public void closingLobbyError() {
-        loginController.closingLobbyError();
+        Platform.runLater(() ->loginController.closingLobbyError());
     }
 
     @Override
@@ -270,7 +272,7 @@ public class GUI extends Application implements ViewInterface {
 
     @Override
     public void stopGaming() {
-
+        //TODO
     }
 
     @Override

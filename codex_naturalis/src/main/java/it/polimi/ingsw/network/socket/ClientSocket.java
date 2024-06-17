@@ -243,7 +243,6 @@ public class ClientSocket implements Runnable, NetworkClient{
      */
     @Override
     public void run() {
-        int i = 0;
         while(true){
             ServerMessage serverMessage = receiveMessage();
             handleResponse(serverMessage);

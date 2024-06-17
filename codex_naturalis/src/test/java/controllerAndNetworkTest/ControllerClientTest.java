@@ -1,6 +1,7 @@
 package controllerAndNetworkTest;
 
 import it.polimi.ingsw.controller.client.Controller;
+import it.polimi.ingsw.view.gui.GUI;
 import it.polimi.ingsw.view.model.LittleModel;
 import it.polimi.ingsw.view.TUI;
 import it.polimi.ingsw.view.ViewInterface;
@@ -26,7 +27,8 @@ public class ControllerClientTest {
 
     @Test
     public void testChooseNumberOfPlayers(){
-        viewInterface.start();
+        //TODO: implementare test
+        ((GUI) viewInterface).start();
         viewInterface.askNumberOfPlayers();
         controller.insertNumberOfPlayers(2);
 

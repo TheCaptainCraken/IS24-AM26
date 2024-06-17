@@ -288,7 +288,7 @@ public class GameMaster {
                     && getOrderPlayer(currentPlayer.getName()) + 1 == lobby.getPlayers().length) {
                 // if it is the last player in last turn cycle, go to end mode
                 gameState = GameState.END;
-                endGame(); //game transitions into the  calculating phase
+                endGame(); //game transitions into the calculating phase
             }
         } else {
             gameState = GameState.DRAWING_PHASE;
@@ -357,31 +357,24 @@ public class GameMaster {
 
         // next player will play?
 
-        if (turnType == TurnType.SECOND_LAST_TURN
-                && getOrderPlayer(currentPlayer.getName()) + 1 == lobby.getPlayers().length) {
-            // if it is the last player in second-last turn cycle, say the next is the last
-            // turn
-            turnType = TurnType.LAST_TURN;
-            gameState = GameState.PLACING_PHASE;
-        } else if (turnType == TurnType.LAST_TURN
-                && getOrderPlayer(currentPlayer.getName()) + 1 == lobby.getPlayers().length) {
-            // if it is the last player in last turn cycle, go to end mode
-            gameState = GameState.END;
-            endGame();//game transitions into the  calculating phase
-        } else if (currentPlayer.getPoints() >= 20 || areTheCardFinished()) {
-            // if a player reached 20 points set this turn cycle as the second-last
+        if(turnType == TurnType.PLAYING && (currentPlayer.getPoints() >= 20 || areTheCardFinished())){
             if (getOrderPlayer(currentPlayer.getName()) + 1 == lobby.getPlayers().length) {
                 turnType = TurnType.LAST_TURN;
-                gameState = GameState.PLACING_PHASE;
             } else {
                 turnType = TurnType.SECOND_LAST_TURN;
-                gameState = GameState.PLACING_PHASE;
             }
-        } else {
-            gameState = GameState.PLACING_PHASE;
+        } else if(turnType != TurnType.PLAYING && getOrderPlayer(currentPlayer.getName()) + 1 == lobby.getPlayers().length){
+            if(turnType == TurnType.SECOND_LAST_TURN){
+                turnType = TurnType.LAST_TURN;
+            } else if(turnType == TurnType.LAST_TURN){
+                gameState = GameState.END;
+                endGame();
+            }
         }
 
+        gameState = GameState.PLACING_PHASE;
         nextGlobalTurn();
+
         return cardDrawn.getId();
     }
 
@@ -561,7 +554,7 @@ public class GameMaster {
      *
      * @param startingCard Where the recursion will start to find the required
      *                     PlayedCard
-     * @param position
+     * @param position position that identifies where the next card should be
      * @return method recursiveFindCard
      */
     private PlayedCard findCard(PlayedCard startingCard, Point position) {
@@ -719,17 +712,17 @@ public class GameMaster {
                             if (!usedCards.contains(card) && card.getCard().getKingdom() == Kingdom.FUNGI) {
                                 Point lowerPosition = (Point) position.clone();
                                 lowerPosition.translate(0, -1);
-                                Point loowerRightPosition = (Point) position.clone();
-                                loowerRightPosition.translate(1, -2);
+                                Point lowerRightPosition = (Point) position.clone();
+                                lowerRightPosition.translate(1, -2);
                                 PlayedCard lower = findCard(player.getRootCard(), lowerPosition);
-                                PlayedCard loowerRight = findCard(player.getRootCard(), loowerRightPosition);
-                                if (lower != null && loowerRight != null && !usedCards.contains(lower)
-                                        && !usedCards.contains(loowerRight)
+                                PlayedCard lowerRight = findCard(player.getRootCard(), lowerRightPosition);
+                                if (lower != null && lowerRight != null && !usedCards.contains(lower)
+                                        && !usedCards.contains(lowerRight)
                                         && lower.getCard().getKingdom() == Kingdom.FUNGI
-                                        && loowerRight.getCard().getKingdom() == Kingdom.PLANT) {
+                                        && lowerRight.getCard().getKingdom() == Kingdom.PLANT) {
                                     points++;
                                     usedCards.add(card);
-                                    usedCards.add(loowerRight);
+                                    usedCards.add(lowerRight);
                                     usedCards.add(lower);
                                 }
                             }
@@ -802,10 +795,14 @@ public class GameMaster {
                 for (PlayedCard card : getPlayersCards(player)) {
                     Point position = card.getPosition();
                     if (!usedCards.contains(card) && card.getCard().getKingdom() == kingdom) {
+                        //TODO questo if è inutile. Basta che fai il getter, controllando che ad ogni step
+                        // tu non abbia null.
+
                         if (card.getCard().getKingdom() == Kingdom.FUNGI
                                 || card.getCard().getKingdom() == Kingdom.ANIMAL) {
                             Point lowerLeftPosition = (Point) position.clone();
                             lowerLeftPosition.translate(-1, -1);
+                            //TODO basta fare il getter eh. SONO lincate le carte
                             PlayedCard lowerLeft = findCard(player.getRootCard(), lowerLeftPosition);
                             Point upperRightPosition = (Point) position.clone();
                             upperRightPosition.translate(1, 1);
@@ -871,7 +868,9 @@ public class GameMaster {
             cards.add(card);
             for (Corner corner : Corner.values()) {
                 PlayedCard attached = card.getAttached(corner);
-                if (attached != null) {
+                //if the attachment is not null and the card is not already in the list, it is added to the stack
+                //remember that cards are double linked, so we need to check if the card is already in the list
+                if (attached != null && !cards.contains(attached)) {
                     stack.push(attached);
                 }
             }
