@@ -47,6 +47,18 @@ import it.polimi.ingsw.network.socket.messages.server.login.StatusLogin;
 
 import java.io.*;
 
+/**
+ * Represents the server-side socket in the network communication.
+ *
+ * This class implements the NetworkPlug interface and is responsible for managing the server-side socket communication.
+ * It maintains a ServerSocket object for accepting incoming connections, a Controller object for accessing the game state and performing game actions,
+ * and a HashMap for storing the connections to the clients.
+ *
+ * The key in the HashMap is the address of the client socket, and the value is the ClientHandler object representing the connection.
+ * The class also includes methods for starting the server, broadcasting messages to all clients, handling the game start process, refreshing the user list,
+ * sending chat messages, broadcasting the information of a placed root card, sending the hands of the players, broadcasting the information of a drawn card,
+ * broadcasting the end game signal, and disconnecting all clients.
+ */
 public class NetworkServerSocket implements NetworkPlug {
     /**
      * The ServerSocket object used to accept incoming connections from clients.
@@ -583,8 +595,9 @@ public class NetworkServerSocket implements NetworkPlug {
                 } catch (CardPositionException e) {
                     sendErrorMessage(ErrorType.CARD_POSITION);
                 }
-            } else if(message instanceof ConnectionClient){
+            } else if(message instanceof ConnectionClient) {
                 connection = true;
+                sendMessage(new ConnectionServer());
             } else {
                 throw new ClassNotFoundException();
             }

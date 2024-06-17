@@ -271,25 +271,26 @@ public class GameMaster {
         }
 
         currentPlayer.giveCard(cardToPlace);
-        gameState = GameState.DRAWING_PHASE;
 
         //if card are not finished, we check in draw phase if is last/second last turn
         if (areTheCardFinished()) {
-            // only when the card are finished and the game is in the final phase
-            // normally, the turn is updated in draw Phase,but since areTheCardFinished() is true we need to update it here.
-            nextGlobalTurn();
             //no need to check for GameFlow: drawPhase check if all card are finished. If so, change the phase to SECOND_LAST_TURN.
             if (turnType == TurnType.SECOND_LAST_TURN
                     && getOrderPlayer(currentPlayer.getName()) + 1 == lobby.getPlayers().length) {
                 // if it is the last player in second-last turn cycle, say the next is the last
                 // turn
                 turnType = TurnType.LAST_TURN;
+                //remains in placing phase if and only if the card are finished
+                gameState = GameState.PLACING_PHASE;
             } else if (turnType == TurnType.LAST_TURN
                     && getOrderPlayer(currentPlayer.getName()) + 1 == lobby.getPlayers().length) {
                 // if it is the last player in last turn cycle, go to end mode
                 gameState = GameState.END;
                 endGame(); //game transitions into the calculating phase
             }
+            // only when the card are finished and the game is in the final phase
+            // normally, the turn is updated in draw Phase,but since areTheCardFinished() is true we need to update it here.
+            nextGlobalTurn();
         } else {
             gameState = GameState.DRAWING_PHASE;
         }
@@ -323,14 +324,21 @@ public class GameMaster {
         ResourceCard cardDrawn;
         if (Gold) {
             if (CardPosition == -1) {
+                try {
                 cardDrawn = (ResourceCard) goldDeck.draw();
-                currentPlayer.takeCard(cardDrawn);
-            } else {
-                cardDrawn = onTableGoldCards[CardPosition];
-                if (cardDrawn == null) {
+                } catch (IndexOutOfBoundsException e) {
                     throw new CardPositionException();
                 }
                 currentPlayer.takeCard(cardDrawn);
+            } else {
+                cardDrawn = onTableGoldCards[CardPosition];
+                //if the card is not present in the table, it throws an exception
+                if (cardDrawn == null) {
+                    throw new CardPositionException();
+                }
+                //remove the card from the model
+                currentPlayer.takeCard(cardDrawn);
+                //update the card on table
                 try {
                     onTableGoldCards[CardPosition] = (GoldCard) goldDeck.draw();
                 } catch (IndexOutOfBoundsException e) {
@@ -339,7 +347,11 @@ public class GameMaster {
             }
         } else {
             if (CardPosition == -1) {
+                try {
                 cardDrawn = (ResourceCard) resourceDeck.draw();
+                } catch (IndexOutOfBoundsException e) {
+                    throw new CardPositionException();
+                }
                 currentPlayer.takeCard(cardDrawn);
             } else {
                 cardDrawn = onTableResourceCards[CardPosition];
@@ -707,19 +719,22 @@ public class GameMaster {
                 ArrayList<PlayedCard> usedCards = new ArrayList<>();
                 for (PlayedCard card : getPlayersCards(player)) {
                     Point position = card.getPosition();
+                    //TODO che senso ha uno switch in un ciclo for di una cosa fissa.
                     switch (kingdom) {
                         case FUNGI:
                             if (!usedCards.contains(card) && card.getCard().getKingdom() == Kingdom.FUNGI) {
                                 Point lowerPosition = (Point) position.clone();
+                                //TODO sbagliato il sistema di coordinate, per andare in basso devi fare -1 da entrambe
                                 lowerPosition.translate(0, -1);
                                 Point lowerRightPosition = (Point) position.clone();
+                                //TODO mentra qua basta fare il getter a seconda della tipologia
                                 lowerRightPosition.translate(1, -2);
                                 PlayedCard lower = findCard(player.getRootCard(), lowerPosition);
                                 PlayedCard lowerRight = findCard(player.getRootCard(), lowerRightPosition);
-                                if (lower != null && lowerRight != null && !usedCards.contains(lower)
-                                        && !usedCards.contains(lowerRight)
-                                        && lower.getCard().getKingdom() == Kingdom.FUNGI
-                                        && lowerRight.getCard().getKingdom() == Kingdom.PLANT) {
+
+                                if (lower != null && lowerRight != null &&
+                                        !usedCards.contains(lower) && !usedCards.contains(lowerRight)
+                                        && lower.getCard().getKingdom() == Kingdom.FUNGI && lowerRight.getCard().getKingdom() == Kingdom.PLANT) {
                                     points++;
                                     usedCards.add(card);
                                     usedCards.add(lowerRight);
@@ -796,21 +811,22 @@ public class GameMaster {
                     Point position = card.getPosition();
                     if (!usedCards.contains(card) && card.getCard().getKingdom() == kingdom) {
                         //TODO questo if è inutile. Basta che fai il getter, controllando che ad ogni step
-                        // tu non abbia null.
-
+                        // tu non abbia null. Non è meglio fare un case.
                         if (card.getCard().getKingdom() == Kingdom.FUNGI
                                 || card.getCard().getKingdom() == Kingdom.ANIMAL) {
                             Point lowerLeftPosition = (Point) position.clone();
                             lowerLeftPosition.translate(-1, -1);
-                            //TODO basta fare il getter eh. SONO lincate le carte
+                            //TODO basta fare il getter eh. Sono lincate le carte. Inoltre stai sbagliando con il sistema di coordinate
+                            //per andare in alto devi fare +1 solo della x, in basso solo della y.
                             PlayedCard lowerLeft = findCard(player.getRootCard(), lowerLeftPosition);
                             Point upperRightPosition = (Point) position.clone();
                             upperRightPosition.translate(1, 1);
                             PlayedCard upperRight = findCard(player.getRootCard(), upperRightPosition);
 
-                            if (lowerLeft != null && upperRight != null && lowerLeft.getCard().getKingdom() == kingdom
-                                    && upperRight.getCard().getKingdom() == kingdom && !usedCards.contains(lowerLeft)
-                                    && !usedCards.contains(upperRight)) {
+                            //check not null, correct kingdom, not already used
+                            if (lowerLeft != null && upperRight != null
+                                    && lowerLeft.getCard().getKingdom() == kingdom && upperRight.getCard().getKingdom() == kingdom
+                                    && !usedCards.contains(lowerLeft) && !usedCards.contains(upperRight)) {
                                 points++;
                                 usedCards.add(upperRight);
                                 usedCards.add(lowerLeft);
@@ -818,15 +834,18 @@ public class GameMaster {
                             }
                         } else {
                             Point upperLeftPosition = (Point) position.clone();
+                            //TODO stessa cosa di prima, sbagli con il sistema di coordinate
+                            // e ti basta fare i getter.
                             upperLeftPosition.translate(-1, 1);
                             PlayedCard upperLeft = findCard(player.getRootCard(), upperLeftPosition);
                             Point lowerRightPosition = (Point) position.clone();
                             lowerRightPosition.translate(1, -1);
                             PlayedCard lowerRight = findCard(player.getRootCard(), lowerRightPosition);
 
-                            if (upperLeft != null && lowerRight != null && upperLeft.getCard().getKingdom() == kingdom
-                                    && lowerRight.getCard().getKingdom() == kingdom && !usedCards.contains(upperLeft)
-                                    && !usedCards.contains(lowerRight)) {
+                            //check not null, correct kingdom, not already used
+                            if (upperLeft != null && lowerRight != null
+                                    && upperLeft.getCard().getKingdom() == kingdom && lowerRight.getCard().getKingdom() == kingdom
+                                    && !usedCards.contains(upperLeft) && !usedCards.contains(lowerRight)) {
                                 points++;
                                 usedCards.add(lowerRight);
                                 usedCards.add(upperLeft);
@@ -868,7 +887,7 @@ public class GameMaster {
             cards.add(card);
             for (Corner corner : Corner.values()) {
                 PlayedCard attached = card.getAttached(corner);
-                //if the attachment is not null and the card is not already in the list, it is added to the stack
+                //if the attachment is not null and the card is not yet in the list, it is added to the stack
                 //remember that cards are double linked, so we need to check if the card is already in the list
                 if (attached != null && !cards.contains(attached)) {
                     stack.push(attached);
@@ -1066,6 +1085,7 @@ public class GameMaster {
     public GameState getGameState() {
         return gameState;
     }
+
     public GameState getState() {
         return gameState;
     }

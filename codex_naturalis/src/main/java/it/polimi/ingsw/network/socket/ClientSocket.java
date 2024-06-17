@@ -3,6 +3,8 @@ package it.polimi.ingsw.network.socket;
 import it.polimi.ingsw.controller.client.Controller;
 import it.polimi.ingsw.model.Color;
 import it.polimi.ingsw.network.NetworkClient;
+import it.polimi.ingsw.network.NetworkHandler;
+import it.polimi.ingsw.network.socket.messages.client.ClientConnection;
 import it.polimi.ingsw.network.socket.messages.client.ConnectionClient;
 import it.polimi.ingsw.network.socket.messages.client.gameflow.SentChatMessage;
 import it.polimi.ingsw.network.socket.messages.client.ClientMessage;
@@ -57,6 +59,8 @@ public class ClientSocket implements Runnable, NetworkClient{
      */
     private final ObjectOutputStream objOutputStream;
 
+    private boolean connection;
+
     /**
      * Creates a new ClientSocket with the given controller, address, and port.
      * It establishes a socket connection to the server and initializes input and output streams for communication.
@@ -75,6 +79,11 @@ public class ClientSocket implements Runnable, NetworkClient{
         objInputStream = new ObjectInputStream(inputStream);
 
         this.controller = controller;
+
+        connection = true;
+
+        //start the thread to check if the client is still connected
+        new Thread(this::iAmConnected).start();
     }
 
     //Methods that correspond to the actions a player takes throughout the life of the connection.
@@ -250,6 +259,24 @@ public class ClientSocket implements Runnable, NetworkClient{
     }
 
     /**
+     * This method is used to periodically check if the client is still connected to the server.
+     * It runs in a separate thread and pauses for a specified interval (30 seconds in this case) between each check.
+     * If the client is no longer connected, we stop gaming client-side.
+     */
+    private void iAmConnected() {
+        while (connection) {
+            try {
+                connection = false;
+                sendMessage(new ClientConnection());
+                Thread.sleep(30000); // 30 seconds
+            } catch (InterruptedException e) {
+                System.out.println("Error in sleep");
+            }
+        }
+        controller.noConnection();
+    }
+
+    /**
      * Handles the response from the server.
      * This method is called by the run method for each received server message.
      * It calls the appropriate method on the controller based on the type of the server message.
@@ -258,6 +285,7 @@ public class ClientSocket implements Runnable, NetworkClient{
      */
     public void handleResponse(ServerMessage message) {
         if (message instanceof ConnectionServer) {
+            connection = true;
             sendMessage(new ConnectionClient());
         } else if (message != null) {
             message.callController(controller);

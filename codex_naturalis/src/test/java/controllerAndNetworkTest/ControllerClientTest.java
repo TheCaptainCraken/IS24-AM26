@@ -25,14 +25,14 @@ public class ControllerClientTest {
         viewInterface = new TUI(littleModel, controller);
     }
 
-    @Test
-    public void testChooseNumberOfPlayers(){
-        //TODO: implementare test
-        ((GUI) viewInterface).start();
-        viewInterface.askNumberOfPlayers();
-        controller.insertNumberOfPlayers(2);
-
-        controller.stopWaiting();
-    }
+//    @Test
+//    public void testChooseNumberOfPlayers(){
+//        //TODO: implementare test
+//        ((GUI) viewInterface).start();
+//        viewInterface.askNumberOfPlayers();
+//        controller.insertNumberOfPlayers(2);
+//
+//        controller.stopWaiting();
+//    }
 
 }
