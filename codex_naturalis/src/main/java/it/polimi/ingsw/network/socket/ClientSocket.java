@@ -3,9 +3,8 @@ package it.polimi.ingsw.network.socket;
 import it.polimi.ingsw.controller.client.Controller;
 import it.polimi.ingsw.model.Color;
 import it.polimi.ingsw.network.NetworkClient;
-import it.polimi.ingsw.network.NetworkHandler;
-import it.polimi.ingsw.network.socket.messages.client.ClientConnection;
 import it.polimi.ingsw.network.socket.messages.client.ConnectionClient;
+import it.polimi.ingsw.network.socket.messages.client.ConnectionClientForServer;
 import it.polimi.ingsw.network.socket.messages.client.gameflow.SentChatMessage;
 import it.polimi.ingsw.network.socket.messages.client.ClientMessage;
 import it.polimi.ingsw.network.socket.messages.client.gameflow.CardToBeDrawn;
@@ -16,8 +15,8 @@ import it.polimi.ingsw.network.socket.messages.client.login.ColorChosen;
 import it.polimi.ingsw.network.socket.messages.client.login.LoginMessage;
 import it.polimi.ingsw.network.socket.messages.client.login.NumberOfPlayersMessage;
 import it.polimi.ingsw.network.socket.messages.server.ConnectionServer;
+import it.polimi.ingsw.network.socket.messages.server.ConnectionServerForClient;
 import it.polimi.ingsw.network.socket.messages.server.ServerMessage;
-import it.polimi.ingsw.network.socket.messages.server.gameflow.RefreshedResources;
 import it.polimi.ingsw.view.model.Phase;
 
 
@@ -267,12 +266,13 @@ public class ClientSocket implements Runnable, NetworkClient{
         while (connection) {
             try {
                 connection = false;
-                sendMessage(new ClientConnection());
-                Thread.sleep(30000); // 30 seconds
+                sendMessage(new ConnectionClient());
+                Thread.sleep(300000); // 30 seconds
             } catch (InterruptedException e) {
                 System.out.println("Error in sleep");
             }
         }
+
         controller.noConnection();
     }
 
@@ -285,12 +285,13 @@ public class ClientSocket implements Runnable, NetworkClient{
      */
     public void handleResponse(ServerMessage message) {
         if (message instanceof ConnectionServer) {
+            sendMessage(new ConnectionClientForServer());
+        }
+        else if(message instanceof ConnectionServerForClient){
             connection = true;
-            sendMessage(new ConnectionClient());
-        } else if (message != null) {
+        }
+        else if (message != null) {
             message.callController(controller);
-        }  else {
-            controller.noConnection();
         }
     }
     /**
@@ -314,6 +315,10 @@ public class ClientSocket implements Runnable, NetworkClient{
         return answer;
     }
 
+    /**
+     * Closes the input and output streams and the socket connection to the server.
+     * If an I/O error occurs while closing the streams or the connection, it calls the `noConnection` method on the controller.
+     */
     public void disconnect(){
         try {
             inputStream.close();

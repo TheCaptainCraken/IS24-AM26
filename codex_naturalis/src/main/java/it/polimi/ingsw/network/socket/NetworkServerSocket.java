@@ -24,6 +24,7 @@ import it.polimi.ingsw.network.NetworkPlug;
 import it.polimi.ingsw.network.socket.messages.client.ConnectionClient;
 import it.polimi.ingsw.network.socket.messages.ErrorType;
 import it.polimi.ingsw.network.socket.messages.client.ClientMessage;
+import it.polimi.ingsw.network.socket.messages.client.ConnectionClientForServer;
 import it.polimi.ingsw.network.socket.messages.client.gameflow.SentChatMessage;
 import it.polimi.ingsw.network.socket.messages.client.gameflow.CardToBeDrawn;
 import it.polimi.ingsw.network.socket.messages.client.gameflow.CardToBePositioned;
@@ -32,11 +33,8 @@ import it.polimi.ingsw.network.socket.messages.client.gamestart.ChosenStartingCa
 import it.polimi.ingsw.network.socket.messages.client.login.ColorChosen;
 import it.polimi.ingsw.network.socket.messages.client.login.LoginMessage;
 import it.polimi.ingsw.network.socket.messages.client.login.NumberOfPlayersMessage;
-import it.polimi.ingsw.network.socket.messages.server.ConnectionServer;
-import it.polimi.ingsw.network.socket.messages.server.ErrorMessage;
+import it.polimi.ingsw.network.socket.messages.server.*;
 import it.polimi.ingsw.network.socket.messages.server.gameflow.ReceivedChatMessage;
-import it.polimi.ingsw.network.socket.messages.server.ServerMessage;
-import it.polimi.ingsw.network.socket.messages.server.StopGaming;
 import it.polimi.ingsw.network.socket.messages.server.endgame.ShowPointsFromObjectives;
 import it.polimi.ingsw.network.socket.messages.server.endgame.ShowRanking;
 import it.polimi.ingsw.network.socket.messages.server.gameflow.*;
@@ -86,7 +84,6 @@ public class NetworkServerSocket implements NetworkPlug {
         //add the network plug to the network handler, who manages the different connections protocols.
         NetworkHandler.getInstance().addNetworkPlug("socket", this);
 
-        //TODO testare questo
         try {
 
             System.out.println("Server is listening on IP: " + InetAddress.getLocalHost().getHostAddress());
@@ -596,8 +593,9 @@ public class NetworkServerSocket implements NetworkPlug {
                     sendErrorMessage(ErrorType.CARD_POSITION);
                 }
             } else if(message instanceof ConnectionClient) {
+                sendMessage(new ConnectionServerForClient());
+            }else if (message instanceof ConnectionClientForServer) {
                 connection = true;
-                sendMessage(new ConnectionServer());
             } else {
                 throw new ClassNotFoundException();
             }

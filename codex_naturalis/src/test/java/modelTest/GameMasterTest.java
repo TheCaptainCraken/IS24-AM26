@@ -67,9 +67,87 @@ public class GameMasterTest {
         Assertions.assertEquals(0, game.getPlayerPoints(game.getCurrentPlayer().getName()));
     }
 
+    //testing end phase:
+    @Test
+    public void CorrectTransitionWhenMoreThan20points() throws WrongGamePhaseException, NoTurnException, NoNameException, NotEnoughResourcesException, CardPositionException {
+        int i;
+        for(i = 0; i < lobby.getPlayers().length; i++){
+            game.placeRootCard(lobby.getPlayers()[i].getName(),false);
+        }
+        for(i = 0; i < lobby.getPlayers().length; i++){
+            game.chooseObjectiveCard(lobby.getPlayers()[i].getName(),0);
+        }
+        lobby.getPlayerFromName("pietro").addPoints(20);
+        Assertions.assertEquals(20, game.getPlayerPoints("pietro"));
+        game.placeCard("pietro", 1, new Point (1,0 ), false);
+        assert (game.getTurnType() == TurnType.PLAYING);
+        game.drawCard("pietro", true, 0);
+        assert(game.getTurnType() == TurnType.SECOND_LAST_TURN);
+
+        game.placeCard("marco", 1, new Point (1,0 ), false);
+        game.drawCard("marco", true, 0);
+        assert (game.getTurnType() == TurnType.SECOND_LAST_TURN);
+        game.placeCard("giovanni", 1, new Point (1,0 ), false);
+        game.drawCard("giovanni", true, 0);
+
+        game.placeCard("francesco", 1, new Point (1,0 ), false);
+        game.drawCard("francesco", true, 0);
+
+        assert (game.getTurnType() == TurnType.LAST_TURN);
+        game.placeCard("pietro", 1, new Point (2,0 ), false);
+        game.drawCard("pietro", true, 0);
+        assert (game.getTurnType() == TurnType.LAST_TURN);
+        game.placeCard("marco", 1, new Point (2,0 ), false);
+        game.drawCard("marco", true, 0);
+        assert (game.getTurnType() == TurnType.LAST_TURN);
+        game.placeCard("giovanni", 1, new Point (2,0 ), false);
+        game.drawCard("giovanni", true, 0);
+        assert (game.getTurnType() == TurnType.LAST_TURN);
+        game.placeCard("francesco", 1, new Point (2,0 ), false);
+        game.drawCard("francesco", true, 0);
+
+        assert (game.getGameState() == GameState.END);
+    }
+    @Test
+    public void transitionAtEndGameForLastPlayer() throws WrongGamePhaseException, NoTurnException, NoNameException, NotEnoughResourcesException, CardPositionException {
+        int i;
+        for(i = 0; i < lobby.getPlayers().length; i++){
+            game.placeRootCard(lobby.getPlayers()[i].getName(),false);
+        }
+        for(i = 0; i < lobby.getPlayers().length; i++){
+            game.chooseObjectiveCard(lobby.getPlayers()[i].getName(),0);
+        }
+        game.placeCard("pietro", 1, new Point (1,0 ), false);
+        assert (game.getTurnType() == TurnType.PLAYING);
+        game.drawCard("pietro", true, 0);
+
+        game.placeCard("marco", 1, new Point (1,0 ), false);
+        game.drawCard("marco", true, 0);
+        game.placeCard("giovanni", 1, new Point (1,0 ), false);
+        game.drawCard("giovanni", true, 0);
+
+        lobby.getPlayerFromName("francesco").addPoints(20);
+        game.placeCard("francesco", 1, new Point (1,0 ), false);
+        game.drawCard("francesco", true, 0);
+        assert (game.getTurnType() == TurnType.LAST_TURN);
+        game.placeCard("pietro", 1, new Point (2,0 ), false);
+        game.drawCard("pietro", true, 0);
+        assert (game.getTurnType() == TurnType.LAST_TURN);
+        game.placeCard("marco", 1, new Point (2,0 ), false);
+        game.drawCard("marco", true, 0);
+        assert (game.getTurnType() == TurnType.LAST_TURN);
+        game.placeCard("giovanni", 1, new Point (2,0 ), false);
+        game.drawCard("giovanni", true, 0);
+        assert (game.getTurnType() == TurnType.LAST_TURN);
+        game.placeCard("francesco", 1, new Point (2,0 ), false);
+        game.drawCard("francesco", true, 0);
+
+        assert (game.getGameState() == GameState.END);
+    }
+
     @Test
     @DisplayName("Exception not current player for placeRootCard")
-    public void NotCurrentPlayerTest() throws IOException, ParseException, WrongGamePhaseException, NoTurnException, NoNameException {
+    public void NotCurrentPlayerTest() {
         Assertions.assertThrows(NoTurnException.class, ()->game.placeRootCard("marco", false));
     }
 
@@ -620,6 +698,8 @@ public class GameMasterTest {
                 ()->game.placeCard(game.getCurrentPlayer().getName(), 2, new Point(4, 0), false));
         assertEquals(GameState.END, game.getGameState());
     }
+
+
 }
 
 

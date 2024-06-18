@@ -367,8 +367,9 @@ public class GameMaster {
             }
         }
 
-        // next player will play?
+        gameState = GameState.PLACING_PHASE;
 
+        // next player will play?
         if(turnType == TurnType.PLAYING && (currentPlayer.getPoints() >= 20 || areTheCardFinished())){
             if (getOrderPlayer(currentPlayer.getName()) + 1 == lobby.getPlayers().length) {
                 turnType = TurnType.LAST_TURN;
@@ -384,7 +385,6 @@ public class GameMaster {
             }
         }
 
-        gameState = GameState.PLACING_PHASE;
         nextGlobalTurn();
 
         return cardDrawn.getId();
@@ -1206,6 +1206,10 @@ public class GameMaster {
      */
     public StartingCard getStartingCardToPosition(String nickname) throws NoNameException {
         return startingCardToPosition[getOrderPlayer(nickname)];
+    }
+
+    public TurnType getTurnType() {
+        return turnType;
     }
 }
 

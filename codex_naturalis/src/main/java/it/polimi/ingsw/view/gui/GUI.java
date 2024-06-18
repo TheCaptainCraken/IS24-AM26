@@ -36,9 +36,6 @@ public class GUI extends Application implements ViewInterface {
     private static Parent match;
     private Parent end;
 
-    public static void main(String[] args) {
-        Application.launch(GUI.class, args);
-    }
     @Override
     public void start(Stage stage) throws IOException {
 
@@ -79,8 +76,7 @@ public class GUI extends Application implements ViewInterface {
             return fxmlLoader.load();
 
         } catch (IOException e){
-            e.printStackTrace();
-            //TODO sistemare l'eccezione. COsi non la stai gestendo, la'pplicazione si blocca e stampa lo stack della eccezione. Ma non è il modo corretto di farlo.
+            System.out.println("Error loading FXML file");
         }
         return null;
     }
@@ -177,15 +173,17 @@ public class GUI extends Application implements ViewInterface {
 
     @Override
     public void showExtraPoints(HashMap<String, Integer> extraPoints) {
-        endgameHandler.setExtraPoints(extraPoints);
+        Platform.runLater(() -> endgameHandler.setExtraPoints(extraPoints));
         Platform.runLater(() -> matchController.gameIsEnding());
     }
 
     @Override
     public void showRanking(ArrayList<Player> ranking) {
-        Scene scene1 = new Scene(end,500,400);
-        Platform.runLater(() -> endgameHandler.showRanking(ranking));
-        primaryStage.setScene(scene1);
+        Platform.runLater(() -> {
+            Scene scene1 = new Scene(end,500,400);
+            endgameHandler.showRanking(ranking);
+            primaryStage.setScene(scene1);
+        });
     }
 
     @Override
