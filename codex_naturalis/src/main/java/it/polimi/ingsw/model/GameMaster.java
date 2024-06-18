@@ -400,12 +400,14 @@ public class GameMaster {
         } else {
             for (Player player : lobby.getPlayers()) {
                 ObjectiveCard secret = player.getSecretObjective();
-                int newPoints = calculateEndGamePoints(secret.getType(), secret.getMultiplier(), player, secret.getKingdom()); //secret objective is calculated first
+                //secret objective is calculated first
+                int newPoints = calculateEndGamePoints(secret.getType(), secret.getMultiplier(), player, secret.getKingdom());
                 player.addObjectivePoints(newPoints);
                 for(ObjectiveCard card : onTableObjectiveCards){
                     newPoints = calculateEndGamePoints(card.getType(), card.getMultiplier(), player, card.getKingdom());
                     player.addObjectivePoints(newPoints);
                 }
+                //add player to ranking after insert all objective points
                 ranking.add(player);
             }
 
@@ -414,13 +416,17 @@ public class GameMaster {
             Collections.sort(ranking, new Comparator<Player>() {
                 @Override
                 public int compare(Player p1, Player p2) {
+                    //total score of a player: normal points during the game and objective points
                     int sum1 = p1.getPoints() + p1.getObjectivePoints();
                     int sum2 = p2.getPoints() + p2.getObjectivePoints();
                     if(sum1 == sum2) {
+                        //if the points are equal, the player with the most objective points wins
                         return Integer.compare(p1.getObjectivePoints(), p2.getObjectivePoints());
                     } else if(sum1 > sum2){
+                        //sum is insert before than player 2
                         return 1;
                     } else {
+                        //sum is insert after than player 2
                         return -1;
                     }
                 }
@@ -1208,8 +1214,232 @@ public class GameMaster {
         return startingCardToPosition[getOrderPlayer(nickname)];
     }
 
+    /**
+     * Retrieves the current turn type of the game.
+     *
+     * This method is used to check the current turn type of the game, which can be useful for determining
+     * the valid actions that can be performed at any given time.
+     *
+     * @return The current turn type of the game as a TurnType enum.
+     */
     public TurnType getTurnType() {
         return turnType;
+    }
+
+    /**
+     * Calculate the number of points given by an objective card.
+     *
+     * @param type       type of the objective card.
+     * @param multiplier multiplier of the objective card.
+     * @param player     player who is getting targeted.
+     * @param kingdom    kingdom of the objective card.
+     * @return number of points to add to the player points
+     */
+    private int calculateEndGamePointsPietro(ObjectiveType type, int multiplier, Player player, Kingdom kingdom) {
+        int points = 0;
+
+        switch (type) {
+            case TWO_QUILLS:
+                points = player.getResources().get(Sign.QUILL) / 2;
+                break;
+            case TWO_INKS:
+                points = player.getResources().get(Sign.INKWELL) / 2;
+                break;
+            case TWO_SCROLLS:
+                points = player.getResources().get(Sign.SCROLL) / 2;
+                break;
+            case FREE_RESOURCES:
+                points = Math.min(player.getResources().get(Sign.QUILL),
+                        Math.min(player.getResources().get(Sign.INKWELL), player.getResources().get(Sign.SCROLL)));
+                break;
+            case TRIS:
+                points = player.getResources().get(fromKingdomToSign(kingdom)) / 3;
+                break;
+            case L_FORMATION: {
+                ArrayList<PlayedCard> usedCards = new ArrayList<>();
+                switch(kingdom) {
+                    case FUNGI:
+                        // i start from top card
+                        for (PlayedCard card : getPlayersCards(player)) {
+                            if (!usedCards.contains(card) && card.getCard().getKingdom() == Kingdom.FUNGI) {
+                                // the top card
+                                Point position = card.getPosition();
+
+                                Point lowerPosition = (Point) position.clone();
+                                lowerPosition.translate(-1, -1);
+                                PlayedCard lower = findCard(player.getRootCard(), lowerPosition);
+
+                                //the card below on the right, linked to lower
+                                PlayedCard lowerRight;
+                                try {
+                                    lowerRight = lower.getAttached(Corner.BOTTOM_RIGHT);
+                                } catch (NullPointerException e) {
+                                    lowerRight = null;
+                                }
+
+                                if (lower != null && lowerRight != null &&
+                                        !usedCards.contains(lower) && !usedCards.contains(lowerRight)
+                                        && lower.getCard().getKingdom() == Kingdom.FUNGI && lowerRight.getCard().getKingdom() == Kingdom.PLANT) {
+                                    points++;
+                                    usedCards.add(card);
+                                    usedCards.add(lowerRight);
+                                    usedCards.add(lower);
+                                }
+                            }
+                        }
+                        break;
+                    case ANIMAL:
+                        // i start from the below card
+                        for (PlayedCard card : getPlayersCards(player)) {
+                            if (!usedCards.contains(card) && card.getCard().getKingdom() == Kingdom.ANIMAL) {
+                                //take the card on top
+                                Point position = card.getPosition();
+                                Point topPosition = (Point) position.clone();
+                                topPosition.translate(+1, +1);
+                                PlayedCard top = findCard(player.getRootCard(), topPosition);
+                                //take the card on top right
+                                PlayedCard topRight;
+                                try {
+                                    topRight = top.getAttached(Corner.TOP_RIGHT);
+                                } catch (NullPointerException e) {
+                                    topRight = null;
+                                }
+
+                                if (top != null && topRight != null &&
+                                        !usedCards.contains(top) && !usedCards.contains(topRight)
+                                        && top.getCard().getKingdom() == Kingdom.ANIMAL && topRight.getCard().getKingdom() == Kingdom.FUNGI) {
+                                    points++;
+                                    usedCards.add(card);
+                                    usedCards.add(topRight);
+                                    usedCards.add(top);
+                                }
+                            }
+                        }
+                        break;
+                    case PLANT:
+                        // i start from the card on top
+                        for (PlayedCard card : getPlayersCards(player)) {
+                            if (!usedCards.contains(card) && card.getCard().getKingdom() == Kingdom.PLANT) {
+                                //take the card on top
+                                Point position = card.getPosition();
+                                Point belowPosition = (Point) position.clone();
+                                belowPosition.translate(-1, -1);
+                                PlayedCard below = findCard(player.getRootCard(), belowPosition);
+                                //take the card on top right
+                                PlayedCard belowLeft;
+                                try {
+                                    belowLeft = below.getAttached(Corner.BOTTOM_LEFT);
+                                } catch (NullPointerException e) {
+                                    belowLeft = null;
+                                }
+
+                                if (below != null && belowLeft != null &&
+                                        !usedCards.contains(below) && !usedCards.contains(belowLeft)
+                                        && below.getCard().getKingdom() == Kingdom.PLANT && belowLeft.getCard().getKingdom() == Kingdom.INSECT) {
+                                    points++;
+                                    usedCards.add(card);
+                                    usedCards.add(belowLeft);
+                                    usedCards.add(below);
+                                }
+                            }
+                        }
+                        break;
+                    case INSECT:
+                        // i start from the below card
+                        for (PlayedCard card : getPlayersCards(player)) {
+                            if (!usedCards.contains(card) && card.getCard().getKingdom() == Kingdom.INSECT) {
+                                //take the card on top
+                                Point position = card.getPosition();
+                                Point topPosition = (Point) position.clone();
+                                topPosition.translate(+1, +1);
+                                PlayedCard top = findCard(player.getRootCard(), topPosition);
+
+                                //take the card on top right
+                                PlayedCard topLeft;
+                                try {
+                                    topLeft = top.getAttached(Corner.TOP_LEFT);
+                                } catch (NullPointerException e) {
+                                    topLeft = null;
+                                }
+
+                                if (top != null && topLeft != null &&
+                                        !usedCards.contains(top) && !usedCards.contains(topLeft)
+                                        && top.getCard().getKingdom() == Kingdom.INSECT && topLeft.getCard().getKingdom() == Kingdom.ANIMAL) {
+                                    points++;
+                                    usedCards.add(card);
+                                    usedCards.add(topLeft);
+                                    usedCards.add(top);
+                                }
+                            }
+                        }
+                        break;
+                }//last parenthesis for kingdom switch
+            }
+                break;
+            case STAIR: {
+                // I put the card used to give points.
+                ArrayList<PlayedCard> usedCards = new ArrayList<>();
+                switch (kingdom) {
+                    // stair formation top right: crescente: I start from the bottom one
+                    case FUNGI :
+                    case ANIMAL:
+                        for(PlayedCard card : getPlayersCards(player)) {
+                            if (card.getCard().getKingdom() == kingdom && !usedCards.contains(card)) {
+                                PlayedCard firstUpper = card.getAttached(Corner.TOP_RIGHT);
+
+                                //if there is no card attached to the first one, I have a null pointer exception
+                                PlayedCard secondUpper;
+                                try {
+                                    secondUpper = firstUpper.getAttached(Corner.TOP_RIGHT);
+                                } catch (NullPointerException e) {
+                                    secondUpper = null;
+                                }
+
+                                //controll that are not null and that the cards are not already used and that the cards are of the right kingdom
+                                if (firstUpper != null && secondUpper != null &&
+                                        !usedCards.contains(firstUpper) && !usedCards.contains(secondUpper)
+                                        && firstUpper.getCard().getKingdom() == kingdom && secondUpper.getCard().getKingdom() == kingdom) {
+                                    points++;
+                                    usedCards.add(card);
+                                    usedCards.add(firstUpper);
+                                    usedCards.add(secondUpper);
+                                }
+                            }
+                        }
+                        break;
+                    // stair formation bottom right: decrescente: I start from the top one
+                    case PLANT:
+                    case INSECT:
+                        for(PlayedCard card : getPlayersCards(player)) {
+                            if (card.getCard().getKingdom() == kingdom && !usedCards.contains(card)) {
+                                PlayedCard firstDown = card.getAttached(Corner.BOTTOM_RIGHT);
+
+                                //if there is no card attached to the first one, I have a null pointer exception
+                                PlayedCard secondDown;
+                                try {
+                                    secondDown = firstDown.getAttached(Corner.BOTTOM_RIGHT);
+                                } catch (NullPointerException e) {
+                                    secondDown = null;
+                                }
+
+                                //controll that are not null and that the cards are not already used and that the cards are of the right kingdom
+                                if (firstDown != null && secondDown != null &&
+                                        !usedCards.contains(firstDown) && !usedCards.contains(secondDown)
+                                        && firstDown.getCard().getKingdom() == kingdom && secondDown.getCard().getKingdom() == kingdom) {
+                                    points++;
+                                    usedCards.add(card);
+                                    usedCards.add(firstDown);
+                                    usedCards.add(secondDown);
+                                }
+                            }
+                        }
+                        break;
+                }
+            }
+                break;
+        }
+
+        return points * multiplier;
     }
 }
 

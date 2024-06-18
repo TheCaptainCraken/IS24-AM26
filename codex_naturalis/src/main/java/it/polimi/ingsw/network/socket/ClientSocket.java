@@ -251,10 +251,17 @@ public class ClientSocket implements Runnable, NetworkClient{
      */
     @Override
     public void run() {
-        while(true){
-            ServerMessage serverMessage = receiveMessage();
+        boolean connected = true;
+        while(connected){
+            ServerMessage serverMessage = null;
+            try {
+                serverMessage = receiveMessage();
+            } catch (IOException e) {
+               connected = false;
+            }
             handleResponse(serverMessage);
         }
+        controller.noConnection();
     }
 
     /**
@@ -301,13 +308,10 @@ public class ClientSocket implements Runnable, NetworkClient{
      *
      * @return The received server message.
      */
-    public ServerMessage receiveMessage(){
+    public ServerMessage receiveMessage() throws IOException {
         ServerMessage answer;
         try {
             answer = (ServerMessage) objInputStream.readObject();
-        } catch (IOException e) {
-            controller.noConnection();
-            return null;
         } catch (ClassNotFoundException e) {
             System.out.println("This error should never happen. The server is sending a message that the client does not know how to handle.");
             return null;
