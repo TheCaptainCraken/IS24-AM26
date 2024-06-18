@@ -689,6 +689,11 @@ public class Controller {
         exitDelay();
     }
 
+    /**
+     * This method returns the NetworkClient object used for communication with the server.
+     *
+     * @return the NetworkClient object used for communication with the server.
+     */
     public NetworkClient getConnection() {
         return connection;
     }

@@ -38,7 +38,18 @@ public class Deck {
         this.shuffle();
     }
 
-    //TODO javaddock
+    /**
+     * This constructor generates the deck of cards from a JSON file and shuffles
+     * it.
+     *
+     * @param cardsFile the path of the JSON file containing the cards.
+     * @param toFile    a boolean that is true if the deck is generated to be saved
+     *                  in a file.
+     * @throws FileNotFoundException    if the file is not found.
+     * @throws IOException              if an I/O error occurs.
+     * @throws ParseException           if the JSON file is not valid.
+     * @throws IllegalArgumentException if the card prototype is invalid.
+     */
     public Deck(String cardsFile, boolean toFile) throws IOException, ParseException {
         cards = new ArrayList<Card>();
         this.generateDeck(cardsFile);

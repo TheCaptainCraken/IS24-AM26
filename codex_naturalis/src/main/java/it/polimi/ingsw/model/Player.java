@@ -182,10 +182,21 @@ public class Player implements java.io.Serializable{
             objectivePoints += new_points;
     }
 
+    /**
+     * This method returns the objective points of the player.
+     * Objective points are special points that are added at the end of the game based on the player's secret objective card.
+     *
+     * @return the objective points of the player.
+     */
     public int getObjectivePoints() {
         return objectivePoints;
     }
 
+    /**
+     * This method sets the color of the player's pin.
+     *
+     * @param colour the color to set for the player's pin.
+     */
     public void setColour(Color colour) {
         this.color = colour;
     }

@@ -104,8 +104,6 @@ public class PlayedCard implements Serializable {
     /**@return the map in which the information on the status of the PlayedCard's corners is stored
      * */
     public HashMap<Corner, PlayedCard> getAttachmentCorners() {
-        //TODO Capire se vogliamo passare l'oggetto o è usiamo un metodo che ritorna l'id e poi risaliamo alla carta,
-        // altrimenti così passiamo un oggetto per valore e si può modificare
         HashMap<Corner, PlayedCard> attachmentCornersCopy = new HashMap<>();
         for(Corner corner : Corner.values()){
             attachmentCornersCopy.put(corner, attachmentCorners.get(corner));

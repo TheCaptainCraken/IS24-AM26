@@ -689,6 +689,13 @@ public class LittleModel {
         }
     }
 
+    /**
+     * This method returns the table of the game.
+     * The table is represented by a HashMap where the key is the player's nickname
+     * and the value is a CardClient object representing the starting card of the player.
+     *
+     * @return the table of the game.
+     */
     public HashMap<String, CardClient> getTable() {
         return table;
     }
