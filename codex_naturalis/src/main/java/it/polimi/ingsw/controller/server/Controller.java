@@ -409,7 +409,7 @@ public class Controller {
      * @return The game state.
      */
     public GameState getGameState() {
-        return game.getState();
+        return game.getGameState();
     }
 
     /**
@@ -440,7 +440,7 @@ public class Controller {
      * @return true if the game state is END, false otherwise.
      */
     public boolean isEndGame() {
-        GameState state = game.getState();
+        GameState state = game.getGameState();
         return state == GameState.END;
     }
 

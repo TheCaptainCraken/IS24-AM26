@@ -194,7 +194,7 @@ public class GameMasterTest {
         CardId = game2.drawCard("marco", true, -1);
         Assertions.assertEquals(CardId, lobby2.getPlayers()[1].getHand()[2].getId());
         //update correctly the deck
-        Assertions.assertNotEquals(CardId, game2.getGoldCardDeck().getId());
+        Assertions.assertNotEquals(CardId, game2.getGoldCardDeckTestOnly().getId());
     }
 
     @Test
@@ -242,7 +242,7 @@ public class GameMasterTest {
         CardId = game2.drawCard("marco", false, -1);
         Assertions.assertEquals(CardId, lobby2.getPlayers()[1].getHand()[2].getId());
         //update correctly the deck
-        Assertions.assertNotEquals(CardId, game2.getResourceCardDeck().getId());
+        Assertions.assertNotEquals(CardId, game2.getResourceCardDeckTestOnly().getId());
     }
 
     //Test for isPositionable

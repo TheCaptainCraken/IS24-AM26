@@ -394,7 +394,6 @@ public class GameMaster {
      * Represents the last part of the game, in which the points gained
      * from fulfilling the objectives are calculated.
      */
-    //TODO verificare questo metodo.
     public void endGame() throws WrongGamePhaseException {
         if (gameState != GameState.END) {
             throw new WrongGamePhaseException();
@@ -410,6 +409,8 @@ public class GameMaster {
                 ranking.add(player);
             }
 
+            //Anonymous function to sort the ranking according to rules of the game
+            //this function does not return anything. The controller will ask for the ranking
             Collections.sort(ranking, new Comparator<Player>() {
                 @Override
                 public int compare(Player p1, Player p2) {
@@ -424,12 +425,6 @@ public class GameMaster {
                     }
                 }
             });
-            /*quello che ho appena fatto è stato creare un'anonymous function per ordinare la lista
-            * in un colpo solo usando sort(), in alternativa avrei dovuto creare una classe apposita per fare
-            * l'overriding di compare, per usarlo solo qui (abbastanza inutile)*/
-
-
-            //funzione ordina ranking e non restituisce nulla, ci penserà il controller a chiedere il ranking e decretare il vincitore
         }
     }
 
@@ -1072,24 +1067,45 @@ public class GameMaster {
             return null;
         }
     }
-
-    // getter for testing
-    public Card getGoldCardDeck() {
+    /**
+     * Retrieves the next gold card from the deck.
+     * This method is used only for testing purposes and should not be used during normal gameplay.
+     *
+     * @return The next gold card from the deck.
+     */
+    public Card getGoldCardDeckTestOnly() {
         return goldDeck.draw();
     }
-
-    public Card getResourceCardDeck() {
+    /**
+     * Retrieves the next resource card from the deck.
+     * This method is used only for testing purposes and should not be used during normal gameplay.
+     *
+     * @return The next gold card from the deck.
+     */
+    public Card getResourceCardDeckTestOnly() {
         return resourceDeck.draw();
     }
 
+    /**
+     * Retrieves the current state of the game.
+     *
+     * This method is used to check the current phase of the game, which can be useful for determining
+     * the valid actions that can be performed at any given time.
+     *
+     * @return The current state of the game as a GameState enum.
+     */
     public GameState getGameState() {
         return gameState;
     }
 
-    public GameState getState() {
-        return gameState;
-    }
-
+    /**
+     * Retrieves the card from the table or deck based on the provided parameters.
+     *
+     * @param gold Indicates if the card to be retrieved is a gold card. If true, a gold card is retrieved, otherwise a resource card is retrieved.
+     * @param onTableOrDeck Specifies the location of the card. If it's a number between 0 and 1, it refers to the position on the table. If it's -1, the card is drawn from the deck.
+     * @return The ID of the retrieved card. If the specified card does not exist, null is returned.
+     * @throws NullPointerException If the specified card position does not exist.
+     */
     public Integer getCard(boolean gold, int onTableOrDeck) {
         if (gold) {
             try {
@@ -1118,10 +1134,29 @@ public class GameMaster {
         return onTableObjectiveCards[i];
     }
 
+    /**
+     * Retrieves an objective card that a player can choose.
+     *
+     * This method is used to retrieve an objective card from the set of cards that a player can choose from.
+     *
+     * @param i The index of the player in the game.
+     * @param j The index of the objective card in the player's set of choosable cards.
+     * @return The objective card at the specified indices.
+     */
     public ObjectiveCard getObjectiveCardToChoose(int i, int j) {
         return objectiveCardToChoose[i][j];
     }
 
+    /**
+     * Retrieves the kingdom of the first card in the specified deck.
+     *
+     * This method is used to peek at the first card in the deck without drawing it.
+     * It can be used to plan ahead and make strategic decisions based on the upcoming card.
+     *
+     * @param gold If true, the method checks the gold deck. If false, it checks the resource deck.
+     * @return The kingdom of the first card in the specified deck. If the deck is empty, returns null.
+     * @throws IndexOutOfBoundsException If the specified deck is empty.
+     */
     public Kingdom getHeadDeck(boolean gold){
         try{
             if (gold) {
@@ -1134,14 +1169,41 @@ public class GameMaster {
         }
     }
 
+    /**
+     * Retrieves the resource card at the specified position on the table.
+     *
+     * This method is used to retrieve a specific resource card from the table in the game.
+     * The position is based on the order in which the cards are placed on the table.
+     *
+     * @param position The position of the resource card on the table.
+     * @return The resource card at the specified position. If the position is invalid, null is returned.
+     */
     public Card getResourceCard(int position) {
         return onTableResourceCards[position];
     }
 
+    /**
+     * Retrieves the gold card at the specified position on the table.
+     *
+     * This method is used to retrieve a specific gold card from the table in the game.
+     * The position is based on the order in which the cards are placed on the table.
+     *
+     * @param position The position of the gold card on the table.
+     * @return The gold card at the specified position. If the position is invalid, null is returned.
+     */
     public Card getGoldCard(int position) {
         return onTableGoldCards[position];
     }
 
+    /**
+     * Retrieves the starting card assigned to a player.
+     *
+     * This method is used to retrieve the starting card that has been assigned to a player based on their nickname.
+     *
+     * @param nickname The nickname of the player.
+     * @return The starting card assigned to the player.
+     * @throws NoNameException If the player with the given nickname does not exist.
+     */
     public StartingCard getStartingCardToPosition(String nickname) throws NoNameException {
         return startingCardToPosition[getOrderPlayer(nickname)];
     }
