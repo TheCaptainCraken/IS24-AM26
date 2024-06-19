@@ -1,6 +1,7 @@
 package it.polimi.ingsw.view.gui;
 
 import it.polimi.ingsw.model.Color;
+import it.polimi.ingsw.model.Player;
 import it.polimi.ingsw.view.ViewSubmissions;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
@@ -35,7 +36,7 @@ public class LoginController {
     @FXML
     TextField input;
     @FXML
-    Button button1,debug;
+    Button button1;
     @FXML
     ImageView avatar1,avatar2,avatar3,avatar4,logo;
 

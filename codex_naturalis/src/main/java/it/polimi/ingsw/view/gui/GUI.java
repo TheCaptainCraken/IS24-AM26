@@ -269,7 +269,11 @@ public class GUI extends Application implements ViewInterface {
 
     @Override
     public void stopGaming() {
-        //TODO
+        Platform.runLater(()->{
+            Parent end = loadFXML("endgameView");
+            Scene scene1 = new Scene(end,600,400);
+            primaryStage.setScene(scene1);
+        });
     }
 
     @Override
@@ -287,7 +291,7 @@ public class GUI extends Application implements ViewInterface {
     }
 
     @Override
-    public void receiveMessage(String sender, String message) {
-        //TODO chat
+    public void receiveChatMessage(String sender, String message,boolean broadcast) {
+        Platform.runLater(() -> matchController.receiveChatMessage(sender,message,broadcast));
     }
 }
