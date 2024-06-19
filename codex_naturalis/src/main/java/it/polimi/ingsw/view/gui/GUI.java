@@ -43,7 +43,6 @@ public class GUI extends Application implements ViewInterface {
             instance = this;
             lock.notify();
         }
-
         root = loadFXML("loginView");
         loginController =(LoginController) fxmlLoader.getController();
         match = loadFXML("matchView");

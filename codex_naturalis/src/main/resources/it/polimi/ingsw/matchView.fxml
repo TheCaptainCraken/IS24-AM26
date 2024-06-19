@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
@@ -118,6 +120,21 @@
                            <children>
                               <ImageView fx:id="secret1" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" />
                               <ImageView fx:id="secret2" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" />
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
+                  <VBox prefHeight="183.0" prefWidth="420.0">
+                     <children>
+                        <ScrollPane hbarPolicy="NEVER" prefHeight="200.0" prefWidth="200.0">
+                           <content>
+                              <VBox fx:id="chatContainer" alignment="BOTTOM_LEFT" prefHeight="141.0" prefWidth="403.0" spacing="5.0" />
+                           </content>
+                        </ScrollPane>
+                        <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
+                           <children>
+                              <TextField fx:id="messageContent" prefHeight="25.0" prefWidth="334.0" promptText="Write @player1 to send private message..." />
+                              <Button fx:id="messageSubmit" mnemonicParsing="false" text="Send" />
                            </children>
                         </HBox>
                      </children>

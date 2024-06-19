@@ -23,6 +23,7 @@ import javafx.stage.Stage;
 import javafx.util.Pair;
 
 import java.awt.*;
+import java.awt.TextField;
 import java.util.*;
 
 /**
@@ -61,13 +62,15 @@ public class MatchController {
     @FXML
     Label status;
     @FXML
-    VBox playerContainer,statusMenu;
+    VBox playerContainer,statusMenu,chatContainer;
     @FXML
     HBox secretContainer,handContainer,statusButtons;
     @FXML
     StackPane board;
     @FXML
-    Button debug;
+    TextField chatContent;
+    @FXML
+    Button chatSubmit;
 
     //TODO  capire come poter fare sparire i bottoni per posizionare le carte + gestire endgame + completare otherplayerView
 
