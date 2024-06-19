@@ -70,6 +70,7 @@ public class GUI extends Application implements ViewInterface {
     }
 
     private Parent loadFXML(String fxml) {
+        System.out.println("Loading the file: " + fxml );
         try{
             fxmlLoader = new FXMLLoader(it.polimi.ingsw.App.class.getResource(fxml + ".fxml"));
             return fxmlLoader.load();

@@ -15,6 +15,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
@@ -23,7 +24,6 @@ import javafx.stage.Stage;
 import javafx.util.Pair;
 
 import java.awt.*;
-import java.awt.TextField;
 import java.util.*;
 
 /**
@@ -64,7 +64,7 @@ public class MatchController {
     @FXML
     VBox playerContainer,statusMenu,chatContainer;
     @FXML
-    HBox secretContainer,handContainer,statusButtons;
+    HBox secretContainer,handContainer,statusButtons,bottom;
     @FXML
     StackPane board;
     @FXML
@@ -174,6 +174,7 @@ public class MatchController {
             String s = messageContent.getText();
             if(!s.isBlank()){
                 ViewSubmissions.getInstance().sendChatMessage(s);
+                messageContent.setText("");
             }
         });
     }
@@ -285,6 +286,10 @@ public class MatchController {
     public void showSecretObjectiveCard(int indexCard){
         status.setText("You have successfully chosen your Secret Objective Card!");
         secretContainer.getChildren().remove(secret2);
+        Pane p = new Pane();
+        p.setPrefHeight(200);
+        p.setPrefWidth(50);
+        bottom.getChildren().add(3,p);
         secret1.setImage(new Image("frontCard"+indexCard+".png"));
         secret1.setOnMouseClicked(null);
     }
