@@ -198,6 +198,29 @@ public class NetworkServerSocket implements NetworkPlug {
     }
 
     /**
+     * Implements the fetchReceivers method of the NetworkPlug interface.
+     *
+     * This method is used to fetch the receivers of a chat message.
+     * It iterates over all the connections and checks if the message contains a tag for a specific client.
+     * If a tag is found, the nickname of the tagged client is added to the list of receivers.
+     *
+     * @param message The message to be fetched.
+     * @return The list of nicknames of the players across connections who should receive the message.
+     */
+    @Override
+    public ArrayList<String> fetchReceivers(String message){
+        ArrayList<String> receivers = new ArrayList<>();
+        for (String nickname : connections.keySet()) {
+            //see how connections work. It is a map with the address of the client as key and the ClientHandler as value.
+            //client handler has the nickname of the client.
+            if (message.toLowerCase().contains("@"+nickname.toLowerCase())) {
+                receivers.add(nickname);
+            }
+        }
+        return receivers;
+    }
+
+    /**
      * Sends a chat message to players checking tags.
      *
      * This method is used to send a chat message from a sender to one or more receivers.
@@ -208,22 +231,14 @@ public class NetworkServerSocket implements NetworkPlug {
      * @param message The message sent by the player.
      */
     @Override
-    public void sendingChatMessage(String sender, String message) {
-        ArrayList<String> receivers = new ArrayList<>();
-        for (String nickname : connections.keySet()) {
-            //see how connections work. It is a map with the address of the client as key and the ClientHandler as value.
-            //client handler has the nickname of the client.
-            if (message.toLowerCase().contains("@"+connections.get(nickname).getNickname().toLowerCase())) {
-                receivers.add(nickname);
-            }
-        }
+    public void sendingChatMessage(String sender, String message, ArrayList<String> receivers) {
         if(receivers.isEmpty()){
             //the message is sent to all the clients
-            sendBroadCastMessage(new ReceivedChatMessage(sender, message));
+            sendBroadCastMessage(new ReceivedChatMessage(sender, message, true));
         }else{
             for (String nickname : connections.keySet()) {
-                if(receivers.contains(connections.get(nickname).getNickname())){
-                        connections.get(nickname).sendMessage(new ReceivedChatMessage(sender, message));
+                if(receivers.contains(nickname)){
+                        connections.get(nickname).sendMessage(new ReceivedChatMessage(sender, message, false));
                 }
             }
         }

@@ -20,16 +20,21 @@ public class ReceivedChatMessage extends ServerMessage {
      * The message sent by the sender.
      */
     private final String message;
+    /**
+     * The boolean value that indicates if the message is a broadcast message.
+     */
+    private boolean broadcast;
 
     /**
      * Class constructor that initializes the sender and message fields.
      * @param sender The nickname/nicknames of the sender of the message.
      * @param message The message sent by the sender.
      */
-    public ReceivedChatMessage(String sender, String message) {
+    public ReceivedChatMessage(String sender, String message, boolean broadcast) {
         super();
         this.sender = sender;
         this.message = message;
+        this.broadcast = broadcast;
     }
     /**
      * This method is used to get the nickname of the sender of the message.
@@ -45,6 +50,11 @@ public class ReceivedChatMessage extends ServerMessage {
     public String getMessage() {
         return message;
     }
+    /**
+     * This method is used to get the boolean value that indicates if the message is a broadcast message.
+     * @return The boolean value that indicates if the message is a broadcast message.
+     */
+    public boolean isBroadcast() { return broadcast; }
 
     /**
      * @param controller The controller that will handle the message.
@@ -53,6 +63,6 @@ public class ReceivedChatMessage extends ServerMessage {
     public void callController(Controller controller) {
         // Pass the received message to the controller for further processing.
         // The controller will handle the message and update the view accordingly.
-        controller.receiveMessage(sender, message);
+        controller.receiveChatMessage(sender, message, broadcast);
     }
 }

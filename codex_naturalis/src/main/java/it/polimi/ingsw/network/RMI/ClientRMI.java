@@ -381,8 +381,8 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
      * @param sender  The nickname of the player who sent the message.
      */
     @Override
-    public void receiveMessage(String message, String sender) {
-        controller.receiveMessage(message, sender);
+    public void receiveChatMessage(String message, String sender, boolean broadcast) {
+        controller.receiveChatMessage(message, sender, broadcast);
     }
 
     /**

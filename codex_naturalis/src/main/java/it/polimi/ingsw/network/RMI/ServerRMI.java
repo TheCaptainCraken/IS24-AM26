@@ -384,6 +384,19 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
         }
     }
 
+    @Override
+    public ArrayList<String> fetchReceivers(String message) {
+        ArrayList<String> receivers = new ArrayList<>();
+        for (String nickname : connections.keySet()) {
+            //see how connections work. It is a map with the address of the client as key and the ClientHandler as value.
+            //client handler has the nickname of the client.
+            if (message.toLowerCase().contains("@"+nickname.toLowerCase())) {
+                receivers.add(nickname);
+            }
+        }
+        return receivers;
+    }
+
     /**
      * It sends a message to all the clients, if they are tagged in the message like in this format "@player1 hi!",
      * the message will be sent only to the player with "player1" nickname.
@@ -393,19 +406,13 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
      * @param sender    nicknames of the sender
      * @param message   message to be sent
      */
-    public void sendingChatMessage(String sender, String message){
-        ArrayList<String> receivers = new ArrayList<>();
-        for (String nickname : connections.keySet()) {
-            if (message.toLowerCase().contains("@"+nickname.toLowerCase())) {
-                receivers.add(nickname);
-            }
-        }
+    public void sendingChatMessage(String sender, String message, ArrayList<String> receivers){
         for (String nickname : connections.keySet()) {
             //receivers is empty means that the message is for all the players. Otherwise, is a single message to a specific client.
             if(receivers.contains(nickname) || receivers.isEmpty()){
                 new Thread(() -> {
                     try {
-                        connections.get(nickname).receiveMessage(sender, message);
+                        connections.get(nickname).receiveChatMessage(sender, message, receivers.isEmpty());
                     } catch (RemoteException e) {
                         connections.remove(nickname);
                         NetworkHandler.getInstance().disconnectBroadcast();

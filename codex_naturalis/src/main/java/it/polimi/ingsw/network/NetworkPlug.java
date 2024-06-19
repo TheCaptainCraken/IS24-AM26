@@ -3,6 +3,7 @@ package it.polimi.ingsw.network;
 import it.polimi.ingsw.model.Kingdom;
 
 import java.awt.*;
+import java.util.ArrayList;
 
 /**
  * The NetworkPlug interface defines the methods that are used for network
@@ -54,12 +55,20 @@ public interface NetworkPlug {
         void gameIsStarting();
 
         /**
+         * Fetches the receivers of the message.
+         *
+         * @return The list of nicknames of the players across connections who should receive the message.
+         */
+        ArrayList<String> fetchReceivers(String message);
+
+        /**
          * Sends a chat message to players checking tags.
          *
          * @param sender  The nickname of the player who sent the message.
          * @param message The message sent by the player.
+         * @param receivers The list of nicknames of the players across connectios who should receive the message.
          */
-        void sendingChatMessage(String sender, String message);
+        void sendingChatMessage(String sender, String message, ArrayList<String> receivers);
 
         /**
          * Sends the placed root card broadcast to all client.

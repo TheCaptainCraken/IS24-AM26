@@ -229,8 +229,8 @@ public class Controller {
      * @param sender The nickname of the player who sent the message.
      * @param message The message sent by the player.
      */
-    public void receiveMessage(String sender, String message) {
-        view.receiveMessage(sender, message);
+    public void receiveChatMessage(String sender, String message, boolean broadcast) {
+        view.receiveChatMessage(sender, message, broadcast);
     }
 
     /**

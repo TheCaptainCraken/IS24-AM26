@@ -163,5 +163,5 @@ public interface ViewInterface {
     /**
      * This method is responsible for showing a message for chatting.
      */
-    void receiveMessage(String sender, String message);
+    void receiveChatMessage(String sender, String message, boolean broadcast);
 }

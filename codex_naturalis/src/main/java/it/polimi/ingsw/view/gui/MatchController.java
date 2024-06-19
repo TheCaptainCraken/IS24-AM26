@@ -68,9 +68,9 @@ public class MatchController {
     @FXML
     StackPane board;
     @FXML
-    TextField chatContent;
+    TextField messageContent;
     @FXML
-    Button chatSubmit;
+    Button messageSubmit;
 
     //TODO  capire come poter fare sparire i bottoni per posizionare le carte + gestire endgame + completare otherplayerView
 
@@ -170,6 +170,12 @@ public class MatchController {
                 }
             }
         }
+        messageSubmit.setOnMouseClicked(event->{
+            String s = messageContent.getText();
+            if(!s.isBlank()){
+                ViewSubmissions.getInstance().sendChatMessage(s);
+            }
+        });
     }
     public void showCommonTable(){
         Integer[] resourceCards = model.getResourceCards();
@@ -773,5 +779,9 @@ public class MatchController {
             ViewSubmissions.getInstance().placeCard(handIndex,position,false);
 
         });
+    }
+
+    public void receiveChatMessage(String sender, String message, boolean broadcast){
+        chatContainer.getChildren().add(new Label((broadcast?"[All] ":"")+sender+": "+message));
     }
 }

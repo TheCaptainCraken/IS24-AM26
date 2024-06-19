@@ -165,7 +165,7 @@ public interface RMIClientInterface extends Remote {
      * @param message The message.
      * @throws RemoteException throws a RemoteException if there is a problem with the connection.
      */
-    void receiveMessage(String sender, String message) throws RemoteException;
+    void receiveChatMessage(String sender, String message, boolean broadcast) throws RemoteException;
 
     /**
      * This method sends to all the stopWaiting signal. When this call arrives, the

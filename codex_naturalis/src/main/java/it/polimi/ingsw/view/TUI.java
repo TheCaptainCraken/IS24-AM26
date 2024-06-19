@@ -102,9 +102,9 @@ public class TUI implements ViewInterface {
      * @param message The content of the message.
      */
     @Override
-    public void receiveMessage(String sender, String message) {
+    public void receiveChatMessage(String sender, String message, boolean broadcast) {
         synchronized (syncornizedObject) {
-            System.out.println("There is a new message from " + sender);
+            System.out.println((broadcast?"[All] ":"") + "There is a new message from " + sender);
             System.out.println(message);
         }
     }

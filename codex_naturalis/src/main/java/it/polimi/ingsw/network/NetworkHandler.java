@@ -8,6 +8,7 @@ import it.polimi.ingsw.model.exception.SameNameException;
 
 import java.awt.*;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -204,8 +205,12 @@ public class NetworkHandler {
      * @param message The message to be sent.
      */
     public void sendChatMessageBroadcast(String sender, String message) {
+        ArrayList<String> receivers = new ArrayList<>();//need to know globally if the list is empty and then send broadcast or not
+        for(NetworkPlug networkPlug : networkInterfacesAndConnections.values()){
+            receivers.addAll(networkPlug.fetchReceivers(message));
+        }
         for (NetworkPlug networkPlug : networkInterfacesAndConnections.values()) {
-            networkPlug.sendingChatMessage(sender, message);
+            networkPlug.sendingChatMessage(sender, message, receivers);
         }
     }
     /**
