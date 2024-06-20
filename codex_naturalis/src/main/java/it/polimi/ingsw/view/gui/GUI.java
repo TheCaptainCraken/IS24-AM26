@@ -21,8 +21,6 @@ import java.util.Objects;
 public class GUI extends Application implements ViewInterface {
     private static ViewInterface instance;
     private static final Object lock = new Object();
-
-
     private LittleModel model;
     private FXMLLoader fxmlLoader;
     public static LoginController loginController;

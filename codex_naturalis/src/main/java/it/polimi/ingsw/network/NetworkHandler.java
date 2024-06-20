@@ -225,4 +225,15 @@ public class NetworkHandler {
         System.out.println("All server connections are closed. Bye!");
         System.exit(0);
     }
+
+    /**
+     * This method is used to notify all connected clients about the current turn across all network interfaces.
+     * It iterates over all the network interfaces and calls their respective notifyTurn method.
+     * The notifyTurn method in each network interface is responsible for broadcasting the current turn information to all clients connected via that interface.
+     */
+    public void notifyTurnBroadcast() {
+        for (NetworkPlug networkPlug : networkInterfacesAndConnections.values()) {
+            networkPlug.notifyTurn();
+        }
+    }
 }

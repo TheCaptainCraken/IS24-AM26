@@ -137,4 +137,10 @@ public interface NetworkPlug {
          * It should be implemented by each network interface to handle the disconnection process according to its specific protocol.
          */
         void disconnectAll();
+
+        /**
+         * This method is used to notify all connected clients about the current turn.
+         * It should be implemented by each network interface to handle the notification process according to its specific protocol.
+         */
+        void notifyTurn();
 }

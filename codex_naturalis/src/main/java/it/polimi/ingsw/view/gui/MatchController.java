@@ -232,7 +232,6 @@ public class MatchController {
     }
 
     public void showStartingCard(int id){ //TODO va sistemato il fatto di scegliere starting card quando non è il proprio turno
-        status.setText("Please Choose the side of the starting Card");
         root.setImage(loadStartingCardResource(id,true));
         root.setOnMouseClicked(event -> {
             if(root_side){
@@ -256,7 +255,6 @@ public class MatchController {
     }
 
     public void showStartingCard(){
-        status.setText("Please wait for the other players...");
         statusButtons.getChildren().removeIf(node -> node instanceof Button);
         root.setOnMouseClicked(event -> {
             revealSpots(root.getTranslateX(),root.getTranslateY());
@@ -264,27 +262,22 @@ public class MatchController {
     }
 
     public void showCommonObjectives(Integer[] objectiveCardIds){
-        status.setText("These are the Common Objectives for this match");
         common1.setImage(new Image("frontCard"+objectiveCardIds[0]+".png"));
         common2.setImage(new Image("frontCard"+objectiveCardIds[1]+".png"));
     }
 
     public void showSecretObjectiveCardsToChoose(Integer[] objectiveCardIds){
-        status.setText("Choose your Secret Objective Card");
         secret1.setImage(new Image("frontCard"+objectiveCardIds[0]+".png"));
         secret2.setImage(new Image("frontCard"+objectiveCardIds[1]+".png"));
         secret1.setOnMouseClicked(event -> {
-            status.setText("Please wait for the other players...");
             ViewSubmissions.getInstance().chooseSecretObjectiveCard(0);
         });
         secret2.setOnMouseClicked(event -> {
-            status.setText("Please wait for the other players...");
             ViewSubmissions.getInstance().chooseSecretObjectiveCard(1);
         });
     }
 
     public void showSecretObjectiveCard(int indexCard){
-        status.setText("You have successfully chosen your Secret Objective Card!");
         secretContainer.getChildren().remove(secret2);
         Pane p = new Pane();
         p.setPrefHeight(200);
@@ -406,6 +399,12 @@ public class MatchController {
     public void showTurnInfo(String currentPlayer, GameState gameState){
         String s;
         switch(gameState){
+            case CHOOSING_OBJECTIVE_CARD:
+                s = "The Player has to choose an Objective Card";
+                break;
+            case CHOOSING_ROOT_CARD:
+                s = "The Player has to choose the side of the Starting Card";
+                break;
             case DRAWING_PHASE:
                 s = "The Player has to draw a card";
                 break;

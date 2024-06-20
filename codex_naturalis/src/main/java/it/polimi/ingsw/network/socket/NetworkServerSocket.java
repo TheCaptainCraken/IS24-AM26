@@ -278,6 +278,8 @@ public class NetworkServerSocket implements NetworkPlug {
                 connection.sendSecretObjectives();
             }
         }
+        //notify the new turn to all the clients
+        sendBroadCastMessage(new TurnInfo(controller.getCurrentPlayer(), controller.getGameState()));
     }
     /**
      * Sends the hands of the players and starts the game flow when all players have chosen their secret objective cards.
@@ -371,6 +373,20 @@ public class NetworkServerSocket implements NetworkPlug {
     @Override
     public void disconnectAll() {
         sendBroadCastMessageDisconnection(new StopGaming());
+    }
+
+    /**
+     * Notifies all connected clients about the current turn.
+     *
+     * This method is used to broadcast the current turn information to all clients.
+     * It retrieves the current player and the game state from the game controller and sends this information to all clients.
+     * It is called at the end of each turn, after a player has finished their actions.
+     */
+    @Override
+    public void notifyTurn() {
+        for (ClientHandler connection : connections.values()) {
+            connection.sendMessage(new TurnInfo(controller.getCurrentPlayer(), controller.getGameState()));
+        }
     }
 
     /**
@@ -503,6 +519,7 @@ public class NetworkServerSocket implements NetworkPlug {
                     //if the lobby is ready to start, we send the message to all the clients(starting card)
                     if (isLobbyReadyToStart) {
                         networkHandler.gameIsStartingBroadcast();
+                        networkHandler.notifyTurnBroadcast();
                     }
                 } catch (NoNameException e) {
                     sendErrorMessage(ErrorType.NAME_UNKNOWN);
@@ -757,6 +774,9 @@ public class NetworkServerSocket implements NetworkPlug {
             //if all the players have chosen the secret objective card, we send the starting player to all the clients.
             if (allWithSecretObjectiveCardChosen) {
                 sendMessage(new FirstPlayer(controller.getFirstPlayer()));
+            } else {
+                //if not all the players have chosen the secret objective card, we send the new turn to all the clients.
+                sendMessage(new TurnInfo(controller.getCurrentPlayer(), controller.getGameState()));
             }
         }
         /**

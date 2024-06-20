@@ -186,6 +186,7 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
         NetworkHandler.getInstance().refreshUsersBroadcast();
         if(isGameStarting){
             NetworkHandler.getInstance().gameIsStartingBroadcast();
+            NetworkHandler.getInstance().notifyTurnBroadcast();
         }
     }
 
@@ -500,6 +501,8 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
                         NetworkHandler.getInstance().disconnectBroadcast();
                     }
                 }).start();
+            }else {
+                NetworkHandler.getInstance().notifyTurnBroadcast();
             }
         }
     }
@@ -528,6 +531,14 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
                     NetworkHandler.getInstance().disconnectBroadcast();
                 } catch (NoNameException e) {
                     System.out.println("NoNameException. Debugging error, this error should never occur");
+                }
+
+                try {
+                    //Refresh the turn information
+                    connections.get(nicknameRefresh).
+                            refreshTurnInfo(Controller.getInstance().getCurrentPlayer(), Controller.getInstance().getGameState());
+                } catch (RemoteException e) {
+                    NetworkHandler.getInstance().disconnectBroadcast();
                 }
             }).start();
 
@@ -684,6 +695,25 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
             }
         }
     }
+
+    /**
+     * This method is used to notify all connected clients about the current turn.
+     * It iterates over all the connections and sends a refresh turn information signal to each client.
+     * The refresh turn information includes the current player and the current game state.
+     */
+    @Override
+    public void notifyTurn() {
+        for(String nickname : connections.keySet()){
+            new Thread(() -> {
+                try {
+                    connections.get(nickname).refreshTurnInfo(Controller.getInstance().getCurrentPlayer(), Controller.getInstance().getGameState());
+                } catch (RemoteException e) {
+                    NetworkHandler.getInstance().disconnectBroadcast();
+                }
+            }).start();
+        }
+    }
+
     /**
      * This method is used to start the periodic check of client connections.
      *
