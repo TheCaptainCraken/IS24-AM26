@@ -198,7 +198,7 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
      * @param message The message to be sent.
      */
     @Override
-    public void sendChatMessage(String message, String sender) throws RemoteException {
+    public void sendChatMessage(String sender, String message) throws RemoteException {
         NetworkHandler.getInstance().sendChatMessageBroadcast(sender, message);
     }
 

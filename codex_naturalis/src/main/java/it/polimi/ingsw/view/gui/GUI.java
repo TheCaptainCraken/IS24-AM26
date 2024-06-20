@@ -293,6 +293,6 @@ public class GUI extends Application implements ViewInterface {
 
     @Override
     public void receiveChatMessage(String sender, String message,boolean broadcast) {
-        Platform.runLater(() -> matchController.receiveChatMessage(sender,message,broadcast));
+        Platform.runLater(() -> matchController.receiveChatMessage(sender, message, broadcast));
     }
 }
