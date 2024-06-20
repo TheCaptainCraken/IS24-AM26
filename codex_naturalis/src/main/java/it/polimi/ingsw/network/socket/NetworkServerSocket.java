@@ -128,8 +128,8 @@ public class NetworkServerSocket implements NetworkPlug {
     private void sendBroadCastMessageDisconnection(ServerMessage message) {
         //disconnect all the clients connected to SocketServer. Different to sendBroadCastMessage
         //since we catch the exception and close the connection.
-        for (String client : connections.keySet()) {
-            connections.get(client).sendMessageDisconnection(message);
+        for (ClientHandler connection : connections.values()) {
+            connection.sendMessageDisconnection(message);
         }
     }
     /**
@@ -140,17 +140,17 @@ public class NetworkServerSocket implements NetworkPlug {
      */
     @Override
     public void finalizingNumberOfPlayers() {
-        for(String client : connections.keySet()){
+        for(String address : connections.keySet()){
             //if the client is admitted to the game, we send a message to stop waiting and start play
-            if(controller.isAdmitted(connections.get(client).getNickname())){
-                connections.get(client).sendMessage(new StopWaitingOrDisconnect(true));
+            if(controller.isAdmitted(connections.get(address).getNickname())){
+                connections.get(address).sendMessage(new StopWaitingOrDisconnect(true));
             }else{
                 //disconnection of the users isn't admitted
-                connections.get(client).sendMessage(new StopWaitingOrDisconnect(false));
+                connections.get(address).sendMessage(new StopWaitingOrDisconnect(false));
                 //close the connection
-                connections.get(client).hastaLaVistaBaby();
+                connections.get(address).hastaLaVistaBaby();
                 //remove from the connection list
-                connections.remove(client);
+                connections.remove(address);
             }
         }
     }
@@ -210,11 +210,11 @@ public class NetworkServerSocket implements NetworkPlug {
     @Override
     public ArrayList<String> fetchReceivers(String message){
         ArrayList<String> receivers = new ArrayList<>();
-        for (String nickname : connections.keySet()) {
+        for (ClientHandler connection : connections.values()) {
             //see how connections work. It is a map with the address of the client as key and the ClientHandler as value.
             //client handler has the nickname of the client.
-            if (message.toLowerCase().contains("@"+nickname.toLowerCase())) {
-                receivers.add(nickname);
+            if (message.toLowerCase().contains("@"+connection.getNickname().toLowerCase())) {
+                receivers.add(connection.getNickname());
             }
         }
         return receivers;
@@ -236,9 +236,9 @@ public class NetworkServerSocket implements NetworkPlug {
             //the message is sent to all the clients
             sendBroadCastMessage(new ReceivedChatMessage(sender, message, true));
         }else{
-            for (String nickname : connections.keySet()) {
-                if(receivers.contains(nickname)){
-                        connections.get(nickname).sendMessage(new ReceivedChatMessage(sender, message, false));
+            for (ClientHandler connection : connections.values()) {
+                if(receivers.contains(connection.getNickname())){
+                        connection.sendMessage(new ReceivedChatMessage(sender, message, false));
                 }
             }
         }
@@ -342,10 +342,10 @@ public class NetworkServerSocket implements NetworkPlug {
      */
     @Override
     public void sendDrawnCard(String nickname, Integer newCardId, Kingdom headDeck, boolean gold, int onTableOrDeck) {
-        for (String player : connections.keySet()) {
+        for (ClientHandler connection : connections.values()) {
             //send the hiddenHand to the players different from the player that has drawn the card.
             //the player that has drawn the card receives the new card in the hand(different method)
-            connections.get(player).sendDrawnCardIfPlayer(nickname, newCardId, headDeck, gold, onTableOrDeck);
+            connection.sendDrawnCardIfPlayer(nickname, newCardId, headDeck, gold, onTableOrDeck);
         }
     }
     /**

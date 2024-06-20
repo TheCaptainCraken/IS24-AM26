@@ -377,12 +377,12 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
      * This method is used to receive a chat message from the server and display it
      * to the client.
      *
-     * @param message The message sent by the player.
      * @param sender  The nickname of the player who sent the message.
+     * @param message The message sent by the player.
      */
     @Override
-    public void receiveChatMessage(String message, String sender, boolean broadcast) {
-        controller.receiveChatMessage(message, sender, broadcast);
+    public void receiveChatMessage(String sender, String message, boolean broadcast) {
+        controller.receiveChatMessage(sender, message, broadcast);
     }
 
     /**
