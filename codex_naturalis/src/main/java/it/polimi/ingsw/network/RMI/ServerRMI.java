@@ -391,7 +391,7 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
             //see how connections work. It is a map with the address of the client as key and the ClientHandler as value.
             //client handler has the nickname of the client.
             if (message.toLowerCase().contains("@"+nickname.toLowerCase())) {
-                receivers.add(nickname);
+                receivers.add(nickname.toLowerCase());//to avoid mistake for capslock
             }
         }
         return receivers;
@@ -409,7 +409,7 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
     public void sendingChatMessage(String sender, String message, ArrayList<String> receivers){
         for (String nickname : connections.keySet()) {
             //receivers is empty means that the message is for all the players. Otherwise, is a single message to a specific client.
-            if(receivers.contains(nickname) || receivers.isEmpty()){
+            if(receivers.contains(nickname.toLowerCase()) || nickname.equalsIgnoreCase(sender) || receivers.isEmpty()){
                 new Thread(() -> {
                     try {
                         connections.get(nickname).receiveChatMessage(sender, message, receivers.isEmpty());

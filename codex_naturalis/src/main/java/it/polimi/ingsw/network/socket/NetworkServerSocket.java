@@ -214,7 +214,7 @@ public class NetworkServerSocket implements NetworkPlug {
             //see how connections work. It is a map with the address of the client as key and the ClientHandler as value.
             //client handler has the nickname of the client.
             if (message.toLowerCase().contains("@"+connection.getNickname().toLowerCase())) {
-                receivers.add(connection.getNickname());
+                receivers.add(connection.getNickname().toLowerCase());//to avoid mistake for capslock
             }
         }
         return receivers;
@@ -237,7 +237,7 @@ public class NetworkServerSocket implements NetworkPlug {
             sendBroadCastMessage(new ReceivedChatMessage(sender, message, true));
         }else{
             for (ClientHandler connection : connections.values()) {
-                if(receivers.contains(connection.getNickname())){
+                if(receivers.contains(connection.getNickname().toLowerCase()) || connection.getNickname().equalsIgnoreCase(sender)){
                         connection.sendMessage(new ReceivedChatMessage(sender, message, false));
                 }
             }

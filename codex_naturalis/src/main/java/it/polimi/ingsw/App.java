@@ -14,6 +14,7 @@ public class App {
         Scanner myObj = new Scanner(System.in);
         String choice;
 
+        System.out.println("Choice your type of connection: RMI or Socket");
         do {
             choice = myObj.nextLine();
 
