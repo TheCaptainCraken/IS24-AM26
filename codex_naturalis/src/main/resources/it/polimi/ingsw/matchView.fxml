@@ -126,7 +126,7 @@
                   </VBox>
                   <VBox prefHeight="183.0" prefWidth="420.0">
                      <children>
-                        <ScrollPane hbarPolicy="NEVER" prefHeight="200.0" prefWidth="200.0">
+                        <ScrollPane hbarPolicy="NEVER" prefHeight="200.0" prefWidth="200.0" vvalue="1.0">
                            <content>
                               <VBox fx:id="chatContainer" alignment="BOTTOM_LEFT" prefHeight="141.0" prefWidth="403.0" spacing="5.0" />
                            </content>

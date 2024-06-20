@@ -1,6 +1,7 @@
 package it.polimi.ingsw.view.gui;
 
 import it.polimi.ingsw.model.Color;
+import it.polimi.ingsw.model.Player;
 import it.polimi.ingsw.view.ViewSubmissions;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
@@ -35,7 +36,7 @@ public class LoginController {
     @FXML
     TextField input;
     @FXML
-    Button button1,debug;
+    Button button1;
     @FXML
     ImageView avatar1,avatar2,avatar3,avatar4,logo;
 
@@ -73,6 +74,7 @@ public class LoginController {
     public void waitLobby(){
         button1.setVisible(false);
         label1.setText("You are connected to the server.\n Please wait for the first player \n to choose the number of players ");
+        input.setVisible(false);
 
     }
 
@@ -81,12 +83,12 @@ public class LoginController {
     }
 
     public void stopWaiting(){
-        label1.setText("Choose your Color!");
         showColorPrompt();
     }
 
 
     public void showColorPrompt(){
+        label1.setText("Choose your Color!");
         button1.setVisible(false);
         inputBox.getChildren().removeIf(node -> node instanceof TextField);
         setupColors();
@@ -154,6 +156,7 @@ public class LoginController {
         HBox box = new HBox(error,l);
         dialog.getDialogPane().setContent(box);
         dialog.show();
+        label1.setText("Please enter a new Username...");
     }
 
     public void noConnection() {

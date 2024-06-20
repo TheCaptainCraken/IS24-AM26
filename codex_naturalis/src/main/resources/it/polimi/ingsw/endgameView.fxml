@@ -9,12 +9,11 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw.view.gui.EndgameHandler">
    <children>
       <VBox alignment="TOP_CENTER" prefHeight="260.0" prefWidth="500.0" spacing="10.0" AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="150.0">
          <children>
-            <TableView prefHeight="200.0" prefWidth="500.0">
+            <TableView fx:id="table" prefHeight="200.0" prefWidth="500.0">
                <columns>
                   <TableColumn fx:id="players" editable="false" prefWidth="150.0" sortable="false" text="Player" />
                   <TableColumn fx:id="gamePoints" editable="false" prefWidth="75.0" sortable="false" text="Points" />
