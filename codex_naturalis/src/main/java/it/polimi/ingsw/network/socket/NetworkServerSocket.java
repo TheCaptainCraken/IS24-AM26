@@ -8,6 +8,7 @@ import java.awt.Point;
 
 import it.polimi.ingsw.controller.server.Controller;
 import it.polimi.ingsw.model.Color;
+import it.polimi.ingsw.model.GameMaster;
 import it.polimi.ingsw.model.Kingdom;
 import it.polimi.ingsw.model.exception.CardPositionException;
 import it.polimi.ingsw.model.exception.ClosingLobbyException;
@@ -30,6 +31,7 @@ import it.polimi.ingsw.network.socket.messages.client.login.NumberOfPlayersMessa
 import it.polimi.ingsw.network.socket.messages.server.ErrorMessage;
 import it.polimi.ingsw.network.socket.messages.server.ServerMessage;
 import it.polimi.ingsw.network.socket.messages.server.StopGaming;
+import it.polimi.ingsw.network.socket.messages.server.loadSavedGame;
 import it.polimi.ingsw.network.socket.messages.server.endgame.ShowPointsFromObjectives;
 import it.polimi.ingsw.network.socket.messages.server.endgame.ShowRanking;
 import it.polimi.ingsw.network.socket.messages.server.gameflow.CardIsPositioned;
@@ -45,15 +47,22 @@ import it.polimi.ingsw.network.NetworkHandler;
 import it.polimi.ingsw.network.NetworkPlug;
 
 import java.io.*;
+
 /**
- * The NetworkServerSocket class is responsible for managing the server-side logic of the socket network communication.
- * It maintains a list of connections to client sockets, representing the connected clients.
+ * The NetworkServerSocket class is responsible for managing the server-side
+ * logic of the socket network communication.
+ * It maintains a list of connections to client sockets, representing the
+ * connected clients.
  *
- * The class provides methods for various game actions such as login, choosing color, placing cards, drawing cards, etc.
- * These methods are invoked by the client by sending a messages, and the corresponding actions are performed on the server side.
+ * The class provides methods for various game actions such as login, choosing
+ * color, placing cards, drawing cards, etc.
+ * These methods are invoked by the client by sending a messages, and the
+ * corresponding actions are performed on the server side.
  *
- * The class also provides methods for broadcasting game state updates to all connected clients.
- * These methods are invoked by the server when the game state changes, and the updates are sent to the clients.
+ * The class also provides methods for broadcasting game state updates to all
+ * connected clients.
+ * These methods are invoked by the server when the game state changes, and the
+ * updates are sent to the clients.
  */
 public class NetworkServerSocket implements NetworkPlug {
 
@@ -89,57 +98,67 @@ public class NetworkServerSocket implements NetworkPlug {
             connection.start();
         }
     }
+
     /**
      * This method is used to send a message to all the clients.
      * 
      * @param message The message to be sent.
      */
     private void sendBroadCastMessage(ServerMessage message) {
-        //all the clients connected to SocketServer
+        // all the clients connected to SocketServer
         for (String client : connections.keySet()) {
             connections.get(client).sendMessage(message);
         }
     }
+
     /**
      * This method is used to send a message to all to disconnect all the clients.
+     * 
      * @param message The message to be sent.
      */
     private void sendBroadCastMessageDisconnection(ServerMessage message) {
-        //disconnect all the clients connected to SocketServer. Different to sendBroadCastMessage
-        //since we catch the exception and close the connection.
+        // disconnect all the clients connected to SocketServer. Different to
+        // sendBroadCastMessage
+        // since we catch the exception and close the connection.
         for (String client : connections.keySet()) {
             connections.get(client).sendMessageDisconnection(message);
         }
     }
+
     /**
-     * This method is called when the number of players in the game has been finalized.
-     * It broadcasts a message to all connected clients indicating that the lobby is ready and the game can start.
+     * This method is called when the number of players in the game has been
+     * finalized.
+     * It broadcasts a message to all connected clients indicating that the lobby is
+     * ready and the game can start.
      */
     @Override
     public void finalizingNumberOfPlayers() {
-       for(ClientHandler client : connections.values()){
-           //if the client is admitted to the game, we send a message to stop waiting and start play
-           if(controller.isAdmitted(client.getNickname())){
-               client.sendMessage(new StopWaitingOrDisconnect(true));
-           }else{
-               //disconnection of the users not admitted
+        for (ClientHandler client : connections.values()) {
+            // if the client is admitted to the game, we send a message to stop waiting and
+            // start play
+            if (controller.isAdmitted(client.getNickname())) {
+                client.sendMessage(new StopWaitingOrDisconnect(true));
+            } else {
+                // disconnection of the users not admitted
                 client.sendMessage(new StopWaitingOrDisconnect(false));
                 client.hastaLaVistaBaby();
-           }
-       }
+            }
+        }
     }
 
     /**
      * Implements the gameIsStarting method of the NetworkPlug interface.
      * This method is responsible for initiating the game start process.
      *
-     * It iterates over all the connections and sends a game start signal to each client.
-     * It is used to notify all clients that the game is starting, sending the commonTable.
+     * It iterates over all the connections and sends a game start signal to each
+     * client.
+     * It is used to notify all clients that the game is starting, sending the
+     * commonTable.
      *
      */
     @Override
     public void gameIsStarting() {
-        //get the resource cards and gold cards of the players
+        // get the resource cards and gold cards of the players
         int resourceCard0 = controller.getResourceCards(0);
         int resourceCard1 = controller.getResourceCards(1);
 
@@ -156,17 +175,22 @@ public class NetworkServerSocket implements NetworkPlug {
             connection.sendStartingCard();
         }
     }
+
     /**
      * Implements the login method of the NetworkPlug interface.
-     * This method is responsible for refreshing the user list for all connected clients.
-     * It iterates over all the connections and sends a user list update to each client.
+     * This method is responsible for refreshing the user list for all connected
+     * clients.
+     * It iterates over all the connections and sends a user list update to each
+     * client.
      *
      * It does not take any parameters and does not return any value.
-     * @catch RemoteException If a communication-related error occurs during the execution of a remote method call.
+     * 
+     * @catch RemoteException If a communication-related error occurs during the
+     *        execution of a remote method call.
      */
     @Override
     public void refreshUsers() {
-        //the name of player and its correspondent pin/colour
+        // the name of player and its correspondent pin/colour
         HashMap<String, Color> playersAndPins = controller.getPlayersAndPins();
         sendBroadCastMessage(new PlayersAndColorPins(playersAndPins));
     }
@@ -174,22 +198,24 @@ public class NetworkServerSocket implements NetworkPlug {
     @Override
     public void sendingPlacedRootCardAndWhenCompleteObjectiveCards(String nickname, boolean side, int cardId,
             boolean allWithRootCardPlaced) {
-        //send the card placed to all the clients, turn is 0 since it is the first card placed.
+        // send the card placed to all the clients, turn is 0 since it is the first card
+        // placed.
         sendBroadCastMessage(new CardIsPositioned(nickname, cardId, new Point(0, 0), side, 0));
         try {
             sendBroadCastMessage(new RefreshedPoints(nickname, controller.getPlayerPoints(nickname)));
             sendBroadCastMessage(new RefreshedResources(nickname, controller.getPlayerResources(nickname)));
         } catch (NoNameException e) {
             // This should never occur
-            System.out.println("Debugging error: NoNameException in sendingPlacedRootCardAndWhenCompleteObjectiveCards");
+            System.out
+                    .println("Debugging error: NoNameException in sendingPlacedRootCardAndWhenCompleteObjectiveCards");
         }
 
         if (allWithRootCardPlaced) {
-            //send the objective cards to all the clients, the common objective cards
+            // send the objective cards to all the clients, the common objective cards
             sendBroadCastMessage(
                     new ShowObjectiveCards(new ArrayList<>(Arrays.asList(controller.getCommonObjectiveCards()))));
             for (ClientHandler connection : connections.values()) {
-                //send the secret objective cards to a specific client.
+                // send the secret objective cards to a specific client.
                 connection.sendSecretObjectives();
             }
         }
@@ -203,17 +229,21 @@ public class NetworkServerSocket implements NetworkPlug {
             connection.sendHand(nickname, allWithSecretObjectiveCardChosen);
         }
     }
+
     /**
      * Implements the sendPlacedCard method of the NetworkPlug interface.
      *
-     * This method is responsible for broadcasting the information of a card that has been placed by a player.
+     * This method is responsible for broadcasting the information of a card that
+     * has been placed by a player.
      * It is called when a player successfully places a card on the board.
-     * It broadcasts the information of the placed card, including the player's nickname, the card ID, the position of the card, and the side of the card.
+     * It broadcasts the information of the placed card, including the player's
+     * nickname, the card ID, the position of the card, and the side of the card.
      *
      * @param nickname The nickname of the player who has placed the card.
-     * @param cardId The id of the card that has been placed.
+     * @param cardId   The id of the card that has been placed.
      * @param position The position where the card has been placed on the board.
-     * @param side The side of the card chosen by the player. True for one side, false for the other.
+     * @param side     The side of the card chosen by the player. True for one side,
+     *                 false for the other.
      */
     @Override
     public void sendPlacedCard(String nickname, int cardId, Point position, boolean side) {
@@ -244,6 +274,13 @@ public class NetworkServerSocket implements NetworkPlug {
     @Override
     public void disconnectAll() {
         sendBroadCastMessageDisconnection(new StopGaming());
+    }
+
+    @Override
+    public void loadGame(GameMaster game) {
+        for (String player : connections.keySet()) {
+            connections.get(player).sendFullGameState(game);
+        }
     }
 
     /**
@@ -286,7 +323,7 @@ public class NetworkServerSocket implements NetworkPlug {
                     }
                 }
             } catch (IOException e) {
-                //disconnect all the clients connected to the server RMI and Socket
+                // disconnect all the clients connected to the server RMI and Socket
                 connections.remove(clientSocket.getRemoteSocketAddress().toString());
                 NetworkHandler.getInstance().disconnectBroadcast();
             }
@@ -306,12 +343,15 @@ public class NetworkServerSocket implements NetworkPlug {
                     // add the player to the lobby
                     controller.addPlayer(parsedMessage.getNickname());
                     nickname = parsedMessage.getNickname();
-                    //communicate to all the clients the new user
+                    // communicate to all the clients the new user
                     networkHandler.refreshUsersBroadcast();
-                    //send the status of the login to the client
+                    // send the status of the login to the client
                     sendMessage(new StatusLogin(controller.getIsFirst(parsedMessage.getNickname())));
-                    
-                    if(!controller.getIsFirst(parsedMessage.getNickname())){
+
+                    if (!controller.getIsFirst(parsedMessage.getNickname())) {
+                        // check if there is a saved game, if there is send a message to the clients,
+                        // otherwise just continue as normal
+
                         sendMessage(new LobbyIsReady(controller.lobbyIsReady()));
                     }
                     networkHandler.finalizingNumberOfPlayersBroadcast();
@@ -332,7 +372,8 @@ public class NetworkServerSocket implements NetworkPlug {
             } else if (message instanceof ColorChosen) {
                 ColorChosen parsedMessage = (ColorChosen) message;
                 try {
-                    boolean isLobbyReadyToStart = controller.setColourAndLobbyIsReadyToStart(parsedMessage.getNickname(),
+                    boolean isLobbyReadyToStart = controller.setColourAndLobbyIsReadyToStart(
+                            parsedMessage.getNickname(),
                             parsedMessage.getColor());
                     networkHandler.refreshUsersBroadcast();
                     if (isLobbyReadyToStart) {
@@ -363,7 +404,8 @@ public class NetworkServerSocket implements NetworkPlug {
                 ChosenObjectiveCard parsedMessage = (ChosenObjectiveCard) message;
                 try {
                     controller.chooseObjectiveCard(parsedMessage.getNickname(), parsedMessage.getIndexCard());
-                    //take the correct the position of the card and respond to the client with the correct choice.
+                    // take the correct the position of the card and respond to the client with the
+                    // correct choice.
                     sendMessage(new ObjectiveCardChosen(parsedMessage.getIndexCard()));
                     boolean allWithSecretObjectiveCardChosen = controller.areAllSecretObjectiveCardChosen();
 
@@ -402,11 +444,13 @@ public class NetworkServerSocket implements NetworkPlug {
                 CardToBeDrawn parsedMessage = (CardToBeDrawn) message;
 
                 try {
-                    //this set the new card in the hand of the player
+                    // this set the new card in the hand of the player
                     controller.drawCard(parsedMessage.getNickname(), parsedMessage.isGold(),
                             parsedMessage.getOnTableOrOnDeck());
-                    // this get the new card on the table. It is -1 , we send anyway the newCardId to the client, but is the same as previous.
-                    int newCardId = controller.newCardOnTable(parsedMessage.isGold(), parsedMessage.getOnTableOrOnDeck());
+                    // this get the new card on the table. It is -1 , we send anyway the newCardId
+                    // to the client, but is the same as previous.
+                    int newCardId = controller.newCardOnTable(parsedMessage.isGold(),
+                            parsedMessage.getOnTableOrOnDeck());
 
                     Kingdom headDeck = controller.getHeadDeck(parsedMessage.isGold());
 
@@ -417,7 +461,7 @@ public class NetworkServerSocket implements NetworkPlug {
                         networkHandler.sendEndGameBroadcast();
                     }
 
-                    //we send the new hand of the player. Unicast message.
+                    // we send the new hand of the player. Unicast message.
                     sendMessage(new ShowHand(parsedMessage.getNickname(), controller.getHand(nickname)));
                 } catch (WrongGamePhaseException e) {
                     sendErrorMessage(ErrorType.WRONG_PHASE);
@@ -517,11 +561,11 @@ public class NetworkServerSocket implements NetworkPlug {
                 try {
                     sendMessage(new ShowHiddenHand(nickname, controller.getHiddenHand(nickname)));
                 } catch (NoNameException e) {
-                   System.out.println("No name exception");
+                    System.out.println("No name exception");
                 }
             }
-            //this message has two cards information: the new card drawn and the head deck
-            //onTableOrDeck is used to know if we should update the table.
+            // this message has two cards information: the new card drawn and the head deck
+            // onTableOrDeck is used to know if we should update the table.
             sendMessage(new ShowNewTable(newCardId, gold, onTableOrDeck, headDeck));
             sendMessage(new TurnInfo(controller.getCurrentPlayer(), controller.getGameState()));
         }
@@ -560,6 +604,10 @@ public class NetworkServerSocket implements NetworkPlug {
             } catch (NoNameException e) {
                 sendErrorMessage(ErrorType.NAME_UNKNOWN);
             }
+        }
+
+        public void sendFullGameState(GameMaster game) {
+            sendMessage(new loadSavedGame(game));
         }
     }
 

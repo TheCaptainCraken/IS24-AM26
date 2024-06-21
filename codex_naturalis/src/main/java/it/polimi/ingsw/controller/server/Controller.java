@@ -82,8 +82,8 @@ public class Controller {
      * @throws IOException            If the file is not found.
      * @throws ClassNotFoundException If the file is not valid.
      */
-    public void tryLoadingGame() throws IOException, ClassNotFoundException {
-        game = GameMaster.tryLoadingGameMaster(savePath);
+    public GameMaster tryLoadingGame() throws IOException, ClassNotFoundException {
+        return GameMaster.tryLoadingGameMaster(savePath);
     }
 
     /**
@@ -489,5 +489,9 @@ public class Controller {
 
     public int getSecretObjectiveCard(String nickname) throws NoNameException {
         return lobby.getPlayerFromName(nickname).getSecretObjective().getId();
+    }
+
+    public Lobby getLobby() {
+        return lobby;
     }
 }

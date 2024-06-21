@@ -226,7 +226,7 @@ public class GameMaster implements Serializable {
             // subtracted only if the PlayedCards
             // present in the attachments HashMap are played on their front side or are
             // referencing the StartingCard
-             if (attachments.get(corner) != null && attachments.get(corner).isFacingUp()) {
+            if (attachments.get(corner) != null && attachments.get(corner).isFacingUp()) {
                 switch (corner) {
                     case TOP_LEFT: {
                         currentPlayer.removeResources(
@@ -249,30 +249,38 @@ public class GameMaster implements Serializable {
                         break;
                     }
                 }
-            } else if(attachments.get(corner) != null && attachments.get(corner).getCard() instanceof StartingCard){
-                 switch (corner) {
+            } else if (attachments.get(corner) != null && attachments.get(corner).getCard() instanceof StartingCard) {
+                switch (corner) {
                     case TOP_LEFT: {
                         currentPlayer.removeResources(
-                                ((StartingCard)attachments.get(corner).getCard()).getBacksideCorners().get(Corner.BOTTOM_RIGHT), 1);
+                                ((StartingCard) attachments.get(corner).getCard()).getBacksideCorners()
+                                        .get(Corner.BOTTOM_RIGHT),
+                                1);
                         break;
                     }
                     case TOP_RIGHT: {
                         currentPlayer.removeResources(
-                                ((StartingCard)attachments.get(corner).getCard()).getBacksideCorners().get(Corner.BOTTOM_LEFT), 1);
+                                ((StartingCard) attachments.get(corner).getCard()).getBacksideCorners()
+                                        .get(Corner.BOTTOM_LEFT),
+                                1);
                         break;
                     }
                     case BOTTOM_LEFT: {
                         currentPlayer.removeResources(
-                                ((StartingCard)attachments.get(corner).getCard()).getBacksideCorners().get(Corner.TOP_RIGHT), 1);
+                                ((StartingCard) attachments.get(corner).getCard()).getBacksideCorners()
+                                        .get(Corner.TOP_RIGHT),
+                                1);
                         break;
                     }
                     case BOTTOM_RIGHT: {
                         currentPlayer.removeResources(
-                                ((StartingCard)attachments.get(corner).getCard()).getBacksideCorners().get(Corner.TOP_LEFT), 1);
+                                ((StartingCard) attachments.get(corner).getCard()).getBacksideCorners()
+                                        .get(Corner.TOP_LEFT),
+                                1);
                         break;
                     }
                 }
-             }
+            }
         }
 
         // At the end because I need to know resources values at the end and how many
@@ -1132,5 +1140,9 @@ public class GameMaster implements Serializable {
 
     public StartingCard getStartingCardToPosition(String nickname) throws NoNameException {
         return startingCardToPosition[getOrderPlayer(nickname)];
+    }
+
+    public Lobby getLobby() {
+        return lobby;
     }
 }

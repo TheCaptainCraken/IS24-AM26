@@ -23,24 +23,36 @@ import java.util.TimerTask;
 import static javafx.application.Application.launch;
 
 /**
- * The Controller class is responsible for managing the game flow and interactions between the model and the view.
- * It handles user inputs, updates the model, and triggers the view to update its display.
+ * The Controller class is responsible for managing the game flow and
+ * interactions between the model and the view.
+ * It handles user inputs, updates the model, and triggers the view to update
+ * its display.
  * The Controller class also communicates with the server to perform actions.
  *
- * The Controller class uses a singleton pattern for the ViewSubmissions instance to ensure that there is only one instance of it in the application.
- * This singleton instance is used to communicate with the controller through the TUI or GUI.
+ * The Controller class uses a singleton pattern for the ViewSubmissions
+ * instance to ensure that there is only one instance of it in the application.
+ * This singleton instance is used to communicate with the controller through
+ * the TUI or GUI.
  *
- * The Controller class also uses a phase attribute to keep track of the current phase of the game.
- * Different phases of the game include LOGIN, WAIT, CHOOSE_SIDE_STARTING_CARD, CHOOSE_SECRET_OBJECTIVE_CARD, and GAMEFLOW.
+ * The Controller class also uses a phase attribute to keep track of the current
+ * phase of the game.
+ * Different phases of the game include LOGIN, WAIT, CHOOSE_SIDE_STARTING_CARD,
+ * CHOOSE_SECRET_OBJECTIVE_CARD, and GAMEFLOW.
  *
- * The Controller class uses a NetworkClient object to handle network communications.
- * The NetworkClient object can be either a ClientRMI object or a ClientSocket object, depending on the type of connection chosen by the user.
+ * The Controller class uses a NetworkClient object to handle network
+ * communications.
+ * The NetworkClient object can be either a ClientRMI object or a ClientSocket
+ * object, depending on the type of connection chosen by the user.
  *
- * The Controller class uses a ViewInterface object to handle the display of the game.
- * The ViewInterface object can be either a TUI object or a GUI object, depending on the type of view chosen by the user.
+ * The Controller class uses a ViewInterface object to handle the display of the
+ * game.
+ * The ViewInterface object can be either a TUI object or a GUI object,
+ * depending on the type of view chosen by the user.
  *
- * The Controller class uses a LittleModel object to store all the required information about the game.
- * The LittleModel object is updated by the Controller class and used by the ViewInterface object to update the display.
+ * The Controller class uses a LittleModel object to store all the required
+ * information about the game.
+ * The LittleModel object is updated by the Controller class and used by the
+ * ViewInterface object to update the display.
  */
 public class Controller {
     /**
@@ -64,23 +76,30 @@ public class Controller {
      */
     private ViewInterface view;
     /**
-     * The little model used for storing all the required information about the game.
+     * The little model used for storing all the required information about the
+     * game.
      */
     private LittleModel model;
+
     /**
-     * Constructs a new Controller object and initializes the game model, phase, and ViewSubmissions instance.
+     * Constructs a new Controller object and initializes the game model, phase, and
+     * ViewSubmissions instance.
      *
-     * It sets the current phase of the game to LOGIN, which prompts the user to input their unique player name.
-     * It also sets the singleton ViewSubmissions instance to communicate with the controller through the TUI or GUI.
+     * It sets the current phase of the game to LOGIN, which prompts the user to
+     * input their unique player name.
+     * It also sets the singleton ViewSubmissions instance to communicate with the
+     * controller through the TUI or GUI.
      */
-    public Controller(){
-        //initialize the model, all the required information will be stored in the model.
+    public Controller() {
+        // initialize the model, all the required information will be stored in the
+        // model.
         model = new LittleModel();
-        //current phase: login, it asks the unique name of the player.
+        // current phase: login, it asks the unique name of the player.
         phase = Phase.LOGIN;
-        //set the singleton to communicate with the controller through TUI/ GUI.
+        // set the singleton to communicate with the controller through TUI/ GUI.
         ViewSubmissions.getInstance().setController(this);
     }
+
     /**
      * Returns the current phase of the game.
      *
@@ -89,6 +108,7 @@ public class Controller {
     public static Phase getPhase() {
         return Controller.phase;
     }
+
     /**
      * Sets the current phase of the game.
      *
@@ -100,24 +120,24 @@ public class Controller {
 
     public void setView(String typeOfView) throws InterruptedException {
         model = new LittleModel();
-        if(typeOfView.equals("TUI")){
+        if (typeOfView.equals("TUI")) {
             this.view = new TUI(model, this);
             view.start();
-        }else if(typeOfView.equals("GUI")){
+        } else if (typeOfView.equals("GUI")) {
             new Thread(() -> {
                 launch(GUI.class);
             }).start();
 
             view = GUI.getInstance();
             ((GUI) view).setModel(model);
-            if(view != null) {
+            if (view != null) {
                 System.out.println("GUI started");
             }
         }
     }
 
-    public void createInstanceOfConnection(String typeOfConnection){
-        if(typeOfConnection.equals("RMI")){
+    public void createInstanceOfConnection(String typeOfConnection) {
+        if (typeOfConnection.equals("RMI")) {
             try {
                 clientRMI = new ClientRMI(this);
             } catch (RemoteException | NotBoundException e) {
@@ -126,10 +146,10 @@ public class Controller {
             }
 
             connection = (NetworkClient) clientRMI;
-        }else if(typeOfConnection.equals("Socket")){
+        } else if (typeOfConnection.equals("Socket")) {
             ClientSocket socket = null;
             try {
-                //TODO porta nuova
+                // TODO porta nuova
                 socket = new ClientSocket(this, "localhost", 4567);
                 connection = socket;
                 new Thread(socket::run).start();
@@ -138,8 +158,10 @@ public class Controller {
             }
         }
     }
+
     /**
      * Sets the nickname of the player.
+     * 
      * @param nickname The nickname of the player.
      */
     public static void setNickname(String nickname) {
@@ -148,6 +170,7 @@ public class Controller {
 
     /**
      * Returns the nickname of the player.
+     * 
      * @return nickname
      */
     public String getNickname() {
@@ -157,17 +180,21 @@ public class Controller {
     /**
      * Triggers the view to ask the user for the number of players.
      *
-     * This method is used to prompt the user to input the number of players that will be participating in the game.
+     * This method is used to prompt the user to input the number of players that
+     * will be participating in the game.
      * The actual input is handled by the view (TUI or GUI).
      */
     public void askNumberOfPlayer() {
         view.askNumberOfPlayers();
     }
+
     /**
      * Triggers the view to display a waiting message to the user.
      *
-     * This method is used to inform the user that they are waiting for other players to join the game lobby.
-     * The actual display of the waiting message is handled by the view (TUI or GUI).
+     * This method is used to inform the user that they are waiting for other
+     * players to join the game lobby.
+     * The actual display of the waiting message is handled by the view (TUI or
+     * GUI).
      */
     public void waitLobby() {
         view.waitLobby();
@@ -176,8 +203,10 @@ public class Controller {
     /**
      * Triggers the view to stop displaying the waiting message.
      *
-     * This method is used to inform the user that the waiting phase is over and the game is starting.
-     * The actual removal of the waiting message is handled by the view (TUI or GUI).
+     * This method is used to inform the user that the waiting phase is over and the
+     * game is starting.
+     * The actual removal of the waiting message is handled by the view (TUI or
+     * GUI).
      */
     public void stopWaiting() {
         view.stopWaiting();
@@ -186,30 +215,41 @@ public class Controller {
     /**
      * Triggers the view to refresh the display of users.
      *
-     * This method is used to update the display of users and their associated colors in the game.
+     * This method is used to update the display of users and their associated
+     * colors in the game.
      * The actual display update is handled by the view (TUI or GUI).
      *
-     * @param playersAndPins A HashMap where the keys are the nicknames of the players and the values are their associated colors.
+     * @param playersAndPins A HashMap where the keys are the nicknames of the
+     *                       players and the values are their associated colors.
      */
     public void refreshUsers(HashMap<String, Color> playersAndPins) {
         model.updateUsers(playersAndPins);
         view.refreshUsers(playersAndPins);
     }
+
     /**
-     * Updates the cards on the table in the game model and triggers the view to display the common table.
+     * Updates the cards on the table in the game model and triggers the view to
+     * display the common table.
      *
      * This method is called when the cards on the table change in the game.
-     * It updates the game model with the new cards on the table and then triggers the view to display the common table.
+     * It updates the game model with the new cards on the table and then triggers
+     * the view to display the common table.
      *
-     * @param resourceCards An array of integers representing the IDs of the resource cards on the table.
-     * @param goldCard An array of integers representing the IDs of the gold cards on the table.
-     * @param resourceCardOnDeck A Kingdom object representing the resource card on the deck.
-     * @param goldCardOnDeck A Kingdom object representing the gold card on the deck.
+     * @param resourceCards      An array of integers representing the IDs of the
+     *                           resource cards on the table.
+     * @param goldCard           An array of integers representing the IDs of the
+     *                           gold cards on the table.
+     * @param resourceCardOnDeck A Kingdom object representing the resource card on
+     *                           the deck.
+     * @param goldCardOnDeck     A Kingdom object representing the gold card on the
+     *                           deck.
      */
-    public void cardsOnTable(Integer[] resourceCards, Integer[] goldCard, Kingdom resourceCardOnDeck, Kingdom goldCardOnDeck) {
+    public void cardsOnTable(Integer[] resourceCards, Integer[] goldCard, Kingdom resourceCardOnDeck,
+            Kingdom goldCardOnDeck) {
         model.updateCommonTable(resourceCards, goldCard, resourceCardOnDeck, goldCardOnDeck);
         view.showCommonTable();
     }
+
     /**
      * Triggers the view to display the starting card to the user.
      *
@@ -226,8 +266,10 @@ public class Controller {
     /**
      * Triggers the view to display the objective cards to the user.
      *
-     * This method is used to inform the user about their objective cards in the game.
-     * The actual display of the objective cards is handled by the view (TUI or GUI).
+     * This method is used to inform the user about their objective cards in the
+     * game.
+     * The actual display of the objective cards is handled by the view (TUI or
+     * GUI).
      *
      * @param objectiveCardIds The IDs of the objective cards.
      */
@@ -238,66 +280,83 @@ public class Controller {
 
     /**
      * Triggers the view to display the secret objective card to the user.
-     * This method is used to inform the user about their secret objective card in the game.
-     * The actual display of the secret objective card is handled by the view (TUI or GUI).
+     * This method is used to inform the user about their secret objective card in
+     * the game.
+     * The actual display of the secret objective card is handled by the view (TUI
+     * or GUI).
      *
      * @param indexCard The index of the secret objective card.
      */
     public void showSecretObjectiveCard(int indexCard) {
         view.showSecretObjectiveCard(model.getSecretObjectiveCardsToChoose()[indexCard]);
     }
+
     /**
      * Triggers the view to refresh the turn information.
      *
-     * This method is used to update the display of the current player and the game state.
+     * This method is used to update the display of the current player and the game
+     * state.
      * The actual display update is handled by the view (TUI or GUI).
      *
      * @param currentPlayer The nickname of the current player.
-     * @param gameState The current state of the game.
+     * @param gameState     The current state of the game.
      */
     public void turnInfo(String currentPlayer, GameState gameState) {
         view.showTurnInfo(currentPlayer, gameState);
     }
+
     /**
      * Triggers the view to display the extra points to the user.
      *
      * This method is used to inform the user about their extra points in the game.
      * The actual display of the extra points is handled by the view (TUI or GUI).
      *
-     * @param extraPoints A HashMap where the keys are the nicknames of the players and the values are their associated extra points.
+     * @param extraPoints A HashMap where the keys are the nicknames of the players
+     *                    and the values are their associated extra points.
      */
     public void showExtraPoints(HashMap<String, Integer> extraPoints) {
         view.showExtraPoints(extraPoints);
     }
+
     /**
      * Triggers the view to display the ranking to the user.
      *
      * This method is used to inform the user about the ranking in the game.
      * The actual display of the ranking is handled by the view (TUI or GUI).
      *
-     * @param ranking A HashMap where the keys are the nicknames of the players and the values are their associated scores.
+     * @param ranking A HashMap where the keys are the nicknames of the players and
+     *                the values are their associated scores.
      */
     public void showRanking(ArrayList ranking) {
         view.showRanking(ranking);
     }
+
     /**
-     * Triggers the view to display the secret objective cards to the user for selection.
+     * Triggers the view to display the secret objective cards to the user for
+     * selection.
      *
-     * This method is used to inform the user about their secret objective cards in the game for selection.
-     * The actual display of the secret objective cards is handled by the view (TUI or GUI).
+     * This method is used to inform the user about their secret objective cards in
+     * the game for selection.
+     * The actual display of the secret objective cards is handled by the view (TUI
+     * or GUI).
      *
-     * @param objectiveCardIds An array of integers representing the IDs of the secret objective cards.
+     * @param objectiveCardIds An array of integers representing the IDs of the
+     *                         secret objective cards.
      */
     public void showSecretObjectiveCardsToChoose(Integer[] objectiveCardIds) {
         model.updateSecretObjectiveCardsToChoose(objectiveCardIds);
         view.showSecretObjectiveCardsToChoose(objectiveCardIds);
         Controller.setPhase(Phase.CHOOSE_SECRET_OBJECTIVE_CARD);
     }
+
     /**
-     * Updates the game model with the secret objective card chosen by the player and triggers the view to display the secret objective card.
+     * Updates the game model with the secret objective card chosen by the player
+     * and triggers the view to display the secret objective card.
      *
-     * This method is called when the player chooses a secret objective card in the game.
-     * It updates the game model with the chosen secret objective card and then triggers the view to display the secret objective card.
+     * This method is called when the player chooses a secret objective card in the
+     * game.
+     * It updates the game model with the chosen secret objective card and then
+     * triggers the view to display the secret objective card.
      *
      * @param indexCard The index of the secret objective card chosen by the player.
      */
@@ -305,60 +364,74 @@ public class Controller {
         model.updateSecretObjectiveCard(indexCard);
         view.showSecretObjectiveCard(model.getSecretObjectiveCard());
     }
+
     /**
-     * Updates the game model with the information of a card that has been placed by a player.
+     * Updates the game model with the information of a card that has been placed by
+     * a player.
      * This method is called when a player successfully places a card on the board.
      * It updates the game model with the information of the placed card,
-     * including the player's nickname, the card ID, the position of the card, the side of the card, and the turn.
+     * including the player's nickname, the card ID, the position of the card, the
+     * side of the card, and the turn.
      *
      * @param nickname The nickname of the player who has placed the card.
-     * @param id The id of the card that has been placed.
+     * @param id       The id of the card that has been placed.
      * @param position The position where the card has been placed on the board.
-     * @param side The side of the card chosen by the player. True for one side, false for the other.
-     * @param turn The turn number when the card was placed.
+     * @param side     The side of the card chosen by the player. True for one side,
+     *                 false for the other.
+     * @param turn     The turn number when the card was placed.
      */
     public void updatePlaceCard(String nickname, int id, Point position, boolean side, int turn) {
         boolean start = false;
-        //if the card is the starting card of the given client, show a message to inform the player.
-        if(position.x == 0 && position.y == 0 && nickname.equals(Controller.nickname))
-        {
+        // if the card is the starting card of the given client, show a message to
+        // inform the player.
+        if (position.x == 0 && position.y == 0 && nickname.equals(Controller.nickname)) {
             model.updatePlaceCard(nickname, id, position, side, turn);
             view.showStartingCardChosen();
             start = true;
 
-        //set the playedCardToNull, if the cards is correctly placed, the player is the owner of it and his hand is not empty.
-        } else if(nickname.equals(Controller.nickname)){
-            for(int i = 0; i < 3; i++){
-                if(model.getCardInHand(i) == id){ //TODO nel momento in cui piazzo la starting card nella gui, qui salta una NUllPointerException, how?
-                    //if is the card placed is the same card in the hand, set the card in hand to null.
+            // set the playedCardToNull, if the cards is correctly placed, the player is the
+            // owner of it and his hand is not empty.
+        } else if (nickname.equals(Controller.nickname)) {
+            for (int i = 0; i < 3; i++) {
+                if (model.getCardInHand(i) == id) { // TODO nel momento in cui piazzo la starting card nella gui, qui
+                                                    // salta una NUllPointerException, how?
+                    // if is the card placed is the same card in the hand, set the card in hand to
+                    // null.
                     model.setCardInHand(i, null);
                     break;
                 }
             }
-            //notify the scene that the hand has been updated. The scene will update the view.
+            // notify the scene that the hand has been updated. The scene will update the
+            // view.
             view.showHand();
         }
 
-       if(!start){
-           model.updatePlaceCard(nickname, id, position, side, turn);
-           //notify the scene that a card has been placed. The scene will update the view.
-           view.showTableOfPlayer(nickname);
-       }
+        if (!start) {
+            model.updatePlaceCard(nickname, id, position, side, turn);
+            // notify the scene that a card has been placed. The scene will update the view.
+            view.showTableOfPlayer(nickname);
+        }
     }
+
     /**
      * Updates the resources of a player in the game model.
      *
      * This method is called when a player's resources change in the game.
      * It updates the game model with the new resources of the player.
      *
-     * @param nickname The nickname of the player whose resources have been updated.
-     * @param resources A HashMap where the keys are the types of resources (Sign) and the values are the quantities of each resource (Integer).
+     * @param nickname  The nickname of the player whose resources have been
+     *                  updated.
+     * @param resources A HashMap where the keys are the types of resources (Sign)
+     *                  and the values are the quantities of each resource
+     *                  (Integer).
      */
     public void updateResources(String nickname, HashMap<Sign, Integer> resources) {
         model.updateResources(nickname, resources);
-        //notify the scene that the resources have been updated. The scene will update the view.
+        // notify the scene that the resources have been updated. The scene will update
+        // the view.
         view.showResourcesPlayer();
     }
+
     /**
      * Updates the score of a player in the game model.
      *
@@ -366,28 +439,37 @@ public class Controller {
      * It updates the game model with the new score of the player.
      *
      * @param nickname The nickname of the player whose score has been updated.
-     * @param points The new score of the player.
+     * @param points   The new score of the player.
      */
     public void updateScore(String nickname, int points) {
         model.updateScore(nickname, points);
-        //notify the scene that the score has been updated. The scene will update the view.
+        // notify the scene that the score has been updated. The scene will update the
+        // view.
         view.showPoints();
     }
+
     /**
-     * Updates the head of the deck and the card on the table in the game model, and triggers the view to display the common table.
+     * Updates the head of the deck and the card on the table in the game model, and
+     * triggers the view to display the common table.
      *
-     * This method is called when the head of the deck or a card on the table changes in the game.
-     * It updates the game model with the new head of the deck and the new card on the table, and then triggers the view to display the common table.
+     * This method is called when the head of the deck or a card on the table
+     * changes in the game.
+     * It updates the game model with the new head of the deck and the new card on
+     * the table, and then triggers the view to display the common table.
      *
-     * @param newCardId The id of the new card that has been placed on the table.
-     * @param gold The gold status of the new card. True if it's a gold card, false otherwise.
-     * @param onTableOrDeck The location of the new card. 0 for on the table, 1 for on the deck.
-     * @param headDeck The new head of the deck.
+     * @param newCardId     The id of the new card that has been placed on the
+     *                      table.
+     * @param gold          The gold status of the new card. True if it's a gold
+     *                      card, false otherwise.
+     * @param onTableOrDeck The location of the new card. 0 for on the table, 1 for
+     *                      on the deck.
+     * @param headDeck      The new head of the deck.
      */
     public void updateAndShowCommonTable(int newCardId, boolean gold, int onTableOrDeck, Kingdom headDeck) {
         model.updateHeadDeck(headDeck, gold);
         model.updateCardOnTable(newCardId, gold, onTableOrDeck);
-        //notify the scene that the table has been updated. The scene will update the view.
+        // notify the scene that the table has been updated. The scene will update the
+        // view.
         view.showCommonTable();
     }
 
@@ -398,27 +480,34 @@ public class Controller {
      * It updates the game model with the new hand of the player.
      *
      * @param nickname The nickname of the player whose hand has been updated.
-     * @param hand An array of integers representing the IDs of the cards in the player's hand.
+     * @param hand     An array of integers representing the IDs of the cards in the
+     *                 player's hand.
      */
     public void updateHand(String nickname, Integer[] hand) {
         model.updatePrivateHand(hand);
-        //notify the scene that the hand has been updated. The scene will update the view.
+        // notify the scene that the hand has been updated. The scene will update the
+        // view.
         view.showHand();
     }
+
     /**
      * Updates the hidden hand of a player in the game model.
      *
      * This method is called when a player's hidden hand changes in the game.
      * It updates the game model with the new hidden hand of the player.
      *
-     * @param nickname The nickname of the player whose hidden hand has been updated.
-     * @param hand An array of Pair objects, each containing a Kingdom and a Boolean, representing the cards in the player's hidden hand.
+     * @param nickname The nickname of the player whose hidden hand has been
+     *                 updated.
+     * @param hand     An array of Pair objects, each containing a Kingdom and a
+     *                 Boolean, representing the cards in the player's hidden hand.
      */
     public void updateHiddenHand(String nickname, Pair<Kingdom, Boolean>[] hand) {
         model.updateHiddenHand(nickname, hand);
-        //notify the scene that the hidden hand has been updated. The scene will update the view.
+        // notify the scene that the hidden hand has been updated. The scene will update
+        // the view.
         view.showHiddenHand(nickname);
     }
+
     /**
      * Triggers the view to display the first player in the game.
      *
@@ -435,7 +524,8 @@ public class Controller {
     /**
      * Logs in the player to the game.
      *
-     * This method is used to log in the player to the game by using the connection object.
+     * This method is used to log in the player to the game by using the connection
+     * object.
      * The actual login is handled by the connection object.
      *
      * @param nickname The nickname of the player.
@@ -448,8 +538,10 @@ public class Controller {
     /**
      * Sets the number of players in the game.
      *
-     * This method is used to set the number of players that will be participating in the game.
-     * The actual setting of the number of players is handled by the connection object.
+     * This method is used to set the number of players that will be participating
+     * in the game.
+     * The actual setting of the number of players is handled by the connection
+     * object.
      *
      * @param numberOfPlayers The number of players.
      */
@@ -470,10 +562,12 @@ public class Controller {
         Controller.phase = Phase.WAIT;
         connection.chooseColor(color);
     }
+
     /**
      * Sets the side of the starting card for the player in the game.
      *
-     * This method is used to set the side of the starting card for the player in the game.
+     * This method is used to set the side of the starting card for the player in
+     * the game.
      * The actual setting of the side is handled by the connection object.
      *
      * @param side The side chosen by the player.
@@ -485,7 +579,8 @@ public class Controller {
     /**
      * Sets the secret objective card for the player in the game.
      *
-     * This method is used to set the secret objective card for the player in the game.
+     * This method is used to set the secret objective card for the player in the
+     * game.
      * The actual setting of the card is handled by the connection object.
      *
      * @param indexCard The index of the secret objective card chosen by the player.
@@ -501,28 +596,31 @@ public class Controller {
      * The actual playing of the card is handled by the connection object.
      *
      * @param indexHand The index of the card in the player's hand.
-     * @param position The position where the card will be placed.
-     * @param side The side of the card.
+     * @param position  The position where the card will be placed.
+     * @param side      The side of the card.
      */
     public void playCard(int indexHand, Point position, boolean side) {
         connection.playCard(indexHand, position, side);
     }
+
     /**
      * Draws a card in the game.
      *
      * This method is used to draw a card in the game.
      * The actual drawing of the card is handled by the connection object.
      *
-     * @param gold The gold status of the card.
+     * @param gold          The gold status of the card.
      * @param onTableOrDeck The location from where the card is drawn.
      */
     public void drawCard(boolean gold, int onTableOrDeck) {
         connection.drawCard(nickname, gold, onTableOrDeck);
     }
+
     /**
      * Notifies the view that the number of players is correct.
      *
-     * This method is used to inform the view that the number of players entered by the user is correct.
+     * This method is used to inform the view that the number of players entered by
+     * the user is correct.
      *
      * @param numberOfPlayers The number of players.
      */
@@ -533,92 +631,114 @@ public class Controller {
     /**
      * Notifies the view that the game is in the wrong phase.
      *
-     * This method is used to inform the view that the game is currently in a phase where the requested action cannot be performed.
+     * This method is used to inform the view that the game is currently in a phase
+     * where the requested action cannot be performed.
      */
     public void wrongPhase() {
         view.wrongGamePhase();
     }
+
     /**
      * Notifies the view that it is not the player's turn.
      *
-     * This method is used to inform the view that the player cannot perform the requested action because it is not their turn.
+     * This method is used to inform the view that the player cannot perform the
+     * requested action because it is not their turn.
      */
     public void noTurn() {
         view.noTurn();
     }
+
     /**
      * Notifies the view that there is no player with the given name.
      *
-     * This method is used to inform the view that the player name entered by the user does not exist in the game.
+     * This method is used to inform the view that the player name entered by the
+     * user does not exist in the game.
      */
     public void noName() {
         view.noPlayer();
     }
+
     /**
      * Notifies the view that the player does not have enough resources.
      *
-     * This method is used to inform the view that the player cannot perform the requested action because they do not have enough resources.
+     * This method is used to inform the view that the player cannot perform the
+     * requested action because they do not have enough resources.
      */
     public void notEnoughResources() {
         view.notEnoughResources();
     }
+
     /**
      * Notifies the view that the card cannot be placed at the given position.
      *
-     * This method is used to inform the view that the player cannot place a card at the requested position on the board.
+     * This method is used to inform the view that the player cannot place a card at
+     * the requested position on the board.
      */
     public void NoName() {
         view.noPlayer();
     }
+
     /**
      * Notifies the view that the card cannot be placed at the given position.
      *
-     * This method is used to inform the view that the player cannot place a card at the requested position on the board.
+     * This method is used to inform the view that the player cannot place a card at
+     * the requested position on the board.
      */
     public void sameName(String name) {
         view.sameName(name);
     }
+
     /**
      * Notifies the view that the color chosen by the player is already taken.
      *
-     * This method is used to inform the view that the color chosen by the player is already taken by another player in the game.
+     * This method is used to inform the view that the color chosen by the player is
+     * already taken by another player in the game.
      */
     public void colorAlreadyTaken() {
         view.colorAlreadyTaken();
     }
+
     /**
      * Notifies the view that the card cannot be placed at the given position.
      *
-     * This method is used to inform the view that the player cannot place a card at the requested position on the board.
+     * This method is used to inform the view that the player cannot place a card at
+     * the requested position on the board.
      */
     public void cardPositionError() {
         view.cardPositionError();
     }
+
     /**
      * Notifies the view that the lobby cannot be closed.
      *
-     * This method is used to inform the view that the game lobby cannot be closed because there are still players in the lobby.
+     * This method is used to inform the view that the game lobby cannot be closed
+     * because there are still players in the lobby.
      */
     public void closingLobbyError() {
         view.closingLobbyError();
     }
+
     /**
      * Notifies the view that the lobby is complete.
      *
-     * This method is used to inform the view that the game lobby is complete and the game can start.
+     * This method is used to inform the view that the game lobby is complete and
+     * the game can start.
      */
     public void lobbyComplete() {
         view.lobbyComplete();
     }
+
     public void stopGaming() {
-        //TODO: da implementare,
-        //also 10 secondi di attesa, ...
-        //view.stopGaming();
+        // TODO: da implementare,
+        // also 10 secondi di attesa, ...
+        // view.stopGaming();
     }
+
     /**
      * Notifies the view that there is no connection.
      *
-     * This method is used to inform the view that the connection to the server has been lost.
+     * This method is used to inform the view that the connection to the server has
+     * been lost.
      * After 10 seconds, the application will be closed.
      */
     public void noConnection() {
@@ -633,16 +753,112 @@ public class Controller {
             public void run() {
                 System.exit(0);
             }
-        }, 10000);  // Delay in milliseconds, 10000ms = 10s
+        }, 10000); // Delay in milliseconds, 10000ms = 10s
     }
+
     /**
      * Triggers the view to handle the disconnection of the user.
      *
-     * This method is used to inform the user that they have been disconnected from the game.
+     * This method is used to inform the user that they have been disconnected from
+     * the game.
      */
     public void disconnect() {
         view.disconnect();
     }
 
-}
+    /**
+     * Sets the model with the required information about the game.
+     *
+     * This method is used to set the model with all the required information about
+     * the game.
+     * The model will store the points, resources, cards, and other information
+     * about the game.
+     *
+     * @param points                       A HashMap where the keys are the
+     *                                     nicknames
+     *                                     of the players and the values are their
+     *                                     associated points.
+     * @param resources                    A HashMap where the keys are the
+     *                                     nicknames
+     *                                     of the players and the values are another
+     *                                     HashMap where the keys are the types of
+     *                                     resources (Sign) and the values are the
+     *                                     quantities of each resource (Integer).
+     * @param myCards                      An array of integers representing the IDs
+     *                                     of
+     *                                     the cards in the player's hand.
+     * @param otherPlayersCards            A HashMap where the keys are the
+     *                                     nicknames
+     *                                     of the players and the values are an
+     *                                     array
+     *                                     of Pair objects, each containing a
+     *                                     Kingdom
+     *                                     and a Boolean, representing the cards in
+     *                                     the
+     *                                     player's hidden hand.
+     * @param table                        A HashMap where the keys are the
+     *                                     positions
+     *                                     of the cards on the table and the values
+     *                                     are
+     *                                     CardClient objects representing the cards
+     *                                     on
+     *                                     the table.
+     * @param resourceCards                An array of integers representing the IDs
+     *                                     of
+     *                                     the resource cards on the table.
+     * @param goldCards                    An array of integers representing the IDs
+     *                                     of
+     *                                     the gold cards on the table.
+     * @param headDeckGold                 A Kingdom object representing the gold
+     *                                     card
+     *                                     on the deck.
+     * @param headDeckResource             A Kingdom object representing the
+     *                                     resource
+     *                                     card on the deck.
+     * @param secretObjectiveCardsToChoose An array of integers representing the IDs
+     *                                     of the secret objective cards to choose
+     *                                     from.
+     * @param commonObjectiveCards         An array of integers representing the IDs
+     *                                     of
+     *                                     the common objective cards.
+     * @param secretObjectiveCard          The ID of the secret objective card
+     *                                     chosen
+     *                                     by the player.
+     */
+    public void setModel(GameMaster game) {
 
+        HashMap<String, Integer> points = new HashMap<>();
+        HashMap<String, HashMap<Sign, Integer>> resources = new HashMap<>();
+        Integer[] myCards = new Integer[3];
+        Integer[] resourceCardsOnTable = new Integer[2];
+        Integer[] goldCardsOnTable = new Integer[2];
+        Integer[] commonObjectiveCards = new Integer[2];
+
+        for (Player player : game.getLobby().getPlayers()) {
+            points.put(player.getName(), player.getPoints());
+            resources.put(player.getName(), player.getResources());
+
+            if (player.getName().equals(nickname)) {
+                ResourceCard[] hand = player.getHand();
+                for (int i = 0; i < 3; i++) {
+                    myCards[i] = hand[i].getId();
+                }
+            } else {
+
+            }
+        }
+
+        for (int i = 0; i < 2; i++) {
+            resourceCardsOnTable[i] = game.getResourceCard(i).getId();
+            goldCardsOnTable[i] = game.getGoldCard(i).getId();
+            commonObjectiveCards[i] = game.getObjectiveCard(i).getId();
+        }
+
+        model = new LittleModel(points, resources, myCards, null, null, resourceCardsOnTable, goldCardsOnTable,
+                game.getHeadDeck(true),
+                game.getHeadDeck(false), null, commonObjectiveCards, null);
+        // notify the scene that the model has been updated. The scene will update the
+        // view.
+    }
+
+}
