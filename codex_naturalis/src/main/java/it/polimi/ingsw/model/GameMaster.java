@@ -7,23 +7,72 @@ import java.awt.*;
 import java.io.IOException;
 import java.util.*;
 
+/**
+ * The GameMaster class represents the main game logic in the application.
+ * It manages the game state, player turns, card decks, and scoring.
+ * It also handles the placement of cards and the drawing of cards from the deck or table.
+ * The GameMaster interacts with the Lobby to manage the players and with the Deck to manage the cards.
+ * It also uses various helper methods to calculate scores, check if a card can be placed, and find cards in the game graph.
+ * The GameMaster class throws various exceptions to handle invalid game actions.
+ */
 public class GameMaster {
+    /**
+     * The global turn counter.
+     */
     private int globalTurn;
+    /**
+     * The type of turn.
+     */
     private TurnType turnType;
+    /**
+     * The lobby of players.
+     */
     private Lobby lobby;
+    /**
+     * The current game state.
+     */
     private GameState gameState;
 
+    /**
+     * The resource deck.
+     */
     private Deck resourceDeck;
+    /**
+     * The gold deck.
+     */
     private Deck goldDeck;
+    /**
+     * The starting deck.
+     */
     private Deck startingDeck;
+    /**
+     * The objective deck.
+     */
     private Deck objectiveDeck;
 
+    /**
+     * The resource cards on the table.
+     */
     private ResourceCard[] onTableResourceCards;
+    /**
+     * The gold cards on the table.
+     */
     private GoldCard[] onTableGoldCards;
+    /**
+     * The objective cards on the table.
+     */
     private ObjectiveCard[] onTableObjectiveCards;
+    /**
+     * The starting cards to position.
+     */
     private StartingCard[] startingCardToPosition;
+    /**
+     * The objective cards to choose.
+     */
     private ObjectiveCard[][] objectiveCardToChoose;
-
+    /**
+     * The ranking of players.
+     */
     private ArrayList<Player> ranking;
 
     /**

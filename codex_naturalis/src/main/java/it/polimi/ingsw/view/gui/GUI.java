@@ -113,6 +113,7 @@ public class GUI extends Application implements ViewInterface {
      * This field is used to store the shutdown view, which is displayed when the game is stopped or closed by a disconnection.
      */
     private Parent shutdown;
+
     /**
      * This is the start method of the Application class in the GUI class.
      * It is overridden from the Application class in JavaFX.
@@ -125,7 +126,6 @@ public class GUI extends Application implements ViewInterface {
      * @param stage The primary stage for this application, onto which the application scene can be set.
      * @throws IOException If an input or output exception occurred
      */
-
     @Override
     public void start(Stage stage) throws IOException {
 
@@ -150,6 +150,7 @@ public class GUI extends Application implements ViewInterface {
         stage.setScene(scene);
         stage.show();
     }
+
     /**
      * This is a static method in the GUI class.
      * It returns the primary stage of the application.
@@ -160,6 +161,7 @@ public class GUI extends Application implements ViewInterface {
     public static Stage getStage() {
         return primaryStage;
     }
+
     /**
      * This is a static method in the GUI class.
      * It returns the match view of the application.
@@ -168,10 +170,10 @@ public class GUI extends Application implements ViewInterface {
      *
      * @return The match view of the application.
      */
-
     public static Parent getMatch(){
         return match;
     } //serve per otherPlayerController
+
     /**
      * This is a method in the GUI class.
      * It is used to load an FXML file that defines the layout and controls of a view in the GUI.
@@ -182,7 +184,6 @@ public class GUI extends Application implements ViewInterface {
      * @param fxml The name of the FXML file to load.
      * @return The root of the object hierarchy defined in the FXML file, or null if an IOException occurred.
      */
-
     private Parent loadFXML(String fxml) {
         System.out.println("Loading the file: " + fxml );
         try{

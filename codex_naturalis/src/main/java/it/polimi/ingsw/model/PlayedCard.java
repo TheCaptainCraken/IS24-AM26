@@ -25,10 +25,12 @@ public class PlayedCard implements Serializable {
      * */
     private final boolean isFacingUp;
 
-    /** Records in which turn the card has been played
+    /**
+     * Records in which turn the card has been played
      * */
     private final int turnOfPositioning;
-    /** Identifies the position in which the card is on the board
+    /**
+     *  Identifies the position in which the card is on the board
      * */
     private final Point position;
 
@@ -44,9 +46,9 @@ public class PlayedCard implements Serializable {
         this.turnOfPositioning = turnNumber;
         this.position = position;
 
-        /** This ForEach cycle iterates on the Keys of the cardsToAttach given in order to fill out attachmentCorners with the PlayedCards
-         * that are attached to this instance of PlayedCard,the newest card is attached first.
-         * */
+        // This ForEach cycle iterates on the Keys of the cardsToAttach given in order to fill out attachmentCorners with the PlayedCards
+        // that are attached to this instance of PlayedCard,the newest card is attached first.
+        //
         for(Corner c : cardsToAttach.keySet()){
             this.attachCard(c, cardsToAttach.get(c));
             if(cardsToAttach.get(c) != null) {
@@ -71,25 +73,29 @@ public class PlayedCard implements Serializable {
         }
     }
 
-    /**@return true if card has already been used for calculating Objective scores
+    /**
+     * @return true if card has already been used for calculating Objective scores
      * */
     public boolean isFlagCountedForObjective() {
         return flagCountedForObjective;
     }
 
-    /**@return true if card was played on its front
+    /**
+     * @return true if card was played on its front
      * */
     public boolean isFacingUp() {
         return isFacingUp;
     }
 
-    /**@return the PlayableCard related to the PlayedCard
+    /**
+     * @return the PlayableCard related to the PlayedCard
      * */
     public PlayableCard getCard() {
         return card;
     }
 
-    /**@return the turn in which the card was played
+    /**
+     * @return the turn in which the card was played
      * */
     public int getTurnOfPositioning() {
         return turnOfPositioning;
@@ -101,7 +107,8 @@ public class PlayedCard implements Serializable {
         this.attachmentCorners.put(corner, playedCard);
     }
 
-    /**@return the map in which the information on the status of the PlayedCard's corners is stored
+    /**
+     * @return the map in which the information on the status of the PlayedCard's corners is stored
      * */
     public HashMap<Corner, PlayedCard> getAttachmentCorners() {
         HashMap<Corner, PlayedCard> attachmentCornersCopy = new HashMap<>();
@@ -110,19 +117,22 @@ public class PlayedCard implements Serializable {
         }
         return attachmentCornersCopy;
     }
-    /**@return the PlayedCard that has been attached to the corner given to this
+    /**
+     * @return the PlayedCard that has been attached to the corner given to this
      * */
     public PlayedCard getAttached(Corner corner){
         return attachmentCorners.get(corner);
     }
 
-    /**@return the coordinates corresponding to the place,related to the StartingCard, in which the card was played
+    /**
+     * @return the coordinates corresponding to the place,related to the StartingCard, in which the card was played
      * */
     public Point getPosition() {
         return new Point(position.x, position.y);
     }
 
-    /**records the use of the card in calculating Objective scores by setting the parameter to true
+    /**
+     * records the use of the card in calculating Objective scores by setting the parameter to true
      * */
     public void flagWasCountedForObjective() {
         this.flagCountedForObjective = true;

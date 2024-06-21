@@ -153,6 +153,15 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
         return Controller.getInstance().isLobbyLocked();
     }
 
+    /**
+     * This method is responsible for setting the number of players in the game.
+     * It is called when the lobby is being finalized and the number of players is being determined.
+     * It throws a ClosingLobbyException if the lobby is already closed and no more players can join.
+     *
+     * @param numberOfPlayers The number of players to be set for the game.
+     * @throws RemoteException If a communication-related error occurs during the execution of a remote method call.
+     * @throws ClosingLobbyException If the lobby is already closed and no more players can join.
+     */
     @Override
     public void insertNumberOfPlayers(int numberOfPlayers) throws
             RemoteException, ClosingLobbyException {

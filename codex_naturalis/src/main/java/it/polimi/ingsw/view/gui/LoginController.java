@@ -22,7 +22,6 @@ import java.util.TimerTask;
  * Controller Class responsible for the handling of the GUI components that are used and updated
  * during the LoginPhase of the game.
  *  */
-
 public class LoginController {
     private Stage stage;
     /**

@@ -9,9 +9,25 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
+/**
+ * The Lobby class represents a lobby where players can join before the game starts.
+ * It manages the players, their nicknames, and the maximum size of the lobby.
+ * It also handles the locking of the lobby, which prevents more players from joining.
+ * The Lobby interacts with the Player class to manage the players.
+ * The Lobby class throws various exceptions to handle invalid actions such as adding a player to a full lobby, adding a player with a duplicate nickname, and setting an invalid lobby size.
+ */
 public class Lobby {
+    /**
+     * The list of players in the lobby.
+     */
     private final ArrayList<Player> players;
+    /**
+     * The maximum size of the lobby.
+     */
     private int maxSize;
+    /**
+     * The lock status of the lobby.
+     */
     boolean complete;
 
     /**

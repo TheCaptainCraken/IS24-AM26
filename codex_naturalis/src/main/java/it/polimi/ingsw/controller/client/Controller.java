@@ -656,7 +656,7 @@ public class Controller {
     private void exitDelay() {
         scheduler.schedule(() -> {
             System.exit(0);
-        }, 10, TimeUnit.SECONDS); // Ritardo di 10 secondi
+        }, 10, TimeUnit.SECONDS); // Delay of 10 seconds.
 
     }
 

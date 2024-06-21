@@ -30,9 +30,9 @@ import java.util.*;
 * Controller Class responsible for the handling of the GUI components that are used and updated
  * during the PlayingPhase of the game.*/
 public class MatchController {
-    //DATI PER SPOSTAMENTI CARTE
-    //118 LUNGO X,60 LUNGO Y (+/-), sommati alla posizione della carta a cui deve essere piazzata la carta
-    //Altezza carta 100, lunghezza 150
+    //DATA FOR CARD MOVEMENTS
+    //118 ALONG X, 60 ALONG Y (+/-), added to the position of the card where the card must be placed
+    //Card height 100, length 150
 
     /**
      * This constant is used in the GUI class to calculate the position of cards on the game board.
