@@ -523,6 +523,8 @@ public class NetworkServerSocket implements NetworkPlug {
                 NumberOfPlayersMessage parsedMessage = (NumberOfPlayersMessage) message;
                 try {
                     controller.initializeLobby(parsedMessage.getNumber());
+
+                    networkHandler.refreshUsersBroadcast();
                     //check if all players have join the lobby(number of players chosen and enough number of players)
                     networkHandler.finalizingNumberOfPlayersBroadcast();
                 } catch (ClosingLobbyException e) {

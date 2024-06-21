@@ -265,9 +265,8 @@ public class MatchController {
             HBox box = new HBox(img1,l,l1);
             box.setSpacing(10);
             FlowPane resources = new FlowPane();
-            //Puo valere la pena di inserire ogni coppia (IconaRisorsa,Numero) in hbox dedicata per ordine
             for(int i = 0; i < 7; i++){
-                ImageView img = new ImageView(); //figlo 0 di FlowPane
+                ImageView img = new ImageView();
                 switch(i){
                     case 0:
                         img.setImage(mushroom);

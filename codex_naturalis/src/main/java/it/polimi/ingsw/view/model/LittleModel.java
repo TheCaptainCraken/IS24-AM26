@@ -168,10 +168,24 @@ public class LittleModel {
         return myCards;
     }
 
+    /**
+     * This method is used to retrieve a card from the player's hand based on its index.
+     * The cards in the hand are represented by an array of Integers, where each Integer is the ID of a card.
+     *
+     * @param index The index of the card in the player's hand.
+     * @return An Integer representing the ID of the card at the given index in the player's hand.
+     */
     public Integer getCardInHand(int index){
         return myCards[index];
     }
 
+    /**
+     * This method is used to set a card in the player's hand at a specific index.
+     * The cards in the hand are represented by an array of Integers, where each Integer is the ID of a card.
+     *
+     * @param index The index at which to set the card in the player's hand.
+     * @param cardId The ID of the card to be set in the player's hand.
+     */
     public void setCardInHand(int index, Integer cardId){
         //set the card at null
         myCards[index] = cardId;
@@ -569,6 +583,7 @@ public class LittleModel {
      * @param playersAndPins A HashMap representing the nicknames of the players and their corresponding colors.
      */
     public void updateUsers(HashMap<String, Color> playersAndPins) {
+        table = new HashMap<>();
         for(String player: playersAndPins.keySet()){
             //update the points and resources for each player
             table.put(player, table.get(player));

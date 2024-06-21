@@ -133,6 +133,7 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
         boolean isFirst = Controller.getInstance().isFirst(nickname);
 
         NetworkHandler.getInstance().finalizingNumberOfPlayersBroadcast();
+        NetworkHandler.getInstance().refreshUsersBroadcast();
         //Return whether the player is the first one to log in
         return isFirst;
     }
@@ -163,13 +164,12 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
     @Override
     public void insertNumberOfPlayers(int numberOfPlayers) throws
             RemoteException, ClosingLobbyException {
-
-        Controller.getInstance().initializeLobby(numberOfPlayers);
         //Deletes all other connections that are not in the lobby
-
-        NetworkHandler.getInstance().finalizingNumberOfPlayersBroadcast();
+        Controller.getInstance().initializeLobby(numberOfPlayers);
         //refresh here since some players can be eliminated
         NetworkHandler.getInstance().refreshUsersBroadcast();
+
+        NetworkHandler.getInstance().finalizingNumberOfPlayersBroadcast();
     }
 
     /**
@@ -450,12 +450,12 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
                     try {
                         connections.get(nickname).disconnect();
                     } catch (RemoteException e) {
-                        connections.remove(nickname);
                         System.out.println("Cannot notify the client to not play. The client is already disconnected.");
                     }
                     connections.remove(nickname);
                 }
             }).start();
+
         }
         //start connection
         new Thread(this::startClientConnectionCheck).start();

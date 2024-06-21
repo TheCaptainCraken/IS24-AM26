@@ -194,7 +194,6 @@ public class LoginController {
      *
      * @param map A HashMap where the keys are player names (String) and the values are their chosen colors (Color).
      */
-
     public void refreshUsers(HashMap<String,Color> map){
         int i;
         for(String s: map.keySet()){
@@ -212,11 +211,26 @@ public class LoginController {
                     if(c != null){
                         Image img = loadColor(c);
                         avatars.get(i).setImage(img);
-
                     }
                     break;
                 }
                 i++;
+            }
+        }
+        //reset label if someone exits the lobby
+        for(i = 0; i < 4; i++){
+            if(!names.get(i).getText().equals(DEFAULT_LABEL)){
+                boolean find = false;
+               for(String s: map.keySet()){
+                   if(s.equals(names.get(i).getText())){
+                       find = true;
+                       break;
+                   }
+               }
+                if(!find){
+                     names.get(i).setText(DEFAULT_LABEL);
+                     avatars.get(i).setImage(DEFAULT_TOKEN);
+                }
             }
         }
     }
