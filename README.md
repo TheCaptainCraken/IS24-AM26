@@ -17,5 +17,4 @@
 - RMI
 - Socket
 - Persistenza
-- Resilienza alle disconnessioni
-- Chat (?)
+- Chat
