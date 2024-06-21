@@ -833,10 +833,12 @@ public class Controller {
         Integer[] resourceCardsOnTable = new Integer[2];
         Integer[] goldCardsOnTable = new Integer[2];
         Integer[] commonObjectiveCards = new Integer[2];
+        HashMap<String, CardClient> table = new HashMap<>();
 
         for (Player player : game.getLobby().getPlayers()) {
             points.put(player.getName(), player.getPoints());
             resources.put(player.getName(), player.getResources());
+            table.put(player.getName(), convertPlayedCard(player.getRootCard()));
 
             if (player.getName().equals(nickname)) {
                 ResourceCard[] hand = player.getHand();
@@ -854,11 +856,21 @@ public class Controller {
             commonObjectiveCards[i] = game.getObjectiveCard(i).getId();
         }
 
-        model = new LittleModel(points, resources, myCards, null, null, resourceCardsOnTable, goldCardsOnTable,
+        model = new LittleModel(points, resources, myCards, null, table, resourceCardsOnTable, goldCardsOnTable,
                 game.getHeadDeck(true),
                 game.getHeadDeck(false), null, commonObjectiveCards, null);
         // notify the scene that the model has been updated. The scene will update the
         // view.
+    }
+
+    private CardClient convertPlayedCard(PlayedCard card) {
+        HashMap<Corner, PlayedCard> playedCardCorners = card.getAttachmentCorners();
+        HashMap<Corner, CardClient> attachmentCorners = new HashMap<>();
+        for (Corner corner : playedCardCorners.keySet()) {
+            attachmentCorners.put(corner, convertPlayedCard(playedCardCorners.get(corner)));
+        }
+        return new CardClient(card.getCard().getId(), card.isFacingUp(), card.getPosition(),
+                card.getTurnOfPositioning(), attachmentCorners);
     }
 
 }
