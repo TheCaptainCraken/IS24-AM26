@@ -14,15 +14,18 @@ public class Lobby {
     private int maxSize;
     boolean complete;
 
-    /**It's a holder for the players that permits to check and limit access
+    /**
+     * It's a holder for the players that permits to check and limit access
      */
     public Lobby(){
         this.players = new ArrayList<>();
         this.complete = false;
     }
 
-    /** If possible it adds a new player to the lobby with a unique nickname
-     *  @param nickname nickname of the new Player
+    /**
+     * If possible it adds a new player to the lobby with a unique nickname
+     *
+     * @param nickname nickname of the new Player
      */
     public void addPlayer(String nickname) throws LobbyCompleteException, SameNameException {
         if(complete){
@@ -44,14 +47,18 @@ public class Lobby {
         }
     }
 
-    /**Get a fixed array of players
+    /**
+     * Get a fixed array of players
+     *
      * @return an array of players
      */
     public Player[] getPlayers() {
         return players.toArray(new Player[players.size()]);
     }
 
-    /**Given a  nickname it returns the player with that unique nickname
+    /**
+     * Given a  nickname it returns the player with that unique nickname
+     *
      * @param nickname nickname of the Player we want to get
      * @return the Player with the given nickname
      */
@@ -64,6 +71,11 @@ public class Lobby {
         throw new NoNameException();
     }
 
+    /**
+     * It sets the maximum size of the lobby scraping the players that exceed the limit
+     *
+     * @param maxSize the maximum size of the lobby
+     */
     public void setMaxSize(int maxSize) throws ClosingLobbyException {
         if(complete || maxSize > 4 || maxSize < 2){
             throw new ClosingLobbyException();
@@ -82,16 +94,27 @@ public class Lobby {
         }
     }
 
-    /** It locks the lobby so nobody can join anymore, the lobby cannot be unlocked
+    /**
+     * It locks the lobby so nobody can join anymore, the lobby cannot be unlocked
      */
     public void setLock(){
         complete = true;
     }
 
+    /**
+     * It returns the lock status of the lobby
+     *
+     * @return true if the lobby is locked
+     */
     public boolean getLock() {
         return complete;
     }
 
+    /**
+     * It returns nicknames of the players and relative color pins
+     *
+     * @return a map with the nicknames of the players and their color pins
+     */
     public HashMap<String, Color> getPlayersAndPins() {
         HashMap<String, Color> PlayerAndPin = new HashMap<>();
 
@@ -102,6 +125,12 @@ public class Lobby {
         return PlayerAndPin;
     }
 
+    /**
+     * It checks if a player is already in the lobby
+     *
+     * @param nickname nickname of the player
+     * @return true if the player is in the lobby
+     */
     public boolean isAdmitted(String nickname) {
         for(Player player : players){
             if(player.getName().equals(nickname)){
@@ -111,6 +140,11 @@ public class Lobby {
         return false;
     }
 
+    /**
+     * It checks if the lobby is ready to start
+     *
+     * @return true if the lobby is ready to start
+     */
     public boolean isReady() {
         //if ready to start, I shuffle the players.
         if(maxSize == players.size()){

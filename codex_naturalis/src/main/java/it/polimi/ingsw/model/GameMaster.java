@@ -1021,6 +1021,11 @@ public class GameMaster {
         return ranking;
     }
 
+    /**
+     * It returns if the cards on the table and in the deck are finished
+     *
+     * @return true if the cards are finished, false otherwise
+     */
     private boolean areTheCardFinished() {
         return getKingdomNextCardResourceDeck() == null &&
                 getKingdomNextCardGoldDeck() == null &&
@@ -1073,6 +1078,7 @@ public class GameMaster {
             return null;
         }
     }
+
     /**
      * Retrieves the next gold card from the deck.
      * This method is used only for testing purposes and should not be used during normal gameplay.
@@ -1082,6 +1088,7 @@ public class GameMaster {
     public Card getGoldCardDeckTestOnly() {
         return goldDeck.draw();
     }
+
     /**
      * Retrieves the next resource card from the deck.
      * This method is used only for testing purposes and should not be used during normal gameplay.
