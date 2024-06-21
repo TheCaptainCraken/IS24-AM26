@@ -25,6 +25,15 @@ public class StopWaitingOrDisconnect extends ServerMessage {
          this.StopWaitingOrDisconnect = StopWaitingOrDisconnect;
     }
     /**
+     * This method is used to check the status of the StopWaitingOrDisconnect flag.
+     *
+     * @return boolean - Returns true if the client should stop waiting or disconnect, false otherwise.
+     */
+    public boolean isStopWaitingOrDisconnect() {
+        return StopWaitingOrDisconnect;
+    }
+
+    /**
      * This method is used to get the boolean value that indicates whether the client should stop waiting or disconnect.
      * @param controller The controller(singleton) on which the appropriate method will be invoked.
      */

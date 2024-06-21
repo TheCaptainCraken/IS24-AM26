@@ -262,7 +262,8 @@ public class NetworkServerSocket implements NetworkPlug {
         try {
             //send the points and resources of the player to all the clients
             sendBroadCastMessage(new RefreshedPoints(nickname, controller.getPlayerPoints(nickname)));
-            sendBroadCastMessage(new RefreshedResources(nickname, controller.getPlayerResources(nickname)));
+            HashMap<Sign, Integer> resourcesCopy = new HashMap<>(controller.getPlayerResources(nickname));
+            sendBroadCastMessage(new RefreshedResources(nickname, resourcesCopy));
         } catch (NoNameException e) {
             // This should never occur
             System.out.println("Debugging error: NoNameException in sendingPlacedRootCardAndWhenCompleteObjectiveCards");
@@ -429,6 +430,7 @@ public class NetworkServerSocket implements NetworkPlug {
             this.clientSocket = socket;
             controller = Controller.getInstance();
             networkHandler = NetworkHandler.getInstance();
+            connection = true;
         }
         /**
          * Getter of nickname of client.
@@ -447,8 +449,6 @@ public class NetworkServerSocket implements NetworkPlug {
                 connection = true;
 
                 ClientMessage message;
-
-                //start the thread to check if the client is still connected
                 new Thread(this::isClientConnected).start();
 
                 while (clientSocket.isConnected()) {
@@ -679,9 +679,16 @@ public class NetworkServerSocket implements NetworkPlug {
          * @param message The message to be sent.
          */
         public void sendMessage(ServerMessage message) {
+            //after sending the message, we start the thread to check if the client is still connected
+//            if(message instanceof StopWaitingOrDisconnect) {
+//                //start the thread to check if the client is still connected
+//                if (((StopWaitingOrDisconnect) message).isStopWaitingOrDisconnect()) {
+//                    new Thread(this::isClientConnected).start();
+//                }
+//            }
+
             try {
                 out.writeObject(message);
-                out.reset();
             } catch (IOException e) {
                 //disconnect all the clients connected to the server RMI and Socket
                 NetworkHandler.getInstance().disconnectBroadcast();
@@ -698,7 +705,7 @@ public class NetworkServerSocket implements NetworkPlug {
                 out.writeObject(message);
                 hastaLaVistaBaby();
             } catch (IOException e) {
-                System.out.println("Error closing connection. Connection already closed.");
+                System.out.println("SOCKET: Error closing connection." + nickname + "Connection already closed.");
             }
         }
 

@@ -50,6 +50,10 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
      * The scheduler for checking the connection.
      */
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+    /**
+     * The lock object for synchronization.
+     */
+    private final Object lock = new Object();
 
     /**
      * Constructor for ClientRMI.
@@ -524,7 +528,10 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
      */
     @Override
     public void stopGaming() throws RemoteException {
-        controller.stopGaming();
+        synchronized (lock) {
+            scheduler.shutdown();
+            controller.stopGaming();
+        }
     }
 
     /**

@@ -738,180 +738,6 @@ public class GameMaster {
     }
 
     /**
-     * Calculate the number of points given by an objective card.
-     *
-     * @param type       type of the objective card.
-     * @param multiplier multiplier of the objective card.
-     * @param player     player who is getting targeted.
-     * @param kingdom    kingdom of the objective card.
-     * @return number of points to add to the player points
-     */
-    private int calculateEndGamePoints(ObjectiveType type, int multiplier, Player player, Kingdom kingdom) {
-        int points = 0;
-        switch (type) {
-            case TWO_QUILLS:
-                points = player.getResources().get(Sign.QUILL) / 2;
-                break;
-            case TWO_INKS:
-                points = player.getResources().get(Sign.INKWELL) / 2;
-                break;
-            case TWO_SCROLLS:
-                points = player.getResources().get(Sign.SCROLL) / 2;
-                break;
-            case FREE_RESOURCES:
-                points = Math.min(player.getResources().get(Sign.QUILL),
-                        Math.min(player.getResources().get(Sign.INKWELL), player.getResources().get(Sign.SCROLL)));
-                break;
-            case TRIS:
-                points = player.getResources().get(fromKingdomToSign(kingdom)) / 3;
-                break;
-            case L_FORMATION: {
-                ArrayList<PlayedCard> usedCards = new ArrayList<>();
-                for (PlayedCard card : getPlayersCards(player)) {
-                    Point position = card.getPosition();
-                    //TODO che senso ha uno switch in un ciclo for di una cosa fissa.
-                    switch (kingdom) {
-                        case FUNGI:
-                            if (!usedCards.contains(card) && card.getCard().getKingdom() == Kingdom.FUNGI) {
-                                Point lowerPosition = (Point) position.clone();
-                                //TODO sbagliato il sistema di coordinate, per andare in basso devi fare -1 da entrambe
-                                lowerPosition.translate(0, -1);
-                                Point lowerRightPosition = (Point) position.clone();
-                                //TODO mentra qua basta fare il getter a seconda della tipologia
-                                lowerRightPosition.translate(1, -2);
-                                PlayedCard lower = findCard(player.getRootCard(), lowerPosition);
-                                PlayedCard lowerRight = findCard(player.getRootCard(), lowerRightPosition);
-
-                                if (lower != null && lowerRight != null &&
-                                        !usedCards.contains(lower) && !usedCards.contains(lowerRight)
-                                        && lower.getCard().getKingdom() == Kingdom.FUNGI && lowerRight.getCard().getKingdom() == Kingdom.PLANT) {
-                                    points++;
-                                    usedCards.add(card);
-                                    usedCards.add(lowerRight);
-                                    usedCards.add(lower);
-                                }
-                            }
-                            break;
-                        case ANIMAL:
-                            if (!usedCards.contains(card) && card.getCard().getKingdom() == Kingdom.ANIMAL) {
-                                Point lowerPosition = (Point) position.clone();
-                                lowerPosition.translate(0, -1);
-                                Point upperRightPosition = (Point) position.clone();
-                                upperRightPosition.translate(1, 1);
-                                PlayedCard lower = findCard(player.getRootCard(), lowerPosition);
-                                PlayedCard upperRight = findCard(player.getRootCard(), upperRightPosition);
-                                if (lower != null && upperRight != null && !usedCards.contains(lower)
-                                        && !usedCards.contains(upperRight)
-                                        && lower.getCard().getKingdom() == Kingdom.ANIMAL
-                                        && upperRight.getCard().getKingdom() == Kingdom.FUNGI) {
-                                    points++;
-                                    usedCards.add(card);
-                                    usedCards.add(upperRight);
-                                    usedCards.add(lower);
-                                }
-                            }
-                            break;
-                        case PLANT:
-                            if (!usedCards.contains(card) && card.getCard().getKingdom() == Kingdom.PLANT) {
-                                Point lowerPosition = (Point) position.clone();
-                                lowerPosition.translate(0, -1);
-                                Point loowerLeftPosition = (Point) position.clone();
-                                loowerLeftPosition.translate(-1, -2);
-                                PlayedCard lower = findCard(player.getRootCard(), lowerPosition);
-                                PlayedCard loowerLeft = findCard(player.getRootCard(), loowerLeftPosition);
-                                if (lower != null && loowerLeft != null && !usedCards.contains(lower)
-                                        && !usedCards.contains(loowerLeft)
-                                        && lower.getCard().getKingdom() == Kingdom.PLANT
-                                        && loowerLeft.getCard().getKingdom() == Kingdom.INSECT) {
-                                    points++;
-                                    usedCards.add(card);
-                                    usedCards.add(loowerLeft);
-                                    usedCards.add(lower);
-                                }
-                            }
-                            break;
-                        case INSECT:
-                            if (!usedCards.contains(card) && card.getCard().getKingdom() == Kingdom.INSECT) {
-                                Point lowerPosition = (Point) position.clone();
-                                lowerPosition.translate(0, -1);
-                                Point upperLeftPosition = (Point) position.clone();
-                                upperLeftPosition.translate(-1, 1);
-                                PlayedCard lower = findCard(player.getRootCard(), lowerPosition);
-                                PlayedCard upperLeft = findCard(player.getRootCard(), upperLeftPosition);
-                                if (lower != null && upperLeft != null && !usedCards.contains(lower)
-                                        && !usedCards.contains(upperLeft)
-                                        && lower.getCard().getKingdom() == Kingdom.INSECT
-                                        && upperLeft.getCard().getKingdom() == Kingdom.ANIMAL) {
-                                    points++;
-                                    usedCards.add(card);
-                                    usedCards.add(upperLeft);
-                                    usedCards.add(lower);
-                                }
-                            }
-                            break;
-                        default:
-                            break;
-                    }
-                }
-                break;
-            }
-            case STAIR: {
-                ArrayList<PlayedCard> usedCards = new ArrayList<>();
-                for (PlayedCard card : getPlayersCards(player)) {
-                    Point position = card.getPosition();
-                    if (!usedCards.contains(card) && card.getCard().getKingdom() == kingdom) {
-                        //TODO questo if è inutile. Basta che fai il getter, controllando che ad ogni step
-                        // tu non abbia null. Non è meglio fare un case.
-                        if (card.getCard().getKingdom() == Kingdom.FUNGI
-                                || card.getCard().getKingdom() == Kingdom.ANIMAL) {
-                            Point lowerLeftPosition = (Point) position.clone();
-                            lowerLeftPosition.translate(-1, -1);
-                            //TODO basta fare il getter eh. Sono lincate le carte. Inoltre stai sbagliando con il sistema di coordinate
-                            //per andare in alto devi fare +1 solo della x, in basso solo della y.
-                            PlayedCard lowerLeft = findCard(player.getRootCard(), lowerLeftPosition);
-                            Point upperRightPosition = (Point) position.clone();
-                            upperRightPosition.translate(1, 1);
-                            PlayedCard upperRight = findCard(player.getRootCard(), upperRightPosition);
-
-                            //check not null, correct kingdom, not already used
-                            if (lowerLeft != null && upperRight != null
-                                    && lowerLeft.getCard().getKingdom() == kingdom && upperRight.getCard().getKingdom() == kingdom
-                                    && !usedCards.contains(lowerLeft) && !usedCards.contains(upperRight)) {
-                                points++;
-                                usedCards.add(upperRight);
-                                usedCards.add(lowerLeft);
-                                usedCards.add(card);
-                            }
-                        } else {
-                            Point upperLeftPosition = (Point) position.clone();
-                            //TODO stessa cosa di prima, sbagli con il sistema di coordinate
-                            // e ti basta fare i getter.
-                            upperLeftPosition.translate(-1, 1);
-                            PlayedCard upperLeft = findCard(player.getRootCard(), upperLeftPosition);
-                            Point lowerRightPosition = (Point) position.clone();
-                            lowerRightPosition.translate(1, -1);
-                            PlayedCard lowerRight = findCard(player.getRootCard(), lowerRightPosition);
-
-                            //check not null, correct kingdom, not already used
-                            if (upperLeft != null && lowerRight != null
-                                    && upperLeft.getCard().getKingdom() == kingdom && lowerRight.getCard().getKingdom() == kingdom
-                                    && !usedCards.contains(upperLeft) && !usedCards.contains(lowerRight)) {
-                                points++;
-                                usedCards.add(lowerRight);
-                                usedCards.add(upperLeft);
-                                usedCards.add(card);
-                            }
-                        }
-                    }
-                }
-                break;
-            }
-        }
-
-        return points * multiplier;
-    }
-
-    /**
      * Convert the graph of PlayedCard of a player in a list of PlayedCard
      *
      * @param player player to explore
@@ -950,7 +776,6 @@ public class GameMaster {
     }
 
     // Turn methods
-
     /**
      * Pass to the next turn consequentially switching player
      */
@@ -1291,7 +1116,7 @@ public class GameMaster {
      * @param kingdom    kingdom of the objective card.
      * @return number of points to add to the player points
      */
-    private int calculateEndGamePointsPietro(ObjectiveType type, int multiplier, Player player, Kingdom kingdom) {
+    private int calculateEndGamePoints(ObjectiveType type, int multiplier, Player player, Kingdom kingdom) {
         int points = 0;
 
         switch (type) {
@@ -1478,7 +1303,7 @@ public class GameMaster {
                                     secondDown = null;
                                 }
 
-                                //controll that are not null and that the cards are not already used and that the cards are of the right kingdom
+                                //control that are not null and that the cards are not already used and that the cards are of the right kingdom
                                 if (firstDown != null && secondDown != null &&
                                         !usedCards.contains(firstDown) && !usedCards.contains(secondDown)
                                         && firstDown.getCard().getKingdom() == kingdom && secondDown.getCard().getKingdom() == kingdom) {

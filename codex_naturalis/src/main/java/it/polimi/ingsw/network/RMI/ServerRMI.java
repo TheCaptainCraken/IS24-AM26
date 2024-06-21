@@ -50,8 +50,6 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
                 System.out.println("Cannot start the socket server. Please restart the server.");
             }
         }).start();
-
-        obj.startClientConnectionCheck();
     }
 
     /**
@@ -459,6 +457,8 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
                 }
             }).start();
         }
+        //start connection
+        new Thread(this::startClientConnectionCheck).start();
     }
     /**
      * It implements the sendingHandsAndWhenSecretObjectiveCardsCompleteStartGameFlow method of the NetworkPlug interface.
@@ -700,7 +700,7 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
             try {
                 connections.get(nickname).stopGaming();
             } catch (RemoteException e) {
-                System.out.println("Cannot communicate with " + nickname + "Already disconnected");
+                System.out.println("RMI : Cannot communicate with " + nickname + " Already disconnected");
             }
         }
     }

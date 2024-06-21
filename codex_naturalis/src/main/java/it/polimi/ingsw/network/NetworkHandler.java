@@ -222,7 +222,7 @@ public class NetworkHandler {
             networkPlug.disconnectAll();
         }
         //close all servers and connections.
-        System.out.println("All server connections are closed. Bye!");
+        System.out.println("All connections are closed. Bye!");
         System.exit(0);
     }
 

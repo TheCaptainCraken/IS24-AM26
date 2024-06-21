@@ -261,7 +261,18 @@ public class ClientSocket implements Runnable, NetworkClient{
             }
             handleResponse(serverMessage);
         }
-        controller.noConnection();
+
+        try {
+            if(socket.getInputStream().read() == -1){
+                //if the socket is closed correctly, a message StopGaming will be sent
+               System.out.println("Connection closed");
+            } else {
+                //if the socket is not closed correctly
+                controller.noConnection();
+            }
+        } catch (IOException e) {
+            controller.noConnection();
+        }
     }
 
     /**
