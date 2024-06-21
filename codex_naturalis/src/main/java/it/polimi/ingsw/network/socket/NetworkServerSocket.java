@@ -44,6 +44,10 @@ import it.polimi.ingsw.network.socket.messages.server.login.PlayersAndColorPins;
 import it.polimi.ingsw.network.socket.messages.server.login.StatusLogin;
 
 import java.io.*;
+import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Represents the server-side socket in the network communication.
@@ -72,6 +76,7 @@ public class NetworkServerSocket implements NetworkPlug {
      */
     private static HashMap<String, ClientHandler> connections;
 
+
     /**
      * This constructor is used to create a new NetworkServerSocket.
      *
@@ -85,7 +90,6 @@ public class NetworkServerSocket implements NetworkPlug {
         NetworkHandler.getInstance().addNetworkPlug("socket", this);
 
         try {
-
             System.out.println("Server is listening on IP: " + InetAddress.getLocalHost().getHostAddress());
             System.out.println("Server is listening on Port: " + serverSocket.getLocalPort());
         } catch (Exception e) {
@@ -140,6 +144,8 @@ public class NetworkServerSocket implements NetworkPlug {
      */
     @Override
     public void finalizingNumberOfPlayers() {
+        HashMap<String, ClientHandler> connectionsToDelete = new HashMap<>();
+
         for(String address : connections.keySet()){
             //if the client is admitted to the game, we send a message to stop waiting and start play
             if(controller.isAdmitted(connections.get(address).getNickname())){
@@ -150,8 +156,12 @@ public class NetworkServerSocket implements NetworkPlug {
                 //close the connection
                 connections.get(address).hastaLaVistaBaby();
                 //remove from the connection list
-                connections.remove(address);
+                connectionsToDelete.put(address, connections.get(address));
             }
+        }
+        //delete the connections that are not admitted to the game
+        for (String address : connectionsToDelete.keySet()) {
+            connections.remove(address);
         }
     }
     /**
@@ -423,6 +433,11 @@ public class NetworkServerSocket implements NetworkPlug {
          */
         private boolean connection;
         /**
+         * The ScheduledExecutorService used to periodically check if the client is still connected to the server.
+         */
+        private ScheduledExecutorService scheduler;
+
+        /**
          * This constructor is used to create a new ClientHandler.
          * @param socket The client socket to be handled.
          */
@@ -449,7 +464,6 @@ public class NetworkServerSocket implements NetworkPlug {
                 connection = true;
 
                 ClientMessage message;
-                new Thread(this::isClientConnected).start();
 
                 while (clientSocket.isConnected()) {
                     try {
@@ -461,8 +475,14 @@ public class NetworkServerSocket implements NetworkPlug {
                     }
                 }
             } catch (IOException e) {
-                //disconnect all the clients connected to the server RMI and Socket
-                NetworkHandler.getInstance().disconnectBroadcast();
+                try {
+                    if(controller.getLobby().getPlayerFromName(nickname) != null){
+                        //disconnect all the clients connected to the server RMI and Socket
+                        NetworkHandler.getInstance().disconnectBroadcast();
+                    }
+                } catch (NoNameException ex) {
+                    System.out.println("Seems this player was not in the lobby.");
+                }
             }
         }
 
@@ -652,16 +672,22 @@ public class NetworkServerSocket implements NetworkPlug {
          * If the client is no longer connected, it triggers a broadcast to disconnect all clients.
          */
         private void isClientConnected() {
-            while (connection) {
-                try {
-                    connection = false;
-                    sendMessage(new ConnectionServer());
-                    Thread.sleep(30000); // 30 seconds
-                } catch (InterruptedException e) {
-                    System.out.println("Error in sleep");
+            scheduler = Executors.newScheduledThreadPool(1);
+
+            final Runnable checker = new Runnable() {
+                public void run() {
+                    if (!connection) {
+                        NetworkHandler.getInstance().disconnectBroadcast();
+                        scheduler.shutdown(); // Stop the scheduler when connection is lost
+                    } else {
+                        connection = false;
+                        sendMessage(new ConnectionServer());
+                    }
                 }
-            }
-            NetworkHandler.getInstance().disconnectBroadcast();
+            };
+
+            // Schedule the task to run every 30 seconds
+            scheduler.scheduleAtFixedRate(checker, 30, 30, TimeUnit.SECONDS);
         }
 
         /**
@@ -680,12 +706,12 @@ public class NetworkServerSocket implements NetworkPlug {
          */
         public void sendMessage(ServerMessage message) {
             //after sending the message, we start the thread to check if the client is still connected
-//            if(message instanceof StopWaitingOrDisconnect) {
-//                //start the thread to check if the client is still connected
-//                if (((StopWaitingOrDisconnect) message).isStopWaitingOrDisconnect()) {
-//                    new Thread(this::isClientConnected).start();
-//                }
-//            }
+            if(message instanceof StopWaitingOrDisconnect) {
+                //start the thread to check if the client is still connected
+                if (((StopWaitingOrDisconnect) message).isStopWaitingOrDisconnect()) {
+                    new Thread(this::isClientConnected).start();
+                }
+            }
 
             try {
                 out.writeObject(message);
