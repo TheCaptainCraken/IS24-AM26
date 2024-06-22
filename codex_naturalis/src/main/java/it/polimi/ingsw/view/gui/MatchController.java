@@ -210,7 +210,7 @@ public class MatchController {
         }
     }
 
-    public void showStartingCard(int id){ //TODO va sistemato il fatto di scegliere starting card quando non è il proprio turno
+    public void showStartingCard(int id){
         status.setText("Please Choose the side of the starting Card");
         root.setImage(loadStartingCardResource(id,true));
         root.setOnMouseClicked(event -> {
@@ -263,7 +263,6 @@ public class MatchController {
     }
 
     public void showSecretObjectiveCard(int indexCard){
-        status.setText("You have successfully chosen your Secret Objective Card!");
         secretContainer.getChildren().remove(secret2);
         secret1.setImage(new Image("frontCard"+indexCard+".png"));
         secret1.setOnMouseClicked(null);

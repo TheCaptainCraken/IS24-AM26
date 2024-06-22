@@ -411,6 +411,41 @@ public class Controller {
         }
     }
 
+
+    /**
+     * Updates the game model with the information of a card that has been placed by
+     * a player.
+     * This method is called when a player successfully places a card on the board.
+     * It updates the game model with the information of the placed card,
+     * including the player's nickname, the card ID, the position of the card, the
+     * side of the card, and the turn.
+     *
+     * @param nickname The nickname of the player who has placed the card.
+     * @param id       The id of the card that has been placed.
+     * @param position The position where the card has been placed on the board.
+     * @param side     The side of the card chosen by the player. True for one side,
+     *                 false for the other.
+     * @param turn     The turn number when the card was placed.
+     */
+    public void updateViewGUI(String nickname, int id, Point position, boolean side, int turn) {
+        boolean start = false;
+        // if the card is the starting card of the given client, show a message to
+        // inform the player.
+        if (position.x == 0 && position.y == 0 && nickname.equals(Controller.nickname)) {
+            model.updatePlaceCard(nickname, id, position, side, turn);
+            start = true;
+
+            // set the playedCardToNull, if the cards is correctly placed, the player is the
+            // owner of it and his hand is not empty.
+        }
+
+        if(!start) {
+            model.updatePlaceCard(nickname, id, position, side, turn);
+        }
+        // notify the scene that a card has been placed. The scene will update the view.
+        view.showTableOfPlayer(nickname);
+    }
+
     /**
      * Updates the resources of a player in the game model.
      *
@@ -912,8 +947,9 @@ public class Controller {
             view.showCommonTable();
 
             view.showCommonObjectives(model.getCommonObjectiveCards());
+            //TODO null
             view.showSecretObjectiveCard(model.getSecretObjectiveCard());
-
+            //TODO null
             for(String nickname : model.getOtherPlayersCards().keySet()) {
                 view.showTableOfPlayer(nickname);
             }
@@ -928,6 +964,9 @@ public class Controller {
                 }
                 view.showTableOfPlayer(player.getName());
             }
+
+            view.start();
+            Controller.setPhase(Phase.GAMEFLOW);
         }else{
             try {
                 view = GUI.getInstance();
@@ -948,6 +987,7 @@ public class Controller {
             view.showPoints();
 
             view.showCommonObjectives(model.getCommonObjectiveCards());
+           // view.showSecretObjectiveCardsToChoose(model.getSecretObjectiveCardsToChoose());
             view.showSecretObjectiveCard(model.getSecretObjectiveCard());
 
             for(Player player : game.getLobby().getPlayers()){
@@ -957,7 +997,6 @@ public class Controller {
                 //TODO non usare updatePlace Card ma altra funzione please.
                 for(PlayedCard playedCard : playedCards){
                     updatePlaceCard(player.getName(), playedCard.getCard().getId(), playedCard.getPosition(), playedCard.isFacingUp(), playedCard.getTurnOfPositioning());
-                    view.showTableOfPlayer(player.getName());
                 }
             }
         }
