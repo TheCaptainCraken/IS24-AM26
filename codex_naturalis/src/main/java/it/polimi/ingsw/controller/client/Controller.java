@@ -411,7 +411,6 @@ public class Controller {
         }
     }
 
-
     /**
      * Updates the game model with the information of a card that has been placed by
      * a player.
@@ -439,7 +438,7 @@ public class Controller {
             // owner of it and his hand is not empty.
         }
 
-        if(!start) {
+        if (!start) {
             model.updatePlaceCard(nickname, id, position, side, turn);
         }
         // notify the scene that a card has been placed. The scene will update the view.
@@ -865,17 +864,16 @@ public class Controller {
         Integer[] resourceCardsOnTable = new Integer[2];
         Integer[] goldCardsOnTable = new Integer[2];
         Integer[] commonObjectiveCards = new Integer[2];
-        HashMap<String, CardClient> table = new HashMap<>();
-        HashMap<String, Pair<Kingdom, Boolean>[]> otherPlayersCards = new HashMap<>();;
+        HashMap<String, Pair<Kingdom, Boolean>[]> otherPlayersCards = new HashMap<>();
+        ;
         Integer[] secretObjectiveCardsToChoose = new Integer[2];
 
         for (Player player : game.getLobby().getPlayers()) {
             points.put(player.getName(), player.getPoints());
             resources.put(player.getName(), player.getResources());
-            table.put(player.getName(), convertPlayedCard(player.getRootCard()));
 
             if (player.getName().equals(nickname)) {
-                //update personal cards
+                // update personal cards
                 ResourceCard[] hand = player.getHand();
                 for (int i = 0; i < 3; i++) {
                     myCards[i] = hand[i].getId();
@@ -883,7 +881,7 @@ public class Controller {
             } else {
                 otherPlayersCards.put(player.getName(), new Pair[3]);
                 Pair<Kingdom, Boolean>[] cards = otherPlayersCards.get(player.getName());
-                for(int i = 0; i < 3; i++) {
+                for (int i = 0; i < 3; i++) {
                     cards[i] = new Pair<>(player.getHand()[i].getKingdom(), player.getHand()[i] instanceof GoldCard);
                 }
             }
@@ -899,25 +897,27 @@ public class Controller {
 
         try {
             playerPosition = game.getOrderPlayer(nickname);
-        }catch (NoNameException e){
+        } catch (NoNameException e) {
             System.out.println("No player with this name");
             playerPosition = -1;
         }
-        //secret objective cards to choose
-        for(int i = 0; i < 2; i++){
+        // secret objective cards to choose
+        for (int i = 0; i < 2; i++) {
             secretObjectiveCardsToChoose[i] = game.getObjectiveCardToChoose(playerPosition, i).getId();
         }
 
         Player player = null;
         try {
             player = game.getLobby().getPlayerFromName(nickname);
-        }catch (NoNameException e){
+        } catch (NoNameException e) {
             System.out.println("No player with this name");
         }
 
-        model = new LittleModel(points, resources, myCards, otherPlayersCards, table, resourceCardsOnTable, goldCardsOnTable,
+        model = new LittleModel(points, resources, myCards, otherPlayersCards, null, resourceCardsOnTable,
+                goldCardsOnTable,
                 game.getHeadDeck(true),
-                game.getHeadDeck(false), secretObjectiveCardsToChoose, commonObjectiveCards, player.getSecretObjective().getId());
+                game.getHeadDeck(false), secretObjectiveCardsToChoose, commonObjectiveCards,
+                player.getSecretObjective().getId());
 
         buildView(game);
     }
@@ -932,72 +932,74 @@ public class Controller {
                 card.getTurnOfPositioning(), attachmentCorners);
     }
 
-    private void buildView(GameMaster game){
-        if(view instanceof TUI) {
+    private void buildView(GameMaster game) {
+        if (view instanceof TUI) {
             view = new TUI(model, this);
-            //print all hands
+            // print all hands
             view.showHand();
-            for(String nickname : model.getOtherPlayersCards().keySet()) {
+            for (String nickname : model.getOtherPlayersCards().keySet()) {
                 view.showHiddenHand(nickname);
             }
-            //print points and resources
+            // print points and resources
             view.showPoints();
             view.showResourcesPlayer();
-            //print table
+            // print table
             view.showCommonTable();
 
             view.showCommonObjectives(model.getCommonObjectiveCards());
-            //TODO null
             view.showSecretObjectiveCard(model.getSecretObjectiveCard());
-            //TODO null
-            for(String nickname : model.getOtherPlayersCards().keySet()) {
+            for (String nickname : model.getOtherPlayersCards().keySet()) {
                 view.showTableOfPlayer(nickname);
             }
 
-            for(Player player : game.getLobby().getPlayers()){
+            for (Player player : game.getLobby().getPlayers()) {
                 ArrayList<PlayedCard> playedCards = game.getPlayersCards(player);
 
-                Collections.sort(playedCards, (card1, card2) -> Integer.compare(card1.getTurnOfPositioning(), card2.getTurnOfPositioning()));
-                //TODO non usare updatePlace Card ma altra funzione please.
-                for(PlayedCard playedCard : playedCards){
-                    updatePlaceCard(player.getName(), playedCard.getCard().getId(), playedCard.getPosition(), playedCard.isFacingUp(), playedCard.getTurnOfPositioning());
+                Collections.sort(playedCards,
+                        (card1, card2) -> Integer.compare(card1.getTurnOfPositioning(), card2.getTurnOfPositioning()));
+                for (PlayedCard playedCard : playedCards) {
+                    model.updatePlaceCard(player.getName(), playedCard.getCard().getId(), playedCard.getPosition(),
+                            playedCard.isFacingUp(), playedCard.getTurnOfPositioning());
+                    view.showTableOfPlayer(player.getName());
                 }
-                view.showTableOfPlayer(player.getName());
             }
 
             view.start();
             Controller.setPhase(Phase.GAMEFLOW);
-        }else{
+        } else {
             try {
                 view = GUI.getInstance();
             } catch (InterruptedException e) {
                 System.out.println("GUI not ready yet");
             }
-            //change the model for GUI
+            // change the model for GUI
             ((GUI) view).setModel(model);
 
             view.showCommonTable();
-            //show all hands
+            // show all hands
             view.showHand();
-            for(String nickname : model.getOtherPlayersCards().keySet()) {
+            for (String nickname : model.getOtherPlayersCards().keySet()) {
                 view.showHiddenHand(nickname);
             }
-            //maybe not necessary
+            // maybe not necessary
             view.showResourcesPlayer();
             view.showPoints();
 
             view.showCommonObjectives(model.getCommonObjectiveCards());
-           // view.showSecretObjectiveCardsToChoose(model.getSecretObjectiveCardsToChoose());
+            // view.showSecretObjectiveCardsToChoose(model.getSecretObjectiveCardsToChoose());
             view.showSecretObjectiveCard(model.getSecretObjectiveCard());
 
-            for(Player player : game.getLobby().getPlayers()){
+            for (Player player : game.getLobby().getPlayers()) {
                 ArrayList<PlayedCard> playedCards = game.getPlayersCards(player);
 
-                Collections.sort(playedCards, (card1, card2) -> Integer.compare(card1.getTurnOfPositioning(), card2.getTurnOfPositioning()));
-                //TODO non usare updatePlace Card ma altra funzione please.
-                for(PlayedCard playedCard : playedCards){
-                    updatePlaceCard(player.getName(), playedCard.getCard().getId(), playedCard.getPosition(), playedCard.isFacingUp(), playedCard.getTurnOfPositioning());
+                Collections.sort(playedCards,
+                        (card1, card2) -> Integer.compare(card1.getTurnOfPositioning(), card2.getTurnOfPositioning()));
+                for (PlayedCard playedCard : playedCards) {
+                    model.updatePlaceCard(player.getName(), playedCard.getCard().getId(), playedCard.getPosition(),
+                            playedCard.isFacingUp(), playedCard.getTurnOfPositioning());
                 }
+                view.showTableOfPlayer(player.getName());
+
             }
         }
     }
