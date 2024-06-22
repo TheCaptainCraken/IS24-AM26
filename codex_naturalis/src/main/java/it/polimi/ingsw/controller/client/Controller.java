@@ -960,8 +960,8 @@ public class Controller {
                 for (PlayedCard playedCard : playedCards) {
                     model.updatePlaceCard(player.getName(), playedCard.getCard().getId(), playedCard.getPosition(),
                             playedCard.isFacingUp(), playedCard.getTurnOfPositioning());
-                    view.showTableOfPlayer(player.getName());
                 }
+                view.showTableOfPlayer(player.getName());
             }
 
             view.start();
@@ -997,8 +997,8 @@ public class Controller {
                 for (PlayedCard playedCard : playedCards) {
                     model.updatePlaceCard(player.getName(), playedCard.getCard().getId(), playedCard.getPosition(),
                             playedCard.isFacingUp(), playedCard.getTurnOfPositioning());
+                    view.showTableOfPlayer(player.getName());
                 }
-                view.showTableOfPlayer(player.getName());
 
             }
         }
