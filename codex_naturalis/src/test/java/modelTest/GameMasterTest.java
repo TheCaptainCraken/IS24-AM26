@@ -698,8 +698,7 @@ public class GameMasterTest {
                 ()->game.placeCard(game.getCurrentPlayer().getName(), 2, new Point(4, 0), false));
         assertEquals(GameState.END, game.getGameState());
     }
-
-
+    
 }
 
 
