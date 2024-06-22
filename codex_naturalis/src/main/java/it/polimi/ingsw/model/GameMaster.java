@@ -878,7 +878,7 @@ public class GameMaster implements Serializable {
      * @param player player to explore
      * @return list of played cards
      */
-    private ArrayList<PlayedCard> getPlayersCards(Player player) {
+    public ArrayList<PlayedCard> getPlayersCards(Player player) {
         PlayedCard rootCard = player.getRootCard();
         return exploreGraph(rootCard);
     }
