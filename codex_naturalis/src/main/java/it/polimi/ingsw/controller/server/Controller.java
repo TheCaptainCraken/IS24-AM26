@@ -22,7 +22,7 @@ import java.io.Serializable;
 public class Controller {
     static String basePath = "codex_naturalis/src/main/java/it/polimi/ingsw/model/decks/";
     private static final Controller INSTANCE = new Controller();
-    private final String savePath = "savedGame.ser";
+    private final String savePath = "SavedGame.data";
 
     Lobby lobby;
     GameMaster game = null;
@@ -70,7 +70,6 @@ public class Controller {
                     basePath + "goldCardsDeck.json",
                     basePath + "objectiveCardsDeck.json",
                     basePath + "startingCardsDeck.json");
-            saveGame();
         } catch (IOException | ParseException ex) {
             System.out.println("the file is not found");
         }
@@ -110,7 +109,6 @@ public class Controller {
     public int placeRootCard(String player, boolean side)
             throws WrongGamePhaseException, NoTurnException, NoNameException {
         int id = game.placeRootCard(player, side);
-        saveGame();
         return id;
     }
 
@@ -139,7 +137,9 @@ public class Controller {
     public void chooseObjectiveCard(String player, int whichCard)
             throws WrongGamePhaseException, NoTurnException, NoNameException {
         game.chooseObjectiveCard(player, whichCard);
-        saveGame();
+        if (areAllSecretObjectiveCardChosen()) {
+            saveGame();
+        }
     }
 
     /**
