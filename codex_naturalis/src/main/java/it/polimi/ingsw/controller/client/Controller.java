@@ -16,10 +16,7 @@ import java.awt.*;
 import java.io.IOException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 import static javafx.application.Application.launch;
 
@@ -886,6 +883,8 @@ public class Controller {
         model = new LittleModel(points, resources, myCards, otherPlayersCards, table, resourceCardsOnTable, goldCardsOnTable,
                 game.getHeadDeck(true),
                 game.getHeadDeck(false), secretObjectiveCardsToChoose, commonObjectiveCards, player.getSecretObjective().getId());
+
+        buildView(game);
     }
 
     private CardClient convertPlayedCard(PlayedCard card) {
@@ -896,6 +895,72 @@ public class Controller {
         }
         return new CardClient(card.getCard().getId(), card.isFacingUp(), card.getPosition(),
                 card.getTurnOfPositioning(), attachmentCorners);
+    }
+
+    private void buildView(GameMaster game){
+        if(view instanceof TUI) {
+            view = new TUI(model, this);
+            //print all hands
+            view.showHand();
+            for(String nickname : model.getOtherPlayersCards().keySet()) {
+                view.showHiddenHand(nickname);
+            }
+            //print points and resources
+            view.showPoints();
+            view.showResourcesPlayer();
+            //print table
+            view.showCommonTable();
+
+            view.showCommonObjectives(model.getCommonObjectiveCards());
+            view.showSecretObjectiveCard(model.getSecretObjectiveCard());
+
+            for(String nickname : model.getOtherPlayersCards().keySet()) {
+                view.showTableOfPlayer(nickname);
+            }
+
+            for(Player player : game.getLobby().getPlayers()){
+                ArrayList<PlayedCard> playedCards = game.getPlayersCards(player);
+
+                Collections.sort(playedCards, (card1, card2) -> Integer.compare(card1.getTurnOfPositioning(), card2.getTurnOfPositioning()));
+                //TODO non usare updatePlace Card ma altra funzione please.
+                for(PlayedCard playedCard : playedCards){
+                    updatePlaceCard(player.getName(), playedCard.getCard().getId(), playedCard.getPosition(), playedCard.isFacingUp(), playedCard.getTurnOfPositioning());
+                }
+                view.showTableOfPlayer(player.getName());
+            }
+        }else{
+            try {
+                view = GUI.getInstance();
+            } catch (InterruptedException e) {
+                System.out.println("GUI not ready yet");
+            }
+            //change the model for GUI
+            ((GUI) view).setModel(model);
+
+            view.showCommonTable();
+            //show all hands
+            view.showHand();
+            for(String nickname : model.getOtherPlayersCards().keySet()) {
+                view.showHiddenHand(nickname);
+            }
+            //maybe not necessary
+            view.showResourcesPlayer();
+            view.showPoints();
+
+            view.showCommonObjectives(model.getCommonObjectiveCards());
+            view.showSecretObjectiveCard(model.getSecretObjectiveCard());
+
+            for(Player player : game.getLobby().getPlayers()){
+                ArrayList<PlayedCard> playedCards = game.getPlayersCards(player);
+
+                Collections.sort(playedCards, (card1, card2) -> Integer.compare(card1.getTurnOfPositioning(), card2.getTurnOfPositioning()));
+                //TODO non usare updatePlace Card ma altra funzione please.
+                for(PlayedCard playedCard : playedCards){
+                    updatePlaceCard(player.getName(), playedCard.getCard().getId(), playedCard.getPosition(), playedCard.isFacingUp(), playedCard.getTurnOfPositioning());
+                    view.showTableOfPlayer(player.getName());
+                }
+            }
+        }
     }
 
 }
