@@ -3,6 +3,7 @@ package it.polimi.ingsw.controller.client;
 import it.polimi.ingsw.model.*;
 
 import it.polimi.ingsw.model.Color;
+import it.polimi.ingsw.model.exception.NoNameException;
 import it.polimi.ingsw.network.RMI.ClientRMI;
 import it.polimi.ingsw.network.socket.ClientSocket;
 import it.polimi.ingsw.network.NetworkClient;
@@ -826,7 +827,6 @@ public class Controller {
      *                                     by the player.
      */
     public void setModel(GameMaster game) {
-
         HashMap<String, Integer> points = new HashMap<>();
         HashMap<String, HashMap<Sign, Integer>> resources = new HashMap<>();
         Integer[] myCards = new Integer[3];
@@ -834,6 +834,8 @@ public class Controller {
         Integer[] goldCardsOnTable = new Integer[2];
         Integer[] commonObjectiveCards = new Integer[2];
         HashMap<String, CardClient> table = new HashMap<>();
+        HashMap<String, Pair<Kingdom, Boolean>[]> otherPlayersCards = new HashMap<>();;
+        Integer[] secretObjectiveCardsToChoose = new Integer[2];
 
         for (Player player : game.getLobby().getPlayers()) {
             points.put(player.getName(), player.getPoints());
@@ -841,12 +843,17 @@ public class Controller {
             table.put(player.getName(), convertPlayedCard(player.getRootCard()));
 
             if (player.getName().equals(nickname)) {
+                //update personal cards
                 ResourceCard[] hand = player.getHand();
                 for (int i = 0; i < 3; i++) {
                     myCards[i] = hand[i].getId();
                 }
             } else {
-
+                otherPlayersCards.put(player.getName(), new Pair[3]);
+                Pair<Kingdom, Boolean>[] cards = otherPlayersCards.get(player.getName());
+                for(int i = 0; i < 3; i++) {
+                    cards[i] = new Pair<>(player.getHand()[i].getKingdom(), player.getHand()[i] instanceof GoldCard);
+                }
             }
         }
 
@@ -856,11 +863,29 @@ public class Controller {
             commonObjectiveCards[i] = game.getObjectiveCard(i).getId();
         }
 
-        model = new LittleModel(points, resources, myCards, null, table, resourceCardsOnTable, goldCardsOnTable,
+        int playerPosition;
+
+        try {
+            playerPosition = game.getOrderPlayer(nickname);
+        }catch (NoNameException e){
+            System.out.println("No player with this name");
+            playerPosition = -1;
+        }
+        //secret objective cards to choose
+        for(int i = 0; i < 2; i++){
+            secretObjectiveCardsToChoose[i] = game.getObjectiveCardToChoose(playerPosition, i).getId();
+        }
+
+        Player player = null;
+        try {
+            player = game.getLobby().getPlayerFromName(nickname);
+        }catch (NoNameException e){
+            System.out.println("No player with this name");
+        }
+
+        model = new LittleModel(points, resources, myCards, otherPlayersCards, table, resourceCardsOnTable, goldCardsOnTable,
                 game.getHeadDeck(true),
-                game.getHeadDeck(false), null, commonObjectiveCards, null);
-        // notify the scene that the model has been updated. The scene will update the
-        // view.
+                game.getHeadDeck(false), secretObjectiveCardsToChoose, commonObjectiveCards, player.getSecretObjective().getId());
     }
 
     private CardClient convertPlayedCard(PlayedCard card) {
