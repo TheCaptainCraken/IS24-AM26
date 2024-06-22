@@ -111,10 +111,4 @@ public class LobbyTest {
         Assertions.assertFalse(lobby.isAdmitted("arturo"));
         Assertions.assertTrue(lobby.getLock());
     }
-    @Test
-    @DisplayName("Lobby has been closed with exact number of players")
-    public void uselessKickOutTest() throws ClosingLobbyException {
-        lobby.setMaxSize(4);
-        Assertions.assertTrue(lobby.getLock());
-    }
 }
