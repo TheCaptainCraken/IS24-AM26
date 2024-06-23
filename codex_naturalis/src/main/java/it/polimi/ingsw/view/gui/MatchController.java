@@ -333,13 +333,7 @@ public class MatchController {
                 }
             }
         }
-        messageSubmit.setOnMouseClicked(event->{
-            String s = messageContent.getText();
-            if(!s.isBlank()){
-                ViewSubmissions.getInstance().sendChatMessage(s);
-                messageContent.setText("");
-            }
-        });
+        messageSubmit.setOnMouseClicked(event-> handleSendMessage());
     }
     /**
      * This method is used in the MatchController class of the GUI.
@@ -499,7 +493,7 @@ public class MatchController {
     public void showSecretObjectiveCard(int indexCard){
         secretContainer.getChildren().remove(secret2);
         spacer.setPrefHeight(200);
-        spacer.setPrefWidth(50);
+        spacer.setPrefWidth(235);
         secret1.setImage(new Image("frontCard"+indexCard+".png"));
         secret1.setOnMouseClicked(null);
     }
@@ -1337,5 +1331,34 @@ public class MatchController {
             ViewSubmissions.getInstance().placeCard(handIndex,position,false);
 
         });
+    }
+
+    public void handleSendMessage(){
+        String s = messageContent.getText();
+        if(!s.isBlank()){
+            int count = 1;
+            for(String name:playerColors.keySet()){
+                if(s.toLowerCase().contains("@"+name.toLowerCase())){
+                    break;
+                }
+                count++;
+            }
+            if(count < playerColors.size() + 1){
+                ViewSubmissions.getInstance().sendChatMessage(s);
+                messageContent.setText("");
+            } else {
+                dialog = new Dialog<>();
+                dialog.setTitle("Invalid Username!");
+                dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK);
+                Label l = new Label("The user you tried to message is not present in the game\n " +
+                        "Please choose a valid username.");
+                l.setFont(Font.font(16));
+                ImageView error = new ImageView("error_icon.png");
+                HBox box = new HBox(error,l);
+                dialog.getDialogPane().setContent(box);
+                dialog.show();
+            }
+
+        }
     }
 }

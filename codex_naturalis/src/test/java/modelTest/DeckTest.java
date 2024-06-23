@@ -8,7 +8,7 @@ import org.junit.jupiter.api.DisplayName;
 
 public class DeckTest {
 
-    String basePath = "src/test/java/it/polimi/ingsw/test_decks/";
+    String basePath = "src/test/java/modelTest/test_decks/";
 
     @Test
     @DisplayName("Test that a deck can be created.")
@@ -47,6 +47,14 @@ public class DeckTest {
     public void createCardsTest() {
         Assertions.assertDoesNotThrow(() -> {
             new Deck(basePath + "omega_deck.json");
+        });
+    }
+    @Test
+    @DisplayName("Test that it's possible to get information about a card in the deck.")
+    public void getCardFromPositionInDeck() {
+        Assertions.assertDoesNotThrow(() -> {
+            Deck deck = new Deck(basePath + "objective_card.json");
+            deck.getCard(0);
         });
     }
 

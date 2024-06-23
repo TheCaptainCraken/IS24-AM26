@@ -107,6 +107,7 @@ public class GameMasterTest {
         game.drawCard("francesco", true, 0);
 
         assert (game.getGameState() == GameState.END);
+        Assertions.assertNotNull(game.getRanking());
     }
     @Test
     public void transitionAtEndGameForLastPlayer() throws WrongGamePhaseException, NoTurnException, NoNameException, NotEnoughResourcesException, CardPositionException {
@@ -699,6 +700,32 @@ public class GameMasterTest {
         assertEquals(GameState.END, game.getGameState());
     }
 
+    @Test
+    @DisplayName(("Tests for basic getters"))
+    public void gettersTest() throws NoNameException {
+        Assertions.assertNotNull(game2.getCard(false,0));
+        Assertions.assertNotNull(game2.getCard(true,0));
+        Assertions.assertNotNull(game2.getHeadDeck(true));
+        Assertions.assertNotNull(game2.getHeadDeck(false));
+        Assertions.assertNotNull(game2.getResourceCard(0));
+        Assertions.assertNotNull(game2.getGoldCard(0));
+        Assertions.assertNotNull(game2.getStartingCardToPosition("pietro"));
+    }
+
+    @Test
+    @DisplayName("Getters for objective phase")
+    public void getObjectiveToChoose() throws IOException, ParseException {
+        Lobby lobby = new Lobby();
+        lobby.addPlayer("pietro");
+        GameMaster game = new GameMaster(lobby,
+                basePath + "resourceCardsDeck.json",
+                basePath + "goldCardsDeck.json",
+                basePath + "objectiveCardsDeck.json",
+                basePath + "startingCardsDeck.json");
+        game.placeRootCard("pietro",true);
+        Assertions.assertNotNull(game.getObjectiveCard(0));
+        Assertions.assertNotNull(game.getObjectiveCardToChoose(0,0));
+    }
 
 }
 

@@ -53,7 +53,7 @@ public class Deck {
     public Deck(String cardsFile, boolean toFile) throws IOException, ParseException {
         cards = new ArrayList<Card>();
         this.generateDeck(cardsFile);
-    }
+    }//do we need to test this?
 
 
     /**
