@@ -25,6 +25,7 @@ public class GameMasterTest {
     static Lobby lobby3;
     static Lobby lobby4;
     static String basePath = "src/main/java/it/polimi/ingsw/model/decks/";
+
     static String alternatebasePath = "src/test/java/modelTest/test_decks/";
 
     @BeforeEach
