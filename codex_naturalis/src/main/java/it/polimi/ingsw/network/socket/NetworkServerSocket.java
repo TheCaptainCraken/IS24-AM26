@@ -69,7 +69,7 @@ public class NetworkServerSocket implements NetworkPlug {
     /**
      * The Controller object used to access the game state and perform game actions.
      */
-    private final Controller controller;
+    private Controller controller;
     /**
      * A HashMap used to store the connections to the clients.
      * The key is the address of the client socket, and the value is the ClientHandler object representing the connection.
@@ -135,6 +135,10 @@ public class NetworkServerSocket implements NetworkPlug {
         for (ClientHandler connection : connections.values()) {
             connection.sendMessageDisconnection(message);
         }
+        connections = new HashMap<>();
+        //set controller to null, and recreate that after the disconnection of all the clients.
+        Controller.getInstance().reset();
+        controller = Controller.getInstance();
     }
     /**
      * Implements the finalizingNumberOfPlayers method of the NetworkPlug interface.
@@ -731,7 +735,7 @@ public class NetworkServerSocket implements NetworkPlug {
         public void sendMessageDisconnection(ServerMessage message) {
             try {
                 out.writeObject(message);
-                scheduler.shutdown();
+                scheduler.shutdownNow();
                 hastaLaVistaBaby();
             } catch (IOException e) {
                 System.out.println("SOCKET: Error closing connection." + nickname + "Connection already closed.");

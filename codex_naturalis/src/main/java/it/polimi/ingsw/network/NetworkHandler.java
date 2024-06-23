@@ -247,14 +247,7 @@ public class NetworkHandler {
         for (NetworkPlug networkPlug : networkInterfacesAndConnections.values()) {
             networkPlug.disconnectAll();
         }
-        try {
-            main(new String[0]);
-            //reset the lobby to null and the controller to null
-            Controller.getInstance().reset();
-        } catch (IOException e) {
-           System.out.println("Cannot restart the server. Please restart the server.");
-           System.exit(0);
-        }
+        //reset the lobby to null and the controller to null
     }
 
     /**

@@ -37,7 +37,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class ServerRMI implements RMIServerInterface, NetworkPlug {
     static int PORT = 1099; //TODO porta dinamica
-    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+    private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     HashMap<String, RMIClientInterface> connections = new HashMap<>();
 
     /**
@@ -691,6 +691,10 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
                 System.out.println("RMI : Cannot communicate with " + nickname + " Already disconnected");
             }
         }
+        scheduler.shutdownNow();
+        scheduler = Executors.newScheduledThreadPool(1);
+        //reset the connections
+        connections = new HashMap<>();
     }
 
     /**
