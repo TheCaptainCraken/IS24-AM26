@@ -606,6 +606,11 @@ public class NetworkServerSocket implements NetworkPlug {
             }
         }
 
+        /**
+         * This method is used to send the full game state to the clients.
+         * 
+         * @param game The game state to be sent.
+         */
         public void sendFullGameState(GameMaster game) {
             sendMessage(new loadSavedGame(game));
         }

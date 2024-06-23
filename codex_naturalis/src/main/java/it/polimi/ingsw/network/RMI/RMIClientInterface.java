@@ -179,5 +179,12 @@ public interface RMIClientInterface extends Remote {
 
         void isConnected() throws RemoteException;
 
+        /**
+         * Loads a saved game.
+         * 
+         * @param game The game to load.
+         * @throws RemoteException throws a RemoteException if there is a problem with
+         *                         the connection.
+         */
         void loadSavedGame(GameMaster game) throws RemoteException;
 }

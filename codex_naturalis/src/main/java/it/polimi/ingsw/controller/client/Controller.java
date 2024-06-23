@@ -799,63 +799,10 @@ public class Controller {
     }
 
     /**
-     * Sets the model with the required information about the game.
-     *
-     * This method is used to set the model with all the required information about
-     * the game.
-     * The model will store the points, resources, cards, and other information
-     * about the game.
-     *
-     * @param points                       A HashMap where the keys are the
-     *                                     nicknames
-     *                                     of the players and the values are their
-     *                                     associated points.
-     * @param resources                    A HashMap where the keys are the
-     *                                     nicknames
-     *                                     of the players and the values are another
-     *                                     HashMap where the keys are the types of
-     *                                     resources (Sign) and the values are the
-     *                                     quantities of each resource (Integer).
-     * @param myCards                      An array of integers representing the IDs
-     *                                     of
-     *                                     the cards in the player's hand.
-     * @param otherPlayersCards            A HashMap where the keys are the
-     *                                     nicknames
-     *                                     of the players and the values are an
-     *                                     array
-     *                                     of Pair objects, each containing a
-     *                                     Kingdom
-     *                                     and a Boolean, representing the cards in
-     *                                     the
-     *                                     player's hidden hand.
-     * @param table                        A HashMap where the keys are the
-     *                                     positions
-     *                                     of the cards on the table and the values
-     *                                     are
-     *                                     CardClient objects representing the cards
-     *                                     on
-     *                                     the table.
-     * @param resourceCards                An array of integers representing the IDs
-     *                                     of
-     *                                     the resource cards on the table.
-     * @param goldCards                    An array of integers representing the IDs
-     *                                     of
-     *                                     the gold cards on the table.
-     * @param headDeckGold                 A Kingdom object representing the gold
-     *                                     card
-     *                                     on the deck.
-     * @param headDeckResource             A Kingdom object representing the
-     *                                     resource
-     *                                     card on the deck.
-     * @param secretObjectiveCardsToChoose An array of integers representing the IDs
-     *                                     of the secret objective cards to choose
-     *                                     from.
-     * @param commonObjectiveCards         An array of integers representing the IDs
-     *                                     of
-     *                                     the common objective cards.
-     * @param secretObjectiveCard          The ID of the secret objective card
-     *                                     chosen
-     *                                     by the player.
+     * Sets the model for the game. And triggers the view to display.
+     * 
+     * @param game The GameMaster object containing all the information about the
+     *             game.
      */
     public void setModel(GameMaster game) {
         HashMap<String, Integer> points = new HashMap<>();
@@ -922,16 +869,16 @@ public class Controller {
         buildView(game);
     }
 
-    private CardClient convertPlayedCard(PlayedCard card) {
-        HashMap<Corner, PlayedCard> playedCardCorners = card.getAttachmentCorners();
-        HashMap<Corner, CardClient> attachmentCorners = new HashMap<>();
-        for (Corner corner : playedCardCorners.keySet()) {
-            attachmentCorners.put(corner, convertPlayedCard(playedCardCorners.get(corner)));
-        }
-        return new CardClient(card.getCard().getId(), card.isFacingUp(), card.getPosition(),
-                card.getTurnOfPositioning(), attachmentCorners);
-    }
-
+    /**
+     * Builds the view for the game.
+     *
+     * This method is used to build the view for the game.
+     * The view will display the hands, points, resources, table, and other
+     * information about the game.
+     *
+     * @param game The GameMaster object containing all the information about the
+     *             game.
+     */
     private void buildView(GameMaster game) {
         if (view instanceof TUI) {
             view = new TUI(model, this);

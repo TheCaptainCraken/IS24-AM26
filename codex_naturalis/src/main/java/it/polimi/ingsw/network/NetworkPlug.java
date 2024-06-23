@@ -124,5 +124,12 @@ public interface NetworkPlug {
          */
         void disconnectAll();
 
+        /**
+         * This method is used to load a game from a save file.
+         * It should be implemented by each network interface to handle the loading
+         * process according to its specific protocol.
+         *
+         * @param game The game to load.
+         */
         void loadGame(GameMaster game);
 }

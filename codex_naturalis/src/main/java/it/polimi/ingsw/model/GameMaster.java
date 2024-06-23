@@ -87,7 +87,12 @@ public class GameMaster implements Serializable {
     }
 
     /**
-     * Creates a GameMaster from a file.
+     * Creates a new instance from a saved GameMaster on file.
+     * 
+     * @param path path of the file to load.
+     * @return the loaded GameMaster.
+     * @throws IOException            if the file is not found or can't be read.
+     * @throws ClassNotFoundException if the class is not found.
      */
     public static GameMaster tryLoadingGameMaster(String path) throws IOException, ClassNotFoundException {
         FileInputStream saveFile = new FileInputStream(path);
