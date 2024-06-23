@@ -1,6 +1,7 @@
 package it.polimi.ingsw.model;
 
 import it.polimi.ingsw.model.exception.*;
+import it.polimi.ingsw.view.model.CardClient;
 import org.json.simple.parser.ParseException;
 
 import java.awt.*;
@@ -678,7 +679,7 @@ public class GameMaster {
      * @param countable Countable to convert
      * @return Sign in which the Kingdom has been converted
      */
-    private Sign fromCountableToSign(Countable countable) throws IllegalArgumentException {
+    public Sign fromCountableToSign(Countable countable) throws IllegalArgumentException {
         switch (countable) {
             case QUILL:
                 return Sign.QUILL;
@@ -770,8 +771,8 @@ public class GameMaster {
                 }
             }
         }
-        // Sort the cards by ascending y position
-        cards.sort((PlayedCard card1, PlayedCard card2) -> card1.getPosition().y - card2.getPosition().y);
+        // Sort the cards by ascending x + y position
+        Collections.sort(cards, Comparator.comparing((PlayedCard card) -> card.getPosition().x + card.getPosition().y));
         return cards;
     }
 
@@ -1116,7 +1117,7 @@ public class GameMaster {
      * @param kingdom    kingdom of the objective card.
      * @return number of points to add to the player points
      */
-    private int calculateEndGamePoints(ObjectiveType type, int multiplier, Player player, Kingdom kingdom) {
+    public int calculateEndGamePoints(ObjectiveType type, int multiplier, Player player, Kingdom kingdom) {
         int points = 0;
 
         switch (type) {

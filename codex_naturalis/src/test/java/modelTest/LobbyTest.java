@@ -105,10 +105,40 @@ public class LobbyTest {
 
     @Test
     @DisplayName("Test kickOut from lobby")
-    public void kickOutTest() throws ClosingLobbyException {
+    public void kickOutTest() throws ClosingLobbyException, SameNameException, LobbyCompleteException {
+        Lobby lobby = new Lobby();
+        lobby.addPlayer("pietro");
+        lobby.addPlayer("marco");
         lobby.setMaxSize(2);
-        Assertions.assertFalse(lobby.isAdmitted("daniel"));
-        Assertions.assertFalse(lobby.isAdmitted("arturo"));
+        Assertions.assertTrue(lobby.isAdmitted("pietro"));
+        Assertions.assertTrue(lobby.isAdmitted("marco"));
         Assertions.assertTrue(lobby.getLock());
+    }
+
+    @Test
+    @DisplayName("test inizialise lobby")
+    public void inzialiseLobby() throws SameNameException, LobbyCompleteException, ClosingLobbyException {
+        Lobby lobby = new Lobby();
+       ;lobby.addPlayer("pietro");
+        lobby.addPlayer("marco");
+        lobby.addPlayer("daniel");
+        lobby.addPlayer("arturo");
+        Assertions.assertEquals(4, lobby.getPlayers().length);
+        lobby.setMaxSize(2);
+        Assertions.assertEquals(2, lobby.getPlayers().length);
+        Assertions.assertThrows(LobbyCompleteException.class, () -> {
+            lobby.addPlayer("daniel");
+        });
+        Assertions.assertThrows(ClosingLobbyException.class, () -> {
+            lobby.setMaxSize(3);
+        });
+    }
+
+    @Test
+    public void normalSetLock() throws SameNameException, LobbyCompleteException, ClosingLobbyException {
+        lobby = new Lobby();
+        lobby.addPlayer("arco");
+        lobby.addPlayer("marco");
+        lobby.setMaxSize(2);
     }
 }

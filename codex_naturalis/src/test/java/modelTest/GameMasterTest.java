@@ -676,6 +676,16 @@ public class GameMasterTest {
         //gold slot[0] is now empty, player 2
         game.drawCard(game.getCurrentPlayer().getName(),true,0);
 
+        Kingdom test = game.getHeadDeck(true);
+        assertNull(test);
+        test = game.getHeadDeck(false);
+        assertNull(test);
+
+        assertNull(game.getCard(true,0));
+        assertNull(game.getCard(false,0));
+
+        assertNull(game.getCard(true, 1));
+        assertNull(game.getCard(false, 1));
         //TABLE EMPTY NOW, we are now in second_last_turn phase.
         //starting from player 3
         for(i = 0; i < 6; i++){
@@ -727,6 +737,170 @@ public class GameMasterTest {
         Assertions.assertNotNull(game.getObjectiveCardToChoose(0,0));
     }
 
+    @Test
+    @DisplayName("WrongPhase")
+    public void wrongPhaseException() throws IOException, ParseException {
+        Lobby lobby = new Lobby();
+        lobby.addPlayer("pietro");
+        lobby.addPlayer("marco");
+        GameMaster game = new GameMaster(lobby,
+                basePath + "resourceCardsDeck.json",
+                basePath + "goldCardsDeck.json",
+                basePath + "objectiveCardsDeck.json",
+                basePath + "startingCardsDeck.json");
+        game.placeRootCard("pietro",true);
+        Assertions.assertThrows(WrongGamePhaseException.class, ()-> game.chooseObjectiveCard("marco",0));
+        game.placeRootCard("marco",true);
+        game.chooseObjectiveCard("pietro",0);
+        Assertions.assertThrows(WrongGamePhaseException.class, ()-> game.placeCard("marco",0,new Point(1,0),true));
+        game.chooseObjectiveCard("marco",0);
+
+        game.placeCard("pietro",0,new Point(1,0),true);
+        game.drawCard("pietro",true,0);
+        Assertions.assertThrows(NoTurnException.class, ()-> game.placeCard("pietro",0,new Point(1,0),true));
+
+        Assertions.assertThrows(WrongGamePhaseException.class, game::endGame);
+    }
+
+    @Test
+    @DisplayName("Test for notEnoughResources")
+     public void notEnoughResources() throws IOException, ParseException {
+        Lobby lobby = new Lobby();
+        lobby.addPlayer("pietro");
+        GameMaster game = new GameMaster(lobby,
+                basePath + "resourceCardsDeck.json",
+                basePath + "goldCardsDeck.json",
+                basePath + "objectiveCardsDeck.json",
+                basePath + "startingCardsDeck.json");
+        game.placeRootCard("pietro",true);
+        game.chooseObjectiveCard("pietro",0);
+        Assertions.assertThrows(NotEnoughResourcesException.class, ()-> game.placeCard("pietro",2,new Point(1,0),true));
+    }
+
+    @Test
+    public void fromCountableToSign(){
+        Assertions.assertEquals(Sign.QUILL, game.fromCountableToSign(Countable.QUILL));
+        Assertions.assertEquals(Sign.INKWELL, game.fromCountableToSign(Countable.INKWELL));
+        Assertions.assertEquals(Sign.SCROLL, game.fromCountableToSign(Countable.SCROLL));
+        Assertions.assertThrows(IllegalArgumentException.class, ()-> game.fromCountableToSign(Countable.CORNER));
+    }
+
+    @Test
+    @DisplayName("player not in lobby")
+    public void NoPlayerException() throws SameNameException, LobbyCompleteException, NoNameException {
+       lobby = new Lobby();
+       lobby.addPlayer("pietro");
+       lobby.addPlayer("marco");
+       Assertions.assertThrows(NoNameException.class, () -> lobby.getPlayerFromName("giovanni"));
+    }
+
+    @Test
+    public void simulateTwoPlayerGame() throws Exception {
+        // Crea due giocatori
+        Player player1 = new Player("Player1");
+        Player player2 = new Player("Player2");
+
+        // Crea un nuovo lobby e aggiungi i giocatori
+        Lobby lobby = new Lobby();
+        lobby.addPlayer(player1.getName());
+        lobby.addPlayer(player2.getName());
+
+        // Crea un nuovo GameMaster con il lobby
+        GameMaster gameMaster = new GameMaster(lobby, basePath + "resourceCardsDeck.json", basePath + "goldCardsDeck.json",
+                basePath + "objectiveCardsDeck.json", basePath + "startingCardsDeck.json");
+
+        // Simula alcune mosse
+        gameMaster.placeRootCard(player1.getName(), true);
+        gameMaster.placeRootCard(player2.getName(), false);
+
+        gameMaster.chooseObjectiveCard(player1.getName(), 0);
+        gameMaster.chooseObjectiveCard(player2.getName(), 1);
+
+        gameMaster.placeCard(player1.getName(), 0, new Point(0, 1), true);
+        gameMaster.drawCard(player1.getName(), true, 0);
+
+        gameMaster.placeCard(player2.getName(), 0, new Point(1, 0), true);
+        gameMaster.drawCard(player2.getName(), false, 1);
+
+        // Verifica che il gioco si comporti come previsto
+        assertEquals(GameState.PLACING_PHASE, gameMaster.getGameState(), "The game state should be PLACING_PHASE");
+        assertNotNull(gameMaster.getResourceCard(0), "The resource card at position 0 should not be null");
+        assertNotNull(gameMaster.getGoldCard(1), "The gold card at position 1 should not be null");
+
+        Assertions.assertThrows(NoNameException.class, () -> game.getOrderPlayer("giacomo"));
+    }
+
+    @Test
+    public void endPointsGame() throws IOException, ParseException {
+        // Crea due giocatori
+        Player player1 = new Player("Player1");
+        Player player2 = new Player("Player2");
+
+        // Crea un nuovo lobby e aggiungi i giocatori
+        Lobby lobby = new Lobby();
+        lobby.addPlayer(player1.getName());
+        lobby.addPlayer(player2.getName());
+
+        // Crea un nuovo GameMaster con il lobby
+        GameMaster gameMaster = new GameMaster(lobby, basePath + "resourceCardsDeck.json", basePath + "goldCardsDeck.json",
+                basePath + "objectiveCardsDeck.json", basePath + "startingCardsDeck.json");
+
+        // Simula alcune mosse
+        gameMaster.placeRootCard(player1.getName(), false);
+        gameMaster.placeRootCard(player2.getName(), false);
+
+        gameMaster.chooseObjectiveCard(player1.getName(), 0);
+        gameMaster.chooseObjectiveCard(player2.getName(), 1);
+
+        gameMaster.placeCard(player1.getName(), 0, new Point(0, 1), false);
+        gameMaster.drawCard(player1.getName(), true, 0);
+
+        gameMaster.placeCard(player2.getName(), 0, new Point(0, 1), false);
+        gameMaster.drawCard(player2.getName(), false, 1);
+
+        gameMaster.placeCard(player1.getName(), 0, new Point(0, 2), false);
+        gameMaster.drawCard(player1.getName(), true, 0);
+
+        gameMaster.placeCard(player2.getName(), 0, new Point(0, 2), false);
+        gameMaster.drawCard(player2.getName(), false, 1);
+
+        gameMaster.placeCard(player1.getName(), 0, new Point(0, 3), false);
+        gameMaster.drawCard(player1.getName(), true, 0);
+
+        gameMaster.placeCard(player2.getName(), 0, new Point(0, 3), false);
+        gameMaster.drawCard(player2.getName(), false, 1);
+
+        gameMaster.placeCard(player1.getName(), 0, new Point(0, 4), false);
+        gameMaster.drawCard(player1.getName(), true, 0);
+
+        gameMaster.placeCard(player2.getName(), 0, new Point(0, 4), false);
+        gameMaster.drawCard(player2.getName(), false, 1);
+
+        gameMaster.placeCard(player1.getName(), 0, new Point(0, 5), false);
+
+        lobby.getPlayerFromName(player1.getName()).addPoints(20);
+        lobby.getPlayerFromName(player2.getName()).addPoints(20);
+
+        gameMaster.drawCard(player1.getName(), true, 0);
+
+        gameMaster.placeCard(player2.getName(), 0, new Point(0, 5), false);
+        gameMaster.drawCard(player2.getName(), false, 1);
+
+        gameMaster.placeCard(player1.getName(), 0, new Point(0, 6), false);
+        gameMaster.drawCard(player1.getName(), true, 0);
+
+        gameMaster.placeCard(player2.getName(), 0, new Point(0, 6), false);
+        gameMaster.drawCard(player2.getName(), true, 0);
+
+        assertEquals(GameState.END, gameMaster.getGameState(), "The game state should be END");
+
+        for(int i = 0; i < lobby.getPlayers().length; i++) {
+            for (int j = 0; j < 2; j++) {
+                ObjectiveCard card = gameMaster.getObjectiveCardToChoose(i, j);
+                gameMaster.calculateEndGamePoints(card.getType(), card.getMultiplier(), lobby.getPlayerFromName("Player1"), card.getKingdom());
+            }
+        }
+    }
 }
 
 
