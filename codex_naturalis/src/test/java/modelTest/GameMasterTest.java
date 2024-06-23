@@ -892,6 +892,13 @@ public class GameMasterTest {
         gameMaster.placeCard(player2.getName(), 0, new Point(0, 6), false);
         gameMaster.drawCard(player2.getName(), true, 0);
 
+        Assertions.assertDoesNotThrow(() -> gameMaster.calculateEndGamePoints(ObjectiveType.STAIR, 1, lobby.getPlayerFromName("Player1"), Kingdom.ANIMAL));
+        Assertions.assertDoesNotThrow(() -> gameMaster.calculateEndGamePoints(ObjectiveType.L_FORMATION, 1, lobby.getPlayerFromName("Player1"), Kingdom.ANIMAL));
+        Assertions.assertDoesNotThrow(() -> gameMaster.calculateEndGamePoints(ObjectiveType.STAIR, 1, lobby.getPlayerFromName("Player2"), Kingdom.PLANT));
+        Assertions.assertDoesNotThrow(() -> gameMaster.calculateEndGamePoints(ObjectiveType.L_FORMATION, 1, lobby.getPlayerFromName("Player1"), Kingdom.PLANT));
+        Assertions.assertDoesNotThrow(() -> gameMaster.calculateEndGamePoints(ObjectiveType.L_FORMATION, 1, lobby.getPlayerFromName("Player1"), Kingdom.FUNGI));
+        Assertions.assertDoesNotThrow(() -> gameMaster.calculateEndGamePoints(ObjectiveType.L_FORMATION, 1, lobby.getPlayerFromName("Player1"), Kingdom.INSECT));
+
         assertEquals(GameState.END, gameMaster.getGameState(), "The game state should be END");
 
         for(int i = 0; i < lobby.getPlayers().length; i++) {
@@ -899,6 +906,310 @@ public class GameMasterTest {
                 ObjectiveCard card = gameMaster.getObjectiveCardToChoose(i, j);
                 gameMaster.calculateEndGamePoints(card.getType(), card.getMultiplier(), lobby.getPlayerFromName("Player1"), card.getKingdom());
             }
+        }
+    }
+
+    @Test
+    public void endGameStairsAnimal() throws IOException, ParseException {
+        lobby = new Lobby();
+        lobby.addPlayer("pietro");
+
+        // Crea un nuovo GameMaster con il lobby
+        GameMaster game = new GameMaster(lobby, basePath + "resourceCardsDeck.json", basePath + "goldCardsDeck.json",
+                basePath + "objectiveCardsDeck.json", basePath + "startingCardsDeck.json");
+
+        game.placeRootCard("pietro", true);
+        game.chooseObjectiveCard("pietro", 0);
+
+        int j = 1;
+        int z = 1;
+        for(int i = 0; i < 30; i++){
+            if(lobby.getPlayerFromName("pietro").getHand()[0].getKingdom() == Kingdom.ANIMAL && j < 7){
+                game.placeCard("pietro", 0, new Point(j, 0), false);
+                game.drawCard("pietro", false, 0);
+                j++;
+            }else{
+                game.placeCard("pietro", 0, new Point(-z, 0), false);
+                game.drawCard("pietro", false, 0);
+                z++;
+            }
+
+        }
+        if(j == 7) {
+            int points = game.calculateEndGamePoints(ObjectiveType.STAIR, 1, lobby.getPlayerFromName("pietro"), Kingdom.ANIMAL);
+            assertEquals(2, points);
+        }
+    }
+
+    @Test
+    public void endGameStairsFungi() throws IOException, ParseException {
+        lobby = new Lobby();
+        lobby.addPlayer("pietro");
+
+        // Crea un nuovo GameMaster con il lobby
+        GameMaster game = new GameMaster(lobby, basePath + "resourceCardsDeck.json", basePath + "goldCardsDeck.json",
+                basePath + "objectiveCardsDeck.json", basePath + "startingCardsDeck.json");
+
+        game.placeRootCard("pietro", true);
+        game.chooseObjectiveCard("pietro", 0);
+
+        int j = 1;
+        int z = 1;
+        for(int i = 0; i < 30; i++){
+            if(lobby.getPlayerFromName("pietro").getHand()[0].getKingdom() == Kingdom.FUNGI && j < 7){
+                game.placeCard("pietro", 0, new Point(j, 0), false);
+                game.drawCard("pietro", false, 0);
+                j++;
+            }else{
+                game.placeCard("pietro", 0, new Point(-z, 0), false);
+                game.drawCard("pietro", false, 0);
+                z++;
+            }
+
+        }
+        if(j == 7) {
+            int points = game.calculateEndGamePoints(ObjectiveType.STAIR, 1, lobby.getPlayerFromName("pietro"), Kingdom.FUNGI);
+            assertEquals(2, points);
+        }
+    }
+
+    @Test
+    public void endGameStairsPlant() throws IOException, ParseException {
+        lobby = new Lobby();
+        lobby.addPlayer("pietro");
+
+        // Crea un nuovo GameMaster con il lobby
+        GameMaster game = new GameMaster(lobby, basePath + "resourceCardsDeck.json", basePath + "goldCardsDeck.json",
+                basePath + "objectiveCardsDeck.json", basePath + "startingCardsDeck.json");
+
+        game.placeRootCard("pietro", true);
+        game.chooseObjectiveCard("pietro", 0);
+
+        int j = 1;
+        int z = 1;
+        for(int i = 0; i < 30; i++){
+            if(lobby.getPlayerFromName("pietro").getHand()[0].getKingdom() == Kingdom.PLANT && j < 7){
+                game.placeCard("pietro", 0, new Point(0, -j), false);
+                game.drawCard("pietro", false, 0);
+                j++;
+            }else{
+                game.placeCard("pietro", 0, new Point(z, 0), false);
+                game.drawCard("pietro", false, 0);
+                z++;
+            }
+
+        }
+        if(j == 7) {
+            int points = game.calculateEndGamePoints(ObjectiveType.STAIR, 1, lobby.getPlayerFromName("pietro"), Kingdom.PLANT);
+            assertEquals(2, points);
+        }
+    }
+
+    @Test
+    public void endGameStairsInsect() throws IOException, ParseException {
+        lobby = new Lobby();
+        lobby.addPlayer("pietro");
+
+        // Crea un nuovo GameMaster con il lobby
+        GameMaster game = new GameMaster(lobby, basePath + "resourceCardsDeck.json", basePath + "goldCardsDeck.json",
+                basePath + "objectiveCardsDeck.json", basePath + "startingCardsDeck.json");
+
+        game.placeRootCard("pietro", true);
+        game.chooseObjectiveCard("pietro", 0);
+
+        int j = 1;
+        int z = 1;
+        for(int i = 0; i < 30; i++){
+            if(lobby.getPlayerFromName("pietro").getHand()[0].getKingdom() == Kingdom.INSECT && j < 7){
+                game.placeCard("pietro", 0, new Point(0, -j), false);
+                game.drawCard("pietro", false, 0);
+                j++;
+            }else{
+                game.placeCard("pietro", 0, new Point(z, 0), false);
+                game.drawCard("pietro", false, 0);
+                z++;
+            }
+
+        }
+
+        if(j == 7) {
+            int points = game.calculateEndGamePoints(ObjectiveType.STAIR, 1, lobby.getPlayerFromName("pietro"), Kingdom.INSECT);
+            assertEquals(2, points);
+        }
+    }
+
+    @Test
+    public void endGameLFormationAnimal() throws IOException, ParseException {
+        lobby = new Lobby();
+        lobby.addPlayer("pietro");
+
+        // Crea un nuovo GameMaster con il lobby
+        GameMaster game = new GameMaster(lobby, basePath + "resourceCardsDeck.json", basePath + "goldCardsDeck.json",
+                basePath + "objectiveCardsDeck.json", basePath + "startingCardsDeck.json");
+
+        game.placeRootCard("pietro", true);
+        game.chooseObjectiveCard("pietro", 0);
+
+        int z = 1;
+        int j = 0;
+        boolean fungi = false;
+        boolean secondLink = false;
+        for(int i = 0; i < 30; i++){
+            if(lobby.getPlayerFromName("pietro").getHand()[0].getKingdom() == Kingdom.FUNGI && !fungi){
+                game.placeCard("pietro", 0, new Point(0, -1), false);
+                fungi = true;
+            }else if(j == 0 && fungi &&  lobby.getPlayerFromName("pietro").getHand()[0].getKingdom() == Kingdom.ANIMAL){
+                game.placeCard("pietro", 0, new Point(-1, -1), false);
+                j++;
+            }else if(j == 1 && !secondLink) {
+                game.placeCard("pietro", 0, new Point(-1, -2), false);
+                secondLink = true;
+            }else if (j == 1 && secondLink && lobby.getPlayerFromName("pietro").getHand()[0].getKingdom() == Kingdom.ANIMAL){
+                game.placeCard("pietro", 0, new Point(-2, -2), false);
+                j++;
+            }else{
+                game.placeCard("pietro", 0, new Point(z, 0), false);
+                z++;
+            }
+
+            game.drawCard("pietro", false, 0);
+        }
+        if(j == 2) {
+            int points = game.calculateEndGamePoints(ObjectiveType.L_FORMATION, 1, lobby.getPlayerFromName("pietro"), Kingdom.ANIMAL);
+            assertEquals(1, points);
+        }
+    }
+
+    @Test
+    public void endGameLFormationMushroom() throws IOException, ParseException {
+        lobby = new Lobby();
+        lobby.addPlayer("pietro");
+
+        // Crea un nuovo GameMaster con il lobby
+        GameMaster game = new GameMaster(lobby, basePath + "resourceCardsDeck.json", basePath + "goldCardsDeck.json",
+                basePath + "objectiveCardsDeck.json", basePath + "startingCardsDeck.json");
+
+        game.placeRootCard("pietro", true);
+        game.chooseObjectiveCard("pietro", 0);
+
+        int z = 1;
+        int j = 0;
+        boolean plant = false;
+        boolean firstLink = false;
+        boolean secondLink = false;
+
+        for(int i = 0; i < 30; i++){
+            if(lobby.getPlayerFromName("pietro").getHand()[0].getKingdom() == Kingdom.PLANT && !plant){
+                game.placeCard("pietro", 0, new Point(0, 1), false);
+                plant = true;
+            }else if(j == 0 && plant &&  lobby.getPlayerFromName("pietro").getHand()[0].getKingdom() == Kingdom.FUNGI){
+                game.placeCard("pietro", 0, new Point(0, 2), false);
+                j++;
+            }else if(plant && !firstLink) {
+                game.placeCard("pietro", 0, new Point(1, 1), false);
+                firstLink = true;
+            }else if (plant && firstLink && !secondLink){
+                game.placeCard("pietro", 0, new Point(1, 2), false);
+                secondLink = true;
+            }else if(j == 1 && plant && firstLink && secondLink && lobby.getPlayerFromName("pietro").getHand()[0].getKingdom() == Kingdom.FUNGI){
+                game.placeCard("pietro", 0, new Point(1, 3), false);
+                j++;
+            }else{
+                game.placeCard("pietro", 0, new Point(-z, 0), false);
+                z++;
+            }
+            game.drawCard("pietro", false, 0);
+        }
+
+        if(j == 2) {
+            int points = game.calculateEndGamePoints(ObjectiveType.L_FORMATION, 1, lobby.getPlayerFromName("pietro"), Kingdom.FUNGI);
+            assertEquals(1, points);
+        }
+    }
+
+    @Test
+    public void endGameLFormationPlant() throws IOException, ParseException {
+        lobby = new Lobby();
+        lobby.addPlayer("pietro");
+
+        // Crea un nuovo GameMaster con il lobby
+        GameMaster game = new GameMaster(lobby, basePath + "resourceCardsDeck.json", basePath + "goldCardsDeck.json",
+                basePath + "objectiveCardsDeck.json", basePath + "startingCardsDeck.json");
+
+        game.placeRootCard("pietro", true);
+        game.chooseObjectiveCard("pietro", 0);
+
+        int z = 1;
+        int j = 0;
+        boolean insect = false;
+        boolean firstLink = false;
+
+        for(int i = 0; i < 30; i++){
+            if(lobby.getPlayerFromName("pietro").getHand()[0].getKingdom() == Kingdom.INSECT && !insect){
+                game.placeCard("pietro", 0, new Point(1, 0), false);
+                insect = true;
+            }else if(j == 0 && insect &&  lobby.getPlayerFromName("pietro").getHand()[0].getKingdom() == Kingdom.PLANT){
+                game.placeCard("pietro", 0, new Point(2, 0), false);
+                j++;
+            }else if(insect && j == 1 && !firstLink) {
+                game.placeCard("pietro", 0, new Point(2, 1), false);
+                firstLink = true;
+            }else if (insect && firstLink && j == 1 && lobby.getPlayerFromName("pietro").getHand()[0].getKingdom() == Kingdom.PLANT){
+                game.placeCard("pietro", 0, new Point(3, 1), false);
+                j++;
+            } else{
+                game.placeCard("pietro", 0, new Point(-z, 0), false);
+                z++;
+            }
+            game.drawCard("pietro", false, 0);
+        }
+
+        if(j == 2) {
+            int points = game.calculateEndGamePoints(ObjectiveType.L_FORMATION, 1, lobby.getPlayerFromName("pietro"), Kingdom.PLANT);
+            assertEquals(1, points);
+        }
+    }
+
+    @Test
+    public void endGameLFormationInsect() throws IOException, ParseException {
+        lobby = new Lobby();
+        lobby.addPlayer("pietro");
+
+        // Crea un nuovo GameMaster con il lobby
+        GameMaster game = new GameMaster(lobby, basePath + "resourceCardsDeck.json", basePath + "goldCardsDeck.json",
+                basePath + "objectiveCardsDeck.json", basePath + "startingCardsDeck.json");
+
+        game.placeRootCard("pietro", true);
+        game.chooseObjectiveCard("pietro", 0);
+
+        int z = 1;
+        int j = 0;
+        boolean insect = false;
+        boolean firstLink = false;
+
+        for(int i = 0; i < 30; i++){
+            if(lobby.getPlayerFromName("pietro").getHand()[0].getKingdom() == Kingdom.ANIMAL && !insect){
+                game.placeCard("pietro", 0, new Point(0, -1), false);
+                insect = true;
+            }else if(j == 0 && insect &&  lobby.getPlayerFromName("pietro").getHand()[0].getKingdom() == Kingdom.INSECT){
+                game.placeCard("pietro", 0, new Point(0, -2), false);
+                j++;
+            }else if(insect && j == 1 && !firstLink) {
+                game.placeCard("pietro", 0, new Point(-1, -2), false);
+                firstLink = true;
+            }else if (insect && firstLink && j == 1 && lobby.getPlayerFromName("pietro").getHand()[0].getKingdom() == Kingdom.INSECT){
+                game.placeCard("pietro", 0, new Point(-1, -3), false);
+                j++;
+            } else{
+                game.placeCard("pietro", 0, new Point(z, 0), false);
+                z++;
+            }
+            game.drawCard("pietro", false, 0);
+        }
+
+        if(j == 2) {
+            int points = game.calculateEndGamePoints(ObjectiveType.L_FORMATION, 1, lobby.getPlayerFromName("pietro"), Kingdom.INSECT);
+            assertEquals(1, points);
         }
     }
 }
