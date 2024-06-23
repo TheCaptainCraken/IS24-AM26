@@ -25,7 +25,7 @@ public class GameMasterTest {
     static Lobby lobby3;
     static Lobby lobby4;
     static String basePath = "src/main/java/it/polimi/ingsw/model/decks/";
-    static String alternatebasePath = "src/test/java/it/polimi/ingsw/test_decks/";
+    static String alternatebasePath = "src/test/java/modelTest/test_decks/";
 
     @BeforeEach
     public void setUp() throws SameNameException, LobbyCompleteException {
@@ -900,6 +900,27 @@ public class GameMasterTest {
                 gameMaster.calculateEndGamePoints(card.getType(), card.getMultiplier(), lobby.getPlayerFromName("Player1"), card.getKingdom());
             }
         }
+    }
+
+    @Test
+    public void removeResourcesToBacksideTest() throws IOException, ParseException {
+        Player p1 = new Player("a");
+        Lobby lobby = new Lobby();
+        lobby.addPlayer(p1.getName());
+        GameMaster game = new GameMaster(lobby, basePath + "resourceCardsDeck.json", alternatebasePath + "test_goldDeck3.json",
+                basePath + "objectiveCardsDeck.json", alternatebasePath + "TestCoverageStart.json");
+        game.placeRootCard(p1.getName(), false);
+        game.chooseObjectiveCard(p1.getName(), 0);
+        Assertions.assertThrows(NotEnoughResourcesException.class, () -> game.placeCard(p1.getName(), 2, new Point(0, 1), true));
+        game.placeCard(p1.getName(), 0, new Point(0, -1), false);
+        game.drawCard(p1.getName(), false, 0);
+        game.placeCard(p1.getName(), 0, new Point(-1, 0), false);
+        game.drawCard(p1.getName(), false, 0);
+        for(Sign s: Sign.values()){
+            game.getCurrentPlayer().addResource(s, 10);
+        }
+        game.placeCard(p1.getName(), 2, new Point(0, 1), true);
+
     }
 }
 
