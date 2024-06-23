@@ -731,6 +731,7 @@ public class NetworkServerSocket implements NetworkPlug {
         public void sendMessageDisconnection(ServerMessage message) {
             try {
                 out.writeObject(message);
+                scheduler.shutdown();
                 hastaLaVistaBaby();
             } catch (IOException e) {
                 System.out.println("SOCKET: Error closing connection." + nickname + "Connection already closed.");

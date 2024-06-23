@@ -5,8 +5,12 @@ import it.polimi.ingsw.model.Kingdom;
 import it.polimi.ingsw.model.exception.LobbyCompleteException;
 import it.polimi.ingsw.model.exception.NoNameException;
 import it.polimi.ingsw.model.exception.SameNameException;
+import it.polimi.ingsw.network.RMI.ServerRMI;
+import it.polimi.ingsw.network.socket.NetworkServerSocket;
 
+import javax.imageio.stream.ImageInputStream;
 import java.awt.*;
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,6 +45,28 @@ public class NetworkHandler {
      */
     public static NetworkHandler getInstance() {
         return INSTANCE;
+    }
+
+    /**
+     * The instance of the RMI server.
+     */
+    private static ServerRMI serverRMI;
+
+    /**
+     * The instance of the Socket server.
+     */
+    private static NetworkServerSocket networkServerSocket;
+
+    public static void main(String[] args) throws IOException {
+        serverRMI = new ServerRMI();
+        networkServerSocket = new NetworkServerSocket(4567);
+        new Thread(()-> {
+            try {
+                networkServerSocket.start();
+            } catch (IOException e) {
+                System.out.println("Cannot start the socket server. Please restart the server.");
+            }
+        }).start();
     }
 
     /**
@@ -221,9 +247,14 @@ public class NetworkHandler {
         for (NetworkPlug networkPlug : networkInterfacesAndConnections.values()) {
             networkPlug.disconnectAll();
         }
-        //close all servers and connections.
-        System.out.println("All connections are closed. Bye!");
-        System.exit(0);
+        try {
+            main(new String[0]);
+            //reset the lobby to null and the controller to null
+            Controller.getInstance().reset();
+        } catch (IOException e) {
+           System.out.println("Cannot restart the server. Please restart the server.");
+           System.exit(0);
+        }
     }
 
     /**

@@ -40,18 +40,6 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     HashMap<String, RMIClientInterface> connections = new HashMap<>();
 
-    public static void main(String[] args) throws IOException {
-        ServerRMI obj = new ServerRMI();
-        NetworkServerSocket networkServerSocket = new NetworkServerSocket(4567);
-        new Thread(()-> {
-            try {
-                networkServerSocket.start();
-            } catch (IOException e) {
-                System.out.println("Cannot start the socket server. Please restart the server.");
-            }
-        }).start();
-    }
-
     /**
      * The ServerRMI constructor initializes the ServerRMI instance.
      * It adds the instance to the NetworkHandler and sets up the RMI registry and server skeleton.
