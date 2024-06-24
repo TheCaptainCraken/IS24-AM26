@@ -1137,6 +1137,8 @@ public class MatchController {
                     img = new Image("insect_res_back.png");
                 }
                 break;
+            default:
+                img = new Image("default_back.png");
         }
         return img;
     }

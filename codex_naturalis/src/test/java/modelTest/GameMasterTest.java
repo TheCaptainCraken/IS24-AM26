@@ -582,27 +582,31 @@ public class GameMasterTest {
         game5.drawCard("pietro",false,-1);
 
         game5.placeCard("pietro",2, new Point(2, 0), false);
+        game5.drawCard("pietro",false,-1);
+        game5.placeCard("pietro",2, new Point(3, 0), false);
+        game5.drawCard("pietro",false,-1);
+        game5.placeCard("pietro",2, new Point(4, 0), false);
         //testing if deck raises the exception, as it is empty
         assertThrows(CardPositionException.class,
                 ()-> game5.drawCard("pietro",false,-1));
 
         //gold deck is now empty
         game5.drawCard("pietro",true,-1);
-        game5.placeCard("pietro", 2, new Point(3, 0), false);
+        game5.placeCard("pietro", 2, new Point(5, 0), false);
         //testing if deck raises the exception, as it is empty
         assertThrows(CardPositionException.class,
                 ()-> game5.drawCard("pietro",true,-1));
 
         //slot[0] of resourceCard is empty
         game5.drawCard("pietro",false,0);
-        game5.placeCard("pietro", 2, new Point(4, 0), false);
+        game5.placeCard("pietro", 2, new Point(0, 1), false);
 
         assertThrows(CardPositionException.class,
                 ()-> game5.drawCard("pietro",false,0));
 
         //slot[1] of resourceCard is empty
         game5.drawCard("pietro",false,1);
-        game5.placeCard("pietro", 2, new Point(5, 0), false);
+        game5.placeCard("pietro", 2, new Point(0, 2), false);
 
         assertThrows(CardPositionException.class,
                 ()-> game5.drawCard("pietro",false,1));
@@ -1232,6 +1236,92 @@ public class GameMasterTest {
             game.getCurrentPlayer().addResource(s, 10);
         }
         game.placeCard(p1.getName(), 2, new Point(0, 1), true);
+
+    }
+
+    @Test
+    @DisplayName("Test for EndGame method")
+    public void ComparatorTestPointsSumDifferent() throws IOException, ParseException {
+
+        Player p1 = new Player("a");
+        Player p2 = new Player("b");
+        Player winner = null;
+        Lobby l = new Lobby();
+        l.addPlayer(p1.getName());
+        l.addPlayer(p2.getName());
+        GameMaster gm = new GameMaster(l, alternatebasePath + "test_resourceDeck.json", alternatebasePath + "test_goldDeck.json",
+                basePath + "objectiveCardsDeck.json", basePath + "StartingCardsDeck.json");
+        gm.placeRootCard(p1.getName(), true);
+        gm.placeRootCard(p2.getName(), true);
+        gm.chooseObjectiveCard(p1.getName(), 0);
+        gm.chooseObjectiveCard(p2.getName(), 1);
+
+        for(int i = 0; i < 2; i++){
+            if(gm.getCurrentPlayer().getName().equals("a")){
+                gm.getCurrentPlayer().addPoints(15);
+                gm.getCurrentPlayer().addObjectivePoints(10);
+            } else {
+                winner = gm.getCurrentPlayer();
+                gm.getCurrentPlayer().addPoints(25);
+                gm.getCurrentPlayer().addObjectivePoints(6);
+            }
+            gm.placeCard(gm.getCurrentPlayer().getName(), 0, new Point(0, 1), false);
+            gm.drawCard(gm.getCurrentPlayer().getName(), false, 0);
+        }
+
+
+        gm.placeCard(gm.getCurrentPlayer().getName(), 0, new Point(0, 2), false);
+        gm.drawCard(gm.getCurrentPlayer().getName(), true, 0);
+
+        gm.placeCard(gm.getCurrentPlayer().getName(), 0, new Point(0, 2), false);
+        gm.drawCard(gm.getCurrentPlayer().getName(), false, 1);
+
+
+        gm.endGame();
+        assertEquals(winner.getName(), gm.getRanking().get(0).getName());
+
+    }
+    @Test
+    @DisplayName("Test for EndGame method")
+    public void ComparatorTestPointsSumEquas() throws IOException, ParseException {
+
+        Player p1 = new Player("a");
+        Player p2 = new Player("b");
+        Player winner = null;
+        Lobby l = new Lobby();
+        l.addPlayer(p1.getName());
+        l.addPlayer(p2.getName());
+        GameMaster gm = new GameMaster(l, alternatebasePath + "test_resourceDeck.json", alternatebasePath + "test_goldDeck.json",
+                basePath + "objectiveCardsDeck.json", basePath + "StartingCardsDeck.json");
+        gm.placeRootCard(p1.getName(), true);
+        gm.placeRootCard(p2.getName(), true);
+        gm.chooseObjectiveCard(p1.getName(), 0);
+        gm.chooseObjectiveCard(p2.getName(), 1);
+
+        for(int i = 0; i < 2; i++){
+            if(gm.getCurrentPlayer().getName().equals("a")){
+                winner = gm.getCurrentPlayer();
+                gm.getCurrentPlayer().addPoints(25);
+                gm.getCurrentPlayer().addObjectivePoints(10);
+            } else {
+
+                gm.getCurrentPlayer().addPoints(25);
+                gm.getCurrentPlayer().addObjectivePoints(6);
+            }
+            gm.placeCard(gm.getCurrentPlayer().getName(), 0, new Point(0, 1), false);
+            gm.drawCard(gm.getCurrentPlayer().getName(), false, 0);
+        }
+
+
+        gm.placeCard(gm.getCurrentPlayer().getName(), 0, new Point(0, 2), false);
+        gm.drawCard(gm.getCurrentPlayer().getName(), true, 0);
+
+        gm.placeCard(gm.getCurrentPlayer().getName(), 0, new Point(0, 2), false);
+        gm.drawCard(gm.getCurrentPlayer().getName(), false, 1);
+
+
+        gm.endGame();
+        assertEquals(winner.getName(), gm.getRanking().get(0).getName());
 
     }
 }
