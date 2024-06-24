@@ -624,6 +624,47 @@ public class MatchController {
         }
 
     }
+
+    /**
+     * This method is used in the MatchController class of the GUI.
+     * It is responsible for updating the game board of a specific player in the game interface.
+     *
+     * The method receives a string representing the nickname of the player.
+     * It retrieves the list of cards of the player from the model and finds the card that was placed last.
+     * If no card is found, the method prints a message to the console and returns.
+     *
+     * The method creates an ImageView for the latest card and sets up a click event handler for it.
+     * If the player is the current user, the click event handler calls the `revealSpots` method, which displays the available spots on the game board where the user can place a card.
+     * The ImageView is then added to the game board.
+     *
+     * If the player is not the current user, the method retrieves the player's game board from the playerBoards map and adds the ImageView to it.
+     *
+     * @param nickname A string representing the nickname of the player.
+     */
+    public void rebuildView(CardClient card, String nickname){
+        Optional<CardClient> c = Optional.ofNullable(card);
+        if(c.isEmpty()){
+            System.out.println("No card found");
+            return;
+        }
+        CardClient latestCard = c.get();
+        ImageView img = setCard(latestCard);
+        if(ViewSubmissions.getInstance().getNickname().equals(nickname)){
+            img.setOnMouseClicked(event ->{
+                revealSpots(img.getTranslateX(),img.getTranslateY());
+            });
+
+            board.getChildren().add(img);
+        } else {
+            AnchorPane parent = (AnchorPane) playerBoards.get(nickname).getRoot();
+            SplitPane s = (SplitPane) parent.getChildrenUnmodifiable().get(0);
+            ScrollPane scroll = (ScrollPane) s.getItems().get(1);
+            AnchorPane pane = (AnchorPane) scroll.getContent();
+            StackPane area = (StackPane) pane.getChildren().get(0);
+            area.getChildren().add(img);
+        }
+
+    }
     /**
      * This method is used in the MatchController class of the GUI.
      * It is responsible for displaying who plays first in the game interface.

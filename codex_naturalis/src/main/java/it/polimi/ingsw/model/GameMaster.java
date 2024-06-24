@@ -5,10 +5,7 @@ import it.polimi.ingsw.view.model.CardClient;
 import org.json.simple.parser.ParseException;
 
 import java.awt.*;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.Serializable;
+import java.io.*;
 import java.util.*;
 
 /**
@@ -82,6 +79,10 @@ public class GameMaster implements Serializable {
      * The ranking of players.
      */
     private ArrayList<Player> ranking;
+    /**
+     * The current turn.
+     */
+    private int turn;
 
     /**
      * The general functionalities of the game representing the peer point of the
@@ -137,6 +138,8 @@ public class GameMaster implements Serializable {
             hand[2] = (ResourceCard) goldDeck.draw();
             player.setHand(hand);
         }
+
+        turn = 0;
     }
 
     /**
@@ -157,6 +160,21 @@ public class GameMaster implements Serializable {
         saveFile.close();
 
         return gameMaster;
+    }
+
+    /**
+     * This method is used to delete a file from the file system.
+     * It takes as input the path of the file to be deleted.
+     * If the file exists and is successfully deleted, no exception is thrown.
+     * If the file does not exist or cannot be deleted due to a system error, no exception is thrown.
+     *
+     * @param savePath A string representing the path of the file to be deleted.
+     */
+    public static void cancelFile(String savePath) {
+        File file = new File(savePath);
+        if(file != null && file.exists()) {
+            file.delete();
+        }
     }
 
     /**

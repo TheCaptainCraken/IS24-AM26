@@ -473,6 +473,13 @@ public class NetworkServerSocket implements NetworkPlug {
         }
     }
 
+    /**
+     * This method is used to load a game from a save file.
+     * It should be implemented by each network interface to handle the loading
+     * process according to its specific protocol.
+     *
+     * @param game The game to load.
+     */
     @Override
     public void loadGame(GameMaster game) {
         for (String player : connections.keySet()) {
@@ -815,6 +822,7 @@ public class NetworkServerSocket implements NetworkPlug {
 
             try {
                 out.writeObject(message);
+                out.reset();
             } catch (IOException e) {
                 // disconnect all the clients connected to the server RMI and Socket
                 NetworkHandler.getInstance().disconnectBroadcast();
@@ -947,6 +955,9 @@ public class NetworkServerSocket implements NetworkPlug {
          */
         public void sendFullGameState(GameMaster game) {
             sendMessage(new loadSavedGame(game));
+
+            // start the thread to check if the client is still connected
+            new Thread(this::isClientConnected).start();
         }
     }
 }

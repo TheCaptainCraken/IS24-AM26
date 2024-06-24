@@ -846,20 +846,36 @@ public class Controller {
                 // update personal cards
                 ResourceCard[] hand = player.getHand();
                 for (int i = 0; i < 3; i++) {
-                    myCards[i] = hand[i].getId();
+                    try {
+                        myCards[i] = hand[i].getId();
+                    } catch (Exception e) {
+                        myCards[i] = null;
+                    }
                 }
             } else {
                 otherPlayersCards.put(player.getName(), new Pair[3]);
                 Pair<Kingdom, Boolean>[] cards = otherPlayersCards.get(player.getName());
                 for (int i = 0; i < 3; i++) {
-                    cards[i] = new Pair<>(player.getHand()[i].getKingdom(), player.getHand()[i] instanceof GoldCard);
+                    try {
+                        cards[i] = new Pair<>(player.getHand()[i].getKingdom(), player.getHand()[i] instanceof GoldCard);
+                    } catch (Exception e) {
+                        cards[i] = new Pair<>(null, false);
+                    }
                 }
             }
         }
 
         for (int i = 0; i < 2; i++) {
-            resourceCardsOnTable[i] = game.getResourceCard(i).getId();
-            goldCardsOnTable[i] = game.getGoldCard(i).getId();
+            try {
+                resourceCardsOnTable[i] = game.getResourceCard(i).getId();
+            } catch (Exception e) {
+                resourceCardsOnTable[i] = null;
+            }
+            try {
+                goldCardsOnTable[i] = game.getGoldCard(i).getId();
+            } catch (Exception e) {
+                goldCardsOnTable[i] = null;
+            }
             commonObjectiveCards[i] = game.getObjectiveCard(i).getId();
         }
 
@@ -936,12 +952,15 @@ public class Controller {
                 Collections.sort(playedCards,
                         (card1, card2) -> Integer.compare(card1.getTurnOfPositioning(), card2.getTurnOfPositioning()));
                 for (PlayedCard playedCard : playedCards) {
-                    model.updatePlaceCard(player.getName(), playedCard.getCard().getId(), playedCard.getPosition(),
-                            playedCard.isFacingUp(), playedCard.getTurnOfPositioning());
+                    if(!(playedCard.getPosition().x == 0 && playedCard.getPosition().y == 0)){
+                        model.updatePlaceCard(player.getName(), playedCard.getCard().getId(), playedCard.getPosition(),
+                                playedCard.isFacingUp(), playedCard.getTurnOfPositioning());
+                    }
                 }
                 view.showTableOfPlayer(player.getName());
             }
 
+            view.showTurnInfo(game.getCurrentPlayer().getName(), game.getGameState());
             Controller.setPhase(Phase.GAME_FLOW);
         } else {
             try {
@@ -976,15 +995,18 @@ public class Controller {
                 Collections.sort(playedCards,
                         (card1, card2) -> Integer.compare(card1.getTurnOfPositioning(), card2.getTurnOfPositioning()));
 
-                System.out.println("Played cards: " + playedCards.size());
                 for (PlayedCard playedCard : playedCards) {
+                    System.out.println(playedCard.getTurnOfPositioning());
                     if(playedCard.getPosition().x == 0 && playedCard.getPosition().y == 0 && player.getName().equals(Controller.nickname)){
-                        view.showTableOfPlayer(player.getName());
+                        view.showStartingCard(playedCard.getCard().getId());
+                        view.showStartingCardChosen();
                     }else {
-                        System.out.println("entrato");
                         model.updatePlaceCard(player.getName(), playedCard.getCard().getId(), playedCard.getPosition(),
                                 playedCard.isFacingUp(), playedCard.getTurnOfPositioning());
-                        view.showTableOfPlayer(player.getName());
+
+                        CardClient card = new CardClient(playedCard.getCard().getId(), playedCard.isFacingUp(),
+                                playedCard.getPosition(), playedCard.getTurnOfPositioning(), null);
+                        ((GUI) view).rebuildBoard(player.getName(), card);
                     }
                 }
             }

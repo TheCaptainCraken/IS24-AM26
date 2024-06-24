@@ -887,15 +887,27 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
     public void connectToServer() throws RemoteException {
     }
 
+    /**
+     * This method is used to load a game from a saved GameMaster object.
+     * It iterates over all the connections and sends the saved game state to each client.
+     * If a RemoteException is thrown during the process, it means that the client is not connected,
+     * so the client is removed from the connections and a disconnect signal is broadcasted.
+     *
+     * @param game The GameMaster object representing the saved game state to be loaded.
+     */
     @Override
     public void loadGame(GameMaster game) {
         for (String nickname : connections.keySet()) {
-            try {
-                connections.get(nickname).loadSavedGame(game);
-            } catch (RemoteException e) {
-                connections.remove(nickname);
-                NetworkHandler.getInstance().disconnectBroadcast();
-            }
+            new Thread(() -> {
+                try {
+                    connections.get(nickname).loadSavedGame(game);
+                } catch (RemoteException e) {
+                    connections.remove(nickname);
+                    NetworkHandler.getInstance().disconnectBroadcast();
+                }
+            }).start();
         }
+        //check after if clients are connected
+        new Thread(this::startClientConnectionCheck).start();
     }
 }

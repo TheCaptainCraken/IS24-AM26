@@ -121,6 +121,15 @@ public class Controller {
     }
 
     /**
+     * This method is used to delete a saved game file from the file system.
+     * It calls the static method `cancelFile` from the `GameMaster` class with the path of the saved game file.
+     * The actual deletion of the file is handled by the `GameMaster` class.
+     */
+    public void cancelFile() {
+        GameMaster.cancelFile(savePath);
+    }
+
+    /**
      * Adds a player to the lobby.
      *
      * @param nickname The nickname of the player.

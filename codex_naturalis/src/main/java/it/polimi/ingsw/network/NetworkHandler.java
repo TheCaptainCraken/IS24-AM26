@@ -242,6 +242,8 @@ public class NetworkHandler {
         for (NetworkPlug networkPlug : networkInterfacesAndConnections.values()) {
             networkPlug.sendEndGame();
         }
+        // reset the lobby to null and the controller to null
+        Controller.getInstance().cancelFile();
     }
 
     /**

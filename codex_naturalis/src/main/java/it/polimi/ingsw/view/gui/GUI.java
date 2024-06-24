@@ -3,6 +3,7 @@ package it.polimi.ingsw.view.gui;
 import it.polimi.ingsw.model.Color;
 import it.polimi.ingsw.model.GameState;
 import it.polimi.ingsw.model.Player;
+import it.polimi.ingsw.view.model.CardClient;
 import it.polimi.ingsw.view.model.LittleModel;
 import it.polimi.ingsw.view.ViewInterface;
 import it.polimi.ingsw.view.ViewSubmissions;
@@ -439,6 +440,23 @@ public class GUI extends Application implements ViewInterface {
     public void showTableOfPlayer(String nickname) {
         Platform.runLater(() -> matchController.showTableOfPlayer(nickname));
     }
+
+    /**
+     * This method is used to rebuild the game board view in the GUI.
+     * It is called when the game state changes and the board view needs to be updated.
+     * The method receives a string representing the name of the player whose board is to be updated,
+     * and a CardClient object representing the card to be placed on the board.
+     * The actual task of updating the board view is delegated to the MatchController's rebuildView method.
+     * The task is wrapped inside Platform.runLater to ensure that it runs on the JavaFX Application Thread,
+     * as it involves a GUI operation which needs to be thread-safe.
+     *
+     * @param name A string representing the name of the player whose board is to be updated.
+     * @param card A CardClient object representing the card to be placed on the board.
+     */
+    public void rebuildBoard(String name, CardClient card){
+        Platform.runLater(() -> matchController.rebuildView(card, name));
+    }
+
     /**
      * This method is part of the ViewInterface implemented by the GUI class.
      * It is used to update the hidden hand of a specific player in the GUI.
