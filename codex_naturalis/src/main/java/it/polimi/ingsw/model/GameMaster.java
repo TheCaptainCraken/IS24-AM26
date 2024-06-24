@@ -8,6 +8,7 @@ import java.awt.*;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.Serializable;
 import java.util.*;
 
 /**
@@ -22,7 +23,7 @@ import java.util.*;
  * The GameMaster class throws various exceptions to handle invalid game
  * actions.
  */
-public class GameMaster {
+public class GameMaster implements Serializable {
     /**
      * The global turn counter.
      */

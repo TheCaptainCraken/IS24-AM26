@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.io.Serializable;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -16,7 +17,7 @@ import org.json.simple.parser.ParseException;
 /**
  * This class represents the deck of cards.
  */
-public class Deck {
+public class Deck implements Serializable {
     /**
      * The list of cards in the deck.
      */
@@ -53,8 +54,7 @@ public class Deck {
     public Deck(String cardsFile, boolean toFile) throws IOException, ParseException {
         cards = new ArrayList<Card>();
         this.generateDeck(cardsFile);
-    }//do we need to test this?
-
+    }// do we need to test this?
 
     /**
      * This method generates the deck of cards from a JSON file.
@@ -251,11 +251,11 @@ public class Deck {
      * 
      * @return the {@link Kingdom} of the first card of the deck.
      */
-    public Kingdom getKingdomFirstCard() throws IndexOutOfBoundsException{
+    public Kingdom getKingdomFirstCard() throws IndexOutOfBoundsException {
         return cards.get(0).getKingdom();
     }
 
-    public Card getCard(int position) throws IndexOutOfBoundsException{
+    public Card getCard(int position) throws IndexOutOfBoundsException {
         return cards.get(position);
     }
 
@@ -268,10 +268,10 @@ public class Deck {
      * @throws IndexOutOfBoundsException if the deck is empty.
      */
     public Card draw() throws IndexOutOfBoundsException {
-        try{
+        try {
             return cards.remove(0);
-        }catch(IndexOutOfBoundsException e){
-            throw new IndexOutOfBoundsException("The deck is empty");//just to add the message
+        } catch (IndexOutOfBoundsException e) {
+            throw new IndexOutOfBoundsException("The deck is empty");// just to add the message
         }
     }
 

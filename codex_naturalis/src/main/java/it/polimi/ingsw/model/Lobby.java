@@ -5,18 +5,23 @@ import it.polimi.ingsw.model.exception.LobbyCompleteException;
 import it.polimi.ingsw.model.exception.SameNameException;
 import it.polimi.ingsw.model.exception.NoNameException;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
 /**
- * The Lobby class represents a lobby where players can join before the game starts.
+ * The Lobby class represents a lobby where players can join before the game
+ * starts.
  * It manages the players, their nicknames, and the maximum size of the lobby.
- * It also handles the locking of the lobby, which prevents more players from joining.
+ * It also handles the locking of the lobby, which prevents more players from
+ * joining.
  * The Lobby interacts with the Player class to manage the players.
- * The Lobby class throws various exceptions to handle invalid actions such as adding a player to a full lobby, adding a player with a duplicate nickname, and setting an invalid lobby size.
+ * The Lobby class throws various exceptions to handle invalid actions such as
+ * adding a player to a full lobby, adding a player with a duplicate nickname,
+ * and setting an invalid lobby size.
  */
-public class Lobby {
+public class Lobby implements Serializable {
     /**
      * The list of players in the lobby.
      */
@@ -33,7 +38,7 @@ public class Lobby {
     /**
      * It's a holder for the players that permits to check and limit access
      */
-    public Lobby(){
+    public Lobby() {
         this.players = new ArrayList<>();
         this.complete = false;
     }
@@ -44,21 +49,22 @@ public class Lobby {
      * @param nickname nickname of the new Player
      */
     public void addPlayer(String nickname) throws LobbyCompleteException, SameNameException {
-        if(complete){
+        if (complete) {
             throw new LobbyCompleteException();
         }
-        for(Player player : players){
-            if(player.getName().equals(nickname)){
+        for (Player player : players) {
+            if (player.getName().equals(nickname)) {
                 throw new SameNameException();
             }
         }
         Player newPlayer = new Player(nickname);
         players.add(newPlayer);
 
-        //max size is always more than zero when we check here.
-        //The first player can choose the size of the lobby(2, 3, 4), so we set lock always when the lobby is full
-        //and the first player has chosen the number of players.
-        if(players.size() == maxSize){
+        // max size is always more than zero when we check here.
+        // The first player can choose the size of the lobby(2, 3, 4), so we set lock
+        // always when the lobby is full
+        // and the first player has chosen the number of players.
+        if (players.size() == maxSize) {
             setLock();
         }
     }
@@ -73,14 +79,14 @@ public class Lobby {
     }
 
     /**
-     * Given a  nickname it returns the player with that unique nickname
+     * Given a nickname it returns the player with that unique nickname
      *
      * @param nickname nickname of the Player we want to get
      * @return the Player with the given nickname
      */
     public Player getPlayerFromName(String nickname) throws NoNameException {
-        for(Player player : getPlayers()){
-            if(player.getName().equals(nickname)){
+        for (Player player : getPlayers()) {
+            if (player.getName().equals(nickname)) {
                 return player;
             }
         }
@@ -88,24 +94,24 @@ public class Lobby {
     }
 
     /**
-     * It sets the maximum size of the lobby scraping the players that exceed the limit
+     * It sets the maximum size of the lobby scraping the players that exceed the
+     * limit
      *
      * @param maxSize the maximum size of the lobby
      */
     public void setMaxSize(int maxSize) throws ClosingLobbyException {
-        if(complete || maxSize > 4 || maxSize < 2){
+        if (complete || maxSize > 4 || maxSize < 2) {
             throw new ClosingLobbyException();
         }
         this.maxSize = maxSize;
 
-        if(maxSize < players.size()){
-            for(int i = players.size() - 1; i >= maxSize; i--)
-            {
+        if (maxSize < players.size()) {
+            for (int i = players.size() - 1; i >= maxSize; i--) {
                 players.remove(i);
             }
-            //after that the lobby is locked, no one can join anymore.
+            // after that the lobby is locked, no one can join anymore.
             setLock();
-        }else if(maxSize == players.size()){
+        } else if (maxSize == players.size()) {
             setLock();
         }
     }
@@ -113,7 +119,7 @@ public class Lobby {
     /**
      * It locks the lobby so nobody can join anymore, the lobby cannot be unlocked
      */
-    public void setLock(){
+    public void setLock() {
         complete = true;
     }
 
@@ -134,7 +140,7 @@ public class Lobby {
     public HashMap<String, Color> getPlayersAndPins() {
         HashMap<String, Color> PlayerAndPin = new HashMap<>();
 
-        for(Player player : players) {
+        for (Player player : players) {
             PlayerAndPin.put(player.getName(), player.getColor());
         }
 
@@ -148,8 +154,8 @@ public class Lobby {
      * @return true if the player is in the lobby
      */
     public boolean isAdmitted(String nickname) {
-        for(Player player : players){
-            if(player.getName().equals(nickname)){
+        for (Player player : players) {
+            if (player.getName().equals(nickname)) {
                 return true;
             }
         }
@@ -162,8 +168,8 @@ public class Lobby {
      * @return true if the lobby is ready to start
      */
     public boolean isReady() {
-        //if ready to start, I shuffle the players.
-        if(maxSize == players.size()){
+        // if ready to start, I shuffle the players.
+        if (maxSize == players.size()) {
             Collections.shuffle(players);
         }
         return maxSize == players.size();
