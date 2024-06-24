@@ -99,14 +99,15 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
         try {
             // call remote method loginAndIsFirst, return if is the first layer and have to
             // choose the number of players.
-            isFirst = stub.loginAndIsFirst(exportedClient, name);
             Controller.setNickname(name);
+            isFirst = stub.loginAndIsFirst(exportedClient, name);
             login = true;
         } catch (RemoteException e) {
             controller.noConnection();
         } catch (LobbyCompleteException e) {
             controller.lobbyComplete();
         } catch (SameNameException e) {
+            Controller.setNickname(null);
             Controller.phase = Phase.LOGIN;
             controller.sameName(name);
         } catch (NoNameException e) {
