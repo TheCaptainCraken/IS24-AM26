@@ -174,4 +174,28 @@ public class Lobby implements Serializable {
         }
         return maxSize == players.size();
     }
+
+    /**
+     * Two lobbies are equal if they have the same number of players with the same
+     * name.
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Lobby) {
+            Lobby lobby = (Lobby) obj;
+
+            if (lobby.players.size() != players.size()) {
+                return false;
+            }
+
+            for (int i = 0; i < players.size(); i++) {
+                if (!players.contains(lobby.players.get(i))) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+        return false;
+    }
 }
