@@ -21,15 +21,19 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
- * The ClientRMI class implements the RMIClientInterface and NetworkClient interfaces and
- * provides the functionality for a client to communicate with a server over RMI connection.
- * It defines methods for game actions such as login, choosing color, drawing cards etc., and sends these actions to the server.
- * It also handles responses from the server and updates the client's view accordingly.
+ * The ClientRMI class implements the RMIClientInterface and NetworkClient
+ * interfaces and
+ * provides the functionality for a client to communicate with a server over RMI
+ * connection.
+ * It defines methods for game actions such as login, choosing color, drawing
+ * cards etc., and sends these actions to the server.
+ * It also handles responses from the server and updates the client's view
+ * accordingly.
  *
  * @author Daniel
  */
 public class ClientRMI implements RMIClientInterface, NetworkClient {
-    static int PORT = 1099; //TODO porta dinamica
+    static int PORT = 1099; // TODO porta dinamica
     /**
      * The controller that handles the client's view.
      */
@@ -57,23 +61,24 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
 
     /**
      * Constructor for ClientRMI.
+     * 
      * @param controller The controller that handles the client's view.
-     * @throws RemoteException if there is a problem with the connection.
+     * @throws RemoteException   if there is a problem with the connection.
      * @throws NotBoundException if the server is not bound.
      */
     public ClientRMI(Controller controller) throws RemoteException, NotBoundException {
         this.controller = controller;
 
-        //Exporting the ClientRMI object as a remote object
-         exportedClient = (RMIClientInterface) UnicastRemoteObject.exportObject(this, 0);
+        // Exporting the ClientRMI object as a remote object
+        exportedClient = (RMIClientInterface) UnicastRemoteObject.exportObject(this, 0);
 
-        //Creating the RMI register //TODO indirizzo ip diverso
+        // Creating the RMI register //TODO indirizzo ip diverso
         registry = LocateRegistry.getRegistry("127.0.0.1", PORT);
 
         // Looking up the remote object
         stub = (RMIServerInterface) registry.lookup("Loggable");
 
-        //periodically check if the client is still connected to the server
+        // periodically check if the client is still connected to the server
         new Thread(this::isClientConnectedToServer).start();
     }
 
@@ -81,8 +86,10 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
      * NetworkClient interface methods
      * Logs in the player with the given name.
      * This method is used to authenticate a player in the game.
-     * If the player is the first to log in, the game will ask for the number of players.
-     * If the player is not the first to log in, the game will wait for the lobby to be ready.
+     * If the player is the first to log in, the game will ask for the number of
+     * players.
+     * If the player is not the first to log in, the game will wait for the lobby to
+     * be ready.
      *
      * @param name The name of the player.
      */
@@ -97,9 +104,9 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
             login = true;
         } catch (RemoteException e) {
             controller.noConnection();
-        }catch (LobbyCompleteException e){
+        } catch (LobbyCompleteException e) {
             controller.lobbyComplete();
-        }catch (SameNameException e){
+        } catch (SameNameException e) {
             Controller.phase = Phase.LOGIN;
             controller.sameName(name);
         } catch (NoNameException e) {
@@ -128,6 +135,7 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
             }
         }
     }
+
     /**
      * NetworkClient interface methods
      *
@@ -154,7 +162,7 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
         } catch (LobbyCompleteException e) {
             controller.lobbyComplete();
         } catch (NoNameException e) {
-           controller.noName();
+            controller.noName();
         }
     }
 
@@ -172,8 +180,7 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
             Controller.phase = Phase.WAIT;
             // call remote method chooseColor
             stub.chooseColor(controller.getNickname(), color);
-        }
-        catch (RemoteException e){
+        } catch (RemoteException e) {
             controller.noConnection();
         } catch (ColorAlreadyTakenException e) {
             // if the color is already taken, set FSM to COLOR and ask for color
@@ -192,9 +199,10 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
      * This method is used to send a chat message to the other players in the game.
      *
      * @param nickname The nickname of the player who sent the message.
-     * @param message The message sent by the player and the information about the receiver.
+     * @param message  The message sent by the player and the information about the
+     *                 receiver.
      */
-    public void sendChatMessage(String nickname, String message){
+    public void sendChatMessage(String nickname, String message) {
         try {
             stub.sendChatMessage(nickname, message);
         } catch (RemoteException e) {
@@ -233,6 +241,7 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
             controller.noName();
         }
     }
+
     /**
      * NetworkClient interface methods
      *
@@ -267,6 +276,7 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
             controller.noName();
         }
     }
+
     /**
      * NetworkClient interface methods
      *
@@ -295,7 +305,7 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
         } catch (NoNameException e) {
             controller.NoName();
         } catch (CardPositionException e) {
-           controller.cardPositionError();
+            controller.cardPositionError();
         }
     }
 
@@ -306,7 +316,8 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
      * This method is used to draw a card for the player.
      * It takes three parameters: the nickname of the player,
      * a boolean indicating whether the card is gold,
-     * and an integer indicating whether the card is drawn from the table or the deck(-1 deck, o or 1 for table).
+     * and an integer indicating whether the card is drawn from the table or the
+     * deck(-1 deck, o or 1 for table).
      *
      * @param nickname      The nickname of the player.
      * @param gold          A boolean indicating whether the card is gold.
@@ -340,8 +351,8 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
      */
     @Override
     public void stopWaiting() {
-            Controller.setPhase(Phase.COLOR);
-            controller.stopWaiting();
+        Controller.setPhase(Phase.COLOR);
+        controller.stopWaiting();
     }
 
     @Override
@@ -361,6 +372,7 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
     public void refreshUsers(HashMap<String, Color> playersAndPins) {
         controller.refreshUsers(playersAndPins);
     }
+
     /**
      * Sends information about the cards on the table to the client.
      * This method is used to update the client's view of the cards on the table.
@@ -371,8 +383,9 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
      * @param goldCardOnDeck     The gold card on the deck.
      */
     @Override
-    public void sendInfoOnTable(Integer[] resourceCards, Integer[] goldCard, Kingdom resourceCardOnDeck, Kingdom goldCardOnDeck){
-        //no need tho change the phase here. We do it in controller.showStartingCard
+    public void sendInfoOnTable(Integer[] resourceCards, Integer[] goldCard, Kingdom resourceCardOnDeck,
+            Kingdom goldCardOnDeck) {
+        // no need tho change the phase here. We do it in controller.showStartingCard
         controller.cardsOnTable(resourceCards, goldCard, resourceCardOnDeck, goldCardOnDeck);
     }
 
@@ -399,6 +412,7 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
     public void showStartingCard(int startingCardId) {
         controller.updateAndShowStartingCard(startingCardId);
     }
+
     /**
      * Sends the common objective cards to the client.
      * This method is used to update the client's view of the common objective
@@ -407,19 +421,22 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
      * @param objectiveCardIds An array of objective card IDs.
      */
     @Override
-    public void sendCommonObjectiveCards(Integer[] objectiveCardIds){
+    public void sendCommonObjectiveCards(Integer[] objectiveCardIds) {
         controller.showCommonObjectiveCards(objectiveCardIds);
     }
+
     /**
      * Sends the secret objective cards to the client for selection.
-     * This method is used to update the client's view of the secret objective cards for selection.
+     * This method is used to update the client's view of the secret objective cards
+     * for selection.
      *
      * @param objectiveCardIds An array of secret objective card IDs.
      */
     @Override
-    public void sendSecretObjectiveCardsToChoose(Integer[] objectiveCardIds){
+    public void sendSecretObjectiveCardsToChoose(Integer[] objectiveCardIds) {
         controller.showSecretObjectiveCardsToChoose(objectiveCardIds);
     }
+
     /**
      * Shows the player's hand to the client.
      * This method is used to update the client's view of the player's hand.
@@ -428,9 +445,10 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
      * @param hand     An array of card IDs in the player's hand.
      */
     @Override
-    public void showHand(String nickname, Integer[] hand){
+    public void showHand(String nickname, Integer[] hand) {
         controller.updateHand(hand);
     }
+
     /**
      * Shows the player's hidden hand to the client.
      * This method is used to update the client's view of the player's hidden hand.
@@ -446,13 +464,14 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
 
     /**
      * Refreshes the turn information for the client.
-     * This method is used to update the client's view of the current player and the game state.
+     * This method is used to update the client's view of the current player and the
+     * game state.
      *
      * @param currentPlayer The nickname of the current player.
-     * @param gameState The current state of the game.
+     * @param gameState     The current state of the game.
      */
     @Override
-    public void refreshTurnInfo(String currentPlayer, GameState gameState){
+    public void refreshTurnInfo(String currentPlayer, GameState gameState) {
         controller.turnInfo(currentPlayer, gameState);
     }
 
@@ -470,12 +489,14 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
      * @param points    The points of the player after the card was placed.
      */
     @Override
-    public void placeCard(String nickname, int id, Point position, boolean side, int turn ,HashMap<Sign, Integer> resources, int points){
-        //update the card on the table
+    public void placeCard(String nickname, int id, Point position, boolean side, int turn,
+            HashMap<Sign, Integer> resources, int points) {
+        // update the card on the table
         controller.updatePlaceCard(nickname, id, position, side, turn);
         controller.updateResources(nickname, resources);
         controller.updateScore(nickname, points);
     }
+
     /**
      * Moves a card on the table.
      * This method is used to update the client's view of the table after a card has
@@ -488,7 +509,7 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
      *                      or the deck.
      */
     @Override
-    public void moveCard(Integer newCardId, Kingdom headDeck, boolean gold, int onTableOrDeck){
+    public void moveCard(Integer newCardId, Kingdom headDeck, boolean gold, int onTableOrDeck) {
         controller.updateAndShowCommonTable(newCardId, gold, onTableOrDeck, headDeck);
     }
 
@@ -506,6 +527,7 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
         controller.showExtraPoints(extraPoints);
         controller.showRanking(ranking);
     }
+
     /**
      * Gets the first player and starts the game.
      * This method is used to update the client's view of the first player and to
@@ -515,16 +537,18 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
      */
     @Override
     public void getIsFirstAndStartGame(String firstPlayer) {
-        //set FSM to GAME_FLOW and show the first player
+        // set FSM to GAME_FLOW and show the first player
         Controller.setPhase(Phase.GAME_FLOW);
         controller.showIsFirst(firstPlayer);
     }
 
     /**
      * This method is used to stop the game for the client.
-     * It is called when the client needs to stop the game, for example, when the client disconnects from the server.
+     * It is called when the client needs to stop the game, for example, when the
+     * client disconnects from the server.
      *
-     * @throws RemoteException throws a RemoteException if there is a problem with the connection.
+     * @throws RemoteException throws a RemoteException if there is a problem with
+     *                         the connection.
      */
     @Override
     public void stopGaming() throws RemoteException {
@@ -536,21 +560,26 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
 
     /**
      * This method is used to check if the client is still connected to the server.
-     * The server will call this method to check if the connection with the client is still active.
+     * The server will call this method to check if the connection with the client
+     * is still active.
      *
-     * @throws RemoteException throws a RemoteException if there is a problem with the connection.
+     * @throws RemoteException throws a RemoteException if there is a problem with
+     *                         the connection.
      */
     @Override
     public void isConnected() throws RemoteException {
-        //this method is used to check if the client is still connected. No implementation needed.
+        // this method is used to check if the client is still connected. No
+        // implementation needed.
     }
 
     /**
-     * This method is used to periodically check if the client is still connected to the server.
-     * It creates a Runnable that calls the isConnected method and schedules it to run at a fixed rate.
+     * This method is used to periodically check if the client is still connected to
+     * the server.
+     * It creates a Runnable that calls the isConnected method and schedules it to
+     * run at a fixed rate.
      * The Runnable is scheduled to run every 30 seconds.
      */
-    public void isClientConnectedToServer(){
+    public void isClientConnectedToServer() {
         final Runnable checker = new Runnable() {
             public void run() {
                 try {
@@ -563,6 +592,9 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
         scheduler.scheduleAtFixedRate(checker, 30, 30, TimeUnit.SECONDS);
     }
 
-
+    @Override
+    public void loadSavedGame(GameMaster game) throws RemoteException {
+        controller.setModel(game);
+    }
 
 }

@@ -1,6 +1,7 @@
 package it.polimi.ingsw.network.RMI;
 
 import it.polimi.ingsw.model.Color;
+import it.polimi.ingsw.model.GameMaster;
 import it.polimi.ingsw.model.GameState;
 import it.polimi.ingsw.model.Kingdom;
 import it.polimi.ingsw.model.Player;
@@ -42,7 +43,6 @@ public interface RMIClientInterface extends Remote {
      */
     void sendInfoOnTable(Integer[] resourceCards, Integer[] goldCard, Kingdom resourceCardOnDeck,
             Kingdom goldCardOnDeck) throws RemoteException;
-
 
     /**
      * This method is used to show the starting card to the clients.
@@ -112,17 +112,20 @@ public interface RMIClientInterface extends Remote {
      * This method is used to place a card on the board. It also sends the resources
      * and the points of the player.
      * It is a broadcast call.
-     * @param nickname The nickname of the player.
-     * @param id The id of the card.
-     * @param position The position of the card.
-     * @param side The side of the card.
-     * @param turn turn of position of the card.
+     * 
+     * @param nickname  The nickname of the player.
+     * @param id        The id of the card.
+     * @param position  The position of the card.
+     * @param side      The side of the card.
+     * @param turn      turn of position of the card.
      * @param resources The resources of the player.
      * @param points    The points of the player.
      * @throws RemoteException throws a RemoteException if there is a problem with
      *                         the connection.
      */
-    void placeCard(String nickname, int id, Point position, boolean side, int turn, HashMap<Sign, Integer> resources, int points) throws RemoteException;
+    void placeCard(String nickname, int id, Point position, boolean side, int turn, HashMap<Sign, Integer> resources,
+            int points) throws RemoteException;
+
     /**
      * This method is used to communicate the new card on table and the new card on
      * deck. It is a broadcast call.
@@ -161,9 +164,11 @@ public interface RMIClientInterface extends Remote {
 
     /**
      * This method is used to deliver a message to the clients.
-     * @param sender The sender of the message.
+     * 
+     * @param sender  The sender of the message.
      * @param message The message.
-     * @throws RemoteException throws a RemoteException if there is a problem with the connection.
+     * @throws RemoteException throws a RemoteException if there is a problem with
+     *                         the connection.
      */
     void receiveChatMessage(String sender, String message, boolean broadcast) throws RemoteException;
 
@@ -179,7 +184,8 @@ public interface RMIClientInterface extends Remote {
     /**
      * This method is used to disconnect the client from the server.
      *
-     * It is called when enough players have joined the lobby and the player cannot continue gaming.
+     * It is called when enough players have joined the lobby and the player cannot
+     * continue gaming.
      *
      * @throws RemoteException if there is a problem with the network connection.
      */
@@ -188,7 +194,8 @@ public interface RMIClientInterface extends Remote {
     /**
      * This method is used to stop the game for a client.
      *
-     * It is called when the server decides to end the game or when the client decides to leave the game or
+     * It is called when the server decides to end the game or when the client
+     * decides to leave the game or
      * lose the connection with the server.
      *
      * @throws RemoteException if there is a problem with the network connection.
@@ -198,10 +205,21 @@ public interface RMIClientInterface extends Remote {
     /**
      * This method is used to check if the client is still connected to the server.
      *
-     * It is called periodically by the server to ensure that the client's connection is still active.
+     * It is called periodically by the server to ensure that the client's
+     * connection is still active.
      * If the client is not connected, a RemoteException will be thrown.
      *
-     * @throws RemoteException if there is a problem with the network connection or the client is not connected.
+     * @throws RemoteException if there is a problem with the network connection or
+     *                         the client is not connected.
      */
     void isConnected() throws RemoteException;
+
+    /**
+     * Loads a saved game.
+     * 
+     * @param game The game to load.
+     * @throws RemoteException throws a RemoteException if there is a problem with
+     *                         the connection.
+     */
+    void loadSavedGame(GameMaster game) throws RemoteException;
 }

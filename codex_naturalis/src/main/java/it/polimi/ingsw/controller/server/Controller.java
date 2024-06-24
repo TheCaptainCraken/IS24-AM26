@@ -7,16 +7,20 @@ import javafx.util.Pair;
 import org.json.simple.parser.ParseException;
 
 import java.awt.*;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
  * This class represents the main controller of the game.
  * It manages the game flow and interactions between server and the game model.
- * It follows the Singleton design pattern to ensure only one instance of the controller exists.
+ * It follows the Singleton design pattern to ensure only one instance of the
+ * controller exists.
  *
- * The controller is responsible for initializing the lobby, adding players, managing game flow,
+ * The controller is responsible for initializing the lobby, adding players,
+ * managing game flow,
  * and handling interactions between the server and the game model.
  *
  */
@@ -39,6 +43,11 @@ public class Controller {
     GameMaster game = null;
 
     /**
+     * The path to save the game state.
+     */
+    private final String savePath = "SavedGame.data";
+
+    /**
      * Gets the instance of the controller.
      *
      * @return The instance of the controller.
@@ -53,9 +62,10 @@ public class Controller {
     /**
      * Resets the instance of the controller.
      * This method is used to reset the singleton instance of the controller.
-     * It can be used when you want to start a new game and need a fresh instance of the controller.
+     * It can be used when you want to start a new game and need a fresh instance of
+     * the controller.
      */
-    public void reset(){
+    public void reset() {
         INSTANCE = null;
     }
 
@@ -101,6 +111,16 @@ public class Controller {
     }
 
     /**
+     * Tries to load a game from a file.
+     * 
+     * @throws IOException            If the file is not found.
+     * @throws ClassNotFoundException If the file is not valid.
+     */
+    public GameMaster tryLoadingGame() throws IOException, ClassNotFoundException {
+        return GameMaster.tryLoadingGameMaster(savePath);
+    }
+
+    /**
      * Adds a player to the lobby.
      *
      * @param nickname The nickname of the player.
@@ -137,6 +157,10 @@ public class Controller {
     public void chooseObjectiveCard(String player, int whichCard)
             throws WrongGamePhaseException, NoTurnException, NoNameException {
         game.chooseObjectiveCard(player, whichCard);
+
+        if (areAllSecretObjectiveCardChosen()) {
+            saveGame();
+        }
     }
 
     /**
@@ -155,7 +179,9 @@ public class Controller {
      */
     public int placeCard(String player, int indexHand, Point position, boolean side) throws WrongGamePhaseException,
             NoTurnException, NotEnoughResourcesException, NoNameException, CardPositionException {
-        return game.placeCard(player, indexHand, position, side);
+        int id = game.placeCard(player, indexHand, position, side);
+        saveGame();
+        return id;
     }
 
     /**
@@ -170,7 +196,9 @@ public class Controller {
      */
     public int drawCard(String player, boolean gold, int onTableOrDeck)
             throws WrongGamePhaseException, NoTurnException, NoNameException, CardPositionException {
-        return game.drawCard(player, gold, onTableOrDeck);
+        int id = game.drawCard(player, gold, onTableOrDeck);
+        saveGame();
+        return id;
     }
 
     /**
@@ -235,26 +263,27 @@ public class Controller {
      * @throws ColorAlreadyTakenException If the color is already taken.
      * @return Whether all players have chosen a color.
      */
-    public boolean setColourAndGameIsReadyToStart(String name, Color colour) throws ColorAlreadyTakenException, NoNameException {
+    public boolean setColourAndGameIsReadyToStart(String name, Color colour)
+            throws ColorAlreadyTakenException, NoNameException {
         for (Player player : lobby.getPlayers()) {
             if (player.getColor() == colour) {
                 throw new ColorAlreadyTakenException();
             }
         }
-        //set the color
+        // set the color
         lobby.getPlayerFromName(name).setColour(colour);
 
-        //check if all players have chosen a color
+        // check if all players have chosen a color
         for (Player player : lobby.getPlayers()) {
             if (player.getColor() == null) {
                 return false;
             }
         }
 
-        //start the game
+        // start the game
         start();
 
-        //return true if all players have chosen a color
+        // return true if all players have chosen a color
         return true;
     }
 
@@ -285,14 +314,16 @@ public class Controller {
      * @return The id of the new card on the table, or -1 if is the deck
      */
     public Integer newCardOnTable(boolean gold, int onTableOrDeck) {
-        //it turns -1 since no card on table has updated, the little model client know how to manage it
+        // it turns -1 since no card on table has updated, the little model client know
+        // how to manage it
         if (onTableOrDeck == -1) {
             return -1;
         } else {
-            //can be null, correct to manage it
+            // can be null, correct to manage it
             return game.getCard(gold, onTableOrDeck);
         }
     }
+
     /**
      * Checks if all root cards are placed.
      *
@@ -306,12 +337,15 @@ public class Controller {
         }
         return true;
     }
+
     /**
      * Getter of the common objective cards for the game.
      *
-     * This method is used to get the IDs of the common objective cards that are currently in play.
+     * This method is used to get the IDs of the common objective cards that are
+     * currently in play.
      *
-     * @return An array of Integer representing the IDs of the common objective cards.
+     * @return An array of Integer representing the IDs of the common objective
+     *         cards.
      */
     public Integer[] getCommonObjectiveCards() {
         Integer[] objectiveCards = new Integer[2];
@@ -320,15 +354,19 @@ public class Controller {
 
         return objectiveCards;
     }
+
     /**
      * Retrieves the secret objective cards for a specific player to choose from.
      *
-     * This method is used to get the IDs of the secret objective cards that the specified player can choose from.
-     * These cards are individual objectives that only the specific player can aim to achieve.
+     * This method is used to get the IDs of the secret objective cards that the
+     * specified player can choose from.
+     * These cards are individual objectives that only the specific player can aim
+     * to achieve.
      *
      * @param name The name of the player.
      * @throws NoNameException If the player's name does not exist.
-     * @return An array of Integer representing the IDs of the secret objective cards.
+     * @return An array of Integer representing the IDs of the secret objective
+     *         cards.
      */
     public Integer[] getSecretObjectiveCardsToChoose(String name) throws NoNameException {
         Integer[] secretObjectiveCards = new Integer[2];
@@ -338,15 +376,17 @@ public class Controller {
 
         return secretObjectiveCards;
     }
+
     /**
      * Gets the head of the deck.
      *
      * @param gold Whether the card is gold or not.
      * @return The head of the deck.
      */
-    public Kingdom getHeadDeck(boolean gold){
+    public Kingdom getHeadDeck(boolean gold) {
         return game.getHeadDeck(gold);
     }
+
     /**
      * Checks if all players have chosen the secret objective card.
      *
@@ -392,11 +432,11 @@ public class Controller {
         int i;
 
         for (i = 0; i < 3; i++) {
-            //hiddenHand[i] can be null since one player has placed a card, but not yet drawn a new one.
+            // hiddenHand[i] can be null since one player has placed a card, but not yet
+            // drawn a new one.
             try {
                 hiddenHand[i] = new Pair<>(player.getHand()[i].getKingdom(), (player.getHand()[i] instanceof GoldCard));
-            }
-            catch (NullPointerException e) {
+            } catch (NullPointerException e) {
                 hiddenHand[i] = null;
             }
         }
@@ -452,6 +492,7 @@ public class Controller {
     public String getFirstPlayer() {
         return lobby.getPlayers()[0].getName();
     }
+
     /**
      * Checks if the lobby is locked.
      *
@@ -460,6 +501,7 @@ public class Controller {
     public boolean isLobbyLocked() {
         return lobby.getLock();
     }
+
     /**
      * Retrieves the resource card at the specified position.
      *
@@ -469,6 +511,7 @@ public class Controller {
     public Integer getResourceCards(int position) {
         return game.getResourceCard(position).getId();
     }
+
     /**
      * Retrieves the gold card at the specified position.
      *
@@ -478,6 +521,7 @@ public class Controller {
     public Integer getGoldCard(int position) {
         return game.getGoldCard(position).getId();
     }
+
     /**
      * Checks if the player with the given nickname is admitted.
      *
@@ -487,22 +531,25 @@ public class Controller {
     public boolean isAdmitted(String nickname) {
         return lobby.isAdmitted(nickname);
     }
+
     /**
      * Checks if the lobby is ready.
      *
      * @return true if the lobby is ready, false otherwise.
      */
-    public boolean lobbyIsReady(){
+    public boolean lobbyIsReady() {
         return lobby.isReady();
     }
+
     /**
      * Retrieves the current turn of the game.
      *
      * @return The current turn of the game.
      */
-    public int getTurn(){
+    public int getTurn() {
         return game.getTurn();
     }
+
     /**
      * Retrieves the lobby of the game.
      *
@@ -510,5 +557,22 @@ public class Controller {
      */
     public Lobby getLobby() {
         return lobby;
+    }
+
+    /**
+     * Saves the game state to a file. This implements the game saving advanced
+     * functionality.
+     */
+    public void saveGame() {
+        try {
+            FileOutputStream saveFile = new FileOutputStream(savePath);
+            ObjectOutputStream save = new ObjectOutputStream(saveFile);
+            save.writeObject(game);
+
+            save.close();
+            saveFile.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

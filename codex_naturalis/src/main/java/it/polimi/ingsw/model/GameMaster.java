@@ -5,16 +5,22 @@ import it.polimi.ingsw.view.model.CardClient;
 import org.json.simple.parser.ParseException;
 
 import java.awt.*;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.*;
 
 /**
  * The GameMaster class represents the main game logic in the application.
  * It manages the game state, player turns, card decks, and scoring.
- * It also handles the placement of cards and the drawing of cards from the deck or table.
- * The GameMaster interacts with the Lobby to manage the players and with the Deck to manage the cards.
- * It also uses various helper methods to calculate scores, check if a card can be placed, and find cards in the game graph.
- * The GameMaster class throws various exceptions to handle invalid game actions.
+ * It also handles the placement of cards and the drawing of cards from the deck
+ * or table.
+ * The GameMaster interacts with the Lobby to manage the players and with the
+ * Deck to manage the cards.
+ * It also uses various helper methods to calculate scores, check if a card can
+ * be placed, and find cards in the game graph.
+ * The GameMaster class throws various exceptions to handle invalid game
+ * actions.
  */
 public class GameMaster {
     /**
@@ -133,6 +139,26 @@ public class GameMaster {
     }
 
     /**
+     * Creates a new instance from a saved GameMaster on file.
+     * 
+     * @param path path of the file to load.
+     * @return the loaded GameMaster.
+     * @throws IOException            if the file is not found or can't be read.
+     * @throws ClassNotFoundException if the class is not found.
+     */
+    public static GameMaster tryLoadingGameMaster(String path) throws IOException, ClassNotFoundException {
+        FileInputStream saveFile = new FileInputStream(path);
+        ObjectInputStream save = new ObjectInputStream(saveFile);
+
+        GameMaster gameMaster = (GameMaster) save.readObject();
+
+        save.close();
+        saveFile.close();
+
+        return gameMaster;
+    }
+
+    /**
      * First turn cycle in which every player decides in which side place its
      * StartingCard
      *
@@ -148,7 +174,7 @@ public class GameMaster {
         } else if (gameState != GameState.CHOOSING_ROOT_CARD) {
             throw new WrongGamePhaseException();
         } else {
-            //first card, all the corners are not linked to any card
+            // first card, all the corners are not linked to any card
             HashMap<Corner, PlayedCard> defaultAttachments = new HashMap<>();
             for (Corner corner : Corner.values()) {
                 defaultAttachments.put(corner, null);
@@ -158,16 +184,17 @@ public class GameMaster {
             currentPlayer.setRootCard(rootCardPlaced);
 
             if (!side) {
-                //add bonus resources
+                // add bonus resources
                 for (Sign sign : rootCard.getBonusResources()) {
                     currentPlayer.addResource(sign, 1);
                 }
-                //add back side corners
+                // add back side corners
                 for (Corner corner : Corner.values()) {
                     currentPlayer.addResource(rootCard.getBacksideCorners().get(corner), 1);
                 }
             } else {
-                // if the card is placed on the top side, the player gets the resources of the corner. Each corner has a resource
+                // if the card is placed on the top side, the player gets the resources of the
+                // corner. Each corner has a resource
                 for (Corner corner : Corner.values()) {
                     currentPlayer.addResource(rootCard.getCorners().get(corner), 1);
                 }
@@ -208,14 +235,14 @@ public class GameMaster {
      * Let the Player capsule in a PlacedCard connected to the rootCard graph of the
      * Player
      *
-     * @param namePlayer  Player who sent the request
-     * @param index Which card wants to place
-     * @param position    In which position of the table the player wants to be
-     *                    place the card
-     * @param side        To which side wants the player to place the card
+     * @param namePlayer Player who sent the request
+     * @param index      Which card wants to place
+     * @param position   In which position of the table the player wants to be
+     *                   place the card
+     * @param side       To which side wants the player to place the card
      */
     public int placeCard(String namePlayer, int index, Point position, boolean side)
-            throws  NoTurnException, WrongGamePhaseException,
+            throws NoTurnException, WrongGamePhaseException,
             NotEnoughResourcesException, CardPositionException, NoNameException {
 
         // manage all possible exceptions
@@ -231,7 +258,8 @@ public class GameMaster {
         ResourceCard cardToPlace = currentPlayer.getHand()[index];
 
         HashMap<Corner, PlayedCard> attachments = isPositionable(currentPlayer.getRootCard(), position);
-        //the player positions the card in the back front. The card is one resource and 4 empty corners.
+        // the player positions the card in the back front. The card is one resource and
+        // 4 empty corners.
         if (!side) {
             new PlayedCard(cardToPlace, attachments, side, getTurn(), position);
             currentPlayer.addResource(fromKingdomToSign(cardToPlace.getKingdom()), 1);
@@ -260,7 +288,7 @@ public class GameMaster {
             // subtracted only if the PlayedCards
             // present in the attachments HashMap are played on their front side or are
             // referencing the StartingCard
-             if (attachments.get(corner) != null && attachments.get(corner).isFacingUp()) {
+            if (attachments.get(corner) != null && attachments.get(corner).isFacingUp()) {
                 switch (corner) {
                     case TOP_LEFT: {
                         currentPlayer.removeResources(
@@ -283,30 +311,38 @@ public class GameMaster {
                         break;
                     }
                 }
-            } else if(attachments.get(corner) != null && attachments.get(corner).getCard() instanceof StartingCard){
-                 switch (corner) {
+            } else if (attachments.get(corner) != null && attachments.get(corner).getCard() instanceof StartingCard) {
+                switch (corner) {
                     case TOP_LEFT: {
                         currentPlayer.removeResources(
-                                ((StartingCard)attachments.get(corner).getCard()).getBacksideCorners().get(Corner.BOTTOM_RIGHT), 1);
+                                ((StartingCard) attachments.get(corner).getCard()).getBacksideCorners()
+                                        .get(Corner.BOTTOM_RIGHT),
+                                1);
                         break;
                     }
                     case TOP_RIGHT: {
                         currentPlayer.removeResources(
-                                ((StartingCard)attachments.get(corner).getCard()).getBacksideCorners().get(Corner.BOTTOM_LEFT), 1);
+                                ((StartingCard) attachments.get(corner).getCard()).getBacksideCorners()
+                                        .get(Corner.BOTTOM_LEFT),
+                                1);
                         break;
                     }
                     case BOTTOM_LEFT: {
                         currentPlayer.removeResources(
-                                ((StartingCard)attachments.get(corner).getCard()).getBacksideCorners().get(Corner.TOP_RIGHT), 1);
+                                ((StartingCard) attachments.get(corner).getCard()).getBacksideCorners()
+                                        .get(Corner.TOP_RIGHT),
+                                1);
                         break;
                     }
                     case BOTTOM_RIGHT: {
                         currentPlayer.removeResources(
-                                ((StartingCard)attachments.get(corner).getCard()).getBacksideCorners().get(Corner.TOP_LEFT), 1);
+                                ((StartingCard) attachments.get(corner).getCard()).getBacksideCorners()
+                                        .get(Corner.TOP_LEFT),
+                                1);
                         break;
                     }
                 }
-             }
+            }
         }
 
         // At the end because I need to know resources values at the end and how many
@@ -322,24 +358,26 @@ public class GameMaster {
 
         currentPlayer.giveCard(cardToPlace);
 
-        //if card are not finished, we check in draw phase if is last/second last turn
+        // if card are not finished, we check in draw phase if is last/second last turn
         if (areTheCardFinished()) {
-            //no need to check for GameFlow: drawPhase check if all card are finished. If so, change the phase to SECOND_LAST_TURN.
+            // no need to check for GameFlow: drawPhase check if all card are finished. If
+            // so, change the phase to SECOND_LAST_TURN.
             if (turnType == TurnType.SECOND_LAST_TURN
                     && getOrderPlayer(currentPlayer.getName()) + 1 == lobby.getPlayers().length) {
                 // if it is the last player in second-last turn cycle, say the next is the last
                 // turn
                 turnType = TurnType.LAST_TURN;
-                //remains in placing phase if and only if the card are finished
+                // remains in placing phase if and only if the card are finished
                 gameState = GameState.PLACING_PHASE;
             } else if (turnType == TurnType.LAST_TURN
                     && getOrderPlayer(currentPlayer.getName()) + 1 == lobby.getPlayers().length) {
                 // if it is the last player in last turn cycle, go to end mode
                 gameState = GameState.END;
-                endGame(); //game transitions into the calculating phase
+                endGame(); // game transitions into the calculating phase
             }
             // only when the card are finished and the game is in the final phase
-            // normally, the turn is updated in draw Phase,but since areTheCardFinished() is true we need to update it here.
+            // normally, the turn is updated in draw Phase,but since areTheCardFinished() is
+            // true we need to update it here.
             nextGlobalTurn();
         } else {
             gameState = GameState.DRAWING_PHASE;
@@ -375,20 +413,20 @@ public class GameMaster {
         if (Gold) {
             if (CardPosition == -1) {
                 try {
-                cardDrawn = (ResourceCard) goldDeck.draw();
+                    cardDrawn = (ResourceCard) goldDeck.draw();
                 } catch (IndexOutOfBoundsException e) {
                     throw new CardPositionException();
                 }
                 currentPlayer.takeCard(cardDrawn);
             } else {
                 cardDrawn = onTableGoldCards[CardPosition];
-                //if the card is not present in the table, it throws an exception
+                // if the card is not present in the table, it throws an exception
                 if (cardDrawn == null) {
                     throw new CardPositionException();
                 }
-                //remove the card from the model
+                // remove the card from the model
                 currentPlayer.takeCard(cardDrawn);
-                //update the card on table
+                // update the card on table
                 try {
                     onTableGoldCards[CardPosition] = (GoldCard) goldDeck.draw();
                 } catch (IndexOutOfBoundsException e) {
@@ -398,7 +436,7 @@ public class GameMaster {
         } else {
             if (CardPosition == -1) {
                 try {
-                cardDrawn = (ResourceCard) resourceDeck.draw();
+                    cardDrawn = (ResourceCard) resourceDeck.draw();
                 } catch (IndexOutOfBoundsException e) {
                     throw new CardPositionException();
                 }
@@ -420,16 +458,17 @@ public class GameMaster {
         gameState = GameState.PLACING_PHASE;
 
         // next player will play?
-        if(turnType == TurnType.PLAYING && (currentPlayer.getPoints() >= 20 || areTheCardFinished())){
+        if (turnType == TurnType.PLAYING && (currentPlayer.getPoints() >= 20 || areTheCardFinished())) {
             if (getOrderPlayer(currentPlayer.getName()) + 1 == lobby.getPlayers().length) {
                 turnType = TurnType.LAST_TURN;
             } else {
                 turnType = TurnType.SECOND_LAST_TURN;
             }
-        } else if(turnType != TurnType.PLAYING && getOrderPlayer(currentPlayer.getName()) + 1 == lobby.getPlayers().length){
-            if(turnType == TurnType.SECOND_LAST_TURN){
+        } else if (turnType != TurnType.PLAYING
+                && getOrderPlayer(currentPlayer.getName()) + 1 == lobby.getPlayers().length) {
+            if (turnType == TurnType.SECOND_LAST_TURN) {
                 turnType = TurnType.LAST_TURN;
-            } else if(turnType == TurnType.LAST_TURN){
+            } else if (turnType == TurnType.LAST_TURN) {
                 gameState = GameState.END;
                 endGame();
             }
@@ -450,33 +489,35 @@ public class GameMaster {
         } else {
             for (Player player : lobby.getPlayers()) {
                 ObjectiveCard secret = player.getSecretObjective();
-                //secret objective is calculated first
-                int newPoints = calculateEndGamePoints(secret.getType(), secret.getMultiplier(), player, secret.getKingdom());
+                // secret objective is calculated first
+                int newPoints = calculateEndGamePoints(secret.getType(), secret.getMultiplier(), player,
+                        secret.getKingdom());
                 player.addObjectivePoints(newPoints);
-                for(ObjectiveCard card : onTableObjectiveCards){
+                for (ObjectiveCard card : onTableObjectiveCards) {
                     newPoints = calculateEndGamePoints(card.getType(), card.getMultiplier(), player, card.getKingdom());
                     player.addObjectivePoints(newPoints);
                 }
-                //add player to ranking after insert all objective points
+                // add player to ranking after insert all objective points
                 ranking.add(player);
             }
 
-            //Anonymous function to sort the ranking according to rules of the game
-            //this function does not return anything. The controller will ask for the ranking
+            // Anonymous function to sort the ranking according to rules of the game
+            // this function does not return anything. The controller will ask for the
+            // ranking
             Collections.sort(ranking, new Comparator<Player>() {
                 @Override
                 public int compare(Player p1, Player p2) {
-                    //total score of a player: normal points during the game and objective points
+                    // total score of a player: normal points during the game and objective points
                     int sum1 = p1.getPoints() + p1.getObjectivePoints();
                     int sum2 = p2.getPoints() + p2.getObjectivePoints();
-                    if(sum1 == sum2) {
-                        //if the points are equal, the player with the most objective points wins
+                    if (sum1 == sum2) {
+                        // if the points are equal, the player with the most objective points wins
                         return Integer.compare(p1.getObjectivePoints(), p2.getObjectivePoints());
-                    } else if(sum1 > sum2){
-                        //sum is insert before than player 2
+                    } else if (sum1 > sum2) {
+                        // sum is insert before than player 2
                         return 1;
                     } else {
-                        //sum is insert after than player 2
+                        // sum is insert after than player 2
                         return -1;
                     }
                 }
@@ -508,7 +549,6 @@ public class GameMaster {
 
         // For each corner of the card to be placed, it checks if there is a possible
         // card to attach it. The switch case refers to the new Card.
-
 
         newCard = findCard(startingCard, position);
         if (newCard != null) {
@@ -617,7 +657,7 @@ public class GameMaster {
      *
      * @param startingCard Where the recursion will start to find the required
      *                     PlayedCard
-     * @param position position that identifies where the next card should be
+     * @param position     position that identifies where the next card should be
      * @return method recursiveFindCard
      */
     private PlayedCard findCard(PlayedCard startingCard, Point position) {
@@ -692,11 +732,13 @@ public class GameMaster {
     }
 
     /**
-     * Controls if the resources of a Player are enough for the requirements of a GoldCard
+     * Controls if the resources of a Player are enough for the requirements of a
+     * GoldCard
      *
      * @param player   Player about we want to know if they can place the GoldCard
      * @param goldCard GoldCard that wants to be placed and has certain requirements
-     * @return true if the player has enough resources to place the GoldCard, false otherwise
+     * @return true if the player has enough resources to place the GoldCard, false
+     *         otherwise
      */
     public boolean requirementsSatisfied(Player player, GoldCard goldCard) {
         for (Sign sign : Sign.values()) {
@@ -744,7 +786,7 @@ public class GameMaster {
      * @param player player to explore
      * @return list of played cards
      */
-    private ArrayList<PlayedCard> getPlayersCards(Player player) {
+    public ArrayList<PlayedCard> getPlayersCards(Player player) {
         PlayedCard rootCard = player.getRootCard();
         return exploreGraph(rootCard);
     }
@@ -764,8 +806,10 @@ public class GameMaster {
             cards.add(card);
             for (Corner corner : Corner.values()) {
                 PlayedCard attached = card.getAttached(corner);
-                //if the attachment is not null and the card is not yet in the list, it is added to the stack
-                //remember that cards are double linked, so we need to check if the card is already in the list
+                // if the attachment is not null and the card is not yet in the list, it is
+                // added to the stack
+                // remember that cards are double linked, so we need to check if the card is
+                // already in the list
                 if (attached != null && !cards.contains(attached)) {
                     stack.push(attached);
                 }
@@ -831,7 +875,6 @@ public class GameMaster {
         return name.equals(currentPlayer.getName());
     }
 
-
     /**
      * Place card on the spot on table
      *
@@ -883,7 +926,7 @@ public class GameMaster {
      * @param namePlayer name of the player about is wanted to get info
      * @return resources of the player
      */
-    public HashMap<Sign, Integer> getPlayerResources(String namePlayer) throws  NoNameException {
+    public HashMap<Sign, Integer> getPlayerResources(String namePlayer) throws NoNameException {
         return lobby.getPlayerFromName(namePlayer).getResources();
     }
 
@@ -956,7 +999,8 @@ public class GameMaster {
 
     /**
      * Retrieves the next gold card from the deck.
-     * This method is used only for testing purposes and should not be used during normal gameplay.
+     * This method is used only for testing purposes and should not be used during
+     * normal gameplay.
      *
      * @return The next gold card from the deck.
      */
@@ -966,7 +1010,8 @@ public class GameMaster {
 
     /**
      * Retrieves the next resource card from the deck.
-     * This method is used only for testing purposes and should not be used during normal gameplay.
+     * This method is used only for testing purposes and should not be used during
+     * normal gameplay.
      *
      * @return The next gold card from the deck.
      */
@@ -977,7 +1022,8 @@ public class GameMaster {
     /**
      * Retrieves the current state of the game.
      *
-     * This method is used to check the current phase of the game, which can be useful for determining
+     * This method is used to check the current phase of the game, which can be
+     * useful for determining
      * the valid actions that can be performed at any given time.
      *
      * @return The current state of the game as a GameState enum.
@@ -989,9 +1035,14 @@ public class GameMaster {
     /**
      * Retrieves the card from the table or deck based on the provided parameters.
      *
-     * @param gold Indicates if the card to be retrieved is a gold card. If true, a gold card is retrieved, otherwise a resource card is retrieved.
-     * @param onTableOrDeck Specifies the location of the card. If it's a number between 0 and 1, it refers to the position on the table. If it's -1, the card is drawn from the deck.
-     * @return The ID of the retrieved card. If the specified card does not exist, null is returned.
+     * @param gold          Indicates if the card to be retrieved is a gold card. If
+     *                      true, a gold card is retrieved, otherwise a resource
+     *                      card is retrieved.
+     * @param onTableOrDeck Specifies the location of the card. If it's a number
+     *                      between 0 and 1, it refers to the position on the table.
+     *                      If it's -1, the card is drawn from the deck.
+     * @return The ID of the retrieved card. If the specified card does not exist,
+     *         null is returned.
      * @throws NullPointerException If the specified card position does not exist.
      */
     public Integer getCard(boolean gold, int onTableOrDeck) {
@@ -1025,10 +1076,12 @@ public class GameMaster {
     /**
      * Retrieves an objective card that a player can choose.
      *
-     * This method is used to retrieve an objective card from the set of cards that a player can choose from.
+     * This method is used to retrieve an objective card from the set of cards that
+     * a player can choose from.
      *
      * @param i The index of the player in the game.
-     * @param j The index of the objective card in the player's set of choosable cards.
+     * @param j The index of the objective card in the player's set of choosable
+     *          cards.
      * @return The objective card at the specified indices.
      */
     public ObjectiveCard getObjectiveCardToChoose(int i, int j) {
@@ -1039,20 +1092,23 @@ public class GameMaster {
      * Retrieves the kingdom of the first card in the specified deck.
      *
      * This method is used to peek at the first card in the deck without drawing it.
-     * It can be used to plan ahead and make strategic decisions based on the upcoming card.
+     * It can be used to plan ahead and make strategic decisions based on the
+     * upcoming card.
      *
-     * @param gold If true, the method checks the gold deck. If false, it checks the resource deck.
-     * @return The kingdom of the first card in the specified deck. If the deck is empty, returns null.
+     * @param gold If true, the method checks the gold deck. If false, it checks the
+     *             resource deck.
+     * @return The kingdom of the first card in the specified deck. If the deck is
+     *         empty, returns null.
      * @throws IndexOutOfBoundsException If the specified deck is empty.
      */
-    public Kingdom getHeadDeck(boolean gold){
-        try{
+    public Kingdom getHeadDeck(boolean gold) {
+        try {
             if (gold) {
                 return goldDeck.getKingdomFirstCard();
             } else {
                 return resourceDeck.getKingdomFirstCard();
             }
-        } catch(IndexOutOfBoundsException e){
+        } catch (IndexOutOfBoundsException e) {
             return null;
         }
     }
@@ -1060,11 +1116,14 @@ public class GameMaster {
     /**
      * Retrieves the resource card at the specified position on the table.
      *
-     * This method is used to retrieve a specific resource card from the table in the game.
-     * The position is based on the order in which the cards are placed on the table.
+     * This method is used to retrieve a specific resource card from the table in
+     * the game.
+     * The position is based on the order in which the cards are placed on the
+     * table.
      *
      * @param position The position of the resource card on the table.
-     * @return The resource card at the specified position. If the position is invalid, null is returned.
+     * @return The resource card at the specified position. If the position is
+     *         invalid, null is returned.
      */
     public Card getResourceCard(int position) {
         return onTableResourceCards[position];
@@ -1073,11 +1132,14 @@ public class GameMaster {
     /**
      * Retrieves the gold card at the specified position on the table.
      *
-     * This method is used to retrieve a specific gold card from the table in the game.
-     * The position is based on the order in which the cards are placed on the table.
+     * This method is used to retrieve a specific gold card from the table in the
+     * game.
+     * The position is based on the order in which the cards are placed on the
+     * table.
      *
      * @param position The position of the gold card on the table.
-     * @return The gold card at the specified position. If the position is invalid, null is returned.
+     * @return The gold card at the specified position. If the position is invalid,
+     *         null is returned.
      */
     public Card getGoldCard(int position) {
         return onTableGoldCards[position];
@@ -1086,7 +1148,8 @@ public class GameMaster {
     /**
      * Retrieves the starting card assigned to a player.
      *
-     * This method is used to retrieve the starting card that has been assigned to a player based on their nickname.
+     * This method is used to retrieve the starting card that has been assigned to a
+     * player based on their nickname.
      *
      * @param nickname The nickname of the player.
      * @return The starting card assigned to the player.
@@ -1099,7 +1162,8 @@ public class GameMaster {
     /**
      * Retrieves the current turn type of the game.
      *
-     * This method is used to check the current turn type of the game, which can be useful for determining
+     * This method is used to check the current turn type of the game, which can be
+     * useful for determining
      * the valid actions that can be performed at any given time.
      *
      * @return The current turn type of the game as a TurnType enum.
@@ -1139,7 +1203,7 @@ public class GameMaster {
                 break;
             case L_FORMATION: {
                 ArrayList<PlayedCard> usedCards = new ArrayList<>();
-                switch(kingdom) {
+                switch (kingdom) {
                     case FUNGI:
                         // i start from top card
                         for (PlayedCard card : getPlayersCards(player)) {
@@ -1151,7 +1215,7 @@ public class GameMaster {
                                 lowerPosition.translate(-1, -1);
                                 PlayedCard lower = findCard(player.getRootCard(), lowerPosition);
 
-                                //the card below on the right, linked to lower
+                                // the card below on the right, linked to lower
                                 PlayedCard lowerRight;
                                 try {
                                     lowerRight = lower.getAttached(Corner.BOTTOM_RIGHT);
@@ -1161,7 +1225,8 @@ public class GameMaster {
 
                                 if (lower != null && lowerRight != null &&
                                         !usedCards.contains(lower) && !usedCards.contains(lowerRight)
-                                        && lower.getCard().getKingdom() == Kingdom.FUNGI && lowerRight.getCard().getKingdom() == Kingdom.PLANT) {
+                                        && lower.getCard().getKingdom() == Kingdom.FUNGI
+                                        && lowerRight.getCard().getKingdom() == Kingdom.PLANT) {
                                     points++;
                                     usedCards.add(card);
                                     usedCards.add(lowerRight);
@@ -1174,12 +1239,12 @@ public class GameMaster {
                         // i start from the below card
                         for (PlayedCard card : getPlayersCards(player)) {
                             if (!usedCards.contains(card) && card.getCard().getKingdom() == Kingdom.ANIMAL) {
-                                //take the card on top
+                                // take the card on top
                                 Point position = card.getPosition();
                                 Point topPosition = (Point) position.clone();
                                 topPosition.translate(+1, +1);
                                 PlayedCard top = findCard(player.getRootCard(), topPosition);
-                                //take the card on top right
+                                // take the card on top right
                                 PlayedCard topRight;
                                 try {
                                     topRight = top.getAttached(Corner.TOP_RIGHT);
@@ -1189,7 +1254,8 @@ public class GameMaster {
 
                                 if (top != null && topRight != null &&
                                         !usedCards.contains(top) && !usedCards.contains(topRight)
-                                        && top.getCard().getKingdom() == Kingdom.ANIMAL && topRight.getCard().getKingdom() == Kingdom.FUNGI) {
+                                        && top.getCard().getKingdom() == Kingdom.ANIMAL
+                                        && topRight.getCard().getKingdom() == Kingdom.FUNGI) {
                                     points++;
                                     usedCards.add(card);
                                     usedCards.add(topRight);
@@ -1202,12 +1268,12 @@ public class GameMaster {
                         // i start from the card on top
                         for (PlayedCard card : getPlayersCards(player)) {
                             if (!usedCards.contains(card) && card.getCard().getKingdom() == Kingdom.PLANT) {
-                                //take the card on top
+                                // take the card on top
                                 Point position = card.getPosition();
                                 Point belowPosition = (Point) position.clone();
                                 belowPosition.translate(-1, -1);
                                 PlayedCard below = findCard(player.getRootCard(), belowPosition);
-                                //take the card on top right
+                                // take the card on top right
                                 PlayedCard belowLeft;
                                 try {
                                     belowLeft = below.getAttached(Corner.BOTTOM_LEFT);
@@ -1217,7 +1283,8 @@ public class GameMaster {
 
                                 if (below != null && belowLeft != null &&
                                         !usedCards.contains(below) && !usedCards.contains(belowLeft)
-                                        && below.getCard().getKingdom() == Kingdom.PLANT && belowLeft.getCard().getKingdom() == Kingdom.INSECT) {
+                                        && below.getCard().getKingdom() == Kingdom.PLANT
+                                        && belowLeft.getCard().getKingdom() == Kingdom.INSECT) {
                                     points++;
                                     usedCards.add(card);
                                     usedCards.add(belowLeft);
@@ -1230,13 +1297,13 @@ public class GameMaster {
                         // i start from the below card
                         for (PlayedCard card : getPlayersCards(player)) {
                             if (!usedCards.contains(card) && card.getCard().getKingdom() == Kingdom.INSECT) {
-                                //take the card on top
+                                // take the card on top
                                 Point position = card.getPosition();
                                 Point topPosition = (Point) position.clone();
                                 topPosition.translate(+1, +1);
                                 PlayedCard top = findCard(player.getRootCard(), topPosition);
 
-                                //take the card on top right
+                                // take the card on top right
                                 PlayedCard topLeft;
                                 try {
                                     topLeft = top.getAttached(Corner.TOP_LEFT);
@@ -1246,7 +1313,8 @@ public class GameMaster {
 
                                 if (top != null && topLeft != null &&
                                         !usedCards.contains(top) && !usedCards.contains(topLeft)
-                                        && top.getCard().getKingdom() == Kingdom.INSECT && topLeft.getCard().getKingdom() == Kingdom.ANIMAL) {
+                                        && top.getCard().getKingdom() == Kingdom.INSECT
+                                        && topLeft.getCard().getKingdom() == Kingdom.ANIMAL) {
                                     points++;
                                     usedCards.add(card);
                                     usedCards.add(topLeft);
@@ -1255,7 +1323,7 @@ public class GameMaster {
                             }
                         }
                         break;
-                }//last parenthesis for kingdom switch
+                }// last parenthesis for kingdom switch
             }
                 break;
             case STAIR: {
@@ -1263,13 +1331,14 @@ public class GameMaster {
                 ArrayList<PlayedCard> usedCards = new ArrayList<>();
                 switch (kingdom) {
                     // stair formation top right: crescente: I start from the bottom one
-                    case FUNGI :
+                    case FUNGI:
                     case ANIMAL:
-                        for(PlayedCard card : getPlayersCards(player)) {
+                        for (PlayedCard card : getPlayersCards(player)) {
                             if (card.getCard().getKingdom() == kingdom && !usedCards.contains(card)) {
                                 PlayedCard firstUpper = card.getAttached(Corner.TOP_RIGHT);
 
-                                //if there is no card attached to the first one, I have a null pointer exception
+                                // if there is no card attached to the first one, I have a null pointer
+                                // exception
                                 PlayedCard secondUpper;
                                 try {
                                     secondUpper = firstUpper.getAttached(Corner.TOP_RIGHT);
@@ -1277,10 +1346,12 @@ public class GameMaster {
                                     secondUpper = null;
                                 }
 
-                                //controll that are not null and that the cards are not already used and that the cards are of the right kingdom
+                                // controll that are not null and that the cards are not already used and that
+                                // the cards are of the right kingdom
                                 if (firstUpper != null && secondUpper != null &&
                                         !usedCards.contains(firstUpper) && !usedCards.contains(secondUpper)
-                                        && firstUpper.getCard().getKingdom() == kingdom && secondUpper.getCard().getKingdom() == kingdom) {
+                                        && firstUpper.getCard().getKingdom() == kingdom
+                                        && secondUpper.getCard().getKingdom() == kingdom) {
                                     points++;
                                     usedCards.add(card);
                                     usedCards.add(firstUpper);
@@ -1292,11 +1363,12 @@ public class GameMaster {
                     // stair formation bottom right: decrescente: I start from the top one
                     case PLANT:
                     case INSECT:
-                        for(PlayedCard card : getPlayersCards(player)) {
+                        for (PlayedCard card : getPlayersCards(player)) {
                             if (card.getCard().getKingdom() == kingdom && !usedCards.contains(card)) {
                                 PlayedCard firstDown = card.getAttached(Corner.BOTTOM_RIGHT);
 
-                                //if there is no card attached to the first one, I have a null pointer exception
+                                // if there is no card attached to the first one, I have a null pointer
+                                // exception
                                 PlayedCard secondDown;
                                 try {
                                     secondDown = firstDown.getAttached(Corner.BOTTOM_RIGHT);
@@ -1304,10 +1376,12 @@ public class GameMaster {
                                     secondDown = null;
                                 }
 
-                                //control that are not null and that the cards are not already used and that the cards are of the right kingdom
+                                // control that are not null and that the cards are not already used and that
+                                // the cards are of the right kingdom
                                 if (firstDown != null && secondDown != null &&
                                         !usedCards.contains(firstDown) && !usedCards.contains(secondDown)
-                                        && firstDown.getCard().getKingdom() == kingdom && secondDown.getCard().getKingdom() == kingdom) {
+                                        && firstDown.getCard().getKingdom() == kingdom
+                                        && secondDown.getCard().getKingdom() == kingdom) {
                                     points++;
                                     usedCards.add(card);
                                     usedCards.add(firstDown);
@@ -1323,5 +1397,8 @@ public class GameMaster {
 
         return points * multiplier;
     }
-}
 
+    public Lobby getLobby() {
+        return lobby;
+    }
+}

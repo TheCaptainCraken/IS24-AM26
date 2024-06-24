@@ -1,5 +1,6 @@
 package it.polimi.ingsw.network;
 
+import it.polimi.ingsw.model.GameMaster;
 import it.polimi.ingsw.model.Kingdom;
 
 import java.awt.*;
@@ -57,16 +58,18 @@ public interface NetworkPlug {
         /**
          * Fetches the receivers of the message.
          *
-         * @return The list of nicknames of the players across connections who should receive the message.
+         * @return The list of nicknames of the players across connections who should
+         *         receive the message.
          */
         ArrayList<String> fetchReceivers(String message);
 
         /**
          * Sends a chat message to players checking tags.
          *
-         * @param sender  The nickname of the player who sent the message.
-         * @param message The message sent by the player.
-         * @param receivers The list of nicknames of the players across connectios who should receive the message.
+         * @param sender    The nickname of the player who sent the message.
+         * @param message   The message sent by the player.
+         * @param receivers The list of nicknames of the players across connectios who
+         *                  should receive the message.
          */
         void sendingChatMessage(String sender, String message, ArrayList<String> receivers);
 
@@ -133,14 +136,26 @@ public interface NetworkPlug {
         void sendEndGame();
 
         /**
-         * This method is used to disconnect all clients from a specific network interface.
-         * It should be implemented by each network interface to handle the disconnection process according to its specific protocol.
+         * This method is used to disconnect all clients from a specific network
+         * interface.
+         * It should be implemented by each network interface to handle the
+         * disconnection process according to its specific protocol.
          */
         void disconnectAll();
 
         /**
          * This method is used to notify all connected clients about the current turn.
-         * It should be implemented by each network interface to handle the notification process according to its specific protocol.
+         * It should be implemented by each network interface to handle the notification
+         * process according to its specific protocol.
          */
         void notifyTurn();
+
+        /**
+         * This method is used to load a game from a save file.
+         * It should be implemented by each network interface to handle the loading
+         * process according to its specific protocol.
+         *
+         * @param game The game to load.
+         */
+        void loadGame(GameMaster game);
 }
