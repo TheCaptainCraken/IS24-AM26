@@ -97,3 +97,5 @@ fabric.properties
 .vscode/
 
 .idea/
+
+*.data

@@ -1,6 +1,7 @@
 package it.polimi.ingsw.network;
 
 import it.polimi.ingsw.controller.server.Controller;
+import it.polimi.ingsw.model.GameMaster;
 import it.polimi.ingsw.model.Kingdom;
 import it.polimi.ingsw.model.exception.LobbyCompleteException;
 import it.polimi.ingsw.model.exception.NoNameException;
@@ -60,7 +61,7 @@ public class NetworkHandler {
     public static void main(String[] args) throws IOException {
         serverRMI = new ServerRMI();
         networkServerSocket = new NetworkServerSocket(4567);
-        new Thread(()-> {
+        new Thread(() -> {
             try {
                 networkServerSocket.start();
             } catch (IOException e) {
@@ -90,18 +91,36 @@ public class NetworkHandler {
     }
 
     /**
-     * This method is responsible for broadcasting a message to all connected clients when the number of players in the game has been finalized.
-     * It first checks if the lobby is ready by calling `Controller.getInstance().lobbyIsReady()`. If the lobby is ready, it iterates over all the network interfaces and calls their respective `finalizingNumberOfPlayers` method.
-     * This method is only called when all players are ready, so the number of players is chosen and all players have entered the lobby.
+     * This method is responsible for broadcasting a message to all connected
+     * clients when the number of players in the game has been finalized.
+     * It first checks if the lobby is ready by calling
+     * `Controller.getInstance().lobbyIsReady()`. If the lobby is ready, it iterates
+     * over all the network interfaces and calls their respective
+     * `finalizingNumberOfPlayers` method.
+     * This method is only called when all players are ready, so the number of
+     * players is chosen and all players have entered the lobby.
      *
      */
     public void finalizingNumberOfPlayersBroadcast() {
         // Filter players if lobby.size() > maxSize
         boolean lobbyIsReady = Controller.getInstance().lobbyIsReady();
-        //only done when all players are ready, so the number of players is chosen, and all players have entered the lobby.
-        if(lobbyIsReady) {
-            for (NetworkPlug networkPlug : networkInterfacesAndConnections.values()) {
-                networkPlug.finalizingNumberOfPlayers();
+        // only done when all players are ready, so the number of players is chosen, and
+        // all players have entered the lobby.
+        if (lobbyIsReady) {
+            GameMaster saved_game = null;
+            try {
+                saved_game = Controller.getInstance().tryLoadingGame();
+            } catch (Exception e) {
+                System.out.println("No saved game found");
+            }
+            if (saved_game != null && saved_game.getLobby().equals(Controller.getInstance().getLobby())) {
+                for (NetworkPlug networkPlug : networkInterfacesAndConnections.values()) {
+                    networkPlug.loadGame(saved_game);
+                }
+            } else {
+                for (NetworkPlug networkPlug : networkInterfacesAndConnections.values()) {
+                    networkPlug.finalizingNumberOfPlayers();
+                }
             }
         }
     }
@@ -224,36 +243,44 @@ public class NetworkHandler {
     }
 
     /**
-     * Broadcasts a chat message to all connected clients across all network interfaces.
+     * Broadcasts a chat message to all connected clients across all network
+     * interfaces.
      * The message is sent to all the different protocols.
      *
-     * @param sender The nickname of the client sending the message.
+     * @param sender  The nickname of the client sending the message.
      * @param message The message to be sent.
      */
     public void sendChatMessageBroadcast(String sender, String message) {
-        ArrayList<String> receivers = new ArrayList<>();//need to know globally if the list is empty and then send broadcast or not
-        for(NetworkPlug networkPlug : networkInterfacesAndConnections.values()){
+        ArrayList<String> receivers = new ArrayList<>();// need to know globally if the list is empty and then send
+                                                        // broadcast or not
+        for (NetworkPlug networkPlug : networkInterfacesAndConnections.values()) {
             receivers.addAll(networkPlug.fetchReceivers(message));
         }
         for (NetworkPlug networkPlug : networkInterfacesAndConnections.values()) {
             networkPlug.sendingChatMessage(sender, message, receivers);
         }
     }
+
     /**
      * This method is used to disconnect all clients from all network interfaces.
-     * It iterates over all the network interfaces and calls their respective disconnectAll method.
+     * It iterates over all the network interfaces and calls their respective
+     * disconnectAll method.
      */
     public void disconnectBroadcast() {
         for (NetworkPlug networkPlug : networkInterfacesAndConnections.values()) {
             networkPlug.disconnectAll();
         }
-        //reset the lobby to null and the controller to null
+        // reset the lobby to null and the controller to null
     }
 
     /**
-     * This method is used to notify all connected clients about the current turn across all network interfaces.
-     * It iterates over all the network interfaces and calls their respective notifyTurn method.
-     * The notifyTurn method in each network interface is responsible for broadcasting the current turn information to all clients connected via that interface.
+     * This method is used to notify all connected clients about the current turn
+     * across all network interfaces.
+     * It iterates over all the network interfaces and calls their respective
+     * notifyTurn method.
+     * The notifyTurn method in each network interface is responsible for
+     * broadcasting the current turn information to all clients connected via that
+     * interface.
      */
     public void notifyTurnBroadcast() {
         for (NetworkPlug networkPlug : networkInterfacesAndConnections.values()) {
