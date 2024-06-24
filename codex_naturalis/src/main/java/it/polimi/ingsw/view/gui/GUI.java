@@ -303,7 +303,7 @@ public class GUI extends Application implements ViewInterface {
             matchController.setModel(model);
             matchController.setScene(scene);
             Platform.runLater(() -> matchController.setup());
-            Platform.runLater(()->matchController.showCommonTable());
+            Platform.runLater(()-> matchController.showCommonTable());
         } else {
             Platform.runLater(() -> matchController.showCommonTable());
         }

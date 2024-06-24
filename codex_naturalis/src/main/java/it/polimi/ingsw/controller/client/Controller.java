@@ -9,6 +9,7 @@ import it.polimi.ingsw.network.RMI.RMIClientInterface;
 import it.polimi.ingsw.network.socket.ClientSocket;
 import it.polimi.ingsw.network.NetworkClient;
 import it.polimi.ingsw.view.*;
+import it.polimi.ingsw.view.model.CardClient;
 import it.polimi.ingsw.view.model.LittleModel;
 import it.polimi.ingsw.view.model.Phase;
 import javafx.util.Pair;
@@ -835,7 +836,6 @@ public class Controller {
         Integer[] goldCardsOnTable = new Integer[2];
         Integer[] commonObjectiveCards = new Integer[2];
         HashMap<String, Pair<Kingdom, Boolean>[]> otherPlayersCards = new HashMap<>();
-        ;
         Integer[] secretObjectiveCardsToChoose = new Integer[2];
 
         for (Player player : game.getLobby().getPlayers()) {
@@ -883,11 +883,19 @@ public class Controller {
             System.out.println("No player with this name");
         }
 
-        model = new LittleModel(points, resources, myCards, otherPlayersCards, null, resourceCardsOnTable,
+        HashMap<String, CardClient> table = new HashMap<>();
+
+        model = new LittleModel(points, resources, myCards, otherPlayersCards, table , resourceCardsOnTable,
                 goldCardsOnTable,
                 game.getHeadDeck(true),
                 game.getHeadDeck(false), secretObjectiveCardsToChoose, commonObjectiveCards,
                 player.getSecretObjective().getId());
+
+
+        for(int i  = 0; i < game.getLobby().getPlayers().length; i++){
+            model.updatePlaceCard(game.getLobby().getPlayers()[i].getName(),
+                    game.getLobby().getPlayers()[i].getRootCard().getCard().getId(), new Point(0, 0),  game.getLobby().getPlayers()[i].getRootCard().isFacingUp(), 0);
+        }
 
         buildView(game);
     }
@@ -944,7 +952,10 @@ public class Controller {
             // change the model for GUI
             ((GUI) view).setModel(model);
 
+            //mandatory order code for setup
+            view.refreshUsers(game.getLobby().getPlayersAndPins());
             view.showCommonTable();
+
             // show all hands
             view.showHand();
             for (String nickname : model.getOtherPlayersCards().keySet()) {
@@ -958,18 +969,28 @@ public class Controller {
             // view.showSecretObjectiveCardsToChoose(model.getSecretObjectiveCardsToChoose());
             view.showSecretObjectiveCard(model.getSecretObjectiveCard());
 
+
             for (Player player : game.getLobby().getPlayers()) {
                 ArrayList<PlayedCard> playedCards = game.getPlayersCards(player);
 
                 Collections.sort(playedCards,
                         (card1, card2) -> Integer.compare(card1.getTurnOfPositioning(), card2.getTurnOfPositioning()));
-                for (PlayedCard playedCard : playedCards) {
-                    model.updatePlaceCard(player.getName(), playedCard.getCard().getId(), playedCard.getPosition(),
-                            playedCard.isFacingUp(), playedCard.getTurnOfPositioning());
-                    view.showTableOfPlayer(player.getName());
-                }
 
+                System.out.println("Played cards: " + playedCards.size());
+                for (PlayedCard playedCard : playedCards) {
+                    if(playedCard.getPosition().x == 0 && playedCard.getPosition().y == 0 && player.getName().equals(Controller.nickname)){
+                        view.showTableOfPlayer(player.getName());
+                    }else {
+                        System.out.println("entrato");
+                        model.updatePlaceCard(player.getName(), playedCard.getCard().getId(), playedCard.getPosition(),
+                                playedCard.isFacingUp(), playedCard.getTurnOfPositioning());
+                        view.showTableOfPlayer(player.getName());
+                    }
+                }
             }
+
+            view.showCommonTable();
+            view.showTurnInfo(game.getCurrentPlayer().getName(), game.getGameState());
         }
     }
 }

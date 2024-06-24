@@ -188,8 +188,14 @@ public class Lobby implements Serializable {
                 return false;
             }
 
+            ArrayList<String> playerNames = new ArrayList<>();
+            for (Player player : players) {
+                playerNames.add(player.getName());
+            }
+
             for (int i = 0; i < players.size(); i++) {
-                if (!players.contains(lobby.players.get(i))) {
+                if (!playerNames.contains(lobby.players.get(i).getName()))
+                {
                     return false;
                 }
             }

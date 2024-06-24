@@ -575,4 +575,16 @@ public class Controller {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Sets the GameMaster for the current game.
+     * This method is used when loading a saved game state. It sets the GameMaster
+     * to the saved game state and updates the lobby accordingly.
+     *
+     * @param savedGame The saved GameMaster object loaded from a file.
+     */
+    public void setGameMaster(GameMaster savedGame) {
+        lobby = savedGame.getLobby();
+        game = savedGame;
+    }
 }

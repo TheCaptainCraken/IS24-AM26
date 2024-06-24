@@ -113,9 +113,11 @@ public class NetworkHandler {
             } catch (Exception e) {
                 System.out.println("No saved game found");
             }
+
             if (saved_game != null && saved_game.getLobby().equals(Controller.getInstance().getLobby())) {
                 for (NetworkPlug networkPlug : networkInterfacesAndConnections.values()) {
                     networkPlug.loadGame(saved_game);
+                    Controller.getInstance().setGameMaster(saved_game);
                 }
             } else {
                 for (NetworkPlug networkPlug : networkInterfacesAndConnections.values()) {
