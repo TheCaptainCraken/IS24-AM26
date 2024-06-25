@@ -138,8 +138,9 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
         // shuffle of the players
         boolean isFirst = Controller.getInstance().isFirst(nickname);
 
-        NetworkHandler.getInstance().finalizingNumberOfPlayersBroadcast();
         NetworkHandler.getInstance().refreshUsersBroadcast();
+
+        NetworkHandler.getInstance().finalizingNumberOfPlayersBroadcast();
         // Return whether the player is the first one to log in
         return isFirst;
     }
