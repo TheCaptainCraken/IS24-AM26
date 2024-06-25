@@ -34,11 +34,12 @@ public class TUI implements ViewInterface {
     /**
      * Model of the game. It is used to retrieve information about the game state
      */
-    private final LittleModel model;
+    private LittleModel model;
     /**
      * Object used for synchronization.
      */
     private final Object syncornizedObject;
+
 
     /**
      * Constructor for the TUI.
@@ -1543,6 +1544,10 @@ public class TUI implements ViewInterface {
         int startSpaces = (length - wordLength) / 2;
         int endSpaces = length - startSpaces - wordLength;
         return "|" + " ".repeat(startSpaces) + word + " ".repeat(endSpaces) + "|";
+    }
+
+    public void setModel(LittleModel model) {
+        this.model = model;
     }
 }
 

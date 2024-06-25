@@ -946,7 +946,9 @@ public class Controller {
      */
     private void buildView(GameMaster game) {
         if (view instanceof TUI) {
-            view = new TUI(model, this);
+            ((TUI) view).setModel(model);
+
+            view.refreshUsers(game.getLobby().getPlayersAndPins());
             // print all hands
             view.showHand();
             for (String nickname : model.getOtherPlayersCards().keySet()) {
@@ -960,9 +962,6 @@ public class Controller {
 
             view.showCommonObjectives(model.getCommonObjectiveCards());
             view.showSecretObjectiveCard(model.getSecretObjectiveCard());
-            for (String nickname : model.getOtherPlayersCards().keySet()) {
-                view.showTableOfPlayer(nickname);
-            }
 
             for (Player player : game.getLobby().getPlayers()) {
                 ArrayList<PlayedCard> playedCards = game.getPlayersCards(player);
@@ -977,9 +976,9 @@ public class Controller {
                 }
                 view.showTableOfPlayer(player.getName());
             }
+            Controller.setPhase(Phase.GAME_FLOW);
 
             view.showTurnInfo(game.getCurrentPlayer().getName(), game.getGameState());
-            Controller.setPhase(Phase.GAME_FLOW);
         } else {
             try {
                 view = GUI.getInstance();

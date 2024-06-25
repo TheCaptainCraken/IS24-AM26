@@ -59,6 +59,8 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
      */
     private final Object lock = new Object();
 
+    public boolean loadGame;
+
     /**
      * Constructor for ClientRMI.
      * 
@@ -68,6 +70,7 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
      */
     public ClientRMI(Controller controller) throws RemoteException, NotBoundException {
         this.controller = controller;
+        this.loadGame = false;
 
         // Exporting the ClientRMI object as a remote object
         exportedClient = (RMIClientInterface) UnicastRemoteObject.exportObject(this, 0);
@@ -115,7 +118,7 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
             controller.noName();
         }
 
-        if (login) {
+        if (login && !loadGame) {
             if (isFirst) {
                 // if first player, set FSM to NUMBER_OF_PLAYERS and ask for number of players
                 Controller.setPhase(Phase.NUMBER_OF_PLAYERS);
@@ -134,6 +137,8 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
                     controller.noConnection();
                 }
             }
+        }else if(loadGame){
+            Controller.setPhase(Phase.GAME_FLOW);
         }
     }
 
@@ -595,6 +600,7 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
 
     @Override
     public void loadSavedGame(GameMaster game) throws RemoteException {
+        loadGame = true;
         controller.setModel(game);
     }
 
