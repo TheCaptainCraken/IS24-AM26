@@ -65,7 +65,7 @@ public class NetworkHandler {
      */
     public static void main(String[] args) throws IOException {
         serverRMI = new ServerRMI();
-        networkServerSocket = new NetworkServerSocket(4567);
+        networkServerSocket = new NetworkServerSocket(0);
         new Thread(() -> {
             try {
                 networkServerSocket.start();

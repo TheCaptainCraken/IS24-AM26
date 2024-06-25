@@ -162,10 +162,10 @@ public class Controller {
      *
      * @param typeOfConnection The type of connection to be set. It can be either "RMI" or "Socket".
      */
-    public void createInstanceOfConnection(String typeOfConnection) {
+    public void createInstanceOfConnection(String typeOfConnection, String ip, Integer port) {
         if (typeOfConnection.equals("RMI")) {
             try {
-                clientRMI = new ClientRMI(this);
+                clientRMI = new ClientRMI(this, ip, port);
             } catch (RemoteException | NotBoundException e) {
                 System.out.println("The server is not ready yet. Please restart the application.");
                 System.exit(0);
@@ -175,8 +175,7 @@ public class Controller {
         } else if (typeOfConnection.equals("Socket")) {
             ClientSocket socket = null;
             try {
-                // TODO porta nuova
-                socket = new ClientSocket(this, "localhost", 4567);
+                socket = new ClientSocket(this, ip, port);
                 connection = socket;
                 new Thread(socket::run).start();
             } catch (IOException e) {

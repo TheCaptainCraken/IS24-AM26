@@ -1,13 +1,10 @@
 package it.polimi.ingsw.model;
 
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Serializable;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -33,7 +30,7 @@ public class Deck implements Serializable {
      * @throws ParseException           if the JSON file is not valid.
      * @throws IllegalArgumentException if the card prototype is invalid.
      */
-    public Deck(String cardsFile) throws FileNotFoundException, IOException, ParseException, IllegalArgumentException {
+    public Deck(InputStream cardsFile) throws FileNotFoundException, IOException, ParseException, IllegalArgumentException {
         cards = new ArrayList<Card>();
         this.generateDeck(cardsFile);
         this.shuffle();
@@ -51,10 +48,10 @@ public class Deck implements Serializable {
      * @throws ParseException           if the JSON file is not valid.
      * @throws IllegalArgumentException if the card prototype is invalid.
      */
-    public Deck(String cardsFile, boolean toFile) throws IOException, ParseException {
+    public Deck(InputStream cardsFile, boolean toFile) throws IOException, ParseException {
         cards = new ArrayList<Card>();
         this.generateDeck(cardsFile);
-    }// do we need to test this?
+    }
 
     /**
      * This method generates the deck of cards from a JSON file.
@@ -65,10 +62,10 @@ public class Deck implements Serializable {
      * @throws ParseException           if the JSON file is not valid.
      * @throws IllegalArgumentException if the card prototype is invalid.
      */
-    private void generateDeck(String cardsFile)
-            throws FileNotFoundException, IOException, ParseException, IllegalArgumentException {
+    private void generateDeck(InputStream cardsFile)
+            throws IOException, ParseException, IllegalArgumentException {
         JSONParser parser = new JSONParser();
-        Reader reader = new FileReader(cardsFile);
+        Reader reader = new InputStreamReader(cardsFile, StandardCharsets.UTF_8);
 
         JSONArray cards = (JSONArray) parser.parse(reader);
         for (Object card : cards) {

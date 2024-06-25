@@ -44,7 +44,6 @@ import java.util.concurrent.TimeUnit;
  *
  */
 public class ServerRMI implements RMIServerInterface, NetworkPlug {
-    static int PORT = 1099; // TODO porta dinamica
     private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     HashMap<String, RMIClientInterface> connections = new HashMap<>();
 
@@ -61,7 +60,7 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
         Registry registry = null;
 
         try {
-            serverSkeleton = (RMIServerInterface) UnicastRemoteObject.exportObject(this, PORT);
+            serverSkeleton = (RMIServerInterface) UnicastRemoteObject.exportObject(this, 0);
             System.out.println("Server skeleton created");
         } catch (RemoteException e) {
             System.out.println("Server skeleton not created");
@@ -70,7 +69,7 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
         }
 
         try {
-            registry = LocateRegistry.createRegistry(PORT);
+            registry = LocateRegistry.createRegistry(0);
             System.out.println("Registry created");
         } catch (RemoteException e) {
             System.out.println("Registry not created");
@@ -95,13 +94,13 @@ public class ServerRMI implements RMIServerInterface, NetworkPlug {
                 System.out.println("serverSkeleton is null, cannot bind the object.");
             }
         }
-        // TODO testare questo
         try {
             InetAddress inetAddress = InetAddress.getLocalHost();
-            System.out.println("Server is listening on IP: " + inetAddress.getHostAddress());
-            System.out.println("Server is listening on Port: " + PORT);
-        } catch (java.net.UnknownHostException e) {
-            throw new RuntimeException(e);
+            System.out.println("Server RMI is listening on IP: " + inetAddress.getHostAddress());
+            System.out.println("Server RMI is listening on Port: " + registry);
+
+        } catch (Exception e) {
+            System.out.println("Cannot get the IP address of the server.");
         }
 
     }

@@ -89,14 +89,14 @@ public class GameMaster implements Serializable {
      * @param jsonResourceCardFileName   json file name to create the resource deck
      * @param jsonGoldCardFileName       json file name to create the gold deck
      * @param jsonObjectiveCardFileName  json file name to create the objective deck
-     * @param jsonObjectiveStartFileName json file name to create the starting deck
+     * @param jsonStartingCardFileName json file name to create the starting deck
      *
      * @throws IOException    if the file is not found or can't be read
      * @throws ParseException if the file is not a valid JSON file
      */
-    public GameMaster(Lobby lobby, String jsonResourceCardFileName, String jsonGoldCardFileName,
-            String jsonObjectiveCardFileName,
-            String jsonObjectiveStartFileName) throws IOException, ParseException {
+    public GameMaster(Lobby lobby, InputStream jsonResourceCardFileName, InputStream jsonGoldCardFileName,
+                      InputStream jsonObjectiveCardFileName,
+                      InputStream jsonStartingCardFileName) throws IOException, ParseException {
         this.globalTurn = 0;
         this.turnType = TurnType.PLAYING;
         this.onTableResourceCards = new ResourceCard[2];
@@ -112,7 +112,7 @@ public class GameMaster implements Serializable {
         this.resourceDeck = new Deck(jsonResourceCardFileName);
         this.goldDeck = new Deck(jsonGoldCardFileName);
         this.objectiveDeck = new Deck(jsonObjectiveCardFileName);
-        this.startingDeck = new Deck(jsonObjectiveStartFileName);
+        this.startingDeck = new Deck(jsonStartingCardFileName);
 
         // Set up of the table
         setOnTableResourceCard((ResourceCard) resourceDeck.draw(), 0);

@@ -98,8 +98,8 @@ public class NetworkServerSocket implements NetworkPlug {
         NetworkHandler.getInstance().addNetworkPlug("socket", this);
 
         try {
-            System.out.println("Server is listening on IP: " + InetAddress.getLocalHost().getHostAddress());
-            System.out.println("Server is listening on Port: " + serverSocket.getLocalPort());
+            System.out.println("Server Socket" + "is listening on IP: " + InetAddress.getLocalHost().getHostAddress());
+            System.out.println("Server Socket is listening on Port: " + serverSocket.getLocalPort());
         } catch (Exception e) {
             System.out.println("Error in getting the IP address and port of the server: " + e.getMessage());
         }

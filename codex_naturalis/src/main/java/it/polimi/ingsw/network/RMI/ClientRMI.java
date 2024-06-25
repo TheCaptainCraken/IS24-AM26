@@ -33,7 +33,6 @@ import java.util.concurrent.TimeUnit;
  * @author Daniel
  */
 public class ClientRMI implements RMIClientInterface, NetworkClient {
-    static int PORT = 1099; // TODO porta dinamica
     /**
      * The controller that handles the client's view.
      */
@@ -68,15 +67,15 @@ public class ClientRMI implements RMIClientInterface, NetworkClient {
      * @throws RemoteException   if there is a problem with the connection.
      * @throws NotBoundException if the server is not bound.
      */
-    public ClientRMI(Controller controller) throws RemoteException, NotBoundException {
+    public ClientRMI(Controller controller, String ip, Integer port) throws RemoteException, NotBoundException {
         this.controller = controller;
         this.loadGame = false;
 
         // Exporting the ClientRMI object as a remote object
         exportedClient = (RMIClientInterface) UnicastRemoteObject.exportObject(this, 0);
 
-        // Creating the RMI register //TODO indirizzo ip diverso
-        registry = LocateRegistry.getRegistry("127.0.0.1", PORT);
+        // Creating the RMI register
+        registry = LocateRegistry.getRegistry(ip, port);
 
         // Looking up the remote object
         stub = (RMIServerInterface) registry.lookup("Loggable");

@@ -48,6 +48,14 @@ public class Controller {
     private final String savePath = "SavedGame.data";
 
     /**
+     * The base path of the decks of cards.
+     */
+    String resourcePath = "/decksJSON/resourceCardsDeck.json";
+    String goldPath = "/decksJSON/goldCardsDeck.json";
+    String startingPath = "/decksJSON/startingCardsDeck.json";
+    String objectivePath = "/decksJSON/objectiveCardsDeck.json";
+
+    /**
      * Gets the instance of the controller.
      *
      * @return The instance of the controller.
@@ -99,10 +107,10 @@ public class Controller {
     public void start() {
         try {
             game = new GameMaster(lobby,
-                    basePath + "resourceCardsDeck.json",
-                    basePath + "goldCardsDeck.json",
-                    basePath + "objectiveCardsDeck.json",
-                    basePath + "startingCardsDeck.json");
+                    getClass().getResourceAsStream(resourcePath),
+                    getClass().getResourceAsStream(goldPath),
+                    getClass().getResourceAsStream(objectivePath),
+                    getClass().getResourceAsStream(startingPath));
         } catch (IOException e) {
             System.out.println("the file is not found");
         } catch (ParseException e) {

@@ -108,6 +108,11 @@ public class LittleModel {
      */
     private Deck goldCardsDeck;
 
+    String resourcePath = "/decksJSON/resourceCardsDeck.json";
+    String goldPath = "/decksJSON/goldCardsDeck.json";
+    String startingPath = "/decksJSON/startingCardsDeck.json";
+    String objectivePath = "/decksJSON/objectiveCardsDeck.json";
+
     /**
      * The LittleModel constructor initializes the points, resources, myCards,
      * otherPlayersCards, and table HashMaps.
@@ -121,53 +126,20 @@ public class LittleModel {
         otherPlayersCards = new HashMap<>();
         table = new HashMap<>();
 
-        try {
-            startingCardsDeck = new Deck(
-                    "codex_naturalis/src/main/java/it/polimi/ingsw/model/decks/startingCardsDeck.json", true);
-            objectiveCardsDeck = new Deck(
-                    "codex_naturalis/src/main/java/it/polimi/ingsw/model/decks/objectiveCardsDeck.json", true);
-            resourceCardsDeck = new Deck(
-                    "codex_naturalis/src/main/java/it/polimi/ingsw/model/decks/resourceCardsDeck.json", true);
-            goldCardsDeck = new Deck("codex_naturalis/src/main/java/it/polimi/ingsw/model/decks/goldCardsDeck.json",
-                    true);
+        try{
+            startingCardsDeck = new Deck(getClass().getResourceAsStream(startingPath), true);
+            objectiveCardsDeck = new Deck(getClass().getResourceAsStream(objectivePath), true);
+            resourceCardsDeck = new Deck(getClass().getResourceAsStream(resourcePath), true);
+            goldCardsDeck = new Deck(getClass().getResourceAsStream(goldPath), true);
         } catch (IOException e) {
-            System.out.println("file for TUI not found");
+            System.out.println("file for little model not found");
+            System.exit(0);
         } catch (ParseException e) {
-            System.out.println("Error in parsing file for TUI");
+            System.out.println("Error in parsing file for little model");
+            System.exit(0);
         }
     }
 
-    /**
-     * The LittleModel constructor initializes the points, resources, myCards,
-     * otherPlayersCards, and table HashMaps.
-     * It also initializes the startingCardsDeck, objectiveCardsDeck,
-     * resourceCardsDeck, and goldCardsDeck.
-     */
-    public LittleModel(String path) {
-        points = new HashMap<>();
-        resources = new HashMap<>();
-        myCards = new Integer[3];
-        otherPlayersCards = new HashMap<>();
-        table = new HashMap<>();
-
-        String resourcePath = path + "resourceCardsDeck.json";
-        String goldPath = path + "goldCardsDeck.json";
-        String startingPath = path + "startingCardsDeck.json";
-        String objectivePath = path + "objectiveCardsDeck.json";
-
-        try {
-            startingCardsDeck = new Deck(startingPath, true);
-            objectiveCardsDeck = new Deck(objectivePath, true);
-            resourceCardsDeck = new Deck(resourcePath, true);
-            goldCardsDeck = new Deck(goldPath, true);
-        } catch (IOException e) {
-            System.out.println("file for TUI not found");
-            throw new RuntimeException("file for TUI not found");
-        } catch (ParseException e) {
-            System.out.println("Error in parsing file for TUI");
-            throw new RuntimeException("Error in parsing file for TUI");
-        }
-    }
     /**
      * Updates the common table in the game.
      *
@@ -207,19 +179,18 @@ public class LittleModel {
         this.secretObjectiveCardsToChoose = secretObjectiveCardsToChoose;
         this.commonObjectiveCards = commonObjectiveCards;
         this.secretObjectiveCard = secretObjectiveCard;
-        try {
-            startingCardsDeck = new Deck(
-                    "codex_naturalis/src/main/java/it/polimi/ingsw/model/decks/startingCardsDeck.json", true);
-            objectiveCardsDeck = new Deck(
-                    "codex_naturalis/src/main/java/it/polimi/ingsw/model/decks/objectiveCardsDeck.json", true);
-            resourceCardsDeck = new Deck(
-                    "codex_naturalis/src/main/java/it/polimi/ingsw/model/decks/resourceCardsDeck.json", true);
-            goldCardsDeck = new Deck("codex_naturalis/src/main/java/it/polimi/ingsw/model/decks/goldCardsDeck.json",
-                    true);
+
+        try{
+            startingCardsDeck = new Deck(getClass().getResourceAsStream(startingPath), true);
+            objectiveCardsDeck = new Deck(getClass().getResourceAsStream(objectivePath), true);
+            resourceCardsDeck = new Deck(getClass().getResourceAsStream(resourcePath), true);
+            goldCardsDeck = new Deck(getClass().getResourceAsStream(goldPath), true);
         } catch (IOException e) {
-            System.out.println("file for TUI not found");
+            System.out.println("file for little model not found");
+            System.exit(0);
         } catch (ParseException e) {
-            System.out.println("Error in parsing file for TUI");
+            System.out.println("Error in parsing file for little model");
+            System.exit(0);
         }
     }
 
