@@ -139,7 +139,6 @@ public class GameMaster implements Serializable {
             player.setHand(hand);
         }
 
-        turn = 0;
     }
 
     /**
