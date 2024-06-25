@@ -493,7 +493,7 @@ public class MatchController {
     public void showSecretObjectiveCard(int indexCard){
         secretContainer.getChildren().remove(secret2);
         spacer.setPrefHeight(200);
-        spacer.setPrefWidth(235);
+        spacer.setPrefWidth(230);
         secret1.setImage(new Image("frontCard"+indexCard+".png"));
         secret1.setOnMouseClicked(null);
     }
