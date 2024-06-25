@@ -1283,7 +1283,7 @@ public class GameMasterTest {
     }
     @Test
     @DisplayName("Test for EndGame method")
-    public void ComparatorTestPointsSumEquas() throws IOException, ParseException {
+    public void ComparatorTestPointsSumIsEqual() throws IOException, ParseException {
 
         Player p1 = new Player("a");
         Player p2 = new Player("b");
