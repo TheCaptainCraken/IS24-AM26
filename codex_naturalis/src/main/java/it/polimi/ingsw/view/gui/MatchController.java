@@ -1137,6 +1137,8 @@ public class MatchController {
                     img = new Image("insect_res_back.png");
                 }
                 break;
+            default:
+                img = new Image("default_back.png");
         }
         return img;
     }
@@ -1378,11 +1380,13 @@ public class MatchController {
         String s = messageContent.getText();
         if(!s.isBlank()){
             int count = 1;
-            for(String name:playerColors.keySet()){
-                if(s.toLowerCase().contains("@"+name.toLowerCase())){
-                    break;
+            if(s.toLowerCase().contains("@")){
+                for(String name:playerColors.keySet()){
+                    if(s.toLowerCase().contains("@"+name.toLowerCase())){
+                        break;
+                    }
+                    count++;
                 }
-                count++;
             }
             if(count < playerColors.size() + 1){
                 ViewSubmissions.getInstance().sendChatMessage(s);

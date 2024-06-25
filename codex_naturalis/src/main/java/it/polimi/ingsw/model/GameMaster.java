@@ -523,7 +523,7 @@ public class GameMaster implements Serializable {
             // Anonymous function to sort the ranking according to rules of the game
             // this function does not return anything. The controller will ask for the
             // ranking
-            Collections.sort(ranking, new Comparator<Player>() {
+            ranking.sort(new Comparator<Player>() {
                 @Override
                 public int compare(Player p1, Player p2) {
                     // total score of a player: normal points during the game and objective points
@@ -534,10 +534,10 @@ public class GameMaster implements Serializable {
                         return Integer.compare(p1.getObjectivePoints(), p2.getObjectivePoints());
                     } else if (sum1 > sum2) {
                         // sum is insert before than player 2
-                        return 1;
+                        return -1;
                     } else {
                         // sum is insert after than player 2
-                        return -1;
+                        return 1;
                     }
                 }
             });

@@ -58,5 +58,29 @@
       "BOTTOM_LEFT": "EMPTY",
       "BOTTOM_RIGHT": null
     }
+  },
+  {
+    "prototype": "RESOURCE",
+    "id": 50,
+    "kingdom": "INSECT",
+    "points": 0,
+    "corners": {
+      "TOP_LEFT": "BUTTERFLY",
+      "TOP_RIGHT": "BUTTERFLY",
+      "BOTTOM_LEFT": "EMPTY",
+      "BOTTOM_RIGHT": null
+    }
+  },
+  {
+    "prototype": "RESOURCE",
+    "id": 55,
+    "kingdom": "INSECT",
+    "points": 0,
+    "corners": {
+      "TOP_LEFT": "BUTTERFLY",
+      "TOP_RIGHT": "BUTTERFLY",
+      "BOTTOM_LEFT": "EMPTY",
+      "BOTTOM_RIGHT": null
+    }
   }
 ]
