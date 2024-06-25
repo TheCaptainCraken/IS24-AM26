@@ -4,9 +4,20 @@ import it.polimi.ingsw.controller.client.Controller;
 
 import java.util.Scanner;
 
+/**
+ * This is the main class for the application.
+ * It provides a command-line interface for the user to choose the type of connection (RMI or Socket)
+ * and the type of view (TUI or GUI).
+ *
+ * The user is prompted to enter their choices and the application is configured accordingly.
+ * If an invalid choice is entered, the user is asked to enter their choice again.
+ *
+ * The application is started by calling the main method.
+ */
 public class App {
     /**
      * JavaFX App
+     * @param args The command line arguments
      */
     public static void main(String[] args) {
         Controller controller = null;

@@ -128,6 +128,14 @@ public class Controller {
         Controller.phase = phase;
     }
 
+    /**
+     * Sets the view for the game based on the type of view specified.
+     * It initializes a new LittleModel object and sets the view to either TUI or GUI based on the input.
+     * If the type of view is GUI, it also starts a new thread to launch the GUI.
+     *
+     * @param typeOfView The type of view to be set. It can be either "TUI" or "GUI".
+     * @throws InterruptedException if any thread has interrupted the current thread.
+     */
     public void setView(String typeOfView) throws InterruptedException {
         model = new LittleModel();
         if (typeOfView.equals("TUI")) {
@@ -146,6 +154,14 @@ public class Controller {
         }
     }
 
+    /**
+     * Creates an instance of the connection for the game based on the type of connection specified.
+     * It initializes a new ClientRMI object or ClientSocket object based on the input.
+     * If the type of connection is RMI, it also starts a new thread to launch the RMI connection.
+     * If the type of connection is Socket, it also starts a new thread to launch the Socket connection.
+     *
+     * @param typeOfConnection The type of connection to be set. It can be either "RMI" or "Socket".
+     */
     public void createInstanceOfConnection(String typeOfConnection) {
         if (typeOfConnection.equals("RMI")) {
             try {
@@ -269,6 +285,7 @@ public class Controller {
      *
      * @param sender  The nickname of the player who sent the message.
      * @param message The message sent by the player.
+     * @param broadcast A boolean value indicating whether the message is a broadcast message.
      */
     public void receiveChatMessage(String sender, String message, boolean broadcast) {
         view.receiveChatMessage(sender, message, broadcast);
@@ -719,6 +736,8 @@ public class Controller {
      * 
      * This method is used to inform the view that the player cannot place a card at
      * the requested position on the board.
+     *
+     * @param name The name of the player.
      */
     public void sameName(String name) {
         view.sameName(name);
@@ -828,7 +847,7 @@ public class Controller {
      * @param game The GameMaster object containing all the information about the
      *             game.
      */
-    public void setModel(GameMaster game) {
+    public synchronized void setModel(GameMaster game) {
         HashMap<String, Integer> points = new HashMap<>();
         HashMap<String, HashMap<Sign, Integer>> resources = new HashMap<>();
         Integer[] myCards = new Integer[3];
@@ -906,7 +925,6 @@ public class Controller {
                 game.getHeadDeck(true),
                 game.getHeadDeck(false), secretObjectiveCardsToChoose, commonObjectiveCards,
                 player.getSecretObjective().getId());
-
 
         for(int i  = 0; i < game.getLobby().getPlayers().length; i++){
             model.updatePlaceCard(game.getLobby().getPlayers()[i].getName(),
@@ -996,7 +1014,6 @@ public class Controller {
                         (card1, card2) -> Integer.compare(card1.getTurnOfPositioning(), card2.getTurnOfPositioning()));
 
                 for (PlayedCard playedCard : playedCards) {
-                    System.out.println(playedCard.getTurnOfPositioning());
                     if(playedCard.getPosition().x == 0 && playedCard.getPosition().y == 0 && player.getName().equals(Controller.nickname)){
                         view.showStartingCard(playedCard.getCard().getId());
                         view.showStartingCardChosen();
@@ -1004,8 +1021,13 @@ public class Controller {
                         model.updatePlaceCard(player.getName(), playedCard.getCard().getId(), playedCard.getPosition(),
                                 playedCard.isFacingUp(), playedCard.getTurnOfPositioning());
 
+                        HashMap<Corner, CardClient> hashOfCards = new HashMap<Corner, CardClient>();
+                        for(Corner corner: Corner.values()){
+                            hashOfCards.put(corner, null);
+                        }
+
                         CardClient card = new CardClient(playedCard.getCard().getId(), playedCard.isFacingUp(),
-                                playedCard.getPosition(), playedCard.getTurnOfPositioning(), null);
+                                playedCard.getPosition(), playedCard.getTurnOfPositioning(), hashOfCards);
                         ((GUI) view).rebuildBoard(player.getName(), card);
                     }
                 }
@@ -1013,6 +1035,7 @@ public class Controller {
 
             view.showCommonTable();
             view.showTurnInfo(game.getCurrentPlayer().getName(), game.getGameState());
+
         }
     }
 }

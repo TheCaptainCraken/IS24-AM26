@@ -43,6 +43,8 @@ public class TUI implements ViewInterface {
     /**
      * Constructor for the TUI.
      * Initializes the TUI with default values.
+     * @param model The model of the game.
+     * @param controller The controller of the game.
      */
     public TUI(LittleModel model, Controller controller) {
         this.model = model;
@@ -1290,6 +1292,7 @@ public class TUI implements ViewInterface {
      * is an array of strings, with each string representing a row of the card.
      *
      * @param card The playedCardToPrint of the card to print.
+     * @return The representation of the card as an array of strings.
      */
     public String[] createCardToPrint(PlayedCard card) {
         HashMap<Corner, String> corner = new HashMap<>();

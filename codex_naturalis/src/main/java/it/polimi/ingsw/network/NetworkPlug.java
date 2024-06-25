@@ -58,8 +58,10 @@ public interface NetworkPlug {
         /**
          * Fetches the receivers of the message.
          *
+         * @param message The message to send.
          * @return The list of nicknames of the players across connections who should
          *         receive the message.
+         *
          */
         ArrayList<String> fetchReceivers(String message);
 

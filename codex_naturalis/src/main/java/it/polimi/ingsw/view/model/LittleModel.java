@@ -137,6 +137,12 @@ public class LittleModel {
         }
     }
 
+    /**
+     * The LittleModel constructor initializes the points, resources, myCards,
+     * otherPlayersCards, and table HashMaps.
+     * It also initializes the startingCardsDeck, objectiveCardsDeck,
+     * resourceCardsDeck, and goldCardsDeck.
+     */
     public LittleModel(String path) {
         points = new HashMap<>();
         resources = new HashMap<>();
@@ -162,7 +168,28 @@ public class LittleModel {
             throw new RuntimeException("Error in parsing file for TUI");
         }
     }
-
+    /**
+     * Updates the common table in the game.
+     *
+     * This method is used to update the common table with the new set of resource
+     * cards, gold cards, and the head decks for both types of cards.
+     * The resource cards and gold cards are represented by Integer arrays where
+     * each Integer is the ID of a card.
+     * The head decks are represented by Kingdom objects.
+     *
+     * @param points             A HashMap representing the points of the players
+     * @param resources         A HashMap representing the resources of the players
+     * @param myCards        An array of Integers representing the IDs of the cards in the
+     * @param otherPlayersCards    A Pair representing the cards of others players
+     * @param table                A Hashmap representing the starting Card of players
+     * @param resourceCards     A Kingdom object representing the head deck of gold
+     * @param goldCards     A Kingdom object representing the head deck of gold
+     * @param headDeckGold     A Kingdom object representing the head deck of gold
+     * @param headDeckResource     A Kingdom object representing the head deck of gold
+     * @param secretObjectiveCardsToChoose     A Kingdom object representing the head deck of gold
+     * @param commonObjectiveCards     A Kingdom object representing the head deck of gold
+     * @param secretObjectiveCard     A Kingdom object representing the head deck of gold
+     */
     public LittleModel(HashMap<String, Integer> points, HashMap<String, HashMap<Sign, Integer>> resources,
             Integer[] myCards, HashMap<String, Pair<Kingdom, Boolean>[]> otherPlayersCards,
             HashMap<String, CardClient> table, Integer[] resourceCards, Integer[] goldCards, Kingdom headDeckGold,
@@ -465,6 +492,7 @@ public class LittleModel {
      * This method is used to retrieve the current IDs of the objective cards.
      * The IDs are represented in an Integer array.
      *
+     * @param id The ID of the objective card.
      * @return An array of Integers representing the IDs of the objective cards.
      */
     public ObjectiveCard getObjectiveCard(int id) {

@@ -14,12 +14,31 @@ public class loadSavedGame extends ServerMessage {
      */
     private GameMaster game;
 
+    /**
+     * Constructs a new loadSavedGame object with the specified game.
+     *
+     * @param game The game that is starting.
+     */
     public loadSavedGame(GameMaster game) {
         this.game = game;
     }
 
+    /**
+     * Calls the controller and sets the model with the game state.
+     *
+     * @param controller The controller to be called.
+     */
     @Override
     public void callController(Controller controller) {
         controller.setModel(game);
+    }
+
+    /**
+     * Returns the game that is starting.
+     *
+     * @return The game that is starting.
+     */
+    public GameMaster getGame() {
+        return game;
     }
 }

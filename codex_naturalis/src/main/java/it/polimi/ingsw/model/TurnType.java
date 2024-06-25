@@ -9,7 +9,16 @@ package it.polimi.ingsw.model;
  * LAST_TURN: Represents the final turn of the game.
  */
 public enum TurnType {
+    /**
+     * The PLAYING turn.
+     */
     PLAYING,
+    /**
+     * The SECOND_LAST_TURN turn.
+     */
     SECOND_LAST_TURN,
+    /**
+     * The LAST_TURN turn.
+     */
     LAST_TURN
 }

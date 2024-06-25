@@ -67,6 +67,8 @@ public class ClientSocket implements Runnable, NetworkClient{
      * @param controller The controller that manages the client's view and game logic.
      * @param address The address of the server.
      * @param port The port of the server.
+     *
+     * @throws IOException if an I/O error occurs while creating the socket or the input/output streams.
      */
     public ClientSocket(Controller controller, String address, int port) throws IOException {
         socket = new Socket(address, port);
@@ -305,7 +307,7 @@ public class ClientSocket implements Runnable, NetworkClient{
         if (message instanceof ConnectionServer) {
             sendMessage(new ConnectionClientForServer());
         }
-        else if(message instanceof ConnectionServerForClient){
+        else if(message instanceof ConnectionServerForClient) {
             connection = true;
         }
         else if (message != null) {
@@ -318,6 +320,8 @@ public class ClientSocket implements Runnable, NetworkClient{
      * It blocks until a message is received or an error occurs.
      *
      * @return The received server message.
+     *
+     * @throws IOException if an I/O error occurs while receiving the message.
      */
     public ServerMessage receiveMessage() throws IOException {
         ServerMessage answer;

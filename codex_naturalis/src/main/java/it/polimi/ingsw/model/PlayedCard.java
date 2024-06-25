@@ -37,6 +37,10 @@ public class PlayedCard implements Serializable {
     /**Constructor for the PlayedCard class
      *
      * @param cardsToAttach is the map which contains the cards that will have to be attached to our new PlayedCard
+     * @param playableCard is the PlayableCard that the PlayedCard will reference
+     * @param position is the position in which the card has been played
+     * @param side is true if the card has been played on its front
+     * @param turnNumber is the turn in which the card has been played
      * */
     public PlayedCard(PlayableCard playableCard, HashMap<Corner, PlayedCard> cardsToAttach, boolean side, int turnNumber, Point position) {
         this.card = playableCard;

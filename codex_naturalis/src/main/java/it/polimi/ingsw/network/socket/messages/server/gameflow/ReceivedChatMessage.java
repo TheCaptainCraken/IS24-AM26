@@ -29,6 +29,7 @@ public class ReceivedChatMessage extends ServerMessage {
      * Class constructor that initializes the sender and message fields.
      * @param sender The nickname/nicknames of the sender of the message.
      * @param message The message sent by the sender.
+     * @param broadcast The boolean value that indicates if the message is a broadcast message.
      */
     public ReceivedChatMessage(String sender, String message, boolean broadcast) {
         super();

@@ -250,11 +250,21 @@ public class Deck implements Serializable {
      * This method returns the kingdom of the first card of the deck.
      * 
      * @return the {@link Kingdom} of the first card of the deck.
+     * @throws IndexOutOfBoundsException if the deck is empty.
+     *
      */
     public Kingdom getKingdomFirstCard() throws IndexOutOfBoundsException {
         return cards.get(0).getKingdom();
     }
 
+    /**
+     * Returns the card at the specified position in the deck.
+     *
+     * @param position The position of the card in the deck.
+     * @return The card at the specified position.
+     * @throws IndexOutOfBoundsException if the position is out of range
+     *         (position < 0 || position >= size()).
+     */
     public Card getCard(int position) throws IndexOutOfBoundsException {
         return cards.get(position);
     }

@@ -169,6 +169,7 @@ public interface RMIClientInterface extends Remote {
      * @param message The message.
      * @throws RemoteException throws a RemoteException if there is a problem with
      *                         the connection.
+     * @param broadcast A boolean indicating whether the message is a broadcast message.
      */
     void receiveChatMessage(String sender, String message, boolean broadcast) throws RemoteException;
 

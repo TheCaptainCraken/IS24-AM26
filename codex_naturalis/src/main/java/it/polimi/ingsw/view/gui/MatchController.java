@@ -412,7 +412,7 @@ public class MatchController {
      *
      * @param id An integer representing the ID of the starting card.
      */
-    public void showStartingCard(int id){ //TODO va sistemato il fatto di scegliere starting card quando non è il proprio turno
+    public void showStartingCard(int id){
         root.setImage(loadStartingCardResource(id,true));
         root.setOnMouseClicked(event -> {
             if(root_side){
@@ -601,6 +601,7 @@ public class MatchController {
      */
     public void showTableOfPlayer(String nickname){
         ArrayList<CardClient> cards = model.getListOfCards(nickname);
+        System.out.println("cards size is" + cards.size());
         Optional<CardClient> c = cards.stream().max(Comparator.comparing(CardClient::getTurnOfPositioning));
         if(c.isEmpty()){
             System.out.println("No card found");
@@ -640,6 +641,7 @@ public class MatchController {
      * If the player is not the current user, the method retrieves the player's game board from the playerBoards map and adds the ImageView to it.
      *
      * @param nickname A string representing the nickname of the player.
+     * @param card A CardClient object representing the card that was placed last by the player.
      */
     public void rebuildView(CardClient card, String nickname){
         Optional<CardClient> c = Optional.ofNullable(card);
@@ -1106,7 +1108,7 @@ public class MatchController {
      * @param isGold A Boolean indicating if the card is a gold card. True for a gold card, false for a resource card.
      * @return An Image object representing the loaded image resource for the card.
      */
-    private Image KingdomToCard(Kingdom kingdom,Boolean isGold){
+    private Image KingdomToCard(Kingdom kingdom, Boolean isGold){
         Image img = null;
         switch(kingdom){
             case FUNGI:
@@ -1376,6 +1378,15 @@ public class MatchController {
         });
     }
 
+    /**
+     * This method is used in the MatchController class of the GUI.
+     * It is responsible for handling the action of sending a chat message.
+     *
+     * The method retrieves the text from the messageContent TextField.
+     * If the text is not blank, it checks if the text contains the "@" character, which is used to mention other players in the chat.
+     * If the text contains fewer "@" characters than the number of players, the method calls the `sendChatMessage` method of the ViewSubmissions singleton instance, passing the text as an argument.
+     * The `sendChatMessage` method is responsible for handling the user's request to send a chat message.
+     */
     public void handleSendMessage(){
         String s = messageContent.getText();
         if(!s.isBlank()){

@@ -42,6 +42,8 @@ public class Player implements java.io.Serializable{
 
     /**
      *   getter of player's name
+     *
+     * @return the name of the player
      */
     public String getName() {
         return name;
@@ -49,6 +51,8 @@ public class Player implements java.io.Serializable{
 
     /**
      *  getter of player's points
+     *
+     * @return the points of the player
      */
     public int getPoints() {
         return points;
@@ -56,6 +60,8 @@ public class Player implements java.io.Serializable{
 
     /**
      * getter of the color of the pin
+     *
+     * @return the color of the pin
      */
     public Color getColor() {
         return color;
@@ -63,6 +69,8 @@ public class Player implements java.io.Serializable{
 
     /**
      * getter of root card, which is the starting card of the game
+     *
+     * @return the root card
      */
     public PlayedCard getRootCard() {
         return rootCard;
@@ -70,6 +78,8 @@ public class Player implements java.io.Serializable{
 
     /**
      * Getter of symbol counter. It tracks the resources for gold card and special objects.
+     *
+     * @return the hashmap of resources
      */
     public HashMap<Sign, Integer> getResources() {
         return resources;
@@ -77,6 +87,8 @@ public class Player implements java.io.Serializable{
 
     /**
      * getter of the secret objective.
+     *
+     * @return the secret objective
      */
     public ObjectiveCard getSecretObjective() {
         return secretObjective;
@@ -84,6 +96,8 @@ public class Player implements java.io.Serializable{
 
     /**
      * getter of the hand of the player, a fixed array of three resources cards
+     *
+     * @return the hand of the player
      */
     public ResourceCard[] getHand() {
         return hand;

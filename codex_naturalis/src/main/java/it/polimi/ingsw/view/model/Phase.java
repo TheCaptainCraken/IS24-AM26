@@ -1,5 +1,8 @@
 package it.polimi.ingsw.view.model;
 
+/**
+ * The Phase enum represents the different phases that a player can have in the game.
+ */
 public enum Phase {
     /**
      * The LOGIN phase is used to authenticate a player in the game. It is the first state of the game.

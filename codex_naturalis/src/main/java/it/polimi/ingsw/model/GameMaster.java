@@ -79,10 +79,7 @@ public class GameMaster implements Serializable {
      * The ranking of players.
      */
     private ArrayList<Player> ranking;
-    /**
-     * The current turn.
-     */
-    private int turn;
+
 
     /**
      * The general functionalities of the game representing the peer point of the
@@ -93,6 +90,9 @@ public class GameMaster implements Serializable {
      * @param jsonGoldCardFileName       json file name to create the gold deck
      * @param jsonObjectiveCardFileName  json file name to create the objective deck
      * @param jsonObjectiveStartFileName json file name to create the starting deck
+     *
+     * @throws IOException    if the file is not found or can't be read
+     * @throws ParseException if the file is not a valid JSON file
      */
     public GameMaster(Lobby lobby, String jsonResourceCardFileName, String jsonGoldCardFileName,
             String jsonObjectiveCardFileName,
@@ -183,6 +183,11 @@ public class GameMaster implements Serializable {
      *
      * @param namePlayer player who sent the request
      * @param side       which side the StartingCard has been want placed
+     * @throws NoTurnException         if the player is not the current player
+     * @throws WrongGamePhaseException if the game is not in the right phase
+     * @throws NoNameException         if the player name is not found
+     *
+     * @return the id of the card placed
      */
     public int placeRootCard(String namePlayer, boolean side)
             throws NoTurnException, WrongGamePhaseException, NoNameException {
@@ -233,6 +238,10 @@ public class GameMaster implements Serializable {
      *
      * @param namePlayer player who sent the request
      * @param whichCard  which of the two ObjectiveCard wants to be used (0, 1)
+     *
+     *  @throws NoTurnException         if the player is not the current player
+     *  @throws WrongGamePhaseException if the game is not in the right phase
+     *  @throws NoNameException         if the player name is not found
      */
     public void chooseObjectiveCard(String namePlayer, int whichCard)
             throws NoTurnException, WrongGamePhaseException, NoNameException {
@@ -259,6 +268,14 @@ public class GameMaster implements Serializable {
      * @param position   In which position of the table the player wants to be
      *                   place the card
      * @param side       To which side wants the player to place the card
+     *
+     * @throws NoTurnException         if the player is not the current player
+     * @throws WrongGamePhaseException if the game is not in the right phase
+     * @throws NotEnoughResourcesException if the player doesn't have enough resources
+     * @throws CardPositionException if the card can't be placed in the position
+     * @throws NoNameException         if the player name is not found
+     *
+     * @return the id of the card placed
      */
     public int placeCard(String namePlayer, int index, Point position, boolean side)
             throws NoTurnException, WrongGamePhaseException,
@@ -414,6 +431,12 @@ public class GameMaster implements Serializable {
      *                     gold or not
      * @param CardPosition If the card is taken from the table or not: -1 means from
      *                     deck, 0 and 1 are the position onTable array
+     *
+     * @throws WrongGamePhaseException if the game is not in the right phase
+     * @throws NoTurnException         if the player is not the current player
+     * @throws NoNameException         if the player name is not found
+     * @throws CardPositionException   if the card can't be drawn from the position
+     *
      * @return the id of the card drawn
      */
     public int drawCard(String namePlayer, boolean Gold, int CardPosition)
@@ -501,6 +524,8 @@ public class GameMaster implements Serializable {
     /**
      * Represents the last part of the game, in which the points gained
      * from fulfilling the objectives are calculated.
+     *
+     * @throws WrongGamePhaseException if the game is not in the right phase
      */
     public void endGame() throws WrongGamePhaseException {
         if (gameState != GameState.END) {
@@ -737,6 +762,8 @@ public class GameMaster implements Serializable {
      *
      * @param countable Countable to convert
      * @return Sign in which the Kingdom has been converted
+     *
+     * @throws IllegalArgumentException if the Countable is not a valid Countable
      */
     public Sign fromCountableToSign(Countable countable) throws IllegalArgumentException {
         switch (countable) {
@@ -870,6 +897,8 @@ public class GameMaster implements Serializable {
      * Get in which number the player plays respectively in the turn cycle
      *
      * @param name player who sent the request
+     * @throws NoNameException if the player name is not found
+     *
      * @return get order of player
      */
     public int getOrderPlayer(String name) throws NoNameException {
@@ -933,6 +962,8 @@ public class GameMaster implements Serializable {
      * Request info about the points of a certain player
      *
      * @param namePlayer name of the player about is wanted to get info
+     *
+     * @throws NoNameException if the player name is not found
      * @return points of the player
      */
     public int getPlayerPoints(String namePlayer) throws NoNameException {
@@ -943,6 +974,7 @@ public class GameMaster implements Serializable {
      * Request info about the resources of a certain player
      *
      * @param namePlayer name of the player about is wanted to get info
+     * @throws NoNameException if the player name is not found
      * @return resources of the player
      */
     public HashMap<Sign, Integer> getPlayerResources(String namePlayer) throws NoNameException {
@@ -1417,6 +1449,14 @@ public class GameMaster implements Serializable {
         return points * multiplier;
     }
 
+    /**
+     * Retrieves the lobby of players in the game.
+     *
+     * This method is used to access the lobby of players in the game, which contains
+     * information about all the players currently participating in the game.
+     *
+     * @return The lobby of players in the game.
+     */
     public Lobby getLobby() {
         return lobby;
     }

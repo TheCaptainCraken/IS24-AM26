@@ -46,6 +46,8 @@ public class Lobby implements Serializable {
     /**
      * If possible it adds a new player to the lobby with a unique nickname
      *
+     * @throws LobbyCompleteException if the lobby is full
+     * @throws SameNameException      if the nickname is already taken
      * @param nickname nickname of the new Player
      */
     public void addPlayer(String nickname) throws LobbyCompleteException, SameNameException {
@@ -81,6 +83,7 @@ public class Lobby implements Serializable {
     /**
      * Given a nickname it returns the player with that unique nickname
      *
+     * @throws NoNameException if the nickname is not found
      * @param nickname nickname of the Player we want to get
      * @return the Player with the given nickname
      */
@@ -96,7 +99,7 @@ public class Lobby implements Serializable {
     /**
      * It sets the maximum size of the lobby scraping the players that exceed the
      * limit
-     *
+     * @throws ClosingLobbyException if the lobby is locked or the size is invalid
      * @param maxSize the maximum size of the lobby
      */
     public void setMaxSize(int maxSize) throws ClosingLobbyException {

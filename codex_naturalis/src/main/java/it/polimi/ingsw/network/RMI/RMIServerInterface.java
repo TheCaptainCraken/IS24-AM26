@@ -31,6 +31,7 @@ public interface RMIServerInterface extends Remote {
      * @throws LobbyCompleteException throws a LobbyCompleteException if the lobby
      *                                is already full or the game has already
      *                                started.
+     * @throws NoNameException        throws a NoNameException if the nickname is
      */
     boolean loginAndIsFirst(RMIClientInterface clientRMI, String nickname)
             throws RemoteException, SameNameException, LobbyCompleteException, NoNameException;
@@ -173,6 +174,7 @@ public interface RMIServerInterface extends Remote {
      *                                 turn.
      * @throws NoNameException         throws a NoNameException if a player with the
      *                                 given nickname does not exist.
+     * @throws CardPositionException   throws a CardPositionException if the player
      */
     Integer[] drawCard(String nickname, boolean gold, int onTableOrDeck)
             throws RemoteException, WrongGamePhaseException, NoTurnException, NoNameException, CardPositionException;

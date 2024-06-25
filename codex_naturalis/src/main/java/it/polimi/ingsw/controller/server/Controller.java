@@ -115,6 +115,8 @@ public class Controller {
      * 
      * @throws IOException            If the file is not found.
      * @throws ClassNotFoundException If the file is not valid.
+     *
+     * @return The GameMaster object loaded from the file.
      */
     public GameMaster tryLoadingGame() throws IOException, ClassNotFoundException {
         return GameMaster.tryLoadingGameMaster(savePath);
@@ -148,6 +150,8 @@ public class Controller {
      * @param side   The side of the card.
      * @throws WrongGamePhaseException If the game is not in the correct phase.
      * @throws NoTurnException         If it's not the player's turn.
+     * @throws NoNameException         If the field does not exist.
+     *
      * @return The id of the placed card.
      */
     public int placeRootCard(String player, boolean side)
@@ -162,6 +166,7 @@ public class Controller {
      * @param whichCard The index of the card to choose.
      * @throws WrongGamePhaseException If the game is not in the correct phase.
      * @throws NoTurnException         If it's not the player's turn.
+     * @throws NoNameException         If the field does not exist.
      */
     public void chooseObjectiveCard(String player, int whichCard)
             throws WrongGamePhaseException, NoTurnException, NoNameException {
@@ -184,6 +189,7 @@ public class Controller {
      * @throws NotEnoughResourcesException If the player does not have enough
      *                                     resources.
      * @throws NoNameException             If the field does not exist.
+     * @throws CardPositionException       If the card position is invalid.
      * @return The id of the placed card.
      */
     public int placeCard(String player, int indexHand, Point position, boolean side) throws WrongGamePhaseException,
@@ -201,6 +207,8 @@ public class Controller {
      * @param onTableOrDeck The index of the card on the table or deck.
      * @throws WrongGamePhaseException If the game is not in the correct phase.
      * @throws NoTurnException         If it's not the player's turn.
+     * @throws NoNameException         If the field does not exist.
+     * @throws CardPositionException   If the card position is invalid.
      * @return The id of the drawn card.
      */
     public int drawCard(String player, boolean gold, int onTableOrDeck)

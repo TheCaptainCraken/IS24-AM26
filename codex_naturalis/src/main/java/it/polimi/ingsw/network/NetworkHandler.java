@@ -58,6 +58,11 @@ public class NetworkHandler {
      */
     private static NetworkServerSocket networkServerSocket;
 
+    /**
+     * The main method of the server.
+     * @param args The arguments of the main method.
+     * @throws IOException If an I/O error occurs.
+     */
     public static void main(String[] args) throws IOException {
         serverRMI = new ServerRMI();
         networkServerSocket = new NetworkServerSocket(4567);

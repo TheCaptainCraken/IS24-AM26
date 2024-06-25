@@ -17,13 +17,40 @@ import java.io.Serializable;
  * NULL: Represents a null or uninitialized sign.
  */
 public enum Sign implements Serializable {
+    /**
+     * The LEAF sign.
+     */
     LEAF,
+    /**
+     * The WOLF sign.
+     */
     WOLF,
+    /**
+     * The MUSHROOM sign.
+     */
     MUSHROOM,
+    /**
+     * The BUTTERFLY sign.
+     */
     BUTTERFLY,
+    /**
+     * The QUILL sign.
+     */
     QUILL,
+    /**
+     * The SCROLL sign.
+     */
     SCROLL,
+    /**
+     * The INKWELL sign.
+     */
     INKWELL,
+    /**
+     * The EMPTY sign.
+     */
     EMPTY,
+    /**
+     * The NULL sign.
+     */
     NULL,
 }

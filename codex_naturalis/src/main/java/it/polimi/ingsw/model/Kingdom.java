@@ -10,8 +10,20 @@ package it.polimi.ingsw.model;
  * INSECT: Represents the insect kingdom.
  */
 public enum Kingdom {
+    /**
+     * The PLANT kingdom.
+     */
     PLANT,
+    /**
+     * The ANIMAL kingdom.
+     */
     ANIMAL,
+    /**
+     * The FUNGI kingdom.
+     */
     FUNGI,
+    /**
+     * The INSECT kingdom.
+     */
     INSECT
 }

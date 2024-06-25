@@ -12,11 +12,32 @@ package it.polimi.ingsw.model;
  * TRIS: Represents the tris objective.
  */
 public enum ObjectiveType {
+    /**
+     * The STAIR objective.
+     */
     STAIR,
+    /**
+     * The L_FORMATION objective.
+     */
     L_FORMATION,
+    /**
+     * The FREE_RESOURCES objective.
+     */
     FREE_RESOURCES,
+    /**
+     * The TWO_QUILLS objective.
+     */
     TWO_QUILLS,
+    /**
+     * The TWO_INKS objective.
+     */
     TWO_INKS,
+    /**
+     * The TWO_SCROLLS objective.
+     */
     TWO_SCROLLS,
+    /**
+     * The TRIS objective.
+     */
     TRIS
 }

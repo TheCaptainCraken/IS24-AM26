@@ -103,6 +103,8 @@ public interface ViewInterface {
     void showTableOfPlayer(String nickname);
     /**
      * This method is responsible for showing the cards placed of all players on the table. One cart at time could be NULL
+     *
+     * @param nickname The name of the player.
      */
     void showHiddenHand(String nickname);
     /**
@@ -162,6 +164,10 @@ public interface ViewInterface {
     void disconnect();
     /**
      * This method is responsible for showing a message for chatting.
+     *
+     * @param sender  The sender of the message.
+     * @param message The message.
+     * @param broadcast A boolean indicating whether the message is a broadcast message.
      */
     void receiveChatMessage(String sender, String message, boolean broadcast);
 }

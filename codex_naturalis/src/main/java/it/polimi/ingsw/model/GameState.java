@@ -11,9 +11,24 @@ package it.polimi.ingsw.model;
  * END: The final state of the game, indicating that the game has ended.
  */
 public enum GameState {
+    /**
+     * The CHOOSING_ROOT_CARD state.
+     */
     CHOOSING_ROOT_CARD,
+    /**
+     * The CHOOSING_OBJECTIVE_CARD state.
+     */
     CHOOSING_OBJECTIVE_CARD,
+    /**
+     * The DRAWING_PHASE state.
+     */
     DRAWING_PHASE,
+    /**
+     * The PLACING_PHASE state.
+     */
     PLACING_PHASE,
+    /**
+     * The END state.
+     */
     END
 }
