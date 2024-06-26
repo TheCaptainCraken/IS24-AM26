@@ -207,18 +207,71 @@ public class TUI implements ViewInterface {
             //create the cards to print(resource cards)
             ArrayList<String[]> cardsToPrint = new ArrayList<>();
             for (Integer cardId : resourceCards) {
-                cardsToPrint.add(createCardToPrint(model.getCard(cardId, true)));
+
+                try {
+                    cardsToPrint.add(createCardToPrint(model.getCard(cardId, true)));
+                } catch (NullPointerException e) {
+                    cardsToPrint.add(new String[]{
+                            "                                  ",
+                            "                                  ",
+                            "                                  ",
+                            "                                  ",
+                            "                                  ",
+                            "                                  ",
+                            "                                  ",
+                            "                                  ",
+                    });
+                }
             }
             //create the resource deck to print
-            cardsToPrint.add(createCardToPrint(fromKingdomToCard(resourceCardOnDeck)));
+            try {
+                cardsToPrint.add(createCardToPrint(fromKingdomToCard(resourceCardOnDeck)));
+            } catch (NullPointerException e) {
+                cardsToPrint.add(new String[]{
+                        "                                  ",
+                        "                                  ",
+                        "                                  ",
+                        "                                  ",
+                        "                                  ",
+                        "                                  ",
+                        "                                  ",
+                        "                                  ",
+                });
+            }
 
             //create the cards to print(gold cards)
             ArrayList<String[]> goldCardsToPrint = new ArrayList<>();
             for (Integer cardId : goldCard) {
-                goldCardsToPrint.add(createCardToPrint(model.getCard(cardId, true)));
+                try {
+                    goldCardsToPrint.add(createCardToPrint(model.getCard(cardId, true)));
+                } catch (NullPointerException e) {
+                    goldCardsToPrint.add(new String[]{
+                            "                                  ",
+                            "                                  ",
+                            "                                  ",
+                            "                                  ",
+                            "                                  ",
+                            "                                  ",
+                            "                                  ",
+                            "                                  ",
+                    });
+                }
             }
             //create the gold deck to print
-            goldCardsToPrint.add(createCardToPrint(fromKingdomToCard(goldCardOnDeck)));
+            try {
+                goldCardsToPrint.add(createCardToPrint(fromKingdomToCard(goldCardOnDeck)));
+            } catch (NullPointerException e) {
+                goldCardsToPrint.add(new String[]{
+                        "                                  ",
+                        "                                  ",
+                        "                                  ",
+                        "                                  ",
+                        "                                  ",
+                        "                                  ",
+                        "                                  ",
+                        "                                  ",
+                });
+            }
 
             System.out.println("This is the resource cards deck:\n");
             printCardArray(cardsToPrint);
