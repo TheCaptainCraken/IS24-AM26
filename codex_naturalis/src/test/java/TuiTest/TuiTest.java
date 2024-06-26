@@ -132,6 +132,7 @@ public class TuiTest {
         HashMap<String, Color> users = new HashMap<>();
         users.put("pippo", Color.BLUE);
         model.updateUsers(users);
+
         model.updatePlaceCard("pippo", 97, new Point(0, 0), true, 0);
         model.updatePlaceCard("pippo", 17, new Point(-1, 0), true, 1);
         model.updatePlaceCard("pippo", 18, new Point(-1, -1), true, 2);
