@@ -1,0 +1,65 @@
+[
+  {
+    "id": 64,
+    "prototype": "GOLD",
+    "points": 3,
+    "kingdom": "FUNGI",
+    "corners": {
+      "TOP_LEFT": "QUILL",
+      "TOP_RIGHT": "EMPTY",
+      "BOTTOM_LEFT": null,
+      "BOTTOM_RIGHT": null
+    },
+    "requirements": {
+      "MUSHROOM": 3,
+      "LEAF": 0,
+      "BUTTERFLY": 0,
+      "WOLF": 0,
+      "QUILL": 0,
+      "INKWELL": 0,
+      "SCROLL": 0
+    }
+  },
+  {
+    "id": 65,
+    "prototype": "GOLD",
+    "points": 3,
+    "kingdom": "FUNGI",
+    "corners": {
+      "TOP_LEFT": null,
+      "TOP_RIGHT": "SCROLL",
+      "BOTTOM_LEFT": null,
+      "BOTTOM_RIGHT": "EMPTY"
+    },
+    "requirements": {
+      "MUSHROOM": 3,
+      "LEAF": 0,
+      "BUTTERFLY": 0,
+      "WOLF": 0,
+      "QUILL": 0,
+      "INKWELL": 0,
+      "SCROLL": 0
+    }
+  },
+  {
+  "id": 66,
+  "prototype": "GOLD",
+  "points": 5,
+  "kingdom": "FUNGI",
+  "corners": {
+    "TOP_LEFT": "EMPTY",
+    "TOP_RIGHT": null,
+    "BOTTOM_LEFT": "EMPTY",
+    "BOTTOM_RIGHT": null
+  },
+  "requirements": {
+    "MUSHROOM": 5,
+    "LEAF": 0,
+    "BUTTERFLY": 0,
+    "WOLF": 0,
+    "QUILL": 0,
+    "INKWELL": 0,
+    "SCROLL": 0
+  }
+}
+]

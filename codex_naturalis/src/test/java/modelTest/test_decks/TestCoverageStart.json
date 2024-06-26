@@ -1,0 +1,21 @@
+[
+  {
+  "prototype":"STARTING",
+  "id":97,
+  "kingdom": null,
+  "front-corners": {
+    "TOP_LEFT":"MUSHROOM",
+    "TOP_RIGHT":"LEAF",
+    "BOTTOM_LEFT":"BUTTERFLY",
+    "BOTTOM_RIGHT":"WOLF"
+  },
+  "back-corners": {
+    "TOP_LEFT":"EMPTY",
+    "TOP_RIGHT":"LEAF",
+    "BOTTOM_LEFT": "BUTTERFLY",
+    "BOTTOM_RIGHT":"EMPTY"
+  },
+  "bonus-resources": [
+    "BUTTERFLY"
+  ]
+}]

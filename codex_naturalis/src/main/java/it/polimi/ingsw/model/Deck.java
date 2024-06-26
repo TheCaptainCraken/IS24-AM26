@@ -36,6 +36,61 @@ public class Deck implements Serializable {
         this.shuffle();
     }
 
+    public Deck(String cardsFile) throws FileNotFoundException, IOException, ParseException, IllegalArgumentException {
+        cards = new ArrayList<Card>();
+        this.generateDeck(cardsFile);
+        this.shuffle();
+    }
+
+    private void generateDeck(String cardsFile)
+            throws IOException, ParseException, IllegalArgumentException {
+        JSONParser parser = new JSONParser();
+        Reader reader = new FileReader(cardsFile);
+
+        JSONArray cards = (JSONArray) parser.parse(reader);
+        for (Object card : cards) {
+            JSONObject cardObject = (JSONObject) card;
+            String prototype = (String) cardObject.get("prototype");
+
+            switch (prototype) {
+                case "OBJECTIVE":
+                    insertObjectiveCard(cardObject);
+                    break;
+                case "RESOURCE":
+                    insertResourceCard(cardObject);
+                    break;
+                case "GOLD":
+                    insertGoldCard(cardObject);
+                    break;
+                case "SPECIAL_GOLD":
+                    insertSpecialGoldCard(cardObject);
+                    break;
+                case "STARTING":
+                    insertStartingCard(cardObject);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Invalid card prototype");
+            }
+        }
+
+    }
+    /**
+     * This constructor generates the deck of cards from a JSON file and shuffles
+     * it.
+     *
+     * @param cardsFile the path of the JSON file containing the cards.
+     * @param toFile    a boolean that is true if the deck is generated to be saved
+     *                  in a file.
+     * @throws FileNotFoundException    if the file is not found.
+     * @throws IOException              if an I/O error occurs.
+     * @throws ParseException           if the JSON file is not valid.
+     * @throws IllegalArgumentException if the card prototype is invalid.
+     */
+    public Deck(String cardsFile, boolean toFile) throws IOException, ParseException {
+        cards = new ArrayList<Card>();
+        this.generateDeck(cardsFile);
+    }
+
     /**
      * This constructor generates the deck of cards from a JSON file and shuffles
      * it.

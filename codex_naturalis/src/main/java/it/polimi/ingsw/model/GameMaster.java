@@ -138,6 +138,65 @@ public class GameMaster implements Serializable {
             hand[2] = (ResourceCard) goldDeck.draw();
             player.setHand(hand);
         }
+    }
+
+    /**
+     * The general functionalities of the game representing the peer point of the
+     * Model, the object is going to speak with the Controller
+     *
+     * @param lobby                      Lobby of user that are going to play
+     * @param jsonResourceCardFileName   json file name to create the resource deck
+     * @param jsonGoldCardFileName       json file name to create the gold deck
+     * @param jsonObjectiveCardFileName  json file name to create the objective deck
+     * @param jsonStartingCardFileName json file name to create the starting deck
+     *
+     * @throws IOException    if the file is not found or can't be read
+     * @throws ParseException if the file is not a valid JSON file
+     */
+    public GameMaster(Lobby lobby, String jsonResourceCardFileName, String jsonGoldCardFileName,
+                      String jsonObjectiveCardFileName,
+                      String jsonStartingCardFileName) throws IOException, ParseException {
+        this.globalTurn = 0;
+        this.turnType = TurnType.PLAYING;
+        this.onTableResourceCards = new ResourceCard[2];
+        this.onTableGoldCards = new GoldCard[2];
+        this.onTableObjectiveCards = new ObjectiveCard[2];
+        this.startingCardToPosition = new StartingCard[lobby.getPlayers().length];
+        this.objectiveCardToChoose = new ObjectiveCard[lobby.getPlayers().length][2];
+        this.ranking = new ArrayList<>();
+        this.lobby = lobby;
+        this.lobby.setLock();
+        this.gameState = GameState.CHOOSING_ROOT_CARD;
+
+        this.resourceDeck = new Deck(jsonResourceCardFileName);
+        this.goldDeck = new Deck(jsonGoldCardFileName);
+        this.objectiveDeck = new Deck(jsonObjectiveCardFileName);
+        this.startingDeck = new Deck(jsonStartingCardFileName);
+
+        // Set up of the table
+        setOnTableResourceCard((ResourceCard) resourceDeck.draw(), 0);
+        setOnTableResourceCard((ResourceCard) resourceDeck.draw(), 1);
+        setOnTableGoldCard((GoldCard) goldDeck.draw(), 0);
+        setOnTableGoldCard((GoldCard) goldDeck.draw(), 1);
+        setOnTableObjectiveCards((ObjectiveCard) objectiveDeck.draw(), 0);
+        setOnTableObjectiveCards((ObjectiveCard) objectiveDeck.draw(), 1);
+
+        int i, j;
+        for (i = 0; i < lobby.getPlayers().length; i++) {
+            startingCardToPosition[i] = (StartingCard) startingDeck.draw();
+        }
+        for (i = 0; i < lobby.getPlayers().length; i++) {
+            for (j = 0; j < 2; j++) {
+                objectiveCardToChoose[i][j] = (ObjectiveCard) objectiveDeck.draw();
+            }
+        }
+        for (Player player : lobby.getPlayers()) {
+            ResourceCard[] hand = new ResourceCard[3];
+            hand[0] = (ResourceCard) resourceDeck.draw();
+            hand[1] = (ResourceCard) resourceDeck.draw();
+            hand[2] = (ResourceCard) goldDeck.draw();
+            player.setHand(hand);
+        }
 
     }
 

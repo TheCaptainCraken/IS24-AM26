@@ -1,0 +1,87 @@
+[
+    {
+        "prototype": "OBJECTIVE",
+        "id": 7,
+        "objective-type": "TWO_SCROLLS",
+        "kingdom": null,
+        "multiplier": 2
+    },
+    {
+        "id": 22,
+        "prototype": "RESOURCE",
+        "points": 7,
+        "kingdom": "FUNGI",
+        "corners": {
+            "TOP_LEFT": "MUSHROOM",
+            "TOP_RIGHT": null,
+            "BOTTOM_LEFT": "WOLF",
+            "BOTTOM_RIGHT": "EMPTY"
+        }
+    },
+    {
+        "id": 32,
+        "prototype": "GOLD",
+        "points": 3,
+        "kingdom": "PLANT",
+        "corners": {
+            "TOP_LEFT": "MUSHROOM",
+            "TOP_RIGHT": "WOLF",
+            "BOTTOM_LEFT": "WOLF",
+            "BOTTOM_RIGHT": "EMPTY"
+        },
+        "requirements": {
+            "MUSHROOM": 2,
+            "LEAF": 1,
+            "BUTTERFLY": 1,
+            "WOLF": 2,
+            "QUILL": 3,
+            "INKWELL": 0,
+            "SCROLL": 0
+        }
+    },
+    {
+        "id": 3,
+        "prototype": "SPECIAL_GOLD",
+        "points": 5,
+        "kingdom": "PLANT",
+        "thing-to-count": "CORNER",
+        "corners": {
+            "TOP_LEFT": "MUSHROOM",
+            "TOP_RIGHT": "WOLF",
+            "BOTTOM_LEFT": "WOLF",
+            "BOTTOM_RIGHT": "EMPTY"
+        },
+        "requirements": {
+            "MUSHROOM": 2,
+            "LEAF": 1,
+            "BUTTERFLY": 1,
+            "WOLF": 2,
+            "QUILL": 3,
+            "INKWELL": 0,
+            "SCROLL": 0
+        }
+    },
+    {
+        "id": 4,
+        "prototype": "STARTING",
+        "kingdom": "PLANT",
+        "front-corners": {
+            "TOP_LEFT": "MUSHROOM",
+            "TOP_RIGHT": "WOLF",
+            "BOTTOM_LEFT": "WOLF",
+            "BOTTOM_RIGHT": "EMPTY"
+        },
+        "back-corners": {
+            "TOP_LEFT": null,
+            "TOP_RIGHT": "WOLF",
+            "BOTTOM_LEFT": "BUTTERFLY",
+            "BOTTOM_RIGHT": "EMPTY"
+        },
+        "bonus-resources": [
+            "MUSHROOM",
+            "WOLF",
+            "WOLF",
+            "BUTTERFLY"
+        ]
+    }
+]

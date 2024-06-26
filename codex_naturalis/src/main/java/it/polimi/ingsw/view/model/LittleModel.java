@@ -141,6 +141,33 @@ public class LittleModel {
     }
 
     /**
+     * The LittleModel constructor initializes the points, resources, myCards,
+     * otherPlayersCards, and table HashMaps.
+     * It also initializes the startingCardsDeck, objectiveCardsDeck,
+     * resourceCardsDeck, and goldCardsDeck.
+     */
+    public LittleModel(String startingPath, String objectivePath, String resourcePath, String goldPath) {
+        points = new HashMap<>();
+        resources = new HashMap<>();
+        myCards = new Integer[3];
+        otherPlayersCards = new HashMap<>();
+        table = new HashMap<>();
+
+        try{
+            startingCardsDeck = new Deck(startingPath, true);
+            objectiveCardsDeck = new Deck(objectivePath, true);
+            resourceCardsDeck = new Deck(resourcePath, true);
+            goldCardsDeck = new Deck(goldPath, true);
+        } catch (IOException e) {
+            System.out.println("file for little model not found");
+            System.exit(0);
+        } catch (ParseException e) {
+            System.out.println("Error in parsing file for little model");
+            System.exit(0);
+        }
+    }
+
+    /**
      * Updates the common table in the game.
      *
      * This method is used to update the common table with the new set of resource
