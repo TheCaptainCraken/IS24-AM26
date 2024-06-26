@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw.view.gui.EndgameHandler">
+   <children>
+      <VBox alignment="TOP_CENTER" prefHeight="260.0" prefWidth="500.0" spacing="10.0" AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="150.0">
+         <children>
+            <TableView fx:id="table" prefHeight="200.0" prefWidth="500.0">
+               <columns>
+                  <TableColumn fx:id="players" editable="false" prefWidth="150.0" sortable="false" text="Player" />
+                  <TableColumn fx:id="gamePoints" editable="false" prefWidth="75.0" sortable="false" text="Points" />
+                  <TableColumn fx:id="objectivePoints" editable="false" prefWidth="150.0" sortable="false" text="Points From Objectives" />
+                  <TableColumn fx:id="total" editable="false" prefWidth="125.0" sortable="false" text="Total Points" />
+               </columns>
+            </TableView>
+            <ButtonBar prefHeight="40.0" prefWidth="500.0">
+              <buttons>
+                <Button fx:id="exit" mnemonicParsing="false" onMouseClicked="#handleExit" text="Exit Game" />
+              </buttons>
+            </ButtonBar>
+         </children>
+      </VBox>
+      <VBox alignment="CENTER" layoutX="261.0" layoutY="-50.0" prefHeight="200.0" prefWidth="100.0" spacing="10.0" AnchorPane.bottomAnchor="275.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="25.0">
+         <children>
+            <Label fx:id="label" text="WinnerText">
+               <font>
+                  <Font size="24.0" />
+               </font>
+            </Label>
+            <Label text="Thanks For Playing!" />
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

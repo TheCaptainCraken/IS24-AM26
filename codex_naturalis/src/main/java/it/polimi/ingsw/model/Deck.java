@@ -1,12 +1,10 @@
 package it.polimi.ingsw.model;
 
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.Reader;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -16,7 +14,7 @@ import org.json.simple.parser.ParseException;
 /**
  * This class represents the deck of cards.
  */
-public class Deck {
+public class Deck implements Serializable {
     /**
      * The list of cards in the deck.
      */
@@ -32,10 +30,82 @@ public class Deck {
      * @throws ParseException           if the JSON file is not valid.
      * @throws IllegalArgumentException if the card prototype is invalid.
      */
+    public Deck(InputStream cardsFile) throws FileNotFoundException, IOException, ParseException, IllegalArgumentException {
+        cards = new ArrayList<Card>();
+        this.generateDeck(cardsFile);
+        this.shuffle();
+    }
+
     public Deck(String cardsFile) throws FileNotFoundException, IOException, ParseException, IllegalArgumentException {
         cards = new ArrayList<Card>();
         this.generateDeck(cardsFile);
         this.shuffle();
+    }
+
+    private void generateDeck(String cardsFile)
+            throws IOException, ParseException, IllegalArgumentException {
+        JSONParser parser = new JSONParser();
+        Reader reader = new FileReader(cardsFile);
+
+        JSONArray cards = (JSONArray) parser.parse(reader);
+        for (Object card : cards) {
+            JSONObject cardObject = (JSONObject) card;
+            String prototype = (String) cardObject.get("prototype");
+
+            switch (prototype) {
+                case "OBJECTIVE":
+                    insertObjectiveCard(cardObject);
+                    break;
+                case "RESOURCE":
+                    insertResourceCard(cardObject);
+                    break;
+                case "GOLD":
+                    insertGoldCard(cardObject);
+                    break;
+                case "SPECIAL_GOLD":
+                    insertSpecialGoldCard(cardObject);
+                    break;
+                case "STARTING":
+                    insertStartingCard(cardObject);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Invalid card prototype");
+            }
+        }
+
+    }
+    /**
+     * This constructor generates the deck of cards from a JSON file and shuffles
+     * it.
+     *
+     * @param cardsFile the path of the JSON file containing the cards.
+     * @param toFile    a boolean that is true if the deck is generated to be saved
+     *                  in a file.
+     * @throws FileNotFoundException    if the file is not found.
+     * @throws IOException              if an I/O error occurs.
+     * @throws ParseException           if the JSON file is not valid.
+     * @throws IllegalArgumentException if the card prototype is invalid.
+     */
+    public Deck(String cardsFile, boolean toFile) throws IOException, ParseException {
+        cards = new ArrayList<Card>();
+        this.generateDeck(cardsFile);
+    }
+
+    /**
+     * This constructor generates the deck of cards from a JSON file and shuffles
+     * it.
+     *
+     * @param cardsFile the path of the JSON file containing the cards.
+     * @param toFile    a boolean that is true if the deck is generated to be saved
+     *                  in a file.
+     * @throws FileNotFoundException    if the file is not found.
+     * @throws IOException              if an I/O error occurs.
+     * @throws ParseException           if the JSON file is not valid.
+     * @throws IllegalArgumentException if the card prototype is invalid.
+     */
+    public Deck(InputStream cardsFile, boolean toFile) throws IOException, ParseException {
+        cards = new ArrayList<Card>();
+        this.generateDeck(cardsFile);
     }
 
     /**
@@ -47,10 +117,10 @@ public class Deck {
      * @throws ParseException           if the JSON file is not valid.
      * @throws IllegalArgumentException if the card prototype is invalid.
      */
-    private void generateDeck(String cardsFile)
-            throws FileNotFoundException, IOException, ParseException, IllegalArgumentException {
+    private void generateDeck(InputStream cardsFile)
+            throws IOException, ParseException, IllegalArgumentException {
         JSONParser parser = new JSONParser();
-        Reader reader = new FileReader(cardsFile);
+        Reader reader = new InputStreamReader(cardsFile, StandardCharsets.UTF_8);
 
         JSONArray cards = (JSONArray) parser.parse(reader);
         for (Object card : cards) {
@@ -232,9 +302,23 @@ public class Deck {
      * This method returns the kingdom of the first card of the deck.
      * 
      * @return the {@link Kingdom} of the first card of the deck.
+     * @throws IndexOutOfBoundsException if the deck is empty.
+     *
      */
-    public Kingdom getKingdomFirstCard() throws IndexOutOfBoundsException{
+    public Kingdom getKingdomFirstCard() throws IndexOutOfBoundsException {
         return cards.get(0).getKingdom();
+    }
+
+    /**
+     * Returns the card at the specified position in the deck.
+     *
+     * @param position The position of the card in the deck.
+     * @return The card at the specified position.
+     * @throws IndexOutOfBoundsException if the position is out of range
+     *         (position < 0 || position >= size()).
+     */
+    public Card getCard(int position) throws IndexOutOfBoundsException {
+        return cards.get(position);
     }
 
     /**
@@ -246,10 +330,10 @@ public class Deck {
      * @throws IndexOutOfBoundsException if the deck is empty.
      */
     public Card draw() throws IndexOutOfBoundsException {
-        try{
+        try {
             return cards.remove(0);
-        }catch(IndexOutOfBoundsException e){
-            throw new IndexOutOfBoundsException("The deck is empty");//just to add the message
+        } catch (IndexOutOfBoundsException e) {
+            throw new IndexOutOfBoundsException("The deck is empty");// just to add the message
         }
     }
 

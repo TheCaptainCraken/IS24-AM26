@@ -10,24 +10,22 @@ import java.lang.Math;
  * At the start phase, the game master should set rootCard, SecretObjective and the hand of the player(a fixed array of 3 cards).
  * At the beginning of the game, the game master set rootCard, secretObjective and the hand.
  */
-public class Player {
+public class Player implements java.io.Serializable{
     private final String name;
     private int points;
     private int objectivePoints;
-    private final Color color;
+    private Color color;
     private PlayedCard rootCard;
     private final HashMap<Sign, Integer> resources;
     private ObjectiveCard secretObjective;
     private ResourceCard[] hand;
 
     /**
-     * It is the constructor of Player, it set the  name and the color of the pin
-     * @param name
-     * @param color
+     * It is the constructor of Player, it set the name and the color of the pin
+     * @param name the name of the player
      */
-    public Player(String name, Color color) {
+    public Player(String name) {
         this.name = name;
-        this.color = color;
         this.points = 0;
         this.objectivePoints = 0;
         resources = new HashMap<>();
@@ -44,6 +42,8 @@ public class Player {
 
     /**
      *   getter of player's name
+     *
+     * @return the name of the player
      */
     public String getName() {
         return name;
@@ -51,6 +51,8 @@ public class Player {
 
     /**
      *  getter of player's points
+     *
+     * @return the points of the player
      */
     public int getPoints() {
         return points;
@@ -58,6 +60,8 @@ public class Player {
 
     /**
      * getter of the color of the pin
+     *
+     * @return the color of the pin
      */
     public Color getColor() {
         return color;
@@ -65,13 +69,17 @@ public class Player {
 
     /**
      * getter of root card, which is the starting card of the game
+     *
+     * @return the root card
      */
     public PlayedCard getRootCard() {
         return rootCard;
     }
 
     /**
-     * getter of symbol counter. It tracks the resources for gold card and special objects.
+     * Getter of symbol counter. It tracks the resources for gold card and special objects.
+     *
+     * @return the hashmap of resources
      */
     public HashMap<Sign, Integer> getResources() {
         return resources;
@@ -79,6 +87,8 @@ public class Player {
 
     /**
      * getter of the secret objective.
+     *
+     * @return the secret objective
      */
     public ObjectiveCard getSecretObjective() {
         return secretObjective;
@@ -86,6 +96,8 @@ public class Player {
 
     /**
      * getter of the hand of the player, a fixed array of three resources cards
+     *
+     * @return the hand of the player
      */
     public ResourceCard[] getHand() {
         return hand;
@@ -184,7 +196,22 @@ public class Player {
             objectivePoints += new_points;
     }
 
+    /**
+     * This method returns the objective points of the player.
+     * Objective points are special points that are added at the end of the game based on the player's secret objective card.
+     *
+     * @return the objective points of the player.
+     */
     public int getObjectivePoints() {
         return objectivePoints;
+    }
+
+    /**
+     * This method sets the color of the player's pin.
+     *
+     * @param colour the color to set for the player's pin.
+     */
+    public void setColour(Color colour) {
+        this.color = colour;
     }
 }

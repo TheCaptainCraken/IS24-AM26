@@ -1,0 +1,86 @@
+[
+  {
+    "prototype": "RESOURCE",
+    "id": 40,
+    "kingdom": "ANIMAL",
+    "points": 0,
+    "corners": {
+      "TOP_LEFT": "EMPTY",
+      "TOP_RIGHT": "WOLF",
+      "BOTTOM_LEFT": null,
+      "BOTTOM_RIGHT": "WOLF"
+    }
+  },
+  {
+    "prototype": "RESOURCE",
+    "id": 47,
+    "kingdom": "INSECT",
+    "points": 0,
+    "corners": {
+      "TOP_LEFT": "BUTTERFLY",
+      "TOP_RIGHT": "BUTTERFLY",
+      "BOTTOM_LEFT": "EMPTY",
+      "BOTTOM_RIGHT": null
+    }
+  },
+  {
+    "prototype": "RESOURCE",
+    "id": 28,
+    "kingdom": "PLANT",
+    "points": 0,
+    "corners": {
+      "TOP_LEFT": "LEAF",
+      "TOP_RIGHT": "LEAF",
+      "BOTTOM_LEFT": null,
+      "BOTTOM_RIGHT": "EMPTY"
+    }
+  },
+  {
+    "prototype": "RESOURCE",
+    "id": 40,
+    "kingdom": "ANIMAL",
+    "points": 0,
+    "corners": {
+      "TOP_LEFT": "EMPTY",
+      "TOP_RIGHT": "WOLF",
+      "BOTTOM_LEFT": null,
+      "BOTTOM_RIGHT": "WOLF"
+    }
+  },
+  {
+    "prototype": "RESOURCE",
+    "id": 47,
+    "kingdom": "INSECT",
+    "points": 0,
+    "corners": {
+      "TOP_LEFT": "BUTTERFLY",
+      "TOP_RIGHT": "BUTTERFLY",
+      "BOTTOM_LEFT": "EMPTY",
+      "BOTTOM_RIGHT": null
+    }
+  },
+  {
+    "prototype": "RESOURCE",
+    "id": 50,
+    "kingdom": "INSECT",
+    "points": 0,
+    "corners": {
+      "TOP_LEFT": "BUTTERFLY",
+      "TOP_RIGHT": "BUTTERFLY",
+      "BOTTOM_LEFT": "EMPTY",
+      "BOTTOM_RIGHT": null
+    }
+  },
+  {
+    "prototype": "RESOURCE",
+    "id": 55,
+    "kingdom": "INSECT",
+    "points": 0,
+    "corners": {
+      "TOP_LEFT": "BUTTERFLY",
+      "TOP_RIGHT": "BUTTERFLY",
+      "BOTTOM_LEFT": "EMPTY",
+      "BOTTOM_RIGHT": null
+    }
+  }
+]

@@ -1,0 +1,114 @@
+[
+    {
+        "prototype": "OBJECTIVE",
+        "id": 1,
+        "objective-type": "TRIS",
+        "kingdom": "FUNGI",
+        "multiplier": 2
+    },
+    {
+        "prototype": "OBJECTIVE",
+        "id": 2,
+        "objective-type": "TRIS",
+        "kingdom": "INSECT",
+        "multiplier": 2
+    },
+    {
+        "prototype": "OBJECTIVE",
+        "id": 3,
+        "objective-type": "TRIS",
+        "kingdom": "ANIMAL",
+        "multiplier": 2
+    },
+    {
+        "prototype": "OBJECTIVE",
+        "id": 4,
+        "objective-type": "TRIS",
+        "kingdom": "PLANT",
+        "multiplier": 2
+    },
+    {
+        "prototype": "OBJECTIVE",
+        "id": 5,
+        "objective-type": "TWO_INKS",
+        "kingdom": null,
+        "multiplier": 2
+    },
+    {
+        "prototype": "OBJECTIVE",
+        "id": 6,
+        "objective-type": "TWO_QUILLS",
+        "kingdom": null,
+        "multiplier": 2
+    },
+    {
+        "prototype": "OBJECTIVE",
+        "id": 7,
+        "objective-type": "TWO_SCROLLS",
+        "kingdom": null,
+        "multiplier": 2
+    },
+    {
+        "prototype": "OBJECTIVE",
+        "id": 8,
+        "objective-type": "FREE_RESOURCES",
+        "kingdom": null,
+        "multiplier": 3
+    },
+    {
+        "prototype": "OBJECTIVE",
+        "id": 9,
+        "objective-type": "STAIR",
+        "kingdom": "FUNGI",
+        "multiplier": 2
+    },
+    {
+        "prototype": "OBJECTIVE",
+        "id": 10,
+        "objective-type": "STAIR",
+        "kingdom": "INSECT",
+        "multiplier": 2
+    },
+    {
+        "prototype": "OBJECTIVE",
+        "id": 11,
+        "objective-type": "STAIR",
+        "kingdom": "ANIMAL",
+        "multiplier": 2
+    },
+    {
+        "prototype": "OBJECTIVE",
+        "id": 12,
+        "objective-type": "STAIR",
+        "kingdom": "PLANT",
+        "multiplier": 2
+    },
+    {
+        "prototype": "OBJECTIVE",
+        "id": 13,
+        "objective-type": "L_FORMATION",
+        "kingdom": "FUNGI",
+        "multiplier": 2
+    },
+    {
+        "prototype": "OBJECTIVE",
+        "id": 14,
+        "objective-type": "L_FORMATION",
+        "kingdom": "INSECT",
+        "multiplier": 2
+    },
+    {
+        "prototype": "OBJECTIVE",
+        "id": 15,
+        "objective-type": "L_FORMATION",
+        "kingdom": "ANIMAL",
+        "multiplier": 2
+    },
+    {
+        "prototype": "OBJECTIVE",
+        "id": 16,
+        "objective-type": "L_FORMATION",
+        "kingdom": "PLANT",
+        "multiplier": 2
+    }
+]

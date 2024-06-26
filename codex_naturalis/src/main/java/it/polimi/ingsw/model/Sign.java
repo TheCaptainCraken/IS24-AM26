@@ -1,36 +1,56 @@
 package it.polimi.ingsw.model;
 
-public enum Sign {
-    LEAF,
-    WOLF,
-    MUSHROOM,
-    BUTTERFLY,
-    QUILL,
-    INKWELL,
-    SCROLL,
-    EMPTY;
+import java.io.Serializable;
 
-    @Override
-    public String toString() {
-        switch(this) {
-            case MUSHROOM:
-                return "M";
-            case LEAF:
-                return "L";
-            case BUTTERFLY:
-                return "B";
-            case WOLF:
-                return "W";
-            case QUILL:
-                return "Q";
-            case INKWELL:
-                return "I";
-            case SCROLL:
-                return "S";
-            case EMPTY:
-                return " ";
-            default:
-                return "X";
-        }
-    }
+/**
+ * The Sign enum represents the different types of signs that can be present on a card in the game.
+ * Each sign corresponds to a different element or item in nature.
+ *
+ * LEAF: Represents the leaf sign.
+ * WOLF: Represents the wolf sign.
+ * MUSHROOM: Represents the mushroom sign.
+ * BUTTERFLY: Represents the butterfly sign.
+ * QUILL: Represents the quill sign.
+ * SCROLL: Represents the scroll sign.
+ * INKWELL: Represents the inkwell sign.
+ * EMPTY: Represents the absence of a sign.
+ * NULL: Represents a null or uninitialized sign.
+ */
+public enum Sign implements Serializable {
+    /**
+     * The LEAF sign.
+     */
+    LEAF,
+    /**
+     * The WOLF sign.
+     */
+    WOLF,
+    /**
+     * The MUSHROOM sign.
+     */
+    MUSHROOM,
+    /**
+     * The BUTTERFLY sign.
+     */
+    BUTTERFLY,
+    /**
+     * The QUILL sign.
+     */
+    QUILL,
+    /**
+     * The SCROLL sign.
+     */
+    SCROLL,
+    /**
+     * The INKWELL sign.
+     */
+    INKWELL,
+    /**
+     * The EMPTY sign.
+     */
+    EMPTY,
+    /**
+     * The NULL sign.
+     */
+    NULL,
 }

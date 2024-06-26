@@ -1,38 +1,49 @@
 package it.polimi.ingsw;
 
-import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.stage.Stage;
-
-import java.io.IOException;
+import it.polimi.ingsw.controller.client.Controller;
 
 /**
  * JavaFX App
  */
-public class App extends Application {
-
-    private static Scene scene;
-
-    @Override
-    public void start(Stage stage) throws IOException {
-        scene = new Scene(loadFXML("primary"), 640, 480);
-        stage.setScene(scene);
-        stage.show();
-    }
-
-    static void setRoot(String fxml) throws IOException {
-        scene.setRoot(loadFXML(fxml));
-    }
-
-    private static Parent loadFXML(String fxml) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource(fxml + ".fxml"));
-        return fxmlLoader.load();
-    }
-
+public class App {
     public static void main(String[] args) {
-        launch();
-    }
+        String connectionType = args[0];
+        String ip = args[1];
+        Integer port = null;
+        try {
+            port = Integer.valueOf(args[2]);
+        } catch (NumberFormatException e) {
+            System.out.println("port not valid.");
+            System.exit(0);
+        }
 
+        String viewType = args[3];
+        Controller controller = new Controller();
+
+        switch(connectionType){
+            case "RMI":
+            case "Socket":
+                controller.createInstanceOfConnection(connectionType, ip, port);
+                break;
+            default:
+                System.out.println("Invalid choice, please insert RMI or Socket");
+                System.exit(0);
+        }
+
+        switch(viewType){
+            case "TUI":
+            case "GUI":
+                try {
+                    controller.setView(viewType);
+                } catch (InterruptedException e) {
+                    System.out.println("Error in setting the view");
+                    System.exit(0);
+                }
+                break;
+            default:
+                System.out.println("Invalid choice, please insert TUI or GUI");
+                System.exit(0);
+        }
+
+    }
 }
