@@ -1007,27 +1007,24 @@ public class Controller {
 
             for (Player player : game.getLobby().getPlayers()) {
                 ArrayList<PlayedCard> playedCards = game.getPlayersCards(player);
-
                 Collections.sort(playedCards,
                         (card1, card2) -> Integer.compare(card1.getTurnOfPositioning(), card2.getTurnOfPositioning()));
 
                 for (PlayedCard playedCard : playedCards) {
-                    if(playedCard.getPosition().x == 0 && playedCard.getPosition().y == 0 && player.getName().equals(Controller.nickname)){
-                        view.showStartingCard(playedCard.getCard().getId());
-                        view.showStartingCardChosen();
-                    }else {
+                    if(!(playedCard.getPosition().x == 0 && playedCard.getPosition().y == 0)){
                         model.updatePlaceCard(player.getName(), playedCard.getCard().getId(), playedCard.getPosition(),
                                 playedCard.isFacingUp(), playedCard.getTurnOfPositioning());
 
-                        HashMap<Corner, CardClient> hashOfCards = new HashMap<Corner, CardClient>();
-                        for(Corner corner: Corner.values()){
-                            hashOfCards.put(corner, null);
-                        }
-
-                        CardClient card = new CardClient(playedCard.getCard().getId(), playedCard.isFacingUp(),
-                                playedCard.getPosition(), playedCard.getTurnOfPositioning(), hashOfCards);
-                        ((GUI) view).rebuildBoard(player.getName(), card);
                     }
+                    HashMap<Corner, CardClient> hashOfCards = new HashMap<Corner, CardClient>();
+                    for(Corner corner: Corner.values()){
+                        hashOfCards.put(corner, null);
+                    }
+
+                    CardClient card = new CardClient(playedCard.getCard().getId(), playedCard.isFacingUp(),
+                            playedCard.getPosition(), playedCard.getTurnOfPositioning(), hashOfCards);
+                    ((GUI) view).rebuildBoard(player.getName(), card);
+
                 }
             }
 
