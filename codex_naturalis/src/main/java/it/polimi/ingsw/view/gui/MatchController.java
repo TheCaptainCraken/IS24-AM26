@@ -353,7 +353,7 @@ public class MatchController {
             res1.setImage(new Image("frontCard"+resourceCards[0]+".png"));
             res1.setOnMouseClicked(event -> setupDeckActions(false,0));
         } else {
-            res1.setImage(new Image("defaultCard.png"));
+            res1.setImage(defaultCard);
             res1.setOnMouseClicked(null);
         }
 
@@ -1109,7 +1109,13 @@ public class MatchController {
      * @return An Image object representing the loaded image resource for the card.
      */
     private Image KingdomToCard(Kingdom kingdom, Boolean isGold){
+
         Image img = null;
+
+        if(kingdom == null){
+            img = defaultCard;
+            return img;
+        }
         switch(kingdom){
             case FUNGI:
                 if(isGold){
@@ -1139,8 +1145,6 @@ public class MatchController {
                     img = new Image("insect_res_back.png");
                 }
                 break;
-            default:
-                img = new Image("default_back.png");
         }
         return img;
     }
