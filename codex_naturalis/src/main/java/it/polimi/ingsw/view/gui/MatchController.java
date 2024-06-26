@@ -1109,7 +1109,13 @@ public class MatchController {
      * @return An Image object representing the loaded image resource for the card.
      */
     private Image KingdomToCard(Kingdom kingdom, Boolean isGold){
+
         Image img = null;
+
+        if(kingdom == null){
+            img = defaultCard;
+            return img;
+        }
         switch(kingdom){
             case FUNGI:
                 if(isGold){
@@ -1139,8 +1145,6 @@ public class MatchController {
                     img = new Image("insect_res_back.png");
                 }
                 break;
-            default:
-                img = new Image("default_back.png");
         }
         return img;
     }
