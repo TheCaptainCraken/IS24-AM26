@@ -14,20 +14,21 @@ It is used by the server to communicate with the clients with different types
 of network connections.
 Each connection protocol will implement this interface, to send messages to the clients broadcast.
 Currently, the implemented connections protocols are
+
 1. Socket connection
 2. RMI connection
 
-
 ## Network Handler
+
 The ServerSocket class implements the SocketServerInterface and NetworkPlug interfaces.
 This class is the controller of the network part of the server.
-It manages the connections with the clients and the broadcast of the messages. 
+It manages the connections with the clients and the broadcast of the messages.
 In particular protocol connection, when a message should be broadcast, the message is sent to all different connection protocols.
 Each protocol will send the message to all the clients connected to it and each
 protocol has a different way to send the message to the clients, but all its methods are override NetworkPlug.
 
-
 ## Server RMI
+
 The ServerRMI class implements the RMIServerInterface and NetworkPlug interfaces.
 It is responsible for handling the server-side logic of the RMI network communication.
 It maintains a map of connections to RMIClientInterface objects, representing the connected clients.
@@ -39,19 +40,38 @@ The class also provides methods for broadcasting game state updates to all conne
 These methods are invoked by the server when the game state changes, and the updates are sent to the clients.
 
 ## Server Socket
-   //TODO
 
+This class implements the NetworkPlug interface and is responsible for
+
+managing the server-side socket communication.
+It maintains a ServerSocket object for accepting incoming connections, a
+Controller object for accessing the game state and performing game actions,
+and a HashMap for storing the connections to the clients.
+
+The key in the HashMap is the address of the client socket, and the value is
+the ClientHandler object representing the connection.
+The class also includes methods for starting the server, broadcasting
+messages to all clients, handling the game start process, refreshing the user
+list,
+sending chat messages, broadcasting the information of a placed root card,
+sending the hands of the players, broadcasting the information of a drawn
+card,
+broadcasting the end game signal, and disconnecting all clients.
 
 ## Login
+
 Login phase illustrates the interaction between the client and server before the creation of the game.
 The client sends a ping to the server to establish a connection. The server checks:
 
 1. Lobby is locked, so the game already started
-2. The player is first, so he/she can create the game. 
+2. The player is first, so he/she can create the game.
 
 While the first player decide the number of players, other clients are put in waiting state.
-When the lobby is created, the server must notify the clients to choose username and colour. And when the last player 
-confirms username and colour the game starts.
+When the lobby is created, the server must notify the clients to choose username and color. And when the last player
+confirms username and color the game starts.
+
+During this phase, if there is a saved game in the server played
+by the same users as the ones currently admitted, the game is loaded with `LoadGame` and the game jumps to the _GameFlow_ section.
 
 ```mermaid
 sequenceDiagram
@@ -100,23 +120,29 @@ sequenceDiagram
         Server ->> Client: StopWaiting()
         end
         alt if admitted
-              loop until colour is accepted
+            alt if saved game does not exist
+              loop until color is accepted
               rect rgba(0, 255, 0, 0.2)
-                  Model ->> Controller: GetPlayersAndPins (player with their colour pins)
-                  Controller ->> Server: GetPlayersAndPins (available colour pins)
-                  Server ->> Client: RefreshUsers (available colour pins)
+                  Model ->> Controller: GetPlayersAndPins (player with their color pins)
+                  Controller ->> Server: GetPlayersAndPins (available color pins)
+                  Server ->> Client: RefreshUsers (available color pins)
                   Client ->> Server: chooseColor(name, color)
-                  Server ->> Controller: setColourAndGameIsReadyToStart(name, color)
+                  Server ->> Controller: setcolorAndGameIsReadyToStart(name, color)
                   Controller ->> Model: name.SetColor(color)
-                  alt colour already taken
+                  alt color already taken
                     rect rgba(255, 0, 0, 0.6)
-                    Controller ->> Server: Error (colour already taken)
-                    Server ->> Client: Error (colour already taken) 
+                    Controller ->> Server: Error (color already taken)
+                    Server ->> Client: Error (color already taken) 
                     end
                   end
                   end
+                end
+            else if exists
+
             end
         else if not admitted
+            Controller ->> Server: LoadGame(game state)
+            Server ->> Client: LoadGame(game state)
             rect rgba(255, 0, 0, 0.6)
             Model ->> Controller: Error (lobby is full)
             Controller ->> Server: Error (lobby is full)
@@ -140,17 +166,20 @@ sequenceDiagram
     end
 
 ```
+
 There are two blocked situations:
 
 1. We proceed with the color phase only if the first player has chosen the number of players and the lobby is created and full (with the number selected by the first player).
 2. If so, we wait that all the players have chosen their color and then we start the game.
 
 ## Game Start
-When the last player joins the lobby, the server must notify the clients that the game is about to start. 
-The server must notify the clients of the starting card and the common objectives, also it must 
+
+When the last player joins the lobby, the server must notify the clients that the game is about to start.
+The server must notify the clients of the starting card and the common objectives, also it must
 notify the clients of the cards in the player's hand and the player turn order.
 
 The green box represents the choose of starting card while the blue one is about choosing objective card.
+
 ```mermaid
 sequenceDiagram
     actor Client
@@ -220,8 +249,10 @@ sequenceDiagram
 ```
 
 ## Game Flow
-The game flow is the main part of the game. 
+
+The game flow is the main part of the game.
 The player can place and draw cards. The server must notify the clients of the player's turn and the table cards status.
+
 ```mermaid
 sequenceDiagram
     actor Client
@@ -286,14 +317,15 @@ We update the hand of who perform drawCard correctly, while we update the hidden
 
 During the end game, the turns are the same as in the game flow, just the server must notify the players of the fact that the game is about to end.
 This can happen when the deck is empty or someone has reached more than 20 points. Our implementations checks it after each turn:
-    
+
 1. After each turn when someone draws a card
 2. When deck is empty, we check this after the place phase
 
 The two case are represented in the green box. Note: in a game just one of two can happen.
 
-The blue part is the end game phase. 
+The blue part is the end game phase.
 The server must notify the clients of the extra points(objective card's points) and the winner.
+
 ```mermaid
 sequenceDiagram
     actor Client
@@ -325,4 +357,3 @@ sequenceDiagram
     Server ->> Client: Info (Winner)
     end
 ```
-
