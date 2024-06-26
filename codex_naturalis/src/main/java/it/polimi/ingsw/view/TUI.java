@@ -1338,7 +1338,7 @@ public class TUI implements ViewInterface {
                 }
             }
             //if is up, there isn't the central sign
-            midSigns.add(" ");
+            midSigns.add(card.getCard().getKingdom().toString());
         } else {
             //facing down, 4 empty corners
             for (Corner c : Corner.values()) {
