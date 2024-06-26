@@ -207,6 +207,7 @@ public class TUI implements ViewInterface {
             //create the cards to print(resource cards)
             ArrayList<String[]> cardsToPrint = new ArrayList<>();
             for (Integer cardId : resourceCards) {
+
                 try {
                     cardsToPrint.add(createCardToPrint(model.getCard(cardId, true)));
                 } catch (NullPointerException e) {
