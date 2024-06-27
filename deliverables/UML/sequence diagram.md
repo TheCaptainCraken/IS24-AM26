@@ -357,3 +357,21 @@ sequenceDiagram
     Server ->> Client: Info (Winner)
     end
 ```
+
+## Chat Messages
+
+Starting with Game Flow on TUI and starting with Game Start in GUI it is possible to send chat messages between players.
+Messages are sent only using Server connections and do not use Server Controller and Server Model to save them in game data.
+
+It is also possible to send private messages only to some players adding '@' before their username (also themselves as a clipboard).
+The server understanding if it is a private message checking nicknames of other players connected sends it only to the receivers and the sender, otherwise, it sends it to all the clients connected to it.
+The data sent to the clients includes also Broadcast data to don't let Client alone to understand if the message is broadcast or not.
+
+```mermaid
+sequenceDiagram
+    actor Client
+    participant Server
+
+    Client ->> Server: SentChatMessage(sender, message)
+    Server ->> Client: ReceivedChatMessage(sender, message, broadcast)
+```
