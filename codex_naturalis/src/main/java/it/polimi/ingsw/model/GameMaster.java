@@ -614,7 +614,8 @@ public class GameMaster implements Serializable {
                     int sum2 = p2.getPoints() + p2.getObjectivePoints();
                     if (sum1 == sum2) {
                         // if the points are equal, the player with the most objective points wins
-                        return Integer.compare(p1.getObjectivePoints(), p2.getObjectivePoints());
+                       return Integer.compare(p2.getObjectivePoints(), p1.getObjectivePoints());
+
                     } else if (sum1 > sum2) {
                         // sum is insert before than player 2
                         return -1;
