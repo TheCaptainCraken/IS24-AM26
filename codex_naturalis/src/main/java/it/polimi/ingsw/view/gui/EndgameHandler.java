@@ -71,10 +71,8 @@ public class EndgameHandler {
             Integer totalPoints = player.getPoints() + player.getObjectivePoints();
             return new SimpleIntegerProperty(totalPoints).asString();
         });
-        int sum1 = ranking.get(0).getPoints() + ranking.get(0).getObjectivePoints();
-        int sum2 = ranking.get(1).getPoints() + ranking.get(1).getObjectivePoints();
         // mi basta controllare i primi due, se ho pareggi successivi, questi sono già considerati
-        if(sum1 == sum2) {
+        if(ranking.get(0).getPoints() == ranking.get(1).getPoints() && ranking.get(0).getObjectivePoints() == ranking.get(1).getObjectivePoints()){
             label.setText("It's a tie!");
         } else {
             label.setText("The Winner is: " + ranking.get(0).getName() + "!");
