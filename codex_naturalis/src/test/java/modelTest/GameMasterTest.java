@@ -1301,8 +1301,8 @@ public class GameMasterTest {
         for(int i = 0; i < 2; i++){
             if(gm.getCurrentPlayer().getName().equals("a")){
                 winner = gm.getCurrentPlayer();
-                gm.getCurrentPlayer().addPoints(25);
-                gm.getCurrentPlayer().addObjectivePoints(10);
+                gm.getCurrentPlayer().addPoints(15);
+                gm.getCurrentPlayer().addObjectivePoints(16);
             } else {
 
                 gm.getCurrentPlayer().addPoints(25);
@@ -1319,9 +1319,75 @@ public class GameMasterTest {
         gm.placeCard(gm.getCurrentPlayer().getName(), 0, new Point(0, 2), false);
         gm.drawCard(gm.getCurrentPlayer().getName(), false, 1);
 
-
-        gm.endGame();
         assertEquals(winner.getName(), gm.getRanking().get(0).getName());
+
+    }
+    @Test
+    @DisplayName("Test for EndGame method")
+    public void ComparatorTestPointsEqualSumsWithFullLobby() throws IOException, ParseException {
+
+        Player p1 = new Player("a");
+        Player p2 = new Player("b");
+        Player p3 = new Player("c");
+        Player p4 = new Player("d");
+        Player winner = null;
+        Player second = null;
+        Player third = null;
+        Player fourth = null;
+        Lobby l = new Lobby();
+        l.addPlayer(p1.getName());
+        l.addPlayer(p2.getName());
+        l.addPlayer(p3.getName());
+        l.addPlayer(p4.getName());
+        GameMaster gm = new GameMaster(l, basePath + "resourceCardsDeck.json", basePath + "goldCardsDeck.json",
+                basePath + "objectiveCardsDeck.json", basePath + "startingCardsDeck.json");
+        gm.placeRootCard(p1.getName(), true);
+        gm.placeRootCard(p2.getName(), true);
+        gm.placeRootCard(p3.getName(), true);
+        gm.placeRootCard(p4.getName(), true);
+        gm.chooseObjectiveCard(p1.getName(), 0);
+        gm.chooseObjectiveCard(p2.getName(), 1);
+        gm.chooseObjectiveCard(p3.getName(), 0);
+        gm.chooseObjectiveCard(p4.getName(), 1);
+
+        for(int i = 0; i < 4; i++){
+            if(gm.getCurrentPlayer().getName().equals("a")){
+                winner = gm.getCurrentPlayer();
+                gm.getCurrentPlayer().addPoints(15);
+                gm.getCurrentPlayer().addObjectivePoints(16);
+
+            } else if(gm.getCurrentPlayer().getName().equals("b")){
+                fourth = gm.getCurrentPlayer();
+                gm.getCurrentPlayer().addPoints(25);
+                gm.getCurrentPlayer().addObjectivePoints(6);
+
+            } else if(gm.getCurrentPlayer().getName().equals("c")){
+                second = gm.getCurrentPlayer();
+                gm.getCurrentPlayer().addPoints(20);
+                gm.getCurrentPlayer().addObjectivePoints(11);
+            } else {
+                third = gm.getCurrentPlayer();
+                gm.getCurrentPlayer().addPoints(24);
+                gm.getCurrentPlayer().addObjectivePoints(7);
+            }
+            gm.placeCard(gm.getCurrentPlayer().getName(), 0, new Point(0, 1), false);
+            gm.drawCard(gm.getCurrentPlayer().getName(), false, 0);
+        }
+
+
+        gm.placeCard(gm.getCurrentPlayer().getName(), 0, new Point(0, 2), false);
+        gm.drawCard(gm.getCurrentPlayer().getName(), true, 0);
+        gm.placeCard(gm.getCurrentPlayer().getName(), 0, new Point(0, 2), false);
+        gm.drawCard(gm.getCurrentPlayer().getName(), false, 1);
+        gm.placeCard(gm.getCurrentPlayer().getName(), 0, new Point(0, 2), false);
+        gm.drawCard(gm.getCurrentPlayer().getName(), false, 1);
+        gm.placeCard(gm.getCurrentPlayer().getName(), 0, new Point(0, 2), false);
+        gm.drawCard(gm.getCurrentPlayer().getName(), false, 1);
+
+        assertEquals(winner.getName(), gm.getRanking().get(0).getName());
+        assertEquals(second.getName(), gm.getRanking().get(1).getName());
+        assertEquals(third.getName(), gm.getRanking().get(2).getName());
+        assertEquals(fourth.getName(), gm.getRanking().get(3).getName());
 
     }
 }
